@@ -10,14 +10,14 @@
 
 #include "mainwindow.h"
 
+#include "Shaders/colorshader.h"
+#include "Shaders/phongshader.h"
+#include "Shaders/textureshader.h"
 #include "billboard.h"
-#include "colorshader.h"
 #include "light.h"
 #include "objmesh.h"
 #include "octahedronball.h"
-#include "phongshader.h"
 #include "skybox.h"
-#include "textureshader.h"
 #include "trianglesurface.h"
 #include "xyz.h"
 
@@ -31,7 +31,8 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     mContext = new QOpenGLContext(this);
     //Give the context the wanted OpenGL format (v4.1 Core)
     mContext->setFormat(requestedFormat());
-    if (!mContext->create()) {
+    if (!mContext->create())
+    {
         delete mContext;
         mContext = nullptr;
         qDebug() << "Context could not be made - quitting this application";
@@ -43,7 +44,8 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
 
 RenderWindow::~RenderWindow()
 {
-    for (auto &i : mShaderProgram) {
+    for (auto &i : mShaderProgram)
+    {
         delete i;
     }
 }
@@ -58,7 +60,8 @@ void RenderWindow::init()
 
     //The OpenGL context has to be set.
     //The context belongs to the instanse of this class!
-    if (!mContext->makeCurrent(this)) {
+    if (!mContext->makeCurrent(this))
+    {
         qDebug() << "makeCurrent() failed";
         return;
     }
@@ -230,7 +233,8 @@ void RenderWindow::render()
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (auto visObject : mVisualObjects) {
+    for (auto visObject : mVisualObjects)
+    {
         visObject->draw();
         //        checkForGLerrors();
     }
@@ -284,7 +288,8 @@ void RenderWindow::exposeEvent(QExposeEvent *)
 
     //If the window actually is exposed to the screen we start the main loop
     //isExposed() is a function in QWindow
-    if (isExposed()) {
+    if (isExposed())
+    {
         //This timer runs the actual MainLoop
         //16 means 16ms = 60 Frames pr second (should be 16.6666666 to be exact..)
         mRenderTimer->start(1);
@@ -302,11 +307,13 @@ void RenderWindow::exposeEvent(QExposeEvent *)
 void RenderWindow::toggleWireframe()
 {
     mWireframe = !mWireframe;
-    if (mWireframe) {
+    if (mWireframe)
+    {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //turn on wireframe mode
         glDisable(GL_CULL_FACE);
     }
-    else {
+    else
+    {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //turn off wireframe mode
         glEnable(GL_CULL_FACE);
     }
@@ -339,14 +346,17 @@ void RenderWindow::calculateFramerate()
 /// Reverts to glGetError() if not
 void RenderWindow::checkForGLerrors()
 {
-    if (mOpenGLDebugLogger) {
+    if (mOpenGLDebugLogger)
+    {
         const QList<QOpenGLDebugMessage> messages = mOpenGLDebugLogger->loggedMessages();
         for (const QOpenGLDebugMessage &message : messages)
             qDebug() << message;
     }
-    else {
+    else
+    {
         GLenum err = GL_NO_ERROR;
-        while ((err = glGetError()) != GL_NO_ERROR) {
+        while ((err = glGetError()) != GL_NO_ERROR)
+        {
             qDebug() << "glGetError returns " << err;
         }
     }
@@ -356,12 +366,14 @@ void RenderWindow::checkForGLerrors()
 void RenderWindow::startOpenGLDebugger()
 {
     QOpenGLContext *temp = this->context();
-    if (temp) {
+    if (temp)
+    {
         QSurfaceFormat format = temp->format();
         if (!format.testOption(QSurfaceFormat::DebugContext))
             qDebug() << "This system can not use QOpenGLDebugLogger, so we revert to glGetError()";
 
-        if (temp->hasExtension(QByteArrayLiteral("GL_KHR_debug"))) {
+        if (temp->hasExtension(QByteArrayLiteral("GL_KHR_debug")))
+        {
             qDebug() << "System can log OpenGL errors!";
             mOpenGLDebugLogger = new QOpenGLDebugLogger(this);
             if (mOpenGLDebugLogger->initialize()) // initializes in the current context
@@ -388,7 +400,8 @@ void RenderWindow::handleInput()
 {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
-    if (mInput.RMB) {
+    if (mInput.RMB)
+    {
         if (mInput.W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
         if (mInput.S)
@@ -402,7 +415,8 @@ void RenderWindow::handleInput()
         if (mInput.E)
             mCurrentCamera->updateHeigth(mCameraSpeed);
     }
-    else {
+    else
+    {
         if (mInput.W)
             mLight->mMatrix.translateZ(-mCameraSpeed);
         if (mInput.S)
@@ -426,85 +440,113 @@ void RenderWindow::keyPressEvent(QKeyEvent *event)
     }
 
     //    You get the keyboard input like this
-    if (event->key() == Qt::Key_W) {
+    if (event->key() == Qt::Key_W)
+    {
         mInput.W = true;
     }
-    if (event->key() == Qt::Key_S) {
+    if (event->key() == Qt::Key_S)
+    {
         mInput.S = true;
     }
-    if (event->key() == Qt::Key_D) {
+    if (event->key() == Qt::Key_D)
+    {
         mInput.D = true;
     }
-    if (event->key() == Qt::Key_A) {
+    if (event->key() == Qt::Key_A)
+    {
         mInput.A = true;
     }
-    if (event->key() == Qt::Key_Q) {
+    if (event->key() == Qt::Key_Q)
+    {
         mInput.Q = true;
     }
-    if (event->key() == Qt::Key_E) {
+    if (event->key() == Qt::Key_E)
+    {
         mInput.E = true;
     }
-    if (event->key() == Qt::Key_Z) {
+    if (event->key() == Qt::Key_Z)
+    {
     }
-    if (event->key() == Qt::Key_X) {
+    if (event->key() == Qt::Key_X)
+    {
     }
-    if (event->key() == Qt::Key_Up) {
+    if (event->key() == Qt::Key_Up)
+    {
         mInput.UP = true;
     }
-    if (event->key() == Qt::Key_Down) {
+    if (event->key() == Qt::Key_Down)
+    {
         mInput.DOWN = true;
     }
-    if (event->key() == Qt::Key_Left) {
+    if (event->key() == Qt::Key_Left)
+    {
         mInput.LEFT = true;
     }
-    if (event->key() == Qt::Key_Right) {
+    if (event->key() == Qt::Key_Right)
+    {
         mInput.RIGHT = true;
     }
-    if (event->key() == Qt::Key_U) {
+    if (event->key() == Qt::Key_U)
+    {
     }
-    if (event->key() == Qt::Key_O) {
+    if (event->key() == Qt::Key_O)
+    {
     }
 }
 
 void RenderWindow::keyReleaseEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_W) {
+    if (event->key() == Qt::Key_W)
+    {
         mInput.W = false;
     }
-    if (event->key() == Qt::Key_S) {
+    if (event->key() == Qt::Key_S)
+    {
         mInput.S = false;
     }
-    if (event->key() == Qt::Key_D) {
+    if (event->key() == Qt::Key_D)
+    {
         mInput.D = false;
     }
-    if (event->key() == Qt::Key_A) {
+    if (event->key() == Qt::Key_A)
+    {
         mInput.A = false;
     }
-    if (event->key() == Qt::Key_Q) {
+    if (event->key() == Qt::Key_Q)
+    {
         mInput.Q = false;
     }
-    if (event->key() == Qt::Key_E) {
+    if (event->key() == Qt::Key_E)
+    {
         mInput.E = false;
     }
-    if (event->key() == Qt::Key_Z) {
+    if (event->key() == Qt::Key_Z)
+    {
     }
-    if (event->key() == Qt::Key_X) {
+    if (event->key() == Qt::Key_X)
+    {
     }
-    if (event->key() == Qt::Key_Up) {
+    if (event->key() == Qt::Key_Up)
+    {
         mInput.UP = false;
     }
-    if (event->key() == Qt::Key_Down) {
+    if (event->key() == Qt::Key_Down)
+    {
         mInput.DOWN = false;
     }
-    if (event->key() == Qt::Key_Left) {
+    if (event->key() == Qt::Key_Left)
+    {
         mInput.LEFT = false;
     }
-    if (event->key() == Qt::Key_Right) {
+    if (event->key() == Qt::Key_Right)
+    {
         mInput.RIGHT = false;
     }
-    if (event->key() == Qt::Key_U) {
+    if (event->key() == Qt::Key_U)
+    {
     }
-    if (event->key() == Qt::Key_O) {
+    if (event->key() == Qt::Key_O)
+    {
     }
 }
 
@@ -533,7 +575,8 @@ void RenderWindow::wheelEvent(QWheelEvent *event)
     QPoint numDegrees = event->angleDelta() / 8;
 
     //if RMB, change the speed of the camera
-    if (mInput.RMB) {
+    if (mInput.RMB)
+    {
         if (numDegrees.y() < 1)
             setCameraSpeed(0.001f);
         if (numDegrees.y() > 1)
@@ -544,7 +587,8 @@ void RenderWindow::wheelEvent(QWheelEvent *event)
 
 void RenderWindow::mouseMoveEvent(QMouseEvent *event)
 {
-    if (mInput.RMB) {
+    if (mInput.RMB)
+    {
         //Using mMouseXYlast as deltaXY so we don't need extra variables
         mMouseXlast = event->pos().x() - mMouseXlast;
         mMouseYlast = event->pos().y() - mMouseYlast;

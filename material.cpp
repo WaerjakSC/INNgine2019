@@ -1,10 +1,9 @@
-#include "innpch.h"
 #include "material.h"
-#include "textureshader.h"
+#include "Shaders/textureshader.h"
+#include "innpch.h"
 
 Material::Material()
 {
-
 }
 
 void Material::setColor(const gsl::Vector3D &color)

@@ -1,7 +1,7 @@
 #ifndef PHONGSHADER_H
 #define PHONGSHADER_H
 
-#include "shader.h"
+#include "Shaders/shader.h"
 
 class PhongShader : public Shader
 {
