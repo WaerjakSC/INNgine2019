@@ -44,7 +44,7 @@ private:
     bool mInitialized{false};
 
     Texture *mTexture[4]{nullptr}; //We can hold 4 textures
-    Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
+    //Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
     void setupPlainShader(int shaderIndex);
     GLint mMatrixUniform0{-1};

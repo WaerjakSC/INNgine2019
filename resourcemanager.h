@@ -11,23 +11,28 @@
 
 // Resource manager work in progress
 
+struct meshData
+{
+    meshData() {}
+};
+
 class ResourceManager
 {
 public:
     // Static std::map(key, object) for resource storage
-    static std::map<std::string, Shader> Shaders;
+    static std::map<std::string, Shader*> Shaders;
     static std::map<std::string, Texture> Textures;
-    static std::map<std::string, ObjMesh> Meshes;
+    static std::map<std::string, meshData> Meshes;
     // Loads and generates shader (takes name and the shader)
     static Shader LoadShader(std::string name, Shader *shader);
     // Gets stored shader
-    Shader* GetShader(std::string name);
+    static Shader* GetShader(std::string name);
     // Loads and generates texture from file
     static Texture LoadTexture(std::string name);
     // Gets stored texture
-    Texture* GetTexture(std::string name);
+    static Texture* GetTexture(std::string name);
     // Reads and loads mesh
-    static ObjMesh ReadMesh(std::string name);
+    static meshData ReadMesh(std::string name);
     // De-allocate loaded resources from memory
     static void Clear();
 

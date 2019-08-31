@@ -20,6 +20,7 @@ HEADERS += \
     GSL/math_constants.h \
     constants.h \
     renderwindow.h \
+    resourcemanager.h \
     shader.h \
     mainwindow.h \
     triangle.h \
@@ -55,6 +56,7 @@ SOURCES += main.cpp \
     GSL/gsl_math.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
+    resourcemanager.cpp \
     shader.cpp \
     triangle.cpp \
     texture.cpp \
