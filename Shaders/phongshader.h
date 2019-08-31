@@ -3,8 +3,7 @@
 
 #include "shader.h"
 
-class PhongShader : public Shader
-{
+class PhongShader : public Shader {
 public:
     PhongShader(const std::string shaderName, const GLchar *geometryPath = nullptr);
     virtual ~PhongShader() override;

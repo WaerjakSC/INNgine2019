@@ -1,30 +1,29 @@
-#include "innpch.h"
 #include "renderwindow.h"
-#include <QTimer>
-#include <QOpenGLContext>
-#include <QOpenGLFunctions>
-#include <QOpenGLDebugLogger>
+#include "innpch.h"
 #include <QKeyEvent>
+#include <QOpenGLContext>
+#include <QOpenGLDebugLogger>
+#include <QOpenGLFunctions>
 #include <QStatusBar>
+#include <QTimer>
 #include <chrono>
 
 #include "mainwindow.h"
 
-#include "xyz.h"
-#include "octahedronball.h"
-#include "skybox.h"
+#include "Shaders/colorshader.h"
+#include "Shaders/phongshader.h"
+#include "Shaders/textureshader.h"
 #include "billboard.h"
-#include "trianglesurface.h"
-#include "objmesh.h"
 #include "light.h"
-#include "colorshader.h"
-#include "textureshader.h"
-#include "phongshader.h"
+#include "objmesh.h"
+#include "octahedronball.h"
 #include "resourcemanager.h"
+#include "skybox.h"
+#include "trianglesurface.h"
+#include "xyz.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
-    : mContext(nullptr), mInitialized(false), mMainWindow(mainWindow)
-{
+    : mContext(nullptr), mInitialized(false), mMainWindow(mainWindow) {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
     setFormat(format);
@@ -42,8 +41,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     mRenderTimer = new QTimer(this);
 }
 
-RenderWindow::~RenderWindow()
-{
+RenderWindow::~RenderWindow() {
     for (int i = 0; i < 4; ++i) {
         //if (mShaderProgram[i])
         //    delete mShaderProgram[i];
@@ -51,8 +49,7 @@ RenderWindow::~RenderWindow()
 }
 
 /// Sets up the general OpenGL stuff and the buffers needed to render a triangle
-void RenderWindow::init()
-{
+void RenderWindow::init() {
     //Connect the gameloop timer to the render function:
     connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(render()));
 
@@ -86,9 +83,9 @@ void RenderWindow::init()
     startOpenGLDebugger();
 
     //general OpenGL stuff:
-    glEnable(GL_DEPTH_TEST);    //enables depth sorting - must use GL_DEPTH_BUFFER_BIT in glClear
-    glEnable(GL_CULL_FACE);     //draws only front side of models - usually what you want -
-    glClearColor(0.4f, 0.4f, 0.4f, 1.0f);    //color used in glClear GL_COLOR_BUFFER_BIT
+    glEnable(GL_DEPTH_TEST);              //enables depth sorting - must use GL_DEPTH_BUFFER_BIT in glClear
+    glEnable(GL_CULL_FACE);               //draws only front side of models - usually what you want -
+    glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
     //Compile shaders:
     ResourceManager::LoadShader("plainshader", new ColorShader("plainshader"));
@@ -118,20 +115,20 @@ void RenderWindow::init()
     glBindTexture(GL_TEXTURE_2D, mTexture[2]->id());
 
     //********************** Making the objects to be drawn **********************
-    VisualObject * temp{nullptr};
+    VisualObject *temp{nullptr};
 
     temp = new XYZ();
     temp->init();
     temp->setShader(ResourceManager::GetShader("plainshader"));
     mVisualObjects.push_back(temp);
 
-//    temp = new OctahedronBall(2);
-//    temp->init();
-//    temp->setShader(mShaderProgram[0]);
-//    temp->mMatrix.scale(0.5f, 0.5f, 0.5f);
-//    temp->mName = "Ball";
-//    mVisualObjects.push_back(temp);
-//    mPlayer = temp;
+    //    temp = new OctahedronBall(2);
+    //    temp->init();
+    //    temp->setShader(mShaderProgram[0]);
+    //    temp->mMatrix.scale(0.5f, 0.5f, 0.5f);
+    //    temp->mName = "Ball";
+    //    mVisualObjects.push_back(temp);
+    //    mPlayer = temp;
 
     temp = new SkyBox();
     temp->init();
@@ -149,7 +146,7 @@ void RenderWindow::init()
     temp->mRenderWindow = this;
     temp->mMaterial.setTextureUnit(1);
     temp->mMaterial.mObjectColor = gsl::Vector3D(0.7f, 0.6f, 0.1f);
-    dynamic_cast<BillBoard*>(temp)->setConstantYUp(true);
+    dynamic_cast<BillBoard *>(temp)->setConstantYUp(true);
     mVisualObjects.push_back(temp);
 
     mLight = new Light();
@@ -164,7 +161,7 @@ void RenderWindow::init()
     temp->mMaterial.mObjectColor = gsl::Vector3D(0.1f, 0.1f, 0.8f);
     mVisualObjects.push_back(temp);
 
-    static_cast<PhongShader*>(ResourceManager::GetShader("phongshader"))->setLight(mLight);
+    static_cast<PhongShader *>(ResourceManager::GetShader("phongshader"))->setLight(mLight);
 
     //testing triangle surface class
     temp = new TriangleSurface("box2.txt");
@@ -182,32 +179,32 @@ void RenderWindow::init()
     temp->mMatrix.translate(3.f, 2.f, -2.f);
     mVisualObjects.push_back(temp);
 
-//     testing objmesh class - many of them!
+    //     testing objmesh class - many of them!
     // here we see the need for resource management!
-//    int x{0};
-//    int y{0};
-//    int numberOfObjs{100};
-//    for (int i{0}; i < numberOfObjs; i++)
-//    {
-//        temp = new ObjMesh("../INNgine2019/Assets/monkey.obj");
-//        temp->setShader(mShaderProgram[0]);
-//        temp->init();
-//        x++;
-//        temp->mMatrix.translate(0.f + x, 0.f, -2.f - y);
-//        temp->mMatrix.scale(0.5f);
-//        mVisualObjects.push_back(temp);
-//        if(x%10 == 0)
-//        {
-//            x = 0;
-//            y++;
-//        }
-//    }
+    //    int x{0};
+    //    int y{0};
+    //    int numberOfObjs{100};
+    //    for (int i{0}; i < numberOfObjs; i++)
+    //    {
+    //        temp = new ObjMesh("../INNgine2019/Assets/monkey.obj");
+    //        temp->setShader(mShaderProgram[0]);
+    //        temp->init();
+    //        x++;
+    //        temp->mMatrix.translate(0.f + x, 0.f, -2.f - y);
+    //        temp->mMatrix.scale(0.5f);
+    //        mVisualObjects.push_back(temp);
+    //        if(x%10 == 0)
+    //        {
+    //            x = 0;
+    //            y++;
+    //        }
+    //    }
 
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
     mCurrentCamera->setPosition(gsl::Vector3D(1.f, 1.f, 4.4f));
-//    mCurrentCamera->yaw(45.f);
-//    mCurrentCamera->pitch(5.f);
+    //    mCurrentCamera->yaw(45.f);
+    //    mCurrentCamera->pitch(5.f);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     ResourceManager::GetShader("plainshader")->setCurrentCamera(mCurrentCamera);
@@ -216,31 +213,28 @@ void RenderWindow::init()
 }
 
 ///Called each frame - doing the rendering
-void RenderWindow::render()
-{
+void RenderWindow::render() {
     //calculate the time since last render-call
     //this should be the same as xxx in the mRenderTimer->start(xxx) set in RenderWindow::exposeEvent(...)
-//    auto now = std::chrono::high_resolution_clock::now();
-//    std::chrono::duration<float> duration = now - mLastTime;
-//    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
-//    mLastTime = now;
+    //    auto now = std::chrono::high_resolution_clock::now();
+    //    std::chrono::duration<float> duration = now - mLastTime;
+    //    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
+    //    mLastTime = now;
 
     //input
     handleInput();
 
     mCurrentCamera->update();
 
-    mTimeStart.restart(); //restart FPS clock
+    mTimeStart.restart();        //restart FPS clock
     mContext->makeCurrent(this); //must be called every frame (every time mContext->swapBuffers is called)
 
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-    for (auto visObject: mVisualObjects)
-    {
+    for (auto visObject : mVisualObjects) {
         visObject->draw();
-//        checkForGLerrors();
+        //        checkForGLerrors();
     }
 
     //Calculate framerate before
@@ -249,40 +243,37 @@ void RenderWindow::render()
     calculateFramerate();
 
     //using our expanded OpenGL debugger to check if everything is OK.
-//    checkForGLerrors();
+    //    checkForGLerrors();
 
     //Qt require us to call this swapBuffers() -function.
     // swapInterval is 1 by default which means that swapBuffers() will (hopefully) block
     // and wait for vsync.
-//    auto start = std::chrono::high_resolution_clock::now();
+    //    auto start = std::chrono::high_resolution_clock::now();
     mContext->swapBuffers(this);
-//    auto end = std::chrono::high_resolution_clock::now();
-//    std::chrono::duration<float> duration = end - start;
-//    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
+    //    auto end = std::chrono::high_resolution_clock::now();
+    //    std::chrono::duration<float> duration = end - start;
+    //    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
 
-//    calculateFramerate();
+    //    calculateFramerate();
 }
 
-void RenderWindow::setupPlainShader(int shaderIndex)
-{
-    mMatrixUniform0 = glGetUniformLocation( ResourceManager::GetShader("plainshader")->getProgram(), "mMatrix" );
-    vMatrixUniform0 = glGetUniformLocation( ResourceManager::GetShader("plainshader")->getProgram(), "vMatrix" );
-    pMatrixUniform0 = glGetUniformLocation( ResourceManager::GetShader("plainshader")->getProgram(), "pMatrix" );
+void RenderWindow::setupPlainShader(int shaderIndex) {
+    mMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader("plainshader")->getProgram(), "mMatrix");
+    vMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader("plainshader")->getProgram(), "vMatrix");
+    pMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader("plainshader")->getProgram(), "pMatrix");
 }
 
-void RenderWindow::setupTextureShader(int shaderIndex)
-{
-    mMatrixUniform1 = glGetUniformLocation( ResourceManager::GetShader("textureshader")->getProgram(), "mMatrix" );
-    vMatrixUniform1 = glGetUniformLocation( ResourceManager::GetShader("textureshader")->getProgram(), "vMatrix" );
-    pMatrixUniform1 = glGetUniformLocation( ResourceManager::GetShader("textureshader")->getProgram(), "pMatrix" );
-    mTextureUniform = glGetUniformLocation( ResourceManager::GetShader("textureshader")->getProgram(), "textureSampler");
+void RenderWindow::setupTextureShader(int shaderIndex) {
+    mMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "mMatrix");
+    vMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "vMatrix");
+    pMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "pMatrix");
+    mTextureUniform = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "textureSampler");
 }
 
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized
 //exposeEvent is a overridden function from QWindow that we inherit from
-void RenderWindow::exposeEvent(QExposeEvent *)
-{
+void RenderWindow::exposeEvent(QExposeEvent *) {
     if (!mInitialized)
         init();
 
@@ -292,8 +283,7 @@ void RenderWindow::exposeEvent(QExposeEvent *)
 
     //If the window actually is exposed to the screen we start the main loop
     //isExposed() is a function in QWindow
-    if (isExposed())
-    {
+    if (isExposed()) {
         //This timer runs the actual MainLoop
         //16 means 16ms = 60 Frames pr second (should be 16.6666666 to be exact..)
         mRenderTimer->start(1);
@@ -308,17 +298,13 @@ void RenderWindow::exposeEvent(QExposeEvent *)
 //Simple way to turn on/off wireframe mode
 //Not totally accurate, but draws the objects with
 //lines instead of filled polygons
-void RenderWindow::toggleWireframe()
-{
+void RenderWindow::toggleWireframe() {
     mWireframe = !mWireframe;
-    if (mWireframe)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);    //turn on wireframe mode
+    if (mWireframe) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //turn on wireframe mode
         glDisable(GL_CULL_FACE);
-    }
-    else
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);    //turn off wireframe mode
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //turn off wireframe mode
         glEnable(GL_CULL_FACE);
     }
 }
@@ -327,235 +313,190 @@ void RenderWindow::toggleWireframe()
 //and check the time right after it is finished (done in the render function)
 //This will approximate what framerate we COULD have.
 //The actual frame rate on your monitor is limited by the vsync and is probably 60Hz
-void RenderWindow::calculateFramerate()
-{
+void RenderWindow::calculateFramerate() {
     long long nsecElapsed = mTimeStart.nsecsElapsed();
-    static int frameCount{0};                       //counting actual frames for a quick "timer" for the statusbar
+    static int frameCount{0}; //counting actual frames for a quick "timer" for the statusbar
 
-    if (mMainWindow)    //if no mainWindow, something is really wrong...
+    if (mMainWindow) //if no mainWindow, something is really wrong...
     {
         ++frameCount;
         if (frameCount > 30) //once pr 30 frames = update the message twice pr second (on a 60Hz monitor)
         {
             //showing some statistics in status bar
             mMainWindow->statusBar()->showMessage(" Time pr FrameDraw: " +
-                                                  QString::number(nsecElapsed/1000000., 'g', 4) + " ms  |  " +
+                                                  QString::number(nsecElapsed / 1000000., 'g', 4) + " ms  |  " +
                                                   "FPS (approximated): " + QString::number(1E9 / nsecElapsed, 'g', 7));
-            frameCount = 0;     //reset to show a new message in 60 frames
+            frameCount = 0; //reset to show a new message in 60 frames
         }
     }
 }
 
 /// Uses QOpenGLDebugLogger if this is present
 /// Reverts to glGetError() if not
-void RenderWindow::checkForGLerrors()
-{
-    if(mOpenGLDebugLogger)
-    {
+void RenderWindow::checkForGLerrors() {
+    if (mOpenGLDebugLogger) {
         const QList<QOpenGLDebugMessage> messages = mOpenGLDebugLogger->loggedMessages();
         for (const QOpenGLDebugMessage &message : messages)
             qDebug() << message;
-    }
-    else
-    {
+    } else {
         GLenum err = GL_NO_ERROR;
-        while((err = glGetError()) != GL_NO_ERROR)
-        {
+        while ((err = glGetError()) != GL_NO_ERROR) {
             qDebug() << "glGetError returns " << err;
         }
     }
 }
 
 /// Tries to start the extended OpenGL debugger that comes with Qt
-void RenderWindow::startOpenGLDebugger()
-{
-    QOpenGLContext * temp = this->context();
-    if (temp)
-    {
+void RenderWindow::startOpenGLDebugger() {
+    QOpenGLContext *temp = this->context();
+    if (temp) {
         QSurfaceFormat format = temp->format();
-        if (! format.testOption(QSurfaceFormat::DebugContext))
+        if (!format.testOption(QSurfaceFormat::DebugContext))
             qDebug() << "This system can not use QOpenGLDebugLogger, so we revert to glGetError()";
 
-        if(temp->hasExtension(QByteArrayLiteral("GL_KHR_debug")))
-        {
+        if (temp->hasExtension(QByteArrayLiteral("GL_KHR_debug"))) {
             qDebug() << "System can log OpenGL errors!";
             mOpenGLDebugLogger = new QOpenGLDebugLogger(this);
             if (mOpenGLDebugLogger->initialize()) // initializes in the current context
                 qDebug() << "Started OpenGL debug logger!";
         }
 
-        if(mOpenGLDebugLogger)
+        if (mOpenGLDebugLogger)
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
 
-void RenderWindow::setCameraSpeed(float value)
-{
+void RenderWindow::setCameraSpeed(float value) {
     mCameraSpeed += value;
 
     //Keep within min and max values
-    if(mCameraSpeed < 0.01f)
+    if (mCameraSpeed < 0.01f)
         mCameraSpeed = 0.01f;
     if (mCameraSpeed > 0.3f)
         mCameraSpeed = 0.3f;
 }
 
-void RenderWindow::handleInput()
-{
+void RenderWindow::handleInput() {
     //Camera
-    mCurrentCamera->setSpeed(0.f);  //cancel last frame movement
-    if(mInput.RMB)
-    {
-        if(mInput.W)
+    mCurrentCamera->setSpeed(0.f); //cancel last frame movement
+    if (mInput.RMB) {
+        if (mInput.W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
-        if(mInput.S)
+        if (mInput.S)
             mCurrentCamera->setSpeed(mCameraSpeed);
-        if(mInput.D)
+        if (mInput.D)
             mCurrentCamera->moveRight(mCameraSpeed);
-        if(mInput.A)
+        if (mInput.A)
             mCurrentCamera->moveRight(-mCameraSpeed);
-        if(mInput.Q)
+        if (mInput.Q)
             mCurrentCamera->updateHeigth(-mCameraSpeed);
-        if(mInput.E)
+        if (mInput.E)
             mCurrentCamera->updateHeigth(mCameraSpeed);
-    }
-    else
-    {
-        if(mInput.W)
+    } else {
+        if (mInput.W)
             mLight->mMatrix.translateZ(-mCameraSpeed);
-        if(mInput.S)
+        if (mInput.S)
             mLight->mMatrix.translateZ(mCameraSpeed);
-        if(mInput.D)
+        if (mInput.D)
             mLight->mMatrix.translateX(mCameraSpeed);
-        if(mInput.A)
+        if (mInput.A)
             mLight->mMatrix.translateX(-mCameraSpeed);
-        if(mInput.Q)
+        if (mInput.Q)
             mLight->mMatrix.translateY(mCameraSpeed);
-        if(mInput.E)
+        if (mInput.E)
             mLight->mMatrix.translateY(-mCameraSpeed);
     }
 }
 
-void RenderWindow::keyPressEvent(QKeyEvent *event)
-{
+void RenderWindow::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Escape) //Shuts down whole program
     {
         mMainWindow->close();
     }
 
     //    You get the keyboard input like this
-    if(event->key() == Qt::Key_W)
-    {
+    if (event->key() == Qt::Key_W) {
         mInput.W = true;
     }
-    if(event->key() == Qt::Key_S)
-    {
+    if (event->key() == Qt::Key_S) {
         mInput.S = true;
     }
-    if(event->key() == Qt::Key_D)
-    {
+    if (event->key() == Qt::Key_D) {
         mInput.D = true;
     }
-    if(event->key() == Qt::Key_A)
-    {
+    if (event->key() == Qt::Key_A) {
         mInput.A = true;
     }
-    if(event->key() == Qt::Key_Q)
-    {
+    if (event->key() == Qt::Key_Q) {
         mInput.Q = true;
     }
-    if(event->key() == Qt::Key_E)
-    {
+    if (event->key() == Qt::Key_E) {
         mInput.E = true;
     }
-    if(event->key() == Qt::Key_Z)
-    {
+    if (event->key() == Qt::Key_Z) {
     }
-    if(event->key() == Qt::Key_X)
-    {
+    if (event->key() == Qt::Key_X) {
     }
-    if(event->key() == Qt::Key_Up)
-    {
+    if (event->key() == Qt::Key_Up) {
         mInput.UP = true;
     }
-    if(event->key() == Qt::Key_Down)
-    {
+    if (event->key() == Qt::Key_Down) {
         mInput.DOWN = true;
     }
-    if(event->key() == Qt::Key_Left)
-    {
+    if (event->key() == Qt::Key_Left) {
         mInput.LEFT = true;
     }
-    if(event->key() == Qt::Key_Right)
-    {
+    if (event->key() == Qt::Key_Right) {
         mInput.RIGHT = true;
     }
-    if(event->key() == Qt::Key_U)
-    {
+    if (event->key() == Qt::Key_U) {
     }
-    if(event->key() == Qt::Key_O)
-    {
+    if (event->key() == Qt::Key_O) {
     }
 }
 
-void RenderWindow::keyReleaseEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_W)
-    {
+void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_W) {
         mInput.W = false;
     }
-    if(event->key() == Qt::Key_S)
-    {
+    if (event->key() == Qt::Key_S) {
         mInput.S = false;
     }
-    if(event->key() == Qt::Key_D)
-    {
+    if (event->key() == Qt::Key_D) {
         mInput.D = false;
     }
-    if(event->key() == Qt::Key_A)
-    {
+    if (event->key() == Qt::Key_A) {
         mInput.A = false;
     }
-    if(event->key() == Qt::Key_Q)
-    {
+    if (event->key() == Qt::Key_Q) {
         mInput.Q = false;
     }
-    if(event->key() == Qt::Key_E)
-    {
+    if (event->key() == Qt::Key_E) {
         mInput.E = false;
     }
-    if(event->key() == Qt::Key_Z)
-    {
+    if (event->key() == Qt::Key_Z) {
     }
-    if(event->key() == Qt::Key_X)
-    {
+    if (event->key() == Qt::Key_X) {
     }
-    if(event->key() == Qt::Key_Up)
-    {
+    if (event->key() == Qt::Key_Up) {
         mInput.UP = false;
     }
-    if(event->key() == Qt::Key_Down)
-    {
+    if (event->key() == Qt::Key_Down) {
         mInput.DOWN = false;
     }
-    if(event->key() == Qt::Key_Left)
-    {
+    if (event->key() == Qt::Key_Left) {
         mInput.LEFT = false;
     }
-    if(event->key() == Qt::Key_Right)
-    {
+    if (event->key() == Qt::Key_Right) {
         mInput.RIGHT = false;
     }
-    if(event->key() == Qt::Key_U)
-    {
+    if (event->key() == Qt::Key_U) {
     }
-    if(event->key() == Qt::Key_O)
-    {
+    if (event->key() == Qt::Key_O) {
     }
 }
 
-void RenderWindow::mousePressEvent(QMouseEvent *event)
-{
+void RenderWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton)
         mInput.RMB = true;
     if (event->button() == Qt::LeftButton)
@@ -564,8 +505,7 @@ void RenderWindow::mousePressEvent(QMouseEvent *event)
         mInput.MMB = true;
 }
 
-void RenderWindow::mouseReleaseEvent(QMouseEvent *event)
-{
+void RenderWindow::mouseReleaseEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton)
         mInput.RMB = false;
     if (event->button() == Qt::LeftButton)
@@ -574,13 +514,11 @@ void RenderWindow::mouseReleaseEvent(QMouseEvent *event)
         mInput.MMB = false;
 }
 
-void RenderWindow::wheelEvent(QWheelEvent *event)
-{
+void RenderWindow::wheelEvent(QWheelEvent *event) {
     QPoint numDegrees = event->angleDelta() / 8;
 
     //if RMB, change the speed of the camera
-    if (mInput.RMB)
-    {
+    if (mInput.RMB) {
         if (numDegrees.y() < 1)
             setCameraSpeed(0.001f);
         if (numDegrees.y() > 1)
@@ -589,10 +527,8 @@ void RenderWindow::wheelEvent(QWheelEvent *event)
     event->accept();
 }
 
-void RenderWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    if (mInput.RMB)
-    {
+void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
+    if (mInput.RMB) {
         //Using mMouseXYlast as deltaXY so we don't need extra variables
         mMouseXlast = event->pos().x() - mMouseXlast;
         mMouseYlast = event->pos().y() - mMouseYlast;

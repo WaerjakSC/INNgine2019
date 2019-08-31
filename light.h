@@ -3,9 +3,7 @@
 
 #include "visualobject.h"
 
-
-class Light : public VisualObject
-{
+class Light : public VisualObject {
 public:
     Light();
     virtual void init() override;

@@ -1,7 +1,5 @@
-#include "innpch.h"
 #include "input.h"
+#include "innpch.h"
 
-Input::Input()
-{
-
+Input::Input() {
 }

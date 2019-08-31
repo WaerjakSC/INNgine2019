@@ -3,9 +3,7 @@
 
 #include "visualobject.h"
 
-
-class SkyBox : public VisualObject
-{
+class SkyBox : public VisualObject {
 public:
     SkyBox();
 

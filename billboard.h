@@ -1,11 +1,10 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-#include "visualobject.h"
 #include "vector3d.h"
+#include "visualobject.h"
 
-class BillBoard : public VisualObject
-{
+class BillBoard : public VisualObject {
 public:
     BillBoard();
 
@@ -14,14 +13,13 @@ public:
 
     gsl::Vector3D getNormal();
 
-
     void setConstantYUp(bool constantUp);
 
 private:
     gsl::Vector3D normal{0.f, 0.f, -1.f};
 
     bool mConstantYUp{true};
-    bool mNormalVersion{false};     //flip between two ways to calculate forward direction
+    bool mNormalVersion{false}; //flip between two ways to calculate forward direction
 };
 
 #endif // BILLBOARD_H

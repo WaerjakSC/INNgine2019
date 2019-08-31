@@ -3,8 +3,7 @@
 
 #include "shader.h"
 
-class ColorShader : public Shader
-{
+class ColorShader : public Shader {
 public:
     ColorShader(const std::string shaderName, const GLchar *geometryPath = nullptr);
     virtual ~ColorShader() override;

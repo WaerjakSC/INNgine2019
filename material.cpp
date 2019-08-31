@@ -1,23 +1,18 @@
-#include "innpch.h"
 #include "material.h"
-#include "textureshader.h"
+#include "Shaders/textureshader.h"
+#include "innpch.h"
 
-Material::Material()
-{
-
+Material::Material() {
 }
 
-void Material::setColor(const gsl::Vector3D &color)
-{
+void Material::setColor(const gsl::Vector3D &color) {
     mObjectColor = color;
 }
 
-void Material::setTextureUnit(const GLuint &textureUnit)
-{
+void Material::setTextureUnit(const GLuint &textureUnit) {
     mTextureUnit = textureUnit;
 }
 
-void Material::setShader(Shader *shader)
-{
+void Material::setShader(Shader *shader) {
     mShader = shader;
 }

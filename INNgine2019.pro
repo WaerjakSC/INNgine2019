@@ -18,10 +18,13 @@ HEADERS += \
     GSL/vector4d.h \
     GSL/gsl_math.h \
     GSL/math_constants.h \
+    Shaders/colorshader.h \
+    Shaders/textureshader.h \
+    Shaders/phongshader.h \
+    Shaders/shader.h \
     constants.h \
     renderwindow.h \
     resourcemanager.h \
-    shader.h \
     mainwindow.h \
     triangle.h \
     texture.h \
@@ -40,10 +43,7 @@ HEADERS += \
     light.h \
     objmesh.h \
 #    innpch.h \
-    colorshader.h \
-    textureshader.h \
     skybox.h \
-    phongshader.h \
 
 
 SOURCES += main.cpp \
@@ -54,10 +54,13 @@ SOURCES += main.cpp \
     GSL/vector3d.cpp \
     GSL/vector4d.cpp \
     GSL/gsl_math.cpp \
+    Shaders/colorshader.cpp \
+    Shaders/textureshader.cpp \
+    Shaders/phongshader.cpp \
+    Shaders/shader.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
-    shader.cpp \
     triangle.cpp \
     texture.cpp \
     billboard.cpp \
@@ -71,10 +74,7 @@ SOURCES += main.cpp \
     material.cpp \
     light.cpp \
     objmesh.cpp \
-    colorshader.cpp \
-    textureshader.cpp \
-    skybox.cpp \
-    phongshader.cpp
+    skybox.cpp
 
 FORMS += \
     mainwindow.ui
