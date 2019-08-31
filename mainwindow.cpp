@@ -1,27 +1,23 @@
-#include "innpch.h"
 #include "mainwindow.h"
+#include "innpch.h"
 #include "ui_mainwindow.h"
 
-#include <QSurfaceFormat>
 #include <QDesktopWidget>
+#include <QSurfaceFormat>
 
 #include "renderwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     init();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete mRenderWindow;
     delete ui;
 }
 
-void MainWindow::init()
-{
+void MainWindow::init() {
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
 
@@ -78,7 +74,6 @@ void MainWindow::init()
 }
 
 //Example of a slot called from the button on the top of the program.
-void MainWindow::on_pushButton_clicked()
-{
+void MainWindow::on_pushButton_clicked() {
     mRenderWindow->toggleWireframe();
 }

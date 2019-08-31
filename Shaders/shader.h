@@ -1,8 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <QOpenGLFunctions_4_1_Core>
 #include "matrix4x4.h"
+#include <QOpenGLFunctions_4_1_Core>
 
 //#include "GL/glew.h" //We use QOpenGLFunctions instead, so no need for Glew (or GLAD)!
 
@@ -14,15 +14,14 @@
 
 class Camera;
 
-class Shader : protected QOpenGLFunctions_4_1_Core
-{
+class Shader : protected QOpenGLFunctions_4_1_Core {
 public:
     // Constructor generates the shader on the fly
-    Shader(const std::string shaderName, const GLchar *geometryPath = nullptr );
+    Shader(const std::string shaderName, const GLchar *geometryPath = nullptr);
     virtual ~Shader();
 
     // Use the current shader
-    void use( );
+    void use();
 
     //Get program number for this shader
     GLuint getProgram() const;
@@ -40,7 +39,6 @@ protected:
     GLint pMatrixUniform{-1};
 
     Camera *mCurrentCamera{nullptr};
-
 };
 
 #endif

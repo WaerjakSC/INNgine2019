@@ -3,8 +3,7 @@
 
 #include "vector3d.h"
 
-class Material
-{
+class Material {
 public:
     Material();
 
@@ -13,7 +12,7 @@ public:
     void setColor(const gsl::Vector3D &color);
 
     gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
-    GLuint mTextureUnit{0};     //the actual texture to put into the uniform
+    GLuint mTextureUnit{0}; //the actual texture to put into the uniform
     Shader *mShader{nullptr};
 };
 

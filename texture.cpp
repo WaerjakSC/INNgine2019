@@ -1,15 +1,14 @@
 #include "innpch.h"
-#include <QImage>
 #include <QBuffer>
 #include <QByteArray>
+#include <QImage>
 
 #include "texture.h"
 
-Texture::Texture(GLuint textureUnit) : QOpenGLFunctions_4_1_Core()
-{
+Texture::Texture(GLuint textureUnit) : QOpenGLFunctions_4_1_Core() {
     initializeOpenGLFunctions();
     //small dummy texture
-    for (int i=0; i<16; i++)
+    for (int i = 0; i < 16; i++)
         pixels[i] = 0;
     pixels[0] = 255;
     pixels[4] = 255;
@@ -24,7 +23,7 @@ Texture::Texture(GLuint textureUnit) : QOpenGLFunctions_4_1_Core()
     glBindTexture(GL_TEXTURE_2D, mId);
     qDebug() << "Texture::Texture() id = " << mId;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 reinterpret_cast<const GLvoid*>(pixels));
+                 reinterpret_cast<const GLvoid *>(pixels));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     setTexture(textureUnit);
@@ -41,8 +40,7 @@ Texture::Texture(GLuint textureUnit) : QOpenGLFunctions_4_1_Core()
  - glTexImage2D()
  are used. The texture can be retrieved later by using the function id()
  */
-Texture::Texture(const std::string& filename, GLuint textureUnit): QOpenGLFunctions_4_1_Core()
-{
+Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core() {
     initializeOpenGLFunctions();
     readBitmap(filename);
     setTexture(textureUnit);
@@ -52,35 +50,30 @@ Texture::Texture(const std::string& filename, GLuint textureUnit): QOpenGLFuncti
     \brief Texture::id() Return the id of a previously generated texture object
     \return The id of a previously generated texture object
  */
-GLuint Texture::id() const
-{
+GLuint Texture::id() const {
     return mId;
 }
 
-void Texture::readBitmap(const std::string &filename)
-{
+void Texture::readBitmap(const std::string &filename) {
     OBITMAPFILEHEADER bmFileHeader;
     OBITMAPINFOHEADER bmInfoHeader;
 
-    std::string fileWithPath =  gsl::assetFilePath + "Textures/" + filename;
+    std::string fileWithPath = gsl::assetFilePath + "Textures/" + filename;
 
     std::ifstream file;
-    file.open (fileWithPath.c_str(), std::ifstream::in | std::ifstream::binary);
-    if (file.is_open())
-    {
-        file.read((char *) &bmFileHeader, 14);
+    file.open(fileWithPath.c_str(), std::ifstream::in | std::ifstream::binary);
+    if (file.is_open()) {
+        file.read((char *)&bmFileHeader, 14);
 
-        file.read((char *) &bmInfoHeader, sizeof(OBITMAPINFOHEADER));
+        file.read((char *)&bmInfoHeader, sizeof(OBITMAPINFOHEADER));
         mColumns = bmInfoHeader.biWidth;
         mRows = bmInfoHeader.biHeight;
         mnByte = bmInfoHeader.biBitCount / 8;
 
         mBitmap = new unsigned char[mColumns * mRows * mnByte];
-        file.read((char *) mBitmap, mColumns * mRows * mnByte);
+        file.read((char *)mBitmap, mColumns * mRows * mnByte);
         file.close();
-    }
-    else
-    {
+    } else {
         qDebug() << "Can not read " << QString(fileWithPath.c_str());
     }
     unsigned char tmp;
@@ -93,8 +86,7 @@ void Texture::readBitmap(const std::string &filename)
     qDebug() << "Texture read: " << QString(fileWithPath.c_str());
 }
 
-void Texture::setTexture(GLuint textureUnit)
-{
+void Texture::setTexture(GLuint textureUnit) {
     glGenTextures(1, &mId);
     // activate the texture unit first before binding texture
     glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -105,14 +97,14 @@ void Texture::setTexture(GLuint textureUnit)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RGB,
-                mColumns,
-                mRows,
-                0,
-                GL_RGB,
-                GL_UNSIGNED_BYTE,
-                mBitmap);
+        GL_TEXTURE_2D,
+        0,
+        GL_RGB,
+        mColumns,
+        mRows,
+        0,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        mBitmap);
     glGenerateMipmap(GL_TEXTURE_2D);
 }

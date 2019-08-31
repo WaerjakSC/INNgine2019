@@ -3,8 +3,7 @@
 
 #include "shader.h"
 
-class TextureShader : public Shader
-{
+class TextureShader : public Shader {
 public:
     TextureShader(const std::string shaderName, const GLchar *geometryPath = nullptr);
     virtual ~TextureShader() override;

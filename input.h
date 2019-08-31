@@ -3,8 +3,7 @@
 
 //This class just defines the keys we want to use for now
 //You have to set the state of this table manually!
-class Input
-{
+class Input {
 public:
     Input();
 
@@ -12,7 +11,7 @@ public:
     bool A{false};
     bool S{false};
     bool D{false};
-    bool UP{false};     //Arrow keys
+    bool UP{false}; //Arrow keys
     bool DOWN{false};
     bool LEFT{false};
     bool RIGHT{false};
@@ -28,6 +27,5 @@ public:
     int MOUSEX{0};
     int MOUSEY{0};
 };
-
 
 #endif // INPUT_H

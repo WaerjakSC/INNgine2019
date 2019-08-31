@@ -2,9 +2,7 @@
 #define OBJMESH_H
 #include "visualobject.h"
 
-
-class ObjMesh : public VisualObject
-{
+class ObjMesh : public VisualObject {
 public:
     ObjMesh();
     ObjMesh(std::string filename);
