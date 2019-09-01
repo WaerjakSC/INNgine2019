@@ -1,5 +1,5 @@
-#ifndef OBJMESH_H
-#define OBJMESH_H
+#ifndef MESHCOMPONENT_H
+#define MESHCOMPONENT_H
 #include "component.h"
 #include "material.h"
 #include "matrix4x4.h"
@@ -34,4 +34,4 @@ protected:
     GLuint mEAB{0}; //holds the indices (Element Array Buffer - EAB)
 };
 
-#endif // OBJMESH_H
+#endif // MESHCOMPONENT_H
