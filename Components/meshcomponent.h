@@ -26,7 +26,7 @@ public:
     void readFile(std::string filename);
 
 private:
-    meshData *mesh{nullptr};
+    meshData *mesh{nullptr}; // could be a shared_ptr? not sure about performance though
 
 protected:
     GLuint mVAO{0};
