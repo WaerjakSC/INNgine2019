@@ -10,12 +10,12 @@
 
 #include "mainwindow.h"
 
+#include "Components/meshcomponent.h"
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
 #include "billboard.h"
 #include "light.h"
-#include "objmesh.h"
 #include "octahedronball.h"
 #include "skybox.h"
 #include "trianglesurface.h"
@@ -171,8 +171,9 @@ void RenderWindow::init()
     mVisualObjects.push_back(temp);
 
     //one monkey
-    temp = new ObjMesh("monkey.obj");
-    temp->setShader(mShaderProgram[2]);
+
+    temp = new MeshComponent("monkey.obj");
+    temp->setShader(ResourceManager::GetShader("phongshader"));
     temp->init();
     temp->mName = "Monkey";
     temp->mMatrix.scale(0.5f);
