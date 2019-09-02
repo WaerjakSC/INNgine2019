@@ -5,6 +5,7 @@
 
 #include "gameobject.h"
 #include "input.h"
+#include "inputcomponent.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>
@@ -23,6 +24,7 @@ class Light;
 class RenderWindow : public QWindow, protected QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
+    RenderWindow();
     RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow);
     ~RenderWindow() override;
 
@@ -32,13 +34,13 @@ public:
     void toggleWireframe();
 
     void checkForGLerrors();
+    void setCameraSpeed(float value);
 
 private slots:
     void render();
 
 private:
     void init();
-    void setCameraSpeed(float value);
 
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
@@ -63,12 +65,14 @@ private:
 
     GameObject *mPlayer; //the controllable object
     Light *mLight;
+    InputComponent *mInput;
 
     Camera *mCurrentCamera{nullptr};
 
     bool mWireframe{false};
 
-    Input mInput;
+    //Input mInput;
+
     float mCameraSpeed{0.01f};
     float mCameraRotateSpeed{0.1f};
     int mMouseXlast{0};
