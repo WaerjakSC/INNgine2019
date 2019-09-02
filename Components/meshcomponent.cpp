@@ -64,6 +64,7 @@ void MeshComponent::setMesh(meshData *value) {
     mesh = value;
 }
 void MeshComponent::readFile(std::string filename) {
+    mesh = new meshData(); // Temporary!! whole function should be moved to resource manager probably
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + filename;
     std::ifstream fileIn;

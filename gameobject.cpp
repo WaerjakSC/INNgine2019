@@ -9,6 +9,9 @@ void GameObject::init() {
     }
 }
 void GameObject::update() {
+    for (auto *mesh : getMeshComponents()) {
+        mesh->draw(mMatrix);
+    }
 }
 /**
  * @brief GameObject::addComponent

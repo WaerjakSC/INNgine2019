@@ -3,6 +3,7 @@
 #include "renderwindow.h"
 
 BillBoard::BillBoard() {
+    mesh = new meshData();
     mesh->mVertices.insert(mesh->mVertices.end(),
                            {
                                // Positions            // Normals          //UVs

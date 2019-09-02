@@ -12,7 +12,7 @@ struct meshData {
     std::vector<GLuint> mIndices;
 };
 
-class MeshComponent : public QOpenGLFunctions_4_1_Core {
+class MeshComponent : public QOpenGLFunctions_4_1_Core, public Component {
 public:
     MeshComponent();
     MeshComponent(std::string filename);

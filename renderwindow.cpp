@@ -118,7 +118,7 @@ void RenderWindow::init() {
     GameObject *temp{nullptr};
 
     temp = new GameObject("XYZ");
-    temp->addComponent(new SkyBox());
+    temp->addComponent(new XYZ());
     temp->init();
     temp->setShaders(ResourceManager::GetShader("plainshader"));
     mGameObjects.emplace_back(temp);
