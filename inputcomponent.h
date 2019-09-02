@@ -1,10 +1,9 @@
 #ifndef INPUTCOMPONENT_H
 #define INPUTCOMPONENT_H
+#include <QKeyEvent>
+#include <QMouseEvent>
 
-#include <QWindow>
-
-class InputComponent : public QWindow
-{
+class InputComponent {
 public:
     InputComponent();
 
@@ -28,18 +27,15 @@ public:
     int MOUSEX{0};
     int MOUSEY{0};
 
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 private:
     void handleInput();
 
 protected:
-
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-
 };
-
 
 #endif // INPUTCOMPONENT_H

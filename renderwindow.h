@@ -1,9 +1,9 @@
 #ifndef RENDERWINDOW_H
 #define RENDERWINDOW_H
 
-#include "inputcomponent.h"
 #include "camera.h"
 #include "input.h"
+#include "inputcomponent.h"
 #include "texture.h"
 #include "visualobject.h"
 #include <QElapsedTimer>
@@ -41,7 +41,6 @@ private slots:
 private:
     void init();
 
-
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
@@ -63,7 +62,7 @@ private:
 
     VisualObject *mPlayer; //the controllable object
     Light *mLight;
-    InputComponent mInput;
+    InputComponent *mInput;
 
     Camera *mCurrentCamera{nullptr};
 
@@ -97,11 +96,11 @@ protected:
     //The QWindow that we inherit from has these functions to capture
     // mouse and keyboard. Uncomment to use
     //
-    //void mousePressEvent(QMouseEvent *event) override;
-    //void mouseReleaseEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
-    //void keyPressEvent(QKeyEvent *event) override;
-    //void keyReleaseEvent(QKeyEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 };
 
