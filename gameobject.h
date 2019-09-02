@@ -1,7 +1,7 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#include "Components/component.h"
+#include "Components/meshcomponent.h"
 #include "matrix4x4.h"
 
 class GameObject {
@@ -10,15 +10,19 @@ public:
 
     gsl::Matrix4x4 mMatrix;
 
-    std::string objectName;
+    std::string mName;
 
     virtual void update();
 
-    template <typename compType>
-    void addComponent(compType comp);
+    void addComponent(Component *comp);
+
+    void init();
+
+    std::vector<MeshComponent *> getMeshComponents();
+    void setShaders(Shader *shader);
 
 private:
-    std::vector<std::unique_ptr<Component>> Components; // Needs testing, not sure if it needs to be a different type
+    std::vector<Component *> Components; // Needs testing, not sure if it needs to be a different type
 };
 
 #endif // GAMEOBJECT_H

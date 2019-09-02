@@ -7,7 +7,7 @@
 #include <QOpenGLFunctions_4_1_Core>
 
 struct meshData {
-    meshData() {}
+    meshData() = default;
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
 };
@@ -25,10 +25,15 @@ public:
 
     void readFile(std::string filename);
 
-private:
-    meshData *mesh{nullptr}; // could be a shared_ptr? not sure about performance though
+    void setShader(Shader *shader);
+
+    meshData *getMesh() const;
+
+    void setMesh(meshData *value);
 
 protected:
+    meshData *mesh{nullptr}; // could be a shared_ptr? not sure about performance though
+
     GLuint mVAO{0};
     GLuint mVBO{0};
     GLuint mEAB{0}; //holds the indices (Element Array Buffer - EAB)

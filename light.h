@@ -1,15 +1,12 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include "visualobject.h"
+#include "Components/meshcomponent.h"
+#include "gameobject.h"
 
-
-class Light : public VisualObject
-{
+class Light : public GameObject {
 public:
-    Light();
-    virtual void init() override;
-    virtual void draw() override;
+    Light(std::string name);
 
     GLfloat mAmbientStrenght{0.3f};
     gsl::Vector3D mAmbientColor{0.3f, 0.3f, 0.3f};

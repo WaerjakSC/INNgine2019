@@ -1,19 +1,17 @@
 #ifndef XYZ_H
 #define XYZ_H
 
+#include "Components/meshcomponent.h"
 #include <QOpenGLFunctions_4_1_Core>
-#include "visualobject.h"
 
-class XYZ : public VisualObject
-{
+class XYZ : public MeshComponent {
 public:
-   XYZ();
-   ~XYZ() override;
-   void init() override;
-   void draw() override;
+    XYZ();
+    ~XYZ() override;
+    void init() override;
+    void draw(gsl::Matrix4x4 &mMatrix) override;
 
 private:
-
 };
 
 #endif // XYZ_H

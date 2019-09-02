@@ -1,19 +1,17 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-#include "visualobject.h"
+#include "Components/meshcomponent.h"
 #include "vector3d.h"
 
-class BillBoard : public VisualObject
-{
+class BillBoard : public MeshComponent {
 public:
     BillBoard();
 
     virtual void init() override;
-    virtual void draw() override;
+    virtual void draw(gsl::Matrix4x4 &mMatrix) override;
 
-    gsl::Vector3D getNormal();
-
+    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
 
     void setConstantYUp(bool constantUp);
 
@@ -21,7 +19,7 @@ private:
     gsl::Vector3D normal{0.f, 0.f, -1.f};
 
     bool mConstantYUp{true};
-    bool mNormalVersion{false};     //flip between two ways to calculate forward direction
+    bool mNormalVersion{false}; //flip between two ways to calculate forward direction
 };
 
 #endif // BILLBOARD_H

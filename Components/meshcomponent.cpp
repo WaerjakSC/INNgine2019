@@ -52,7 +52,17 @@ void MeshComponent::draw(gsl::Matrix4x4 &mMatrix) {
     glDrawElements(GL_TRIANGLES, mesh->mIndices.size(), GL_UNSIGNED_INT, nullptr);
     //    glBindVertexArray(0);
 }
+void MeshComponent::setShader(Shader *shader) {
+    mMaterial.mShader = shader;
+}
 
+meshData *MeshComponent::getMesh() const {
+    return mesh;
+}
+
+void MeshComponent::setMesh(meshData *value) {
+    mesh = value;
+}
 void MeshComponent::readFile(std::string filename) {
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + filename;

@@ -1,14 +1,14 @@
 #ifndef RENDERWINDOW_H
 #define RENDERWINDOW_H
 
-#include <QWindow>
-#include <QTimer>
-#include <QElapsedTimer>
-#include <chrono>
-#include "texture.h"
 #include "camera.h"
-#include "visualobject.h"
+#include "gameobject.h"
 #include "input.h"
+#include "texture.h"
+#include <QElapsedTimer>
+#include <QTimer>
+#include <QWindow>
+#include <chrono>
 
 class QOpenGLContext;
 class Shader;
@@ -19,8 +19,7 @@ class Light;
 /// OpenGL surface.
 /// We also inherit from QOpenGLFunctions, to get access to the OpenGL functions
 /// This is the same as using glad and glw from general OpenGL tutorials
-class RenderWindow : public QWindow, protected QOpenGLFunctions_4_1_Core
-{
+class RenderWindow : public QWindow, protected QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
     RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow);
@@ -43,7 +42,7 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    Texture *mTexture[4]{nullptr}; //We can hold 4 textures
+    Texture *mTexture[4]{nullptr};      //We can hold 4 textures
     Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
     void setupPlainShader(int shaderIndex);
@@ -57,9 +56,9 @@ private:
     GLint pMatrixUniform1{-1};
     GLint mTextureUniform{-1};
 
-    std::vector<VisualObject*> mVisualObjects;
+    std::vector<GameObject *> mGameObjects;
 
-    VisualObject *mPlayer;  //the controllable object
+    GameObject *mPlayer; //the controllable object
     Light *mLight;
 
     Camera *mCurrentCamera{nullptr};
@@ -72,12 +71,12 @@ private:
     int mMouseXlast{0};
     int mMouseYlast{0};
 
-    QTimer *mRenderTimer{nullptr};  //timer that drives the gameloop
-    QElapsedTimer mTimeStart;       //time variable that reads the actual FPS
+    QTimer *mRenderTimer{nullptr}; //timer that drives the gameloop
+    QElapsedTimer mTimeStart;      //time variable that reads the actual FPS
 
     float mAspectratio{1.f};
 
-    MainWindow *mMainWindow{nullptr};    //points back to MainWindow to be able to put info in StatusBar
+    MainWindow *mMainWindow{nullptr}; //points back to MainWindow to be able to put info in StatusBar
 
     class QOpenGLDebugLogger *mOpenGLDebugLogger{nullptr};
 

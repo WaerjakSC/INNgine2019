@@ -1,8 +1,10 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-class Triangle :  protected QOpenGLFunctions_4_1_Core
-{
+#include "innpch.h"
+#include <QOpenGLFunctions_4_1_Core>
+
+class Triangle : protected QOpenGLFunctions_4_1_Core {
 public:
     Triangle();
 
@@ -12,7 +14,7 @@ public:
 private:
     GLuint mVAO{0};
     GLuint mVBO{0};
-    GLint  mMatrixUniform{0};
+    GLint mMatrixUniform{0};
     gsl::Matrix4x4 mMatrix;
 };
 

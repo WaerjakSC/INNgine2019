@@ -1,11 +1,11 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include <map>
-#include <string>
+#include "Components/meshcomponent.h"
 #include "Shaders/shader.h"
 #include "texture.h"
-#include "Components/meshcomponent.h"
+#include <map>
+#include <string>
 
 // Resource manager work in progress
 class ResourceManager {
@@ -21,9 +21,9 @@ public:
     // Loads and generates texture from file
     static void LoadTexture(std::string name);
     // Gets stored texture
-    static Texture *GetTexture(std::string name);
-    // Reads and loads mesh
-    static meshData ReadMesh(std::string name);
+    //    static Texture *GetTexture(std::string name);
+    //    // Reads and loads mesh
+    //    static meshData ReadMesh(std::string name);
     // De-allocate loaded resources from memory
     static void Clear();
 
