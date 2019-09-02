@@ -3,9 +3,9 @@
 
 #include "camera.h"
 
+#include "Components/inputcomponent.h"
 #include "gameobject.h"
 #include "input.h"
-#include "inputcomponent.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>
@@ -45,7 +45,6 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-
     Texture *mTexture[4]{nullptr};      //We can hold 4 textures
     Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
@@ -59,7 +58,6 @@ private:
     GLint vMatrixUniform1{-1};
     GLint pMatrixUniform1{-1};
     GLint mTextureUniform{-1};
-
 
     std::vector<GameObject *> mGameObjects;
 

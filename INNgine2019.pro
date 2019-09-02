@@ -8,7 +8,6 @@ TARGET      = INNgine2019
 PRECOMPILED_HEADER = innpch.h
 
 INCLUDEPATH +=  ./GSL
-
 HEADERS += \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
@@ -22,29 +21,29 @@ HEADERS += \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
     Shaders/shader.h \
+    Components/component.h \
+    Components/meshcomponent.h \
+    Components/inputcomponent.h \
+    Assets/Meshes/skybox.h \
+    Assets/Meshes/billboard.h \
+    Assets/Meshes/trianglesurface.h \
+    Assets/Meshes/octahedronball.h \
+    Assets/Meshes/xyz.h \
     constants.h \
-    inputcomponent.h \
+    gameobject.h \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
     triangle.h \
     texture.h \
-    billboard.h \
     vertex.h \
-    xyz.h \
     visualobject.h \
-    octahedronball.h \
-    billboard.h \
     camera.h \
-    octahedronball.h \
     gltypes.h \
-    trianglesurface.h \
     input.h \
     material.h \
     light.h \
-    objmesh.h \
 #    innpch.h \
-    skybox.h \
 
 
 SOURCES += main.cpp \
@@ -59,24 +58,26 @@ SOURCES += main.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
-    inputcomponent.cpp \
+    Components/component.cpp \
+    Components/meshcomponent.cpp \
+    Components/inputcomponent.cpp \
+    Assets/Meshes/skybox.cpp \
+    Assets/Meshes/billboard.cpp \
+    Assets/Meshes/trianglesurface.cpp \
+    Assets/Meshes/octahedronball.cpp \
+    Assets/Meshes/xyz.cpp \
+    gameobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
     triangle.cpp \
     texture.cpp \
-    billboard.cpp \
     vertex.cpp \
     visualobject.cpp \
     camera.cpp \
-    octahedronball.cpp \
-    xyz.cpp \
-    trianglesurface.cpp \
     input.cpp \
     material.cpp \
-    light.cpp \
-    objmesh.cpp \
-    skybox.cpp
+    light.cpp
 
 FORMS += \
     mainwindow.ui

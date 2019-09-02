@@ -4,23 +4,18 @@
 #include <map>
 #include <string>
 
+#include "Components/meshcomponent.h"
 #include "Shaders/shader.h"
 #include "texture.h"
-//#include "visualobject.h"
-#include "objmesh.h"
 
 // Resource manager work in progress
-
-struct meshData {
-    meshData() {}
-};
 
 class ResourceManager {
 public:
     // Static std::map(key, object) for resource storage
     static std::map<std::string, Shader *> Shaders;
     static std::map<std::string, Texture *> Textures;
-    static std::map<std::string, meshData> Meshes;
+    static std::map<std::string, meshData *> Meshes;
     // Loads and generates shader (takes name and the shader)
     static void LoadShader(std::string name, Shader *shader);
     // Gets stored shader
@@ -30,7 +25,7 @@ public:
     // Gets stored texture
     static Texture *GetTexture(std::string name);
     // Reads and loads mesh
-    static meshData ReadMesh(std::string name);
+    static meshData *ReadMesh(std::string name);
     // De-allocate loaded resources from memory
     static void Clear();
 
