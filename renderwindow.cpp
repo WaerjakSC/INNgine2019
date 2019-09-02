@@ -10,19 +10,17 @@
 
 #include "mainwindow.h"
 
-
+#include "Assets/Meshes/billboard.h"
+#include "Assets/Meshes/octahedronball.h"
+#include "Assets/Meshes/skybox.h"
+#include "Assets/Meshes/trianglesurface.h"
+#include "Assets/Meshes/xyz.h"
 #include "Components/meshcomponent.h"
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
-#include "billboard.h"
 #include "light.h"
-
-#include "octahedronball.h"
 #include "resourcemanager.h"
-#include "skybox.h"
-#include "trianglesurface.h"
-#include "xyz.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false), mMainWindow(mainWindow) {
@@ -134,7 +132,6 @@ void RenderWindow::init() {
     //    temp->mName = "Ball";
     //    mVisualObjects.push_back(temp);
     //    mPlayer = temp;
-
 
     temp = new GameObject("Cube");
     temp->addComponent(new SkyBox());
