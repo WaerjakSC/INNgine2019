@@ -6,6 +6,7 @@ std::map<std::string, Texture *> ResourceManager::Textures;
 
 ResourceManager::ResourceManager() {
 }
+
 // Do resource manager stuff -- Aka actually delete the pointers after application end
 ResourceManager::~ResourceManager() {
     for (auto &shader : Shaders) {
@@ -14,8 +15,6 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : Textures) {
         delete texture.second;
     }
-}
-void ResourceManager::Clear() {
 }
 
 void ResourceManager::LoadShader(std::string name, Shader *shader) {
@@ -31,6 +30,7 @@ Shader *ResourceManager::GetShader(std::string name) {
 }
 
 void ResourceManager::LoadTexture(std::string name) {
+
 }
 
 Texture *ResourceManager::GetTexture(std::string name) {

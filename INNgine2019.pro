@@ -23,6 +23,7 @@ HEADERS += \
     Shaders/phongshader.h \
     Shaders/shader.h \
     constants.h \
+    inputcomponent.h \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
@@ -58,6 +59,7 @@ SOURCES += main.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
+    inputcomponent.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
