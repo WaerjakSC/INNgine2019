@@ -37,7 +37,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
         mContext = nullptr;
         qDebug() << "Context could not be made - quitting this application";
     }
-    mInput = new InputComponent();
+    mInput = new InputComponent(mMainWindow);
     //Make the gameloop timer:
     mRenderTimer = new QTimer(this);
 }
@@ -366,6 +366,7 @@ void RenderWindow::startOpenGLDebugger() {
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
+
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
     mInput->keyPressEvent(event);
 }
@@ -384,7 +385,6 @@ void RenderWindow::setCameraSpeed(float value) {
 
 void RenderWindow::handleInput() {
     //Camera
-
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
     if (mInput->RMB) {
         if (mInput->W)

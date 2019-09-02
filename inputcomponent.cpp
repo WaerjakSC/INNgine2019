@@ -2,13 +2,21 @@
 #include "renderwindow.h"
 #include <QKeyEvent>
 
-InputComponent::InputComponent()
+// InputComponent handling user inputs (moved from renderwindow and implemented here)
+
+InputComponent::InputComponent(MainWindow *mainWindow) : mMainWindow(mainWindow)
 {
 
 }
 
 void InputComponent::keyPressEvent(QKeyEvent *event){
     //    You get the keyboard input like this
+
+    if (event->key() == Qt::Key_Escape) //Shuts down whole program
+    {
+        mMainWindow->close();
+    }
+
     if (event->key() == Qt::Key_W) {
         W = true;
     }

@@ -2,10 +2,11 @@
 #define INPUTCOMPONENT_H
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include "mainwindow.h"
 
 class InputComponent {
 public:
-    InputComponent();
+    InputComponent(MainWindow *mainWindow);
 
     bool W{false};
     bool A{false};
@@ -34,6 +35,7 @@ public:
 
 private:
     void handleInput();
+    MainWindow *mMainWindow;
 
 protected:
 };
