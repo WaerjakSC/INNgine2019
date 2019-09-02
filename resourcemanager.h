@@ -1,13 +1,20 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include "Components/meshcomponent.h"
-#include "Shaders/shader.h"
-#include "texture.h"
 #include <map>
 #include <string>
 
+#include "Shaders/shader.h"
+#include "texture.h"
+//#include "visualobject.h"
+#include "objmesh.h"
+
 // Resource manager work in progress
+
+struct meshData {
+    meshData() {}
+};
+
 class ResourceManager {
 public:
     // Static std::map(key, object) for resource storage
@@ -21,9 +28,9 @@ public:
     // Loads and generates texture from file
     static void LoadTexture(std::string name);
     // Gets stored texture
-    //    static Texture *GetTexture(std::string name);
-    //    // Reads and loads mesh
-    //    static meshData ReadMesh(std::string name);
+    static Texture *GetTexture(std::string name);
+    // Reads and loads mesh
+    static meshData ReadMesh(std::string name);
     // De-allocate loaded resources from memory
     static void Clear();
 

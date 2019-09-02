@@ -22,28 +22,29 @@ HEADERS += \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
     Shaders/shader.h \
-    Components/component.h \
-    Components/meshcomponent.h \
-    Assets/Meshes/skybox.h \
-    Assets/Meshes/billboard.h \
-    Assets/Meshes/trianglesurface.h \
-    Assets/Meshes/octahedronball.h \
-    Assets/Meshes/xyz.h \
     constants.h \
-    gameobject.h \
+    inputcomponent.h \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
     triangle.h \
     texture.h \
+    billboard.h \
     vertex.h \
+    xyz.h \
     visualobject.h \
+    octahedronball.h \
+    billboard.h \
     camera.h \
+    octahedronball.h \
     gltypes.h \
+    trianglesurface.h \
     input.h \
     material.h \
     light.h \
+    objmesh.h \
 #    innpch.h \
+    skybox.h \
 
 
 SOURCES += main.cpp \
@@ -58,25 +59,24 @@ SOURCES += main.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
-    Components/component.cpp \
-    Components/meshcomponent.cpp \
-    Assets/Meshes/skybox.cpp \
-    Assets/Meshes/billboard.cpp \
-    Assets/Meshes/trianglesurface.cpp \
-    Assets/Meshes/octahedronball.cpp \
-    Assets/Meshes/xyz.cpp \
-    gameobject.cpp \
+    inputcomponent.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
     triangle.cpp \
     texture.cpp \
+    billboard.cpp \
     vertex.cpp \
     visualobject.cpp \
     camera.cpp \
+    octahedronball.cpp \
+    xyz.cpp \
+    trianglesurface.cpp \
     input.cpp \
     material.cpp \
-    light.cpp
+    light.cpp \
+    objmesh.cpp \
+    skybox.cpp
 
 FORMS += \
     mainwindow.ui
