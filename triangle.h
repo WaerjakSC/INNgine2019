@@ -1,6 +1,10 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
+
+#include "innpch.h"
+#include <QOpenGLFunctions_4_1_Core>
+
 class Triangle : protected QOpenGLFunctions_4_1_Core {
 public:
     Triangle();

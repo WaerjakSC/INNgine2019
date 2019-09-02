@@ -1,17 +1,20 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
+
+#include "Components/meshcomponent.h"
 #include "vector3d.h"
 #include "visualobject.h"
 
-class BillBoard : public VisualObject {
+
+class BillBoard : public MeshComponent {
 public:
     BillBoard();
 
     virtual void init() override;
-    virtual void draw() override;
+    virtual void draw(gsl::Matrix4x4 &mMatrix) override;
 
-    gsl::Vector3D getNormal();
+    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
 
     void setConstantYUp(bool constantUp);
 

@@ -10,7 +10,8 @@
 
 class RenderWindow;
 
-class VisualObject : public QOpenGLFunctions_4_1_Core {
+class VisualObject : public QOpenGLFunctions_4_1_Core
+{
 public:
     VisualObject();
     virtual ~VisualObject();

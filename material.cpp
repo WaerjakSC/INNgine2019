@@ -2,7 +2,8 @@
 #include "Shaders/textureshader.h"
 #include "innpch.h"
 
-Material::Material() {
+Material::Material()
+{
 }
 
 void Material::setColor(const gsl::Vector3D &color) {

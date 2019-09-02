@@ -2,9 +2,10 @@
 #define RENDERWINDOW_H
 
 #include "camera.h"
+
+#include "gameobject.h"
 #include "input.h"
 #include "texture.h"
-#include "visualobject.h"
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QWindow>
@@ -42,8 +43,9 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    Texture *mTexture[4]{nullptr}; //We can hold 4 textures
-    //Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
+
+    Texture *mTexture[4]{nullptr};      //We can hold 4 textures
+    Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
     void setupPlainShader(int shaderIndex);
     GLint mMatrixUniform0{-1};
@@ -56,9 +58,10 @@ private:
     GLint pMatrixUniform1{-1};
     GLint mTextureUniform{-1};
 
-    std::vector<VisualObject *> mVisualObjects;
 
-    VisualObject *mPlayer; //the controllable object
+    std::vector<GameObject *> mGameObjects;
+
+    GameObject *mPlayer; //the controllable object
     Light *mLight;
 
     Camera *mCurrentCamera{nullptr};

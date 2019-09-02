@@ -1,7 +1,8 @@
 #ifndef PHONGSHADER_H
 #define PHONGSHADER_H
 
-#include "shader.h"
+#include "Shaders/shader.h"
+#include "light.h"
 
 class PhongShader : public Shader {
 public:
@@ -10,7 +11,7 @@ public:
 
     void transmitUniformData(gsl::Matrix4x4 *modelMatrix, Material *material) override;
 
-    void setLight(class Light *light);
+    void setLight(Light *light);
 
 private:
     //    GLint textureUniform{-1};

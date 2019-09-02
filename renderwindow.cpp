@@ -10,12 +10,14 @@
 
 #include "mainwindow.h"
 
+
+#include "Components/meshcomponent.h"
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
 #include "billboard.h"
 #include "light.h"
-#include "objmesh.h"
+
 #include "octahedronball.h"
 #include "resourcemanager.h"
 #include "skybox.h"
@@ -115,12 +117,15 @@ void RenderWindow::init() {
     glBindTexture(GL_TEXTURE_2D, mTexture[2]->id());
 
     //********************** Making the objects to be drawn **********************
-    VisualObject *temp{nullptr};
 
-    temp = new XYZ();
+    GameObject *temp{nullptr};
+
+    temp = new GameObject("XYZ");
+    temp->addComponent(new XYZ());
     temp->init();
-    temp->setShader(ResourceManager::GetShader("plainshader"));
-    mVisualObjects.push_back(temp);
+
+    temp->setShaders(ResourceManager::GetShader("plainshader"));
+    mGameObjects.emplace_back(temp);
 
     //    temp = new OctahedronBall(2);
     //    temp->init();
@@ -130,54 +135,50 @@ void RenderWindow::init() {
     //    mVisualObjects.push_back(temp);
     //    mPlayer = temp;
 
-    temp = new SkyBox();
+
+    temp = new GameObject("Cube");
+    temp->addComponent(new SkyBox());
     temp->init();
-    temp->setShader(ResourceManager::GetShader("textureshader"));
-    temp->mMaterial.setTextureUnit(2);
+    temp->setShaders(ResourceManager::GetShader("textureshader"));
     temp->mMatrix.scale(15.f);
-    temp->mName = "Cube";
-    mVisualObjects.push_back(temp);
+    mGameObjects.emplace_back(temp);
 
-    temp = new BillBoard();
+    temp = new GameObject("Billboard");
+    temp->addComponent(new BillBoard());
     temp->init();
-    temp->setShader(ResourceManager::GetShader("textureshader"));
+    temp->setShaders(ResourceManager::GetShader("textureshader"));
     temp->mMatrix.translate(4.f, 0.f, -3.5f);
-    temp->mName = "Billboard";
-    temp->mRenderWindow = this;
-    temp->mMaterial.setTextureUnit(1);
-    temp->mMaterial.mObjectColor = gsl::Vector3D(0.7f, 0.6f, 0.1f);
-    dynamic_cast<BillBoard *>(temp)->setConstantYUp(true);
-    mVisualObjects.push_back(temp);
+    //    temp->mRenderWindow = this; // Not sure if needed
+    mGameObjects.emplace_back(temp);
 
-    mLight = new Light();
+    mLight = new Light("Light");
     temp = mLight;
     temp->init();
-    temp->setShader(ResourceManager::GetShader("textureshader"));
+    temp->setShaders(ResourceManager::GetShader("textureshader"));
     temp->mMatrix.translate(2.5f, 3.f, 0.f);
     //    temp->mMatrix.rotateY(180.f);
-    temp->mName = "light";
-    temp->mRenderWindow = this;
-    temp->mMaterial.setTextureUnit(0);
-    temp->mMaterial.mObjectColor = gsl::Vector3D(0.1f, 0.1f, 0.8f);
-    mVisualObjects.push_back(temp);
+    //    temp->mRenderWindow = this;
+    mGameObjects.emplace_back(temp);
 
-    static_cast<PhongShader *>(ResourceManager::GetShader("phongshader"))->setLight(mLight);
+    dynamic_cast<PhongShader *>(ResourceManager::GetShader("phongshader"))->setLight(mLight);
 
     //testing triangle surface class
-    temp = new TriangleSurface("box2.txt");
+    temp = new GameObject("TriangleSurface");
+    auto *tempMesh = new MeshComponent("box2.txt");
+    temp->addComponent(tempMesh);
     temp->init();
     temp->mMatrix.rotateY(180.f);
-    temp->setShader(ResourceManager::GetShader("plainshader"));
-    mVisualObjects.push_back(temp);
+    temp->setShaders(ResourceManager::GetShader("plainshader"));
+    mGameObjects.emplace_back(temp);
 
     //one monkey
-    temp = new ObjMesh("monkey.obj");
-    temp->setShader(ResourceManager::GetShader("phongshader"));
+    temp = new GameObject("Monkey");
+    temp->addComponent(new MeshComponent("monkey.obj"));
+    temp->setShaders(ResourceManager::GetShader("phongshader"));
     temp->init();
-    temp->mName = "Monkey";
     temp->mMatrix.scale(0.5f);
     temp->mMatrix.translate(3.f, 2.f, -2.f);
-    mVisualObjects.push_back(temp);
+    mGameObjects.emplace_back(temp);
 
     //     testing objmesh class - many of them!
     // here we see the need for resource management!
@@ -232,8 +233,8 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (auto visObject : mVisualObjects) {
-        visObject->draw();
+    for (auto visObject : mGameObjects) {
+        visObject->update();
         //        checkForGLerrors();
     }
 

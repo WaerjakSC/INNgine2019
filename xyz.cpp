@@ -1,22 +1,21 @@
 #include "xyz.h"
 #include "Shaders/shader.h"
 #include "innpch.h"
+
 XYZ::XYZ() {
-    mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
-    mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
-    mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
-    mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
-    mMatrix.setToIdentity();
+    mesh = new meshData();
+    mesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mesh->mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
+    mesh->mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
+    mesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
+    mesh->mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 }
 
 XYZ::~XYZ() {
 }
 
 void XYZ::init() {
-    //    VisualObject::init(matrixUniform, viewMatrixUniform, projectionMatrixUniform);
-
     initializeOpenGLFunctions();
 
     //Vertex Array Object - VAO
@@ -27,7 +26,8 @@ void XYZ::init() {
     glGenBuffers(1, &mVBO);
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 
-    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), mVertices.data(), GL_STATIC_DRAW);
+
+    glBufferData(GL_ARRAY_BUFFER, mesh->mVertices.size() * sizeof(Vertex), mesh->mVertices.data(), GL_STATIC_DRAW);
 
     // 1rst attribute buffer : vertices
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
@@ -45,9 +45,10 @@ void XYZ::init() {
     glBindVertexArray(0);
 }
 
-void XYZ::draw() {
+
+void XYZ::draw(gsl::Matrix4x4 &mMatrix) {
     glUseProgram(mMaterial.mShader->getProgram());
     glBindVertexArray(mVAO);
     mMaterial.mShader->transmitUniformData(&mMatrix);
-    glDrawArrays(GL_LINES, 0, mVertices.size());
+    glDrawArrays(GL_LINES, 0, mesh->mVertices.size());
 }

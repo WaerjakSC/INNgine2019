@@ -1,19 +1,20 @@
 #ifndef OCTAHEDRONBALL_H
 #define OCTAHEDRONBALL_H
 
+#include "Components/meshcomponent.h"
 #include "gltypes.h"
 #include "vector3d.h"
-#include "visualobject.h"
 
 class Vertex;
 
-class OctahedronBall : public VisualObject {
+class OctahedronBall : public MeshComponent {
 public:
     OctahedronBall(int n = 0);
     ~OctahedronBall() override;
 
     virtual void init() override;
-    virtual void draw() override;
+
+    virtual void draw(gsl::Matrix4x4 &mMatrix) override;
 
     GLint getRecursions() const { return mRecursions; }
 

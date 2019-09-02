@@ -33,8 +33,8 @@ Shader *ResourceManager::GetShader(std::string name) {
 void ResourceManager::LoadTexture(std::string name) {
 }
 
-Texture *ResourceManager::GetTexture(std::string name) {
-}
+//Texture *ResourceManager::GetTexture(std::string name) {
+//}
 
-meshData ResourceManager::ReadMesh(std::string name) {
-}
+//meshData ResourceManager::ReadMesh(std::string name) {
+//}

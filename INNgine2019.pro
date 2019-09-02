@@ -22,7 +22,10 @@ HEADERS += \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
     Shaders/shader.h \
+    Components/component.h \
+    Components/meshcomponent.h \
     constants.h \
+    gameobject.h \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
@@ -41,7 +44,6 @@ HEADERS += \
     input.h \
     material.h \
     light.h \
-    objmesh.h \
 #    innpch.h \
     skybox.h \
 
@@ -58,6 +60,9 @@ SOURCES += main.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
+    Components/component.cpp \
+    Components/meshcomponent.cpp \
+    gameobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
@@ -73,7 +78,6 @@ SOURCES += main.cpp \
     input.cpp \
     material.cpp \
     light.cpp \
-    objmesh.cpp \
     skybox.cpp
 
 FORMS += \

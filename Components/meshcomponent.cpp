@@ -1,18 +1,19 @@
-#include "objmesh.h"
+#include "meshcomponent.h"
 #include "innpch.h"
 
-ObjMesh::ObjMesh() : VisualObject() {
+MeshComponent::MeshComponent() {
 }
 
-ObjMesh::ObjMesh(std::string filename) : VisualObject() {
+MeshComponent::MeshComponent(std::string filename) {
     readFile(filename);
-    mMatrix.setToIdentity();
 }
 
-ObjMesh::~ObjMesh() {
+MeshComponent::~MeshComponent() {
+    glDeleteVertexArrays(1, &mVAO);
+    glDeleteBuffers(1, &mVBO);
 }
 
-void ObjMesh::init() {
+void MeshComponent::init() {
     //must call this to use OpenGL functions
     initializeOpenGLFunctions();
 
@@ -24,7 +25,7 @@ void ObjMesh::init() {
     glGenBuffers(1, &mVBO);
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 
-    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), mVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mesh->mVertices.size() * sizeof(Vertex), mesh->mVertices.data(), GL_STATIC_DRAW);
 
     // 1rst attribute buffer : vertices
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
@@ -41,12 +42,31 @@ void ObjMesh::init() {
     //Second buffer - holds the indices (Element Array Buffer - EAB):
     glGenBuffers(1, &mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEAB);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndices.size() * sizeof(GLuint), mIndices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->mIndices.size() * sizeof(GLuint), mesh->mIndices.data(), GL_STATIC_DRAW);
 
     glBindVertexArray(0);
 }
 
-void ObjMesh::readFile(std::string filename) {
+void MeshComponent::draw(gsl::Matrix4x4 &mMatrix) {
+    glUseProgram(mMaterial.mShader->getProgram());
+    glBindVertexArray(mVAO);
+    mMaterial.mShader->transmitUniformData(&mMatrix, &mMaterial);
+    glDrawElements(GL_TRIANGLES, mesh->mIndices.size(), GL_UNSIGNED_INT, nullptr);
+    //    glBindVertexArray(0);
+}
+void MeshComponent::setShader(Shader *shader) {
+    mMaterial.mShader = shader;
+}
+
+meshData *MeshComponent::getMesh() const {
+    return mesh;
+}
+
+void MeshComponent::setMesh(meshData *value) {
+    mesh = value;
+}
+void MeshComponent::readFile(std::string filename) {
+    mesh = new meshData(); // Temporary!! whole function should be moved to resource manager probably
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + filename;
     std::ifstream fileIn;
@@ -162,13 +182,13 @@ void ObjMesh::readFile(std::string filename) {
                 if (uv > -1) //uv present!
                 {
                     Vertex tempVert(tempVertecies[index], tempNormals[normal], tempUVs[uv]);
-                    mVertices.push_back(tempVert);
+                    mesh->mVertices.push_back(tempVert);
                 } else //no uv in mesh data, use 0, 0 as uv
                 {
                     Vertex tempVert(tempVertecies[index], tempNormals[normal], gsl::Vector2D(0.0f, 0.0f));
-                    mVertices.push_back(tempVert);
+                    mesh->mVertices.push_back(tempVert);
                 }
-                mIndices.push_back(temp_index++);
+                mesh->mIndices.push_back(temp_index++);
             }
 
             //For some reason the winding order is backwards so fixing this by swapping the last two indices
@@ -182,12 +202,4 @@ void ObjMesh::readFile(std::string filename) {
     //beeing a nice boy and closing the file after use
     fileIn.close();
     qDebug() << "Obj file read: " << QString::fromStdString(filename);
-}
-
-void ObjMesh::draw() {
-    glUseProgram(mMaterial.mShader->getProgram());
-    glBindVertexArray(mVAO);
-    mMaterial.mShader->transmitUniformData(&mMatrix, &mMaterial);
-    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, nullptr);
-    //    glBindVertexArray(0);
 }
