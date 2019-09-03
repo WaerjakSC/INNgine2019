@@ -90,31 +90,23 @@ void RenderWindow::init() {
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
     //Compile shaders:
-    ResourceManager::LoadShader("plainshader", new ColorShader("plainshader"));
-    ResourceManager::LoadShader("textureshader", new TextureShader("textureshader"));
-    ResourceManager::LoadShader("phongshader", new PhongShader("phongshader"));
-
-    //mShaderProgram[0] = new ColorShader("plainshader");
-    //qDebug() << "Plain shader program id: " << mShaderProgram[0]->getProgram();
-    //mShaderProgram[1]= new TextureShader("textureshader");
-
-    //qDebug() << "Texture shader program id: " << mShaderProgram[1]->getProgram();
-    //mShaderProgram[2]= new PhongShader("phongshader");
-    //qDebug() << "Phong shader program id: " << mShaderProgram[2]->getProgram();
+    ResourceManager::LoadShader(ShaderType::Color);
+    ResourceManager::LoadShader(ShaderType::Tex);
+    ResourceManager::LoadShader(ShaderType::Phong);
 
     //**********************  Texture stuff: **********************
 
-    mTexture[0] = new Texture("white.bmp");
-    mTexture[1] = new Texture("hund.bmp", 1);
-    mTexture[2] = new Texture("skybox.bmp", 2);
+    ResourceManager::LoadTexture("white.bmp");
+    ResourceManager::LoadTexture("hund.bmp", 1);
+    ResourceManager::LoadTexture("skybox.bmp", 2);
 
     //Set the textures loaded to a texture unit
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mTexture[0]->id());
+    glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTexture("white.bmp")->id());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mTexture[1]->id());
+    glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTexture("hund.bmp")->id());
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mTexture[2]->id());
+    glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTexture("skybox.bmp")->id());
 
     //********************** Making the objects to be drawn **********************
 
@@ -123,8 +115,7 @@ void RenderWindow::init() {
     temp = new GameObject("XYZ");
     temp->addComponent(new XYZ());
     temp->init();
-
-    temp->setShaders(ResourceManager::GetShader("plainshader"));
+    temp->setShaders(ResourceManager::GetShader(ShaderType::Color));
     mGameObjects.emplace_back(temp);
 
     //    temp = new OctahedronBall(2);
@@ -138,14 +129,14 @@ void RenderWindow::init() {
     temp = new GameObject("Cube");
     temp->addComponent(new SkyBox());
     temp->init();
-    temp->setShaders(ResourceManager::GetShader("textureshader"));
+    temp->setShaders(ResourceManager::GetShader(ShaderType::Tex));
     temp->mMatrix.scale(15.f);
     mGameObjects.emplace_back(temp);
 
     temp = new GameObject("Billboard");
     temp->addComponent(new BillBoard());
     temp->init();
-    temp->setShaders(ResourceManager::GetShader("textureshader"));
+    temp->setShaders(ResourceManager::GetShader(ShaderType::Tex));
     temp->mMatrix.translate(4.f, 0.f, -3.5f);
     //    temp->mRenderWindow = this; // Not sure if needed
     mGameObjects.emplace_back(temp);
@@ -153,13 +144,13 @@ void RenderWindow::init() {
     mLight = new Light("Light");
     temp = mLight;
     temp->init();
-    temp->setShaders(ResourceManager::GetShader("textureshader"));
+    temp->setShaders(ResourceManager::GetShader(ShaderType::Tex));
     temp->mMatrix.translate(2.5f, 3.f, 0.f);
     //    temp->mMatrix.rotateY(180.f);
     //    temp->mRenderWindow = this;
     mGameObjects.emplace_back(temp);
 
-    dynamic_cast<PhongShader *>(ResourceManager::GetShader("phongshader"))->setLight(mLight);
+    dynamic_cast<PhongShader *>(ResourceManager::GetShader(ShaderType::Phong))->setLight(mLight);
 
     //testing triangle surface class
     temp = new GameObject("TriangleSurface");
@@ -167,13 +158,13 @@ void RenderWindow::init() {
     temp->addComponent(tempMesh);
     temp->init();
     temp->mMatrix.rotateY(180.f);
-    temp->setShaders(ResourceManager::GetShader("plainshader"));
+    temp->setShaders(ResourceManager::GetShader(ShaderType::Color));
     mGameObjects.emplace_back(temp);
 
     //one monkey
     temp = new GameObject("Monkey");
     temp->addComponent(new MeshComponent("monkey.obj"));
-    temp->setShaders(ResourceManager::GetShader("phongshader"));
+    temp->setShaders(ResourceManager::GetShader(ShaderType::Phong));
     temp->init();
     temp->mMatrix.scale(0.5f);
     temp->mMatrix.translate(3.f, 2.f, -2.f);
@@ -207,9 +198,9 @@ void RenderWindow::init() {
     //    mCurrentCamera->pitch(5.f);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    ResourceManager::GetShader("plainshader")->setCurrentCamera(mCurrentCamera);
-    ResourceManager::GetShader("textureshader")->setCurrentCamera(mCurrentCamera);
-    ResourceManager::GetShader("phongshader")->setCurrentCamera(mCurrentCamera);
+    ResourceManager::GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
+    ResourceManager::GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
+    ResourceManager::GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
 }
 
 ///Called each frame - doing the rendering
@@ -258,16 +249,16 @@ void RenderWindow::render() {
 }
 
 void RenderWindow::setupPlainShader(int shaderIndex) {
-    mMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader("plainshader")->getProgram(), "mMatrix");
-    vMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader("plainshader")->getProgram(), "vMatrix");
-    pMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader("plainshader")->getProgram(), "pMatrix");
+    mMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "mMatrix");
+    vMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "vMatrix");
+    pMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "pMatrix");
 }
 
 void RenderWindow::setupTextureShader(int shaderIndex) {
-    mMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "mMatrix");
-    vMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "vMatrix");
-    pMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "pMatrix");
-    mTextureUniform = glGetUniformLocation(ResourceManager::GetShader("textureshader")->getProgram(), "textureSampler");
+    mMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "mMatrix");
+    vMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "vMatrix");
+    pMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "pMatrix");
+    mTextureUniform = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "textureSampler");
 }
 
 //This function is called from Qt when window is exposed (shown)
