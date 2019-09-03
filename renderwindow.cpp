@@ -154,7 +154,7 @@ void RenderWindow::init() {
 
     //testing triangle surface class
     temp = new GameObject("TriangleSurface");
-    auto *tempMesh = new MeshComponent("box2.txt");
+    auto *tempMesh = new MeshComponent(ResourceManager::LoadMesh("box2.txt"));
     temp->addComponent(tempMesh);
     temp->init();
     temp->mMatrix.rotateY(180.f);
@@ -163,7 +163,7 @@ void RenderWindow::init() {
 
     //one monkey
     temp = new GameObject("Monkey");
-    temp->addComponent(new MeshComponent("monkey.obj"));
+    temp->addComponent(new MeshComponent(ResourceManager::LoadMesh("monkey.obj")));
     temp->setShaders(ResourceManager::GetShader(ShaderType::Phong));
     temp->init();
     temp->mMatrix.scale(0.5f);
@@ -190,7 +190,25 @@ void RenderWindow::init() {
     //            y++;
     //        }
     //    }
-
+    // Comment below and uncomment above to see difference in performance!
+    int x{0};
+    int y{0};
+    int numberOfObjs{100};
+    for (int i{0}; i < numberOfObjs; i++) {
+        temp = new GameObject("Monkey");
+        temp->addComponent(new MeshComponent(ResourceManager::LoadMesh("monkey.obj")));
+        temp->setShaders(ResourceManager::GetShader(ShaderType::Phong));
+        temp->init();
+        x++;
+        temp->mMatrix.translate(0.f + x, 0.f, -2.f - y);
+        temp->mMatrix.scale(0.5f);
+        mGameObjects.push_back(temp);
+        if (x % 10 == 0) {
+            x = 0;
+            y++;
+        }
+    }
+    // End of performance test
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
     mCurrentCamera->setPosition(gsl::Vector3D(1.f, 1.f, 4.4f));

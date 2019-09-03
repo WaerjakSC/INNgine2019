@@ -25,7 +25,9 @@ public:
     // Gets stored texture
     static Texture *GetTexture(std::string name);
     // Reads and loads mesh
-    static meshData *ReadMesh(std::string name);
+    static meshData *LoadMesh(std::string fileName);
+
+    static meshData *GetMesh(std::string name);
     // De-allocate loaded resources from memory
     static void Clear();
 
@@ -34,6 +36,8 @@ public:
 private:
     // Private constructor
     ResourceManager();
+
+    static bool readFile(std::string fileName);
 };
 
 #endif // RESOURCEMANAGER_H

@@ -3,13 +3,13 @@
 #include "innpch.h"
 
 XYZ::XYZ() {
-    mesh = new meshData();
-    mesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mesh->mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
-    mesh->mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
-    mesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
-    mesh->mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
+    mMesh = new meshData();
+    mMesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mMesh->mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mMesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
+    mMesh->mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
+    mMesh->mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
+    mMesh->mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 }
 
 XYZ::~XYZ() {
@@ -27,7 +27,7 @@ void XYZ::init() {
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 
 
-    glBufferData(GL_ARRAY_BUFFER, mesh->mVertices.size() * sizeof(Vertex), mesh->mVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mMesh->mVertices.size() * sizeof(Vertex), mMesh->mVertices.data(), GL_STATIC_DRAW);
 
     // 1rst attribute buffer : vertices
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
@@ -50,5 +50,5 @@ void XYZ::draw(gsl::Matrix4x4 &mMatrix) {
     glUseProgram(mMaterial.mShader->getProgram());
     glBindVertexArray(mVAO);
     mMaterial.mShader->transmitUniformData(&mMatrix);
-    glDrawArrays(GL_LINES, 0, mesh->mVertices.size());
+    glDrawArrays(GL_LINES, 0, mMesh->mVertices.size());
 }
