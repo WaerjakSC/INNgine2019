@@ -175,17 +175,16 @@ void RenderWindow::init() {
     //    int x{0};
     //    int y{0};
     //    int numberOfObjs{100};
-    //    for (int i{0}; i < numberOfObjs; i++)
-    //    {
-    //        temp = new ObjMesh("../INNgine2019/Assets/monkey.obj");
-    //        temp->setShader(mShaderProgram[0]);
+    //    for (int i{0}; i < numberOfObjs; i++) {
+    //        temp = new GameObject("Monkey");
+    //        temp->addComponent(new MeshComponent("monkey.obj"));
+    //        temp->setShaders(ResourceManager::GetShader(ShaderType::Phong));
     //        temp->init();
     //        x++;
     //        temp->mMatrix.translate(0.f + x, 0.f, -2.f - y);
     //        temp->mMatrix.scale(0.5f);
-    //        mVisualObjects.push_back(temp);
-    //        if(x%10 == 0)
-    //        {
+    //        mGameObjects.push_back(temp);
+    //        if (x % 10 == 0) {
     //            x = 0;
     //            y++;
     //        }
@@ -266,13 +265,13 @@ void RenderWindow::render() {
     //    calculateFramerate();
 }
 
-void RenderWindow::setupPlainShader(int shaderIndex) {
+void RenderWindow::setupPlainShader() {
     mMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "mMatrix");
     vMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "vMatrix");
     pMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "pMatrix");
 }
 
-void RenderWindow::setupTextureShader(int shaderIndex) {
+void RenderWindow::setupTextureShader() {
     mMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "mMatrix");
     vMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "vMatrix");
     pMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "pMatrix");

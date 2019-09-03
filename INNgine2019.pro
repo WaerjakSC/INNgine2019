@@ -39,7 +39,6 @@ HEADERS += \
     vertex.h \
     camera.h \
     gltypes.h \
-    input.h \
     material.h \
     light.h \
 #    innpch.h \
@@ -73,7 +72,6 @@ SOURCES += main.cpp \
     texture.cpp \
     vertex.cpp \
     camera.cpp \
-    input.cpp \
     material.cpp \
     light.cpp
 

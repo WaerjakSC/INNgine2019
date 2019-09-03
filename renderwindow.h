@@ -5,7 +5,6 @@
 
 #include "Components/inputcomponent.h"
 #include "gameobject.h"
-#include "input.h"
 #include "inputcomponent.h"
 #include "texture.h"
 #include <QElapsedTimer>
@@ -49,12 +48,12 @@ private:
     Texture *mTexture[4]{nullptr};      //We can hold 4 textures
     Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
-    void setupPlainShader(int shaderIndex);
+    void setupPlainShader();
     GLint mMatrixUniform0{-1};
     GLint vMatrixUniform0{-1};
     GLint pMatrixUniform0{-1};
 
-    void setupTextureShader(int shaderIndex);
+    void setupTextureShader();
     GLint mMatrixUniform1{-1};
     GLint vMatrixUniform1{-1};
     GLint pMatrixUniform1{-1};
