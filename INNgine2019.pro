@@ -8,7 +8,6 @@ TARGET      = INNgine2019
 PRECOMPILED_HEADER = innpch.h
 
 INCLUDEPATH +=  ./GSL
-
 HEADERS += \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
@@ -24,6 +23,7 @@ HEADERS += \
     Shaders/shader.h \
     Components/component.h \
     Components/meshcomponent.h \
+    Components/inputcomponent.h \
     Assets/Meshes/skybox.h \
     Assets/Meshes/billboard.h \
     Assets/Meshes/trianglesurface.h \
@@ -60,6 +60,7 @@ SOURCES += main.cpp \
     Shaders/shader.cpp \
     Components/component.cpp \
     Components/meshcomponent.cpp \
+    Components/inputcomponent.cpp \
     Assets/Meshes/skybox.cpp \
     Assets/Meshes/billboard.cpp \
     Assets/Meshes/trianglesurface.cpp \
