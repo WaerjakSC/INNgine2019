@@ -13,7 +13,11 @@
 //must inherit from QOpenGLFunctions_4_1_Core, since we use that instead of glfw/glew/glad
 
 class Camera;
-
+enum ShaderType {
+    Color = 0,
+    Tex = 1,
+    Phong = 2
+};
 class Shader : protected QOpenGLFunctions_4_1_Core {
 public:
     // Constructor generates the shader on the fly

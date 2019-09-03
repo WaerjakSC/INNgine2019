@@ -37,10 +37,8 @@ HEADERS += \
     triangle.h \
     texture.h \
     vertex.h \
-    visualobject.h \
     camera.h \
     gltypes.h \
-    input.h \
     material.h \
     light.h \
 #    innpch.h \
@@ -73,9 +71,7 @@ SOURCES += main.cpp \
     triangle.cpp \
     texture.cpp \
     vertex.cpp \
-    visualobject.cpp \
     camera.cpp \
-    input.cpp \
     material.cpp \
     light.cpp
 

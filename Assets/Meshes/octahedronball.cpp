@@ -4,7 +4,7 @@
 
 OctahedronBall::OctahedronBall(GLint n) : mRecursions{n}, mIndex{0}
 {
-    mesh = new meshData();
+    mMesh = new meshData();
     mNumberOfVertices = static_cast<GLuint>(3 * 8 * std::pow(4, mRecursions));
     makeUnitOctahedron();
 }
@@ -14,9 +14,9 @@ OctahedronBall::~OctahedronBall() {
 
 void OctahedronBall::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3)
 {
-    mesh->mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
-    mesh->mVertices.push_back(Vertex(v2, v2, gsl::Vector2D(1.f, 0.f)));
-    mesh->mVertices.push_back(Vertex(v3, v3, gsl::Vector2D(0.5f, 1.f)));
+    mMesh->mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
+    mMesh->mVertices.push_back(Vertex(v2, v2, gsl::Vector2D(1.f, 0.f)));
+    mMesh->mVertices.push_back(Vertex(v3, v3, gsl::Vector2D(0.5f, 1.f)));
 }
 
 void OctahedronBall::subDivide(const gsl::Vector3D &a, const gsl::Vector3D &b, const gsl::Vector3D &c, GLint n)
@@ -74,7 +74,7 @@ void OctahedronBall::init() {
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 
 
-    glBufferData(GL_ARRAY_BUFFER, mesh->mVertices.size() * sizeof(Vertex), mesh->mVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mMesh->mVertices.size() * sizeof(Vertex), mMesh->mVertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
@@ -95,6 +95,6 @@ void OctahedronBall::draw(gsl::Matrix4x4 &mMatrix)
     glUseProgram(mMaterial.mShader->getProgram());
     glBindVertexArray(mVAO);
     mMaterial.mShader->transmitUniformData(&mMatrix, &mMaterial);
-    glDrawArrays(GL_TRIANGLES, 0, mesh->mVertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, mMesh->mVertices.size());
     glBindVertexArray(0);
 }

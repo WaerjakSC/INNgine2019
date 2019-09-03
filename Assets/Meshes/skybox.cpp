@@ -2,8 +2,8 @@
 #include "innpch.h"
 
 SkyBox::SkyBox() {
-    mesh = new meshData();
-    mesh->mVertices.insert(mesh->mVertices.end(),
+    mMesh = new meshData();
+    mMesh->mVertices.insert(mMesh->mVertices.end(),
                            {
                                //Vertex data for front
                                Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.333f)}, //v0
@@ -42,7 +42,7 @@ SkyBox::SkyBox() {
                                Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.999f)}    //v23
                            });
 
-    mesh->mIndices.insert(mesh->mIndices.end(),
+    mMesh->mIndices.insert(mMesh->mIndices.end(),
                           {
                               0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
                               4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)

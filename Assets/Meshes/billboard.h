@@ -1,11 +1,8 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-
 #include "Components/meshcomponent.h"
 #include "vector3d.h"
-#include "visualobject.h"
-
 
 class BillBoard : public MeshComponent {
 public:

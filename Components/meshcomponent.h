@@ -16,6 +16,8 @@ class MeshComponent : public QOpenGLFunctions_4_1_Core, public Component {
 public:
     MeshComponent();
     MeshComponent(std::string filename);
+    MeshComponent(meshData *mMesh);
+
     virtual ~MeshComponent();
 
     virtual void init();
@@ -29,10 +31,10 @@ public:
 
     meshData *getMesh() const;
 
-    void setMesh(meshData *value);
+    void setMesh(meshData *mesh);
 
 protected:
-    meshData *mesh{nullptr}; // could be a shared_ptr? not sure about performance though
+    meshData *mMesh{nullptr}; // could be a shared_ptr? not sure about performance though
 
     GLuint mVAO{0};
     GLuint mVBO{0};
