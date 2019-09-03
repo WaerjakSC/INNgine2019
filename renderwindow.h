@@ -5,7 +5,6 @@
 
 #include "Components/inputcomponent.h"
 #include "gameobject.h"
-#include "inputcomponent.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>
