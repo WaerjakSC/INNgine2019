@@ -20,6 +20,9 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : Textures) {
         delete texture.second;
     }
+    for (auto &mesh : Meshes) {
+        delete mesh.second;
+    }
 }
 
 void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
