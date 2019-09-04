@@ -15,7 +15,6 @@ struct meshData {
 class MeshComponent : public QOpenGLFunctions_4_1_Core, public Component {
 public:
     MeshComponent();
-    MeshComponent(std::string filename);
     MeshComponent(meshData *mMesh);
 
     virtual ~MeshComponent();
@@ -25,7 +24,6 @@ public:
 
     Material mMaterial;
 
-    void readFile(std::string filename);
 
     void setShader(Shader *shader);
 
