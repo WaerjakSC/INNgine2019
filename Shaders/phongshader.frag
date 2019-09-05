@@ -5,7 +5,7 @@ in vec3 normalTransposed;   //Normal
 in vec3 fragmentPosition;   //FragPos
 //in vec2 UV;
 
-uniform float ambientStrengt;   // hardcoded in tutorial
+uniform float ambientStrength;   // hardcoded in tutorial
 uniform vec3 lightPosition;     // lightPos
 in vec3 cameraPosition;    // viewPos
 uniform vec3 lightColor;
@@ -18,7 +18,7 @@ uniform int specularExponent;
 
 void main() {
     //ambient
-    vec3 ambient = ambientStrengt * lightColor;
+    vec3 ambient = ambientStrength * lightColor;
 
     //diffuse
     vec3 normalCorrected = normalize(normalTransposed);

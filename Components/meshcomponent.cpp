@@ -1,6 +1,6 @@
 #include "meshcomponent.h"
 #include "innpch.h"
-
+#include "materialcomponent.h"
 MeshComponent::MeshComponent() {
 }
 
@@ -12,9 +12,7 @@ MeshComponent::~MeshComponent() {
     glDeleteBuffers(1, &mVBO);
 }
 
-void MeshComponent::update(float dt)
-{
-
+void MeshComponent::update(float dt) {
 }
 
 // Code initialization (Similar to Unity's void Start()), separating the constructor and code initialization
@@ -54,17 +52,13 @@ void MeshComponent::init() {
     }
 }
 
-void MeshComponent::draw(gsl::Matrix4x4 &mMatrix) {
-    glUseProgram(mMaterial.mShader->getProgram());
+void MeshComponent::draw(MaterialComponent *material) {
+    glUseProgram(material->getShader()->getProgram());
     glBindVertexArray(mVAO);
-    mMaterial.mShader->transmitUniformData(&mMatrix, &mMaterial);
     if (mMesh) {
         glDrawElements(GL_TRIANGLES, mMesh->mIndices.size(), GL_UNSIGNED_INT, nullptr);
     }
     //    glBindVertexArray(0);
-}
-void MeshComponent::setShader(Shader *shader) {
-    mMaterial.mShader = shader;
 }
 
 meshData *MeshComponent::getMesh() const {

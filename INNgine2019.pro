@@ -34,6 +34,7 @@ HEADERS += \
     Assets/Meshes/trianglesurface.h \
     Assets/Meshes/octahedronball.h \
     Assets/Meshes/xyz.h \
+    Systems/rendersystem.h \
     constants.h \
     gameobject.h \
     renderwindow.h \
@@ -44,8 +45,7 @@ HEADERS += \
     vertex.h \
     camera.h \
     gltypes.h \
-    material.h \
-    light.h \
+    light.h
 #    innpch.h \
 
 
@@ -74,6 +74,7 @@ SOURCES += main.cpp \
     Assets/Meshes/trianglesurface.cpp \
     Assets/Meshes/octahedronball.cpp \
     Assets/Meshes/xyz.cpp \
+    Systems/rendersystem.cpp \
     gameobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
@@ -82,7 +83,6 @@ SOURCES += main.cpp \
     texture.cpp \
     vertex.cpp \
     camera.cpp \
-    material.cpp \
     light.cpp
 
 FORMS += \

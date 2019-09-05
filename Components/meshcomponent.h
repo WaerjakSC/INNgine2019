@@ -11,7 +11,7 @@ struct meshData {
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
 };
-
+class MaterialComponent;
 class MeshComponent : public QOpenGLFunctions_4_1_Core, public Component {
 public:
     MeshComponent();
@@ -20,9 +20,7 @@ public:
     virtual ~MeshComponent();
     virtual void update(float dt);
     virtual void init();
-    virtual void draw(gsl::Matrix4x4 &mMatrix);
-
-    Material mMaterial;
+    virtual void draw(MaterialComponent *material);
 
     void setShader(Shader *shader);
 

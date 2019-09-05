@@ -149,7 +149,7 @@ void RenderWindow::init() {
     //    temp->mRenderWindow = this;
     mGameObjects.emplace_back(temp);
 
-    dynamic_cast<PhongShader *>(ResourceManager::GetShader(ShaderType::Phong))->setLight(mLight);
+    //    dynamic_cast<PhongShader *>(ResourceManager::GetShader(ShaderType::Phong))->setLight(mLight);
 
     //testing triangle surface class
     temp = new GameObject("TriangleSurface");
