@@ -4,6 +4,18 @@
 
 // InputComponent handling user inputs (moved from renderwindow and implemented here)
 
+// Updates each game loop/tick
+void InputComponent::update(float dt)
+{
+
+}
+
+// Code initialization (Similar to Unity's void Start()), separating the constructor and code initialization
+void InputComponent::init()
+{
+
+}
+
 InputComponent::InputComponent(MainWindow *mainWindow) : mMainWindow(mainWindow)
 {
 

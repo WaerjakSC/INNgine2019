@@ -18,12 +18,11 @@ public:
     MeshComponent(meshData *mMesh);
 
     virtual ~MeshComponent();
-
+    virtual void update(float dt);
     virtual void init();
     virtual void draw(gsl::Matrix4x4 &mMatrix);
 
     Material mMaterial;
-
 
     void setShader(Shader *shader);
 

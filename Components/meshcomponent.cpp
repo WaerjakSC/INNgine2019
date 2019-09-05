@@ -12,6 +12,12 @@ MeshComponent::~MeshComponent() {
     glDeleteBuffers(1, &mVBO);
 }
 
+void MeshComponent::update(float dt)
+{
+
+}
+
+// Code initialization (Similar to Unity's void Start()), separating the constructor and code initialization
 void MeshComponent::init() {
     if (mMesh) { // Make sure you're not trying to use a nullptr
         //must call this to use OpenGL functions

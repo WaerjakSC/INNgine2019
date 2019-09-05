@@ -7,6 +7,10 @@
 
 class InputComponent : public Component {
 public:
+
+    virtual void update(float dt);
+    virtual void init();
+
     InputComponent(MainWindow *mainWindow);
 
     bool W{false};
