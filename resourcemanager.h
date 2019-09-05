@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "Components/meshcomponent.h"
+#include "Components/comppch.h"
 #include "Shaders/shader.h"
 #include "texture.h"
 
@@ -25,10 +25,19 @@ public:
     // Gets stored texture
     static Texture *GetTexture(std::string name);
     // Reads and loads mesh
-
     static meshData *LoadMesh(std::string fileName);
-
+    // Gets the mesh
     static meshData *GetMesh(std::string name);
+
+    // Component vectors
+    std::vector<InputComponent> inputs;
+    std::vector<LightingComponent> lighting;
+    std::vector<MaterialComponent> materials;
+    std::vector<MeshComponent> meshes;
+    std::vector<PhysicsComponent> physics;
+    std::vector<SoundComponent> sounds;
+    std::vector<TransformComponent> transforms;
+
     // De-allocate loaded resources from memory
     static void Clear();
 
