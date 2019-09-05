@@ -9,6 +9,11 @@ PRECOMPILED_HEADER = innpch.h
 
 INCLUDEPATH +=  ./GSL
 HEADERS += \
+    Components/lightingcomponent.h \
+    Components/materialcomponent.h \
+    Components/physicscomponent.h \
+    Components/soundcomponent.h \
+    Components/transformcomponent.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -45,6 +50,11 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
+    Components/lightingcomponent.cpp \
+    Components/materialcomponent.cpp \
+    Components/physicscomponent.cpp \
+    Components/soundcomponent.cpp \
+    Components/transformcomponent.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
     GSL/matrix4x4.cpp \

@@ -12,6 +12,7 @@ public:
 
     std::string mName;
 
+    GLuint eID;
     virtual void update();
 
     void addComponent(Component *comp);
@@ -22,6 +23,7 @@ public:
     void setShaders(Shader *shader);
 
 private:
+    GLuint mComponents[8];
     std::vector<Component *> Components; // Needs testing, not sure if it needs to be a different type
 };
 

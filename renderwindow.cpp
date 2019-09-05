@@ -169,26 +169,6 @@ void RenderWindow::init() {
     temp->mMatrix.translate(3.f, 2.f, -2.f);
     mGameObjects.emplace_back(temp);
 
-    //     testing objmesh class - many of them!
-    // here we see the need for resource management!
-    //    int x{0};
-    //    int y{0};
-    //    int numberOfObjs{100};
-    //    for (int i{0}; i < numberOfObjs; i++) {
-    //        temp = new GameObject("Monkey");
-    //        temp->addComponent(new MeshComponent("monkey.obj"));
-    //        temp->setShaders(ResourceManager::GetShader(ShaderType::Phong));
-    //        temp->init();
-    //        x++;
-    //        temp->mMatrix.translate(0.f + x, 0.f, -2.f - y);
-    //        temp->mMatrix.scale(0.5f);
-    //        mGameObjects.push_back(temp);
-    //        if (x % 10 == 0) {
-    //            x = 0;
-    //            y++;
-    //        }
-    //    }
-    // Comment below and uncomment above to see difference in performance!
     int x{0};
     int y{0};
     int numberOfObjs{100};
