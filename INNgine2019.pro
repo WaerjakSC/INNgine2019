@@ -8,8 +8,12 @@ TARGET      = INNgine2019
 PRECOMPILED_HEADER = innpch.h
 
 INCLUDEPATH +=  ./GSL
-
 HEADERS += \
+    Components/lightingcomponent.h \
+    Components/materialcomponent.h \
+    Components/physicscomponent.h \
+    Components/soundcomponent.h \
+    Components/transformcomponent.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -24,29 +28,30 @@ HEADERS += \
     Shaders/shader.h \
     Components/component.h \
     Components/meshcomponent.h \
-    Assets/Meshes/skybox.h \
-    Assets/Meshes/billboard.h \
+    Components/inputcomponent.h \
     Assets/Meshes/trianglesurface.h \
-    Assets/Meshes/octahedronball.h \
-    Assets/Meshes/xyz.h \
+    Systems/rendersystem.h \
     constants.h \
+    billboard.h \
     gameobject.h \
+    lightobject.h \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
     triangle.h \
     texture.h \
     vertex.h \
-    visualobject.h \
     camera.h \
-    gltypes.h \
-    input.h \
-    material.h \
-    light.h \
+    gltypes.h
 #    innpch.h \
 
 
 SOURCES += main.cpp \
+    Components/lightingcomponent.cpp \
+    Components/materialcomponent.cpp \
+    Components/physicscomponent.cpp \
+    Components/soundcomponent.cpp \
+    Components/transformcomponent.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
     GSL/matrix4x4.cpp \
@@ -60,23 +65,19 @@ SOURCES += main.cpp \
     Shaders/shader.cpp \
     Components/component.cpp \
     Components/meshcomponent.cpp \
-    Assets/Meshes/skybox.cpp \
-    Assets/Meshes/billboard.cpp \
+    Components/inputcomponent.cpp \
     Assets/Meshes/trianglesurface.cpp \
-    Assets/Meshes/octahedronball.cpp \
-    Assets/Meshes/xyz.cpp \
+    Systems/rendersystem.cpp \
+    billboard.cpp \
     gameobject.cpp \
+    lightobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
     triangle.cpp \
     texture.cpp \
     vertex.cpp \
-    visualobject.cpp \
-    camera.cpp \
-    input.cpp \
-    material.cpp \
-    light.cpp
+    camera.cpp
 
 FORMS += \
     mainwindow.ui

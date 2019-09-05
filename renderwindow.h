@@ -14,7 +14,7 @@
 class QOpenGLContext;
 class Shader;
 class MainWindow;
-class Light;
+class LightObject;
 
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
@@ -62,7 +62,9 @@ private:
     std::vector<GameObject *> mGameObjects;
 
     GameObject *mPlayer; //the controllable object
-    Light *mLight;
+
+    LightObject *mLight;
+    InputComponent *mInput;
 
     Camera *mCurrentCamera{nullptr};
 

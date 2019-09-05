@@ -1,44 +1,44 @@
 #include "gameobject.h"
 
-GameObject::GameObject(std::string name) : mName(name) {
+GameObject::GameObject(GLuint ID, std::string name) : mName(name), eID(ID) {
+    // Reserve 7 slots and set all to -1 to indicate that the entity has no components yet.
+    for (std::size_t i = 0; i < 7; i++) {
+        mComponentsID.push_back(-1);
+    }
     mMatrix.setToIdentity();
 }
+
+GameObject::~GameObject() {
+}
+
+bool GameObject::hasComponent(CType type) {
+    return mComponentsID.at((int)type) > -1;
+}
 void GameObject::init() {
-    for (auto *mesh : getMeshComponents()) {
-        mesh->init();
-    }
 }
 void GameObject::update() {
-    for (auto *mesh : getMeshComponents()) {
-        mesh->draw(mMatrix);
-    }
+    //    for (auto *mesh : getMeshComponents()) {
+    //        mesh->draw(mMatrix);
+    //    }
 }
-/**
- * @brief GameObject::addComponent
- * @param comp
- * Not sure about checking for uniqueness and stuff for components that you only ever want one of...
- */
-//template <typename compType> // In theory this template should allow the adding of any class that inherits from the Component class
-void GameObject::addComponent(Component *comp) {
-    Components.push_back(comp);
-}
-std::vector<MeshComponent *> GameObject::getMeshComponents() {
-    std::vector<MeshComponent *> temp;
-    // Temporary way to init meshcomponents, probably very inefficient
-    for (Component *comp : Components) {
-        auto *mesh = dynamic_cast<MeshComponent *>(comp);
-        if (mesh) {
-            temp.emplace_back(mesh);
-        }
-    }
-    return temp;
-}
+
+//std::vector<MeshComponent *> GameObject::getMeshComponents() {
+//    std::vector<MeshComponent *> temp;
+//    // Temporary way to init meshcomponents, probably very inefficient
+//    for (Component *comp : Components) {
+//        auto *mesh = dynamic_cast<MeshComponent *>(comp);
+//        if (mesh) {
+//            temp.emplace_back(mesh);
+//        }
+//    }
+//    return temp;
+//}
 /**
  * @brief GameObject::setShaders
  * Potentially temporary function (if we want to let a gameobject have more than one mesh component with different shaders, this won't be sufficient)
  */
-void GameObject::setShaders(Shader *shader) {
-    for (auto *mesh : getMeshComponents()) {
-        mesh->setShader(shader);
-    }
-}
+//void GameObject::setShaders(Shader *shader) {
+//    for (auto *mesh : getMeshComponents()) {
+//        mesh->setShader(shader);
+//    }
+//}

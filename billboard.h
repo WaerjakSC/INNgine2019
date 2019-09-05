@@ -1,22 +1,22 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-
-#include "Components/meshcomponent.h"
+#include "gameobject.h"
 #include "vector3d.h"
-#include "visualobject.h"
-
-
-class BillBoard : public MeshComponent {
+class TransformComponent;
+class MaterialComponent;
+class BillBoard : public GameObject {
 public:
-    BillBoard();
+    BillBoard(GLuint eID, std::string name);
+    ~BillBoard();
 
-    virtual void init() override;
-    virtual void draw(gsl::Matrix4x4 &mMatrix) override;
+    virtual void update() override;
 
     gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
 
     void setConstantYUp(bool constantUp);
+
+    void update(MaterialComponent *material, TransformComponent *transform);
 
 private:
     gsl::Vector3D normal{0.f, 0.f, -1.f};

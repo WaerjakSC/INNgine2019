@@ -4,10 +4,9 @@
 #include "Components/meshcomponent.h"
 #include "gameobject.h"
 
-
-class Light : public GameObject {
+class LightObject : public GameObject {
 public:
-    Light(std::string name);
+    LightObject(GLuint eID, std::string name);
 
     GLfloat mAmbientStrenght{0.3f};
     gsl::Vector3D mAmbientColor{0.3f, 0.3f, 0.3f};
