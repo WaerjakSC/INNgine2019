@@ -11,8 +11,11 @@ public:
 
     virtual ~MeshComponent();
 
+    virtual ~MeshComponent();
+    virtual void update(float dt);
     virtual void init();
     virtual void draw(MaterialComponent *material);
+
 
     GLuint mVAO{0};
     GLuint mVBO{0};

@@ -13,7 +13,6 @@ public:
 
     std::string mName;
 
-
     GLuint eID;
     std::vector<int> mComponentsID;
 

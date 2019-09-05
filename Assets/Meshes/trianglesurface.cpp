@@ -122,3 +122,4 @@ TriangleSurface::TriangleSurface() {
 //            mMesh->mVertices.push_back(Vertex{x + h, y + h, z, x, y, z});
 //        }
 //}
+

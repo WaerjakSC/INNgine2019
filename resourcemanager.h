@@ -7,6 +7,10 @@
 #include "texture.h"
 #include <QOpenGLFunctions_4_1_Core>
 
+#include "Components/comppch.h"
+#include "Shaders/shader.h"
+#include "texture.h"
+
 // Resource manager work in progress
 struct meshData {
     meshData() = default;

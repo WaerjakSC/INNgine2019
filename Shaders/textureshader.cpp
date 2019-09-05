@@ -1,6 +1,6 @@
 #include "textureshader.h"
+#include "Components/materialcomponent.h"
 #include "innpch.h"
-#include "material.h"
 
 TextureShader::TextureShader(const std::string shaderName, const GLchar *geometryPath)
     : Shader(shaderName, geometryPath) {
@@ -15,7 +15,7 @@ TextureShader::~TextureShader() {
     qDebug() << "Deleting TextureShader";
 }
 
-void TextureShader::transmitUniformData(gsl::Matrix4x4 *modelMatrix, Material *material) {
+void TextureShader::transmitUniformData(gsl::Matrix4x4 *modelMatrix, MaterialData *material) {
     Shader::transmitUniformData(modelMatrix);
 
     glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);

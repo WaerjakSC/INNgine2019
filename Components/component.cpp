@@ -6,6 +6,7 @@ Component::Component() {
 Component::~Component() {
 }
 
+
 CType Component::type() const {
     return mType;
 }

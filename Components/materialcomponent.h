@@ -20,10 +20,11 @@ public:
     void update(float dt);
     virtual void draw(gsl::Matrix4x4 &mMatrix);
 
+
+    void setShader(Shader *getShader);
     void setTextureUnit(const GLuint &textureUnit);
     virtual void setColor(const gsl::Vector3D &color);
 
-    void setShader(Shader *getShader);
     Shader *getShader() const;
 
 protected:

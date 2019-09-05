@@ -12,3 +12,12 @@ LightingComponent::LightingComponent() {
 //    material.mObjectColor = color;
 //    light.mObjectColor = color;
 //}
+
+void LightingComponent::draw(gsl::Matrix4x4 &mMatrix) {
+    mShader->transmitUniformData(&mMatrix, &light);
+}
+void LightingComponent::setColor(const gsl::Vector3D &color) {
+    material.mObjectColor = color;
+    light.mObjectColor = color;
+}
+

@@ -6,6 +6,7 @@
 class TransformComponent;
 class MaterialComponent;
 class BillBoard : public GameObject {
+
 public:
     BillBoard(GLuint eID, std::string name);
     ~BillBoard();

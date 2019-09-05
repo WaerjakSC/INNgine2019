@@ -3,8 +3,8 @@
 
 #include "camera.h"
 
+#include "Components/inputcomponent.h"
 #include "gameobject.h"
-#include "input.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>
@@ -23,6 +23,7 @@ class LightObject;
 class RenderWindow : public QWindow, protected QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
+    RenderWindow();
     RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow);
     ~RenderWindow() override;
 
@@ -32,45 +33,45 @@ public:
     void toggleWireframe();
 
     void checkForGLerrors();
+    void setCameraSpeed(float value);
 
 private slots:
     void render();
 
 private:
     void init();
-    void setCameraSpeed(float value);
 
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-
     Texture *mTexture[4]{nullptr};      //We can hold 4 textures
     Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
-    void setupPlainShader(int shaderIndex);
+    void setupPlainShader();
     GLint mMatrixUniform0{-1};
     GLint vMatrixUniform0{-1};
     GLint pMatrixUniform0{-1};
 
-    void setupTextureShader(int shaderIndex);
+    void setupTextureShader();
     GLint mMatrixUniform1{-1};
     GLint vMatrixUniform1{-1};
     GLint pMatrixUniform1{-1};
     GLint mTextureUniform{-1};
-
 
     std::vector<GameObject *> mGameObjects;
 
     GameObject *mPlayer; //the controllable object
 
     LightObject *mLight;
+
     InputComponent *mInput;
 
     Camera *mCurrentCamera{nullptr};
 
     bool mWireframe{false};
 
-    Input mInput;
+    //Input mInput;
+
     float mCameraSpeed{0.01f};
     float mCameraRotateSpeed{0.1f};
     int mMouseXlast{0};

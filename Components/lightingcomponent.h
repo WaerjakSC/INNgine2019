@@ -28,6 +28,7 @@ public:
 
     //    void setColor(const gsl::Vector3D &color);
 
+
 private:
     LightData light;
 };

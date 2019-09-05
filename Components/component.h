@@ -1,5 +1,6 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
+#include "matrix4x4.h"
 
 #include "matrix4x4.h"
 enum CType {
@@ -29,6 +30,7 @@ public:
 
 protected:
     CType mType;
+
 };
 
 #endif // COMPONENT_H

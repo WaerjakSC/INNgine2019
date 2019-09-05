@@ -23,6 +23,9 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : Textures) {
         delete texture.second;
     }
+    for (auto &mesh : Meshes) {
+        delete mesh.second;
+    }
 }
 Component *ResourceManager::getComponent(CType type, int eID) {
     if (eID <= -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
@@ -393,11 +396,11 @@ void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
     }
 }
 
-void ResourceManager::LoadShader(std::string name, Shader *shader) {
-    if (shader && Shaders.find(name) == Shaders.end()) {
-        Shaders[name] = shader;
+void ResourceManager::LoadTexture(std::string fileName, GLuint textureUnit) {
+    if (Textures.find(fileName) == Textures.end()) {
+        Textures[fileName] = new Texture(fileName, textureUnit);
 
-        qDebug() << "ResourceManager: Added shader " << QString::fromStdString(name);
+        qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
     }
 }
 
@@ -408,6 +411,51 @@ Shader *ResourceManager::GetShader(ShaderType type) {
 Texture *ResourceManager::GetTexture(std::string fileName) {
     return Textures[fileName];
 }
+/**
+ * @brief ResourceManager::LoadMesh - Loads the meshData from file if it isn't already in the Meshes map.
+ * @param fileName
+ * @return
+ */
+meshData *ResourceManager::LoadMesh(std::string fileName) {
+    if (Meshes.find(fileName) == Meshes.end()) { // If the mesh isn't already in the Meshes array, create it.
+        if (!readFile(fileName)) {               // Should run readFile and add the mesh to the Meshes map if it can be found
+            qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
+            return 0;
+        }
+        return Meshes[fileName];
+    }
+    return Meshes[fileName]; // Simply return the correct meshData if it has already been loaded
+}
+/**
+ * @brief ResourceManager::GetMesh - Use this function if you know you've already loaded the mesh.
+ * @param name
+ * @return
+ */
+meshData *ResourceManager::GetMesh(std::string name) {
+    return Meshes[name];
+}
+bool ResourceManager::readFile(std::string fileName) {
+    auto *mesh = new meshData(); // Prepare the mesh data container
+    //Open File
+    std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
+    std::ifstream fileIn;
+    fileIn.open(fileWithPath, std::ifstream::in);
+    if (!fileIn) {
+        qDebug() << "Could not open file for reading: " << QString::fromStdString(fileName);
+        return false;
+    }
+
+    //One line at a time-variable
+    std::string oneLine;
+    //One word at a time-variable
+    std::string oneWord;
+
+    std::vector<gsl::Vector3D> tempVertecies;
+    std::vector<gsl::Vector3D> tempNormals;
+    std::vector<gsl::Vector2D> tempUVs;
+
+    // Variable for constructing the indices vector
+    unsigned int temp_index = 0;
 
 /**
  * @brief ResourceManager::LoadMesh - Loads the mesh from file if it isn't already in the Meshes map.
@@ -502,7 +550,6 @@ bool ResourceManager::readFile(std::string fileName) {
 
             //Vertex made - pushing it into vertex-vector
             tempVertecies.push_back(tempVertex);
-
             continue;
         }
         if (oneWord == "vt") {
