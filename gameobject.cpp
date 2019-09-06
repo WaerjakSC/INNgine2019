@@ -11,10 +11,14 @@ GameObject::GameObject(GLuint ID, std::string name) : mName(name), eID(ID) {
 GameObject::~GameObject() {
 }
 
-bool GameObject::hasComponent(CType type) {
+bool GameObject::hasComponent(const CType type) {
     return mComponentsID.at((int)type) > -1;
 }
 void GameObject::init() {
+}
+
+int GameObject::getComponentIndex(const CType type) {
+    return mComponentsID.at(type);
 }
 void GameObject::update() {
     //    for (auto *mesh : getMeshComponents()) {

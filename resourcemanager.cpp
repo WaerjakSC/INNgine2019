@@ -29,22 +29,24 @@ Component *ResourceManager::getComponent(CType type, int eID) {
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
     if (eID <= mGameObjects.size() && mGameObjects.at(eID).hasComponent(type)) {
+        // Get the index of the desired component. Index is saved in entity -- mComponentsID
+        int index = mGameObjects.at(eID).getComponentIndex(type);
         switch (type) {
         case Transform:
-            // Returns a pointer to the transform component. Index is saved in entity -- mComponentsID.at((int)type)
-            return &mTransforms.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            // Returns a pointer to the transform component.
+            return &mTransforms.at(index);
         case Material:
-            return &mMaterials.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            return &mMaterials.at(index);
         case Mesh:
-            return &mMeshes.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            return &mMeshes.at(index);
         case Light:
-            return &mLighting.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            return &mLighting.at(index);
         case Input:
-            return &mInputs.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            return &mInputs.at(index);
         case Physics:
-            return &mPhysics.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            return &mPhysics.at(index);
         case Sound:
-            return &mSounds.at(mGameObjects.at(eID).mComponentsID.at((int)type));
+            return &mSounds.at(index);
         }
     } else {
         qDebug() << "No GameObject with this ID exists.";
@@ -56,14 +58,13 @@ void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
     if (eID <= mGameObjects.size() && mGameObjects.at(eID).hasComponent(Mesh)) {
-        mMeshes.at(mGameObjects.at(eID).mComponentsID.at((int)Mesh)) = *mesh;
+        mMeshes.at(mGameObjects.at(eID).getComponentIndex(Mesh)) = *mesh;
     }
 }
 /**
  * @brief ResourceManager::addComponent - Generic component creator
- * The if-check
- * @param type
- * @param eID
+ * @param type Component type enum
+ * @param eID Entity ID
  */
 void ResourceManager::addComponent(CType type, int eID) {
     if (eID <= -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
@@ -73,38 +74,38 @@ void ResourceManager::addComponent(CType type, int eID) {
     if (eID < mGameObjects.size() && !mGameObjects.at(eID).hasComponent(type)) {
         switch (type) {
         case Transform:
-            // Not sure about readability here... Transform casts to 0 because that's its enum value.
+            // Not sure about readability here... Transform equals 0 because that's its enum value.
             // mComponentsID thus holds an index to the last TransformComponent once we add the new component, for easy look-up by eID
-            mGameObjects.at(eID).mComponentsID.at((int)Transform) = mTransforms.size();
+            mGameObjects.at(eID).mComponentsID.at(Transform) = mTransforms.size();
             mTransforms.emplace_back(TransformComponent());
             break;
         case Material:
-            mGameObjects.at(eID).mComponentsID.at((int)Material) = mMaterials.size();
+            mGameObjects.at(eID).mComponentsID.at(Material) = mMaterials.size();
             mMaterials.emplace_back(MaterialComponent());
             break;
         case Mesh:
-            mGameObjects.at(eID).mComponentsID.at((int)Mesh) = mMeshes.size();
+            mGameObjects.at(eID).mComponentsID.at(Mesh) = mMeshes.size();
             // Creates an empty Mesh object -- for use with hardcoded objects mostly.
             mMeshes.emplace_back(MeshComponent());
             break;
         case Light:
-            mGameObjects.at(eID).mComponentsID.at((int)Light) = mLighting.size();
+            mGameObjects.at(eID).mComponentsID.at(Light) = mLighting.size();
             mLighting.emplace_back(LightingComponent());
             break;
         case Input:
             qDebug() << "Use addInputComponent() for now...";
             break;
         case Physics:
-            mGameObjects.at(eID).mComponentsID.at((int)Physics) = mPhysics.size();
+            mGameObjects.at(eID).mComponentsID.at(Physics) = mPhysics.size();
             mPhysics.emplace_back(PhysicsComponent());
             break;
         case Sound:
-            mGameObjects.at(eID).mComponentsID.at((int)Sound) = mSounds.size();
+            mGameObjects.at(eID).mComponentsID.at(Sound) = mSounds.size();
             mSounds.emplace_back(SoundComponent());
             break;
         }
     } else
-        qDebug() << "No GameObject with this ID exists.";
+        qDebug() << "No GameObject with this ID exists or Component already exists.";
 }
 /**
  * @brief ResourceManager::addMeshComponent - If you don't want a default, empty mesh component,
@@ -119,13 +120,25 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
     addComponent(Mesh, eID);
     setMesh(LoadMesh(name), eID);
 }
-void ResourceManager::addInputComponent(MainWindow *mainWindow, GLuint eID) {
+/**
+ * @brief ResourceManager::addInputComponent requires a pointer to mainWindow for input key events
+ * @param mainWindow
+ * @param eID
+ */
+void ResourceManager::addInputComponent(MainWindow *mainWindow, int eID) {
+    if (eID <= -1 || eID > mGameObjects.size() - 1) {
+        eID = mGameObjects.size() - 1;
+    }
     if (!mGameObjects.at(eID).hasComponent(Input)) {
+        mGameObjects.at(eID).mComponentsID.at(Input) = mInputs.size();
         mInputs.emplace_back(InputComponent(mainWindow));
-        mGameObjects.at(eID).mComponentsID.at((int)Input) = mInputs.size();
     }
 }
-
+/**
+ * @brief ResourceManager::makeGameObject
+ * @param name Name of the gameobject. Leave blank if no name desired.
+ * @return Returns the entity ID for use in adding components or other tasks.
+ */
 GLuint ResourceManager::makeGameObject(std::string name) {
     GLuint eID = mNumObjects;
     ++mNumObjects;
@@ -135,7 +148,7 @@ GLuint ResourceManager::makeGameObject(std::string name) {
 /**
  * @brief ResourceManager::makeXYZ - Creates basic XYZ lines
  */
-void ResourceManager::makeXYZ() {
+GLuint ResourceManager::makeXYZ() {
     GLuint eID = makeGameObject("XYZ");
     addComponent(Mesh, eID);
     addComponent(Material, eID);
@@ -157,9 +170,10 @@ void ResourceManager::makeXYZ() {
     mMeshes.back().mDrawType = GL_LINES;
 
     glBindVertexArray(0);
+    return eID;
 }
 
-void ResourceManager::makeSkyBox() {
+GLuint ResourceManager::makeSkyBox() {
     GLuint eID = makeGameObject("Cube");
     addComponent(Mesh, eID);
     addComponent(Material, eID);
@@ -225,6 +239,8 @@ void ResourceManager::makeSkyBox() {
     mMeshes.back().mDrawType = GL_TRIANGLES;
 
     glBindVertexArray(0);
+
+    return eID;
 }
 
 /**
@@ -246,7 +262,7 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
     return eID;
 }
 
-void ResourceManager::makeBillBoard() {
+GLuint ResourceManager::makeBillBoard() {
     GLuint eID = mNumObjects;
     ++mNumObjects;
     mGameObjects.emplace_back(BillBoard(eID, "BillBoard"));
@@ -274,9 +290,10 @@ void ResourceManager::makeBillBoard() {
     mMeshes.back().mDrawType = GL_TRIANGLE_STRIP;
 
     glBindVertexArray(0);
+    return eID;
 }
 
-void ResourceManager::makeOctBall(int n) {
+GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = makeGameObject("Ball");
     mMesh.Clear();
     initializeOpenGLFunctions();
@@ -296,9 +313,10 @@ void ResourceManager::makeOctBall(int n) {
     mMeshes.back().mIndiceCount = mMesh.mIndices.size();
     mMeshes.back().mDrawType = GL_TRIANGLES;
     glBindVertexArray(0);
+    return eID;
 }
 
-void ResourceManager::makeLightObject() {
+GLuint ResourceManager::makeLightObject() {
     GLuint eID = mNumObjects;
     ++mNumObjects;
     mGameObjects.emplace_back(LightObject(eID, "Light"));
@@ -335,6 +353,7 @@ void ResourceManager::makeLightObject() {
     mMeshes.back().mDrawType = GL_TRIANGLES;
 
     glBindVertexArray(0);
+    return eID;
 }
 
 void ResourceManager::initVertexBuffers() {
