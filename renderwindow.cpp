@@ -147,7 +147,8 @@ void RenderWindow::init() {
 
     //testing triangle surface class
     GLuint boxID = factory.makeTriangleSurface("box2.txt");
-    dynamic_cast<MaterialComponent *>(factory.getComponent(Material, boxID))->setShader(factory.GetShader(Color));
+    // This is pretty wordy :/
+    static_cast<MaterialComponent *>(factory.getComponent(Material, boxID))->setShader(factory.GetShader(Color));
     //    temp = new GameObject("TriangleSurface");
     //    auto *tempMesh = new MeshComponent(ResourceManager::LoadMesh("box2.txt"));
     //    temp->addComponent(tempMesh);
@@ -160,7 +161,7 @@ void RenderWindow::init() {
     factory.makeGameObject("Monkey");
     factory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
     factory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
-    dynamic_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(factory.GetShader(Phong));
+    static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(factory.GetShader(Phong));
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
     //    mGameObjects.emplace_back(temp);
@@ -252,7 +253,6 @@ void RenderWindow::render() {
 //    pMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "pMatrix");
 //    mTextureUniform = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "textureSampler");
 //}
-
 
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized

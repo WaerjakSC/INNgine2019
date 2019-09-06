@@ -19,8 +19,8 @@ public:
     virtual void update();
 
     void init();
-
-    bool hasComponent(CType type);
+    int getComponentIndex(const CType type);
+    bool hasComponent(const CType type);
 };
 
 #endif // GAMEOBJECT_H
