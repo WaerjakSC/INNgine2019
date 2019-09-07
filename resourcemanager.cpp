@@ -25,12 +25,12 @@ ResourceManager::~ResourceManager() {
     }
 }
 Component *ResourceManager::getComponent(CType type, int eID) {
-    if (eID <= -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
+    if (eID != -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
-    if (eID <= mGameObjects.size() && mGameObjects.at(eID).hasComponent(type)) {
+    if (eID <= mGameObjects.size() && mGameObjects.at(eID)->hasComponent(type)) {
         // Get the index of the desired component. Index is saved in entity -- mComponentsID
-        int index = mGameObjects.at(eID).getComponentIndex(type);
+        int index = mGameObjects.at(eID)->getComponentIndex(type);
         switch (type) {
         case Transform:
             // Returns a pointer to the transform component.
@@ -54,11 +54,11 @@ Component *ResourceManager::getComponent(CType type, int eID) {
     return 0;
 }
 void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
-    if (eID <= -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
+    if (eID != -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
-    if (eID <= mGameObjects.size() && mGameObjects.at(eID).hasComponent(Mesh)) {
-        mMeshes.at(mGameObjects.at(eID).getComponentIndex(Mesh)) = *mesh;
+    if (eID <= mGameObjects.size() && mGameObjects.at(eID)->hasComponent(Mesh)) {
+        mMeshes.at(mGameObjects.at(eID)->getComponentIndex(Mesh)) = *mesh;
     }
 }
 /**
@@ -67,40 +67,40 @@ void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
  * @param eID Entity ID
  */
 void ResourceManager::addComponent(CType type, int eID) {
-    if (eID <= -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
+    if (eID != -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
         eID = mGameObjects.size() - 1;
 
     // If gameobject exists in vector and the component doesn't already exist on object
-    if (eID < mGameObjects.size() && !mGameObjects.at(eID).hasComponent(type)) {
+    if (eID < mGameObjects.size() && !mGameObjects.at(eID)->hasComponent(type)) {
         switch (type) {
         case Transform:
             // Not sure about readability here... Transform equals 0 because that's its enum value.
             // mComponentsID thus holds an index to the last TransformComponent once we add the new component, for easy look-up by eID
-            mGameObjects.at(eID).mComponentsID.at(Transform) = mTransforms.size();
+            mGameObjects.at(eID)->mComponentsID.at(Transform) = mTransforms.size();
             mTransforms.emplace_back(TransformComponent());
             break;
         case Material:
-            mGameObjects.at(eID).mComponentsID.at(Material) = mMaterials.size();
+            mGameObjects.at(eID)->mComponentsID.at(Material) = mMaterials.size();
             mMaterials.emplace_back(MaterialComponent());
             break;
         case Mesh:
-            mGameObjects.at(eID).mComponentsID.at(Mesh) = mMeshes.size();
+            mGameObjects.at(eID)->mComponentsID.at(Mesh) = mMeshes.size();
             // Creates an empty Mesh object -- for use with hardcoded objects mostly.
             mMeshes.emplace_back(MeshComponent());
             break;
         case Light:
-            mGameObjects.at(eID).mComponentsID.at(Light) = mLighting.size();
+            mGameObjects.at(eID)->mComponentsID.at(Light) = mLighting.size();
             mLighting.emplace_back(LightingComponent());
             break;
         case Input:
             qDebug() << "Use addInputComponent() for now...";
             break;
         case Physics:
-            mGameObjects.at(eID).mComponentsID.at(Physics) = mPhysics.size();
+            mGameObjects.at(eID)->mComponentsID.at(Physics) = mPhysics.size();
             mPhysics.emplace_back(PhysicsComponent());
             break;
         case Sound:
-            mGameObjects.at(eID).mComponentsID.at(Sound) = mSounds.size();
+            mGameObjects.at(eID)->mComponentsID.at(Sound) = mSounds.size();
             mSounds.emplace_back(SoundComponent());
             break;
         }
@@ -114,7 +114,7 @@ void ResourceManager::addComponent(CType type, int eID) {
  * @param eID
  */
 void ResourceManager::addMeshComponent(std::string name, int eID) {
-    if (eID <= -1 || eID > mGameObjects.size() - 1) {
+    if (eID != -1 || eID > mGameObjects.size() - 1) {
         eID = mGameObjects.size() - 1;
     }
     addComponent(Mesh, eID);
@@ -126,11 +126,11 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
  * @param eID
  */
 void ResourceManager::addInputComponent(MainWindow *mainWindow, int eID) {
-    if (eID <= -1 || eID > mGameObjects.size() - 1) {
+    if (eID != -1 || eID > mGameObjects.size() - 1) {
         eID = mGameObjects.size() - 1;
     }
-    if (!mGameObjects.at(eID).hasComponent(Input)) {
-        mGameObjects.at(eID).mComponentsID.at(Input) = mInputs.size();
+    if (!mGameObjects.at(eID)->hasComponent(Input)) {
+        mGameObjects.at(eID)->mComponentsID.at(Input) = mInputs.size();
         mInputs.emplace_back(InputComponent(mainWindow));
     }
 }
@@ -140,9 +140,9 @@ void ResourceManager::addInputComponent(MainWindow *mainWindow, int eID) {
  * @return Returns the entity ID for use in adding components or other tasks.
  */
 GLuint ResourceManager::makeGameObject(std::string name) {
-    GLuint eID = mNumObjects;
-    ++mNumObjects;
-    mGameObjects.emplace_back(GameObject(eID, name));
+    GLuint eID = mNumGameObjects;
+    mNumGameObjects++;
+    mGameObjects.emplace_back(new GameObject(eID, name));
     return eID;
 }
 /**
@@ -154,19 +154,19 @@ GLuint ResourceManager::makeXYZ() {
     addComponent(Material, eID);
 
     initializeOpenGLFunctions();
-    mMesh.Clear();
-    mMesh.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mMesh.mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mMesh.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
-    mMesh.mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
-    mMesh.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
-    mMesh.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
+    mMeshData.Clear();
+    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers();
     // Once VAO and VBO have been generated, mMesh data can be discarded.
     mMaterials.back().setShader(Shaders[Color]);
-    mMeshes.back().mVerticeCount = mMesh.mVertices.size();
+    mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
     mMeshes.back().mDrawType = GL_LINES;
 
     glBindVertexArray(0);
@@ -181,61 +181,61 @@ GLuint ResourceManager::makeSkyBox() {
     mMaterials.back().setShader(Shaders[Tex]);
     //    temp->mMatrix.scale(15.f);
     initializeOpenGLFunctions();
-    mMesh.Clear();
-    mMesh.mVertices.insert(mMesh.mVertices.end(),
-                           {
-                               //Vertex data for front
-                               Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.333f)}, //v0
-                               Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.333f)},   //v1
-                               Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.666f)},  //v2
-                               Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.666f)},    //v3
+    mMeshData.Clear();
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
+                               {
+                                   //Vertex data for front
+                                   Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.333f)}, //v0
+                                   Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.333f)},   //v1
+                                   Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.666f)},  //v2
+                                   Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.666f)},    //v3
 
-                               //Vertex data for right
-                               Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v4
-                               Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.333f)}, //v5
-                               Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v6
-                               Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.666f)},  //v7
+                                   //Vertex data for right
+                                   Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v4
+                                   Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.333f)}, //v5
+                                   Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v6
+                                   Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.666f)},  //v7
 
-                               //Vertex data for back
-                               Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(0.75f, 0.333f)}, //v8
-                               Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(1.f, 0.333f)},  //v9
-                               Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(0.75f, 0.666f)},  //v10
-                               Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(1.f, 0.666f)},   //v11
+                                   //Vertex data for back
+                                   Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(0.75f, 0.333f)}, //v8
+                                   Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(1.f, 0.333f)},  //v9
+                                   Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(0.75f, 0.666f)},  //v10
+                                   Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(1.f, 0.666f)},   //v11
 
-                               //Vertex data for left
-                               Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.f, 0.333f)},  //v12
-                               Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v13
-                               Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.f, 0.666f)},   //v14
-                               Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v15
+                                   //Vertex data for left
+                                   Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.f, 0.333f)},  //v12
+                                   Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v13
+                                   Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.f, 0.666f)},   //v14
+                                   Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v15
 
-                               //Vertex data for bottom
-                               Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.25f, 0.f)},   //v16
-                               Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.5f, 0.f)},     //v17
-                               Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v18
-                               Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v19
+                                   //Vertex data for bottom
+                                   Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.25f, 0.f)},   //v16
+                                   Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.5f, 0.f)},     //v17
+                                   Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v18
+                                   Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v19
 
-                               //Vertex data for top
-                               Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v20
-                               Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v21
-                               Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.25f, 0.999f)}, //v22
-                               Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.999f)}    //v23
-                           });
+                                   //Vertex data for top
+                                   Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v20
+                                   Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v21
+                                   Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.25f, 0.999f)}, //v22
+                                   Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.999f)}    //v23
+                               });
 
-    mMesh.mIndices.insert(mMesh.mIndices.end(),
-                          {
-                              0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
-                              4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
-                              8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
-                              12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
-                              16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
-                              20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
-                          });
+    mMeshData.mIndices.insert(mMeshData.mIndices.end(),
+                              {
+                                  0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
+                                  4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
+                                  8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
+                                  12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
+                                  16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
+                                  20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
+                              });
     initVertexBuffers();
     initIndexBuffers();
 
     mMaterials.back().setTextureUnit(Textures["skybox.bmp"]->id()); // Could just hardcode int 2 here but this seems more readable?
-    mMeshes.back().mVerticeCount = mMesh.mVertices.size();
-    mMeshes.back().mIndiceCount = mMesh.mIndices.size();
+    mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.back().mIndiceCount = mMeshData.mIndices.size();
     mMeshes.back().mDrawType = GL_TRIANGLES;
 
     glBindVertexArray(0);
@@ -249,7 +249,7 @@ GLuint ResourceManager::makeSkyBox() {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
-    mMesh.Clear();
+    mMeshData.Clear();
 
     initializeOpenGLFunctions();
 
@@ -263,30 +263,30 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
 }
 
 GLuint ResourceManager::makeBillBoard() {
-    GLuint eID = mNumObjects;
-    ++mNumObjects;
-    mGameObjects.emplace_back(BillBoard(eID, "BillBoard"));
+    GLuint eID = mNumGameObjects;
+    ++mNumGameObjects;
+    mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
     addComponent(Mesh, eID);
     addComponent(Material, eID);
 
     initializeOpenGLFunctions();
 
-    mMesh.Clear();
-    mMesh.mVertices.insert(mMesh.mVertices.end(),
-                           {
-                               // Positions            // Normals          //UVs
-                               Vertex{gsl::Vector3D(-2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
-                               Vertex{gsl::Vector3D(2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
-                               Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
-                               Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
-                           });
+    mMeshData.Clear();
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
+                               {
+                                   // Positions            // Normals          //UVs
+                                   Vertex{gsl::Vector3D(-2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
+                                   Vertex{gsl::Vector3D(2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
+                                   Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
+                                   Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
+                               });
     mMaterials.back().setTextureUnit(Textures["hund.bmp"]->id());
     mMaterials.back().setShader(Shaders[Tex]);
     mMaterials.back().setColor(gsl::Vector3D(0.7f, 0.6f, 0.1f));
 
     initVertexBuffers();
 
-    mMeshes.back().mVerticeCount = mMesh.mVertices.size();
+    mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
     mMeshes.back().mDrawType = GL_TRIANGLE_STRIP;
 
     glBindVertexArray(0);
@@ -295,7 +295,7 @@ GLuint ResourceManager::makeBillBoard() {
 
 GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = makeGameObject("Ball");
-    mMesh.Clear();
+    mMeshData.Clear();
     initializeOpenGLFunctions();
     addComponent(Mesh, eID);
 
@@ -309,38 +309,38 @@ GLuint ResourceManager::makeOctBall(int n) {
     initVertexBuffers();
     initIndexBuffers();
 
-    mMeshes.back().mVerticeCount = mMesh.mVertices.size();
-    mMeshes.back().mIndiceCount = mMesh.mIndices.size();
+    mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.back().mIndiceCount = mMeshData.mIndices.size();
     mMeshes.back().mDrawType = GL_TRIANGLES;
     glBindVertexArray(0);
     return eID;
 }
 
 GLuint ResourceManager::makeLightObject() {
-    GLuint eID = mNumObjects;
-    ++mNumObjects;
-    mGameObjects.emplace_back(LightObject(eID, "Light"));
+    GLuint eID = mNumGameObjects;
+    ++mNumGameObjects;
+    mGameObjects.emplace_back(new LightObject(eID, "Light"));
     addComponent(Mesh, eID);
     addComponent(Material, eID);
 
     initializeOpenGLFunctions();
 
-    mMesh.Clear();
+    mMeshData.Clear();
 
-    mMesh.mVertices.insert(mMesh.mVertices.end(),
-                           {
-                               //Vertex data - normals not correct
-                               Vertex{gsl::Vector3D(-0.5f, -0.5f, 0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.f, 0.f)},  //Left low
-                               Vertex{gsl::Vector3D(0.5f, -0.5f, 0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(1.f, 0.f)},   //Right low
-                               Vertex{gsl::Vector3D(0.0f, 0.5f, 0.0f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.5f)},  //Top
-                               Vertex{gsl::Vector3D(0.0f, -0.5f, -0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.5f)} //Back low
-                           });
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
+                               {
+                                   //Vertex data - normals not correct
+                                   Vertex{gsl::Vector3D(-0.5f, -0.5f, 0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.f, 0.f)},  //Left low
+                                   Vertex{gsl::Vector3D(0.5f, -0.5f, 0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(1.f, 0.f)},   //Right low
+                                   Vertex{gsl::Vector3D(0.0f, 0.5f, 0.0f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.5f)},  //Top
+                                   Vertex{gsl::Vector3D(0.0f, -0.5f, -0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.5f)} //Back low
+                               });
 
-    mMesh.mIndices.insert(mMesh.mIndices.end(),
-                          {0, 1, 2,
-                           1, 3, 2,
-                           3, 0, 2,
-                           0, 3, 1});
+    mMeshData.mIndices.insert(mMeshData.mIndices.end(),
+                              {0, 1, 2,
+                               1, 3, 2,
+                               3, 0, 2,
+                               0, 3, 1});
     mMaterials.back().setTextureUnit(Textures["white.bmp"]->id());
     mMaterials.back().setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
     mMaterials.back().setShader(Shaders[Tex]);
@@ -348,8 +348,8 @@ GLuint ResourceManager::makeLightObject() {
     initVertexBuffers();
     initIndexBuffers();
 
-    mMeshes.back().mVerticeCount = mMesh.mVertices.size();
-    mMeshes.back().mIndiceCount = mMesh.mIndices.size();
+    mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.back().mIndiceCount = mMeshData.mIndices.size();
     mMeshes.back().mDrawType = GL_TRIANGLES;
 
     glBindVertexArray(0);
@@ -366,7 +366,7 @@ void ResourceManager::initVertexBuffers() {
     glGenBuffers(1, &mMeshes.back().mVBO);
     glBindBuffer(GL_ARRAY_BUFFER, mMeshes.back().mVBO);
 
-    glBufferData(GL_ARRAY_BUFFER, mMesh.mVertices.size() * sizeof(Vertex), mMesh.mVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mMeshData.mVertices.size() * sizeof(Vertex), mMeshData.mVertices.data(), GL_STATIC_DRAW);
 
     // 1rst attribute buffer : vertices
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
@@ -384,7 +384,7 @@ void ResourceManager::initVertexBuffers() {
 void ResourceManager::initIndexBuffers() {
     glGenBuffers(1, &mMeshes.back().mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMeshes.back().mEAB);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMesh.mIndices.size() * sizeof(GLuint), mMesh.mIndices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
 }
 
 void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
@@ -445,7 +445,7 @@ bool ResourceManager::readFile(std::string fileName) {
         return false;
     }
 
-    mMesh.Clear();
+    mMeshData.Clear();
 
     //One line at a time-variable
     std::string oneLine;
@@ -551,13 +551,13 @@ bool ResourceManager::readFile(std::string fileName) {
                 if (uv > -1) //uv present!
                 {
                     Vertex tempVert(tempVertecies[index], tempNormals[normal], tempUVs[uv]);
-                    mMesh.mVertices.push_back(tempVert);
+                    mMeshData.mVertices.push_back(tempVert);
                 } else //no uv in mesh data, use 0, 0 as uv
                 {
                     Vertex tempVert(tempVertecies[index], tempNormals[normal], gsl::Vector2D(0.0f, 0.0f));
-                    mMesh.mVertices.push_back(tempVert);
+                    mMeshData.mVertices.push_back(tempVert);
                 }
-                mMesh.mIndices.push_back(temp_index++);
+                mMeshData.mIndices.push_back(temp_index++);
             }
 
             //For some reason the winding order is backwards so fixing this by swapping the last two indices
@@ -574,8 +574,8 @@ bool ResourceManager::readFile(std::string fileName) {
     initVertexBuffers();
     initIndexBuffers();
 
-    mMeshes.back().mVerticeCount = mMesh.mVertices.size();
-    mMeshes.back().mIndiceCount = mMesh.mIndices.size();
+    mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.back().mIndiceCount = mMeshData.mIndices.size();
     mMeshes.back().mDrawType = GL_TRIANGLES;
 
     qDebug() << "Obj file read: " << QString::fromStdString(fileName);
@@ -615,7 +615,7 @@ MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
 bool ResourceManager::readTriangleFile(std::string fileName) {
     std::ifstream inn;
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
-    mMesh.Clear();
+    mMeshData.Clear();
     inn.open(fileWithPath);
 
     if (inn.is_open()) {
@@ -623,17 +623,17 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         Vertex vertex;
         inn >> n;
 
-        mMesh.mVertices.reserve(n);
+        mMeshData.mVertices.reserve(n);
         for (int i = 0; i < n; i++) {
             inn >> vertex;
-            mMesh.mVertices.push_back(vertex);
+            mMeshData.mVertices.push_back(vertex);
         }
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
         initVertexBuffers();
 
-        mMeshes.back().mVerticeCount = mMesh.mVertices.size();
+        mMeshes.back().mVerticeCount = mMeshData.mVertices.size();
         mMeshes.back().mDrawType = GL_TRIANGLES;
         return true;
     } else {
@@ -642,9 +642,9 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
     }
 }
 void ResourceManager::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3) {
-    mMesh.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
-    mMesh.mVertices.push_back(Vertex(v2, v2, gsl::Vector2D(1.f, 0.f)));
-    mMesh.mVertices.push_back(Vertex(v3, v3, gsl::Vector2D(0.5f, 1.f)));
+    mMeshData.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
+    mMeshData.mVertices.push_back(Vertex(v2, v2, gsl::Vector2D(1.f, 0.f)));
+    mMeshData.mVertices.push_back(Vertex(v3, v3, gsl::Vector2D(0.5f, 1.f)));
 }
 
 void ResourceManager::subDivide(const gsl::Vector3D &a, const gsl::Vector3D &b, const gsl::Vector3D &c, GLint n) {

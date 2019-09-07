@@ -57,16 +57,19 @@ public:
 private:
     // Private constructor
     ResourceManager();
-    GLuint mNumObjects{0};
+    GLuint mNumGameObjects{0};
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;
     std::map<std::string, Texture *> Textures;
     std::map<std::string, unsigned int> mMeshMap;
 
     // Temp mVertices/mIndices container. Cleared before each use.
-    meshData mMesh;
+    meshData mMeshData;
 
     // Component vectors
+    std::vector<Component *> mComponents;
+
+    // Each of these would in theory be vectors of ints instead
     std::vector<InputComponent> mInputs;
     std::vector<LightingComponent> mLighting;
     std::vector<MaterialComponent> mMaterials;
@@ -74,7 +77,7 @@ private:
     std::vector<PhysicsComponent> mPhysics;
     std::vector<SoundComponent> mSounds;
     std::vector<TransformComponent> mTransforms;
-    std::vector<GameObject> mGameObjects;
+    std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
 
     // OpenGL init functions
     void initVertexBuffers();
