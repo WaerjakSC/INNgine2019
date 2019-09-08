@@ -1,17 +1,18 @@
 #include "rendersystem.h"
 
-RenderSystem::RenderSystem(ResourceManager &resources) : factory(resources) {
-    mRenderCompIDs.emplace_back(factory.getCompIndex().at(Transform));
-    mRenderCompIDs.emplace_back(factory.getCompIndex().at(Material));
-    mRenderCompIDs.emplace_back(factory.getCompIndex().at(Mesh));
+RenderSystem::RenderSystem() {
+    factory = &ResourceManager::instance();
+    mRenderCompIDs.emplace_back(factory->getCompIndex().at(Transform));
+    mRenderCompIDs.emplace_back(factory->getCompIndex().at(Material));
+    mRenderCompIDs.emplace_back(factory->getCompIndex().at(Mesh));
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
     mViableEntities = getViableEntities();
     connectComponents();
 }
 void RenderSystem::iterateEntity(int eID) {
     for (auto cOffset : mRenderCompIDs) {
-        int componentLocation = factory.getEntityStart().at(eID) + cOffset->at(eID);
-        factory.getComponents().at(componentLocation)->update();
+        int componentLocation = factory->getEntityStart().at(eID) + cOffset->at(eID);
+        factory->getComponents().at(componentLocation)->update();
     }
 }
 /**
@@ -59,9 +60,9 @@ void RenderSystem::render() {
  */
 void RenderSystem::connectComponents() {
     for (auto entity : mViableEntities) {
-        Shader *shader = static_cast<MaterialComponent *>(factory.getComponent(Material, entity))->getShader();
-        gsl::Matrix4x4 model = static_cast<TransformComponent *>(factory.getComponent(Transform, entity))->matrix();
-        static_cast<MaterialComponent *>(factory.getComponent(Material, entity))->setMatrix(model);
-        static_cast<MeshComponent *>(factory.getComponent(Mesh, entity))->setShader(shader);
+        Shader *shader = static_cast<MaterialComponent *>(factory->getComponent(Material, entity))->getShader();
+        gsl::Matrix4x4 model = static_cast<TransformComponent *>(factory->getComponent(Transform, entity))->matrix();
+        static_cast<MaterialComponent *>(factory->getComponent(Material, entity))->setMatrix(model);
+        static_cast<MeshComponent *>(factory->getComponent(Mesh, entity))->setShader(shader);
     }
 }

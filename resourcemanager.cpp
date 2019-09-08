@@ -7,7 +7,7 @@
 #include "lightobject.h"
 #include <QDebug>
 
-ResourceManager::ResourceManager(MainWindow *window) : mainWindow(window) {
+ResourceManager::ResourceManager() {
 }
 
 std::vector<std::map<int, int> *> ResourceManager::getCompIndex() const {
@@ -22,9 +22,9 @@ std::vector<Component *> ResourceManager::getComponents() const {
     return mComponents;
 }
 
-ResourceManager &ResourceManager::instance(MainWindow *window) {
+ResourceManager &ResourceManager::instance() {
 
-    static ResourceManager *mInstance = new ResourceManager(window);
+    static ResourceManager *mInstance = new ResourceManager();
     return *mInstance;
 }
 
@@ -154,7 +154,7 @@ void ResourceManager::addComponent(CType type, int eID) {
             mComponents.emplace_back(new LightingComponent());
             break;
         case Input:
-            mComponents.emplace_back(new InputComponent(mainWindow));
+            mComponents.emplace_back(new InputComponent(mMainWindow));
             break;
         case Physics:
             mComponents.emplace_back(new PhysicsComponent());

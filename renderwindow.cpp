@@ -86,7 +86,8 @@ void RenderWindow::init() {
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
     // Create Resource Manager instance
-    ResourceManager &factory = ResourceManager::instance(mMainWindow);
+    ResourceManager &factory = ResourceManager::instance();
+    factory.setMainWindow(mMainWindow);
 
     //Compile shaders:
     factory.LoadShader(ShaderType::Color);
@@ -178,7 +179,7 @@ void RenderWindow::init() {
     factory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
-    mRenderer = new RenderSystem(factory);
+    mRenderer = new RenderSystem();
 }
 
 ///Called each frame - doing the rendering

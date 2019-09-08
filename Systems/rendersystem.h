@@ -4,10 +4,11 @@
 #include "Components/materialcomponent.h"
 #include "Components/meshcomponent.h"
 #include "resourcemanager.h"
+#include <QOpenGLFunctions_4_1_Core>
 
-class RenderSystem {
+class RenderSystem : public QOpenGLFunctions_4_1_Core {
 public:
-    RenderSystem(ResourceManager &factory);
+    RenderSystem();
     // Each map in mCompIndex contains a list of entities with that component
     // Get the smallest map of componentIndices and check for overlaps in the other maps
     // RenderSystem needs:
@@ -17,7 +18,7 @@ public:
 
 private:
     std::vector<std::map<int, int> *> mRenderCompIDs;
-    ResourceManager &factory;
+    ResourceManager *factory{nullptr};
     std::vector<int> mViableEntities;
     std::vector<int> getViableEntities();
     void iterateEntity(int eID);

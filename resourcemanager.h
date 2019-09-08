@@ -23,7 +23,7 @@ struct meshData {
 };
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
 public:
-    static ResourceManager &instance(MainWindow *window);
+    static ResourceManager &instance();
     virtual ~ResourceManager();
 
     // Loads and generates shader (takes name and the shader)
@@ -38,6 +38,7 @@ public:
     MeshComponent *GetMesh(std::string name);
     // De-allocate loaded resources from memory
     void Clear();
+    void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
     GLuint makeGameObject(std::string name = "");
 
@@ -65,7 +66,7 @@ public:
 
 private:
     // Private constructor
-    ResourceManager(MainWindow *window);
+    ResourceManager();
     GLuint mNumGameObjects{0};
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;
@@ -74,7 +75,7 @@ private:
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;
-    MainWindow *mainWindow;
+    MainWindow *mMainWindow;
     // Component vectors
     /** @example
      *      auto search = mInputs.at(entityID);
