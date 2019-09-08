@@ -85,7 +85,7 @@ void RenderWindow::init() {
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
     // Create Resource Manager instance
-    ResourceManager &factory = ResourceManager::instance();
+    ResourceManager &factory = ResourceManager::instance(mMainWindow);
     //Compile shaders:
     factory.LoadShader(ShaderType::Color);
     factory.LoadShader(ShaderType::Tex);
@@ -164,26 +164,7 @@ void RenderWindow::init() {
     static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(factory.GetShader(Phong));
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
-    //    mGameObjects.emplace_back(temp);
 
-    //    int x{0};
-    //    int y{0};
-    //    int numberOfObjs{100};
-    //    for (int i{0}; i < numberOfObjs; i++) {
-    //        temp = new GameObject("Monkey");
-    //        temp->addComponent(new MeshComponent(ResourceManager::LoadMesh("monkey.obj")));
-    //        temp->setShaders(ResourceManager::GetShader(ShaderType::Phong));
-    //        temp->init();
-    //        x++;
-    //        temp->mMatrix.translate(0.f + x, 0.f, -2.f - y);
-    //        temp->mMatrix.scale(0.5f);
-    //        mGameObjects.push_back(temp);
-    //        if (x % 10 == 0) {
-    //            x = 0;
-    //            y++;
-    //        }
-    //    }
-    // End of performance test
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
     mCurrentCamera->setPosition(gsl::Vector3D(1.f, 1.f, 4.4f));

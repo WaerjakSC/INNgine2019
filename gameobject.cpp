@@ -1,25 +1,14 @@
 #include "gameobject.h"
 
 GameObject::GameObject(GLuint ID, std::string name) : mName(name), eID(ID) {
-    // Reserve 7 slots and set all to -1 to indicate that the entity has no components yet.
-    for (std::size_t i = 0; i < 7; i++) {
-        mComponentsID.push_back(-1);
-    }
-    mMatrix.setToIdentity();
 }
 
 GameObject::~GameObject() {
 }
 
-bool GameObject::hasComponent(const CType type) {
-    return mComponentsID.at((int)type) > -1;
-}
 void GameObject::init() {
 }
 
-int GameObject::getComponentIndex(const CType type) {
-    return mComponentsID.at(type);
-}
 void GameObject::update() {
     //    for (auto *mesh : getMeshComponents()) {
     //        mesh->draw(mMatrix);

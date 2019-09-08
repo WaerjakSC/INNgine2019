@@ -14,13 +14,11 @@ public:
     std::string mName;
 
     GLuint eID;
-    std::vector<int> mComponentsID;
+    bool hasComponents{false};
 
     virtual void update();
 
     void init();
-    int getComponentIndex(const CType type);
-    bool hasComponent(const CType type);
 };
 
 #endif // GAMEOBJECT_H
