@@ -19,6 +19,9 @@ private:
     std::vector<std::map<int, int> *> mRenderCompIDs;
     ResourceManager &factory;
     std::vector<int> mViableEntities;
+    std::vector<int> getViableEntities();
+    void iterateEntity(int eID);
+    void connectComponents();
 };
 
 #endif // RENDERSYSTEM_H

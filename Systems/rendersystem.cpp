@@ -6,6 +6,7 @@ RenderSystem::RenderSystem(ResourceManager &resources) : factory(resources) {
     mRenderCompIDs.emplace_back(factory.getCompIndex().at(Mesh));
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
     mViableEntities = getViableEntities();
+    connectComponents();
 }
 void RenderSystem::iterateEntity(int eID) {
     for (auto cOffset : mRenderCompIDs) {
@@ -47,8 +48,20 @@ std::vector<int> RenderSystem::getViableEntities() {
     }
     return renderEntities;
 }
+
 void RenderSystem::render() {
     for (auto entityID : mViableEntities) {
         iterateEntity(entityID);
+    }
+}
+/**
+ * @brief RenderSystem::connectComponents VERY temporary function just to make things render
+ */
+void RenderSystem::connectComponents() {
+    for (auto entity : mViableEntities) {
+        Shader *shader = static_cast<MaterialComponent *>(factory.getComponent(Material, entity))->getShader();
+        gsl::Matrix4x4 model = static_cast<TransformComponent *>(factory.getComponent(Transform, entity))->matrix();
+        static_cast<MaterialComponent *>(factory.getComponent(Material, entity))->setMatrix(model);
+        static_cast<MeshComponent *>(factory.getComponent(Mesh, entity))->setShader(shader);
     }
 }

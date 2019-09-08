@@ -16,6 +16,7 @@
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
+#include "Systems/rendersystem.h"
 #include "lightobject.h"
 #include "resourcemanager.h"
 
@@ -86,6 +87,7 @@ void RenderWindow::init() {
 
     // Create Resource Manager instance
     ResourceManager &factory = ResourceManager::instance(mMainWindow);
+
     //Compile shaders:
     factory.LoadShader(ShaderType::Color);
     factory.LoadShader(ShaderType::Tex);
@@ -159,8 +161,9 @@ void RenderWindow::init() {
 
     //one monkey
     factory.makeGameObject("Monkey");
-    factory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
+    factory.addComponent(Transform);
     factory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
+    factory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
     static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(factory.GetShader(Phong));
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
@@ -175,6 +178,7 @@ void RenderWindow::init() {
     factory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+    mRenderer = new RenderSystem(factory);
 }
 
 ///Called each frame - doing the rendering
@@ -197,10 +201,7 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (auto visObject : mGameObjects) {
-        visObject->update();
-        //        checkForGLerrors();
-    }
+    mRenderer->render();
 
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -360,9 +361,9 @@ void RenderWindow::handleInput() {
         if (mInput->A)
             mCurrentCamera->moveRight(-mCameraSpeed);
         if (mInput->Q)
-            mCurrentCamera->updateHeigth(-mCameraSpeed);
+            mCurrentCamera->updateHeight(-mCameraSpeed);
         if (mInput->E)
-            mCurrentCamera->updateHeigth(mCameraSpeed);
+            mCurrentCamera->updateHeight(mCameraSpeed);
     } else {
         if (mInput->W)
             mLight->mMatrix.translateZ(-mCameraSpeed);

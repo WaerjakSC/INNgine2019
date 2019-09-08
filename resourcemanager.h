@@ -57,6 +57,12 @@ public:
 
     int largestOffset(int eID);
 
+    std::vector<Component *> getComponents() const;
+
+    std::vector<int> getEntityStart() const;
+
+    std::vector<std::map<int, int> *> getCompIndex() const;
+
 private:
     // Private constructor
     ResourceManager(MainWindow *window);

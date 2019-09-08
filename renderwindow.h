@@ -15,6 +15,7 @@ class QOpenGLContext;
 class Shader;
 class MainWindow;
 class LightObject;
+class RenderSystem;
 
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
@@ -59,6 +60,7 @@ private:
     GLint mTextureUniform{-1};
 
     std::vector<GameObject *> mGameObjects;
+    RenderSystem *mRenderer;
 
     GameObject *mPlayer; //the controllable object
 

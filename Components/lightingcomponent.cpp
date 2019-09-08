@@ -5,6 +5,9 @@ LightingComponent::LightingComponent() {
     mType = CType::Light;
 }
 
+void LightingComponent::update(float dt) {
+}
+
 //void LightingComponent::draw(gsl::Matrix4x4 &mMatrix) {
 //    mShader->transmitUniformData(&mMatrix, &light);
 //}

@@ -6,9 +6,6 @@ MaterialComponent::MaterialComponent() {
 }
 
 void MaterialComponent::update(float dt) {
-}
-
-void MaterialComponent::draw(gsl::Matrix4x4 &mMatrix) {
     mShader->transmitUniformData(&mMatrix, &material);
 }
 
@@ -21,6 +18,10 @@ void MaterialComponent::setColor(const gsl::Vector3D &color) {
 
 Shader *MaterialComponent::getShader() const {
     return mShader;
+}
+
+void MaterialComponent::setMatrix(const gsl::Matrix4x4 &matrix) {
+    mMatrix = matrix;
 }
 
 void MaterialComponent::setTextureUnit(const GLuint &textureUnit) {

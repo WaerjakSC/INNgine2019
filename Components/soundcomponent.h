@@ -6,6 +6,7 @@
 class SoundComponent : public Component {
 public:
     SoundComponent();
+    virtual void update(float dt);
 };
 
 #endif // SOUNDCOMPONENT_H

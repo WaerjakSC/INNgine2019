@@ -6,24 +6,16 @@ MeshComponent::MeshComponent() {
 }
 
 MeshComponent::~MeshComponent() {
-    //    glDeleteVertexArrays(1, &mVAO);
-    //    glDeleteBuffers(1, &mVBO);
+    glDeleteVertexArrays(1, &mVAO);
+    glDeleteBuffers(1, &mVBO);
 }
 
 void MeshComponent::update(float dt) {
+    glUseProgram(mShader->getProgram());
+    glBindVertexArray(mVAO);
+    glDrawElements(GL_TRIANGLES, mIndiceCount, GL_UNSIGNED_INT, nullptr);
 }
 
-// Code initialization (Similar to Unity's void Start()), separating the constructor and code initialization
-void MeshComponent::init() {
-    //    if (mMesh) { // Make sure you're not trying to use a nullptr
-
-    //    }
-}
-
-void MeshComponent::draw(MaterialComponent *material) {
-    //    glUseProgram(material->getShader()->getProgram());
-    //    glBindVertexArray(mVAO);
-    //    if (mMesh) {
-    //        glDrawElements(GL_TRIANGLES, mMesh->mIndices.size(), GL_UNSIGNED_INT, nullptr);
-    //    }
+void MeshComponent::setShader(Shader *shader) {
+    mShader = shader;
 }

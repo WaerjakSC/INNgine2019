@@ -23,11 +23,11 @@ struct LightData {
 class LightingComponent : public Component {
 public:
     LightingComponent();
+    virtual void update(float dt);
 
     //    void draw(gsl::Matrix4x4 &mMatrix);
 
     //    void setColor(const gsl::Vector3D &color);
-
 
 private:
     LightData light;

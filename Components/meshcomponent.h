@@ -3,17 +3,16 @@
 #include "component.h"
 #include "matrix4x4.h"
 #include "vertex.h"
-
+#include <QOpenGLFunctions_4_1_Core>
 class MaterialComponent;
-class MeshComponent : public Component {
+class Shader;
+class MeshComponent : protected QOpenGLFunctions_4_1_Core, public Component {
 public:
     MeshComponent();
 
     virtual ~MeshComponent();
 
     virtual void update(float dt);
-    virtual void init();
-    virtual void draw(MaterialComponent *material);
 
     GLuint mVAO{0};
     GLuint mVBO{0};
@@ -23,7 +22,10 @@ public:
     GLuint mIndiceCount{0};
     GLenum mDrawType{0};
 
-protected:
+    void setShader(Shader *shader);
+
+private:
+    Shader *mShader{nullptr};
 };
 
 #endif // MESHCOMPONENT_H

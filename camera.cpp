@@ -60,8 +60,8 @@ void Camera::setSpeed(float speed) {
     mSpeed = speed;
 }
 
-void Camera::updateHeigth(float deltaHeigth) {
-    mPosition.y += deltaHeigth;
+void Camera::updateHeight(float deltaHeight) {
+    mPosition.y += deltaHeight;
 }
 
 void Camera::moveRight(float delta) {

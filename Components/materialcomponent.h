@@ -18,8 +18,6 @@ public:
     MaterialComponent();
 
     void update(float dt);
-    virtual void draw(gsl::Matrix4x4 &mMatrix);
-
 
     void setShader(Shader *getShader);
     void setTextureUnit(const GLuint &textureUnit);
@@ -27,9 +25,15 @@ public:
 
     Shader *getShader() const;
 
+    void setMatrix(const gsl::Matrix4x4 &matrix);
+
+public slots:
+    void updatedMatrix(gsl::Matrix4x4 *matrix) { mMatrix = matrix; }
+
 protected:
-    Shader *mShader{nullptr};
     MaterialData material;
+    Shader *mShader{nullptr};
+    gsl::Matrix4x4 mMatrix;
 };
 
 #endif // MATERIALCOMPONENT_H

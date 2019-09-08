@@ -16,13 +16,13 @@ enum CType {
 /**
  * @brief The Component class is the base class for all components.
  */
-class Component {
+class Component : public QObject {
 public:
     Component();
     virtual ~Component();
 
     virtual void init();
-    virtual void update(float dt = 0.0f);
+    virtual void update(float dt = 0.0f) = 0;
 
     CType type() const;
 

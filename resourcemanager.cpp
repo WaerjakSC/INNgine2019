@@ -9,16 +9,22 @@
 
 ResourceManager::ResourceManager(MainWindow *window) : mainWindow(window) {
 }
-ResourceManager::ResourceManager() {
+
+std::vector<std::map<int, int> *> ResourceManager::getCompIndex() const {
+    return mCompIndex;
 }
+
+std::vector<int> ResourceManager::getEntityStart() const {
+    return mEntityStart;
+}
+
+std::vector<Component *> ResourceManager::getComponents() const {
+    return mComponents;
+}
+
 ResourceManager &ResourceManager::instance(MainWindow *window) {
 
     static ResourceManager *mInstance = new ResourceManager(window);
-    return *mInstance;
-}
-
-ResourceManager &ResourceManager::instance() {
-    static ResourceManager *mInstance = new ResourceManager();
     return *mInstance;
 }
 
@@ -198,8 +204,9 @@ GLuint ResourceManager::makeGameObject(std::string name) {
  */
 GLuint ResourceManager::makeXYZ() {
     GLuint eID = makeGameObject("XYZ");
-    addComponent(Mesh, eID);
-    addComponent(Material, eID);
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
 
     initializeOpenGLFunctions();
     mMeshData.Clear();
@@ -224,8 +231,9 @@ GLuint ResourceManager::makeXYZ() {
 
 GLuint ResourceManager::makeSkyBox() {
     GLuint eID = makeGameObject("Cube");
-    addComponent(Mesh, eID);
-    addComponent(Material, eID);
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
 
     //    temp->mMatrix.scale(15.f);
     initializeOpenGLFunctions();
@@ -306,8 +314,9 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
     initializeOpenGLFunctions();
 
     GLuint eID = makeGameObject(fileName);
-    addComponent(Mesh, eID);
-    addComponent(Material, eID);
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
     setMesh(LoadTriangleMesh(fileName), eID);
     glBindVertexArray(0);
 
@@ -318,8 +327,9 @@ GLuint ResourceManager::makeBillBoard() {
     GLuint eID = mNumGameObjects;
     ++mNumGameObjects;
     mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
-    addComponent(Mesh, eID);
-    addComponent(Material, eID);
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
 
     initializeOpenGLFunctions();
 
@@ -376,8 +386,9 @@ GLuint ResourceManager::makeLightObject() {
     GLuint eID = mNumGameObjects;
     ++mNumGameObjects;
     mGameObjects.emplace_back(new LightObject(eID, "Light"));
-    addComponent(Mesh, eID);
-    addComponent(Material, eID);
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
 
     initializeOpenGLFunctions();
 

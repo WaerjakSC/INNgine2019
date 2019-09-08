@@ -19,7 +19,7 @@ public:
     void setPosition(const gsl::Vector3D &position);
 
     void setSpeed(float speed);
-    void updateHeigth(float deltaHeigth);
+    void updateHeight(float deltaHeigth);
     void moveRight(float delta);
 
     gsl::Vector3D position() const;
