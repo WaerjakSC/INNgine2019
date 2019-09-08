@@ -42,7 +42,9 @@ public:
     GLuint makeGameObject(std::string name = "");
 
     void addComponent(CType type, int eID = -1);
+    void removeComponent(CType type, int eID);
     Component *getComponent(CType type, int eID = -1);
+
     void addMeshComponent(std::string name, int eID = -1);
 
     // Basic Shapes and Prefabs
@@ -97,12 +99,11 @@ private:
     // Each Entity has a vector of size n = TotalPossibleComponents that points to the offset of each component in mComponents
     //Holds the index of the first component created for each entity.
     std::vector<int> mEntityStart;          // mEntityStart[n] is the location of the (n+1)th entity's first component
-    std::vector<Component *> mComponents;   // Dense Set of Components
+    std::vector<Component *> mComponents;   // Dense Set of Components initially sorted by entity
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
     std::vector<std::map<int, int> *> mCompIndex{&mTransforms, &mMaterials, &mMeshes, &mLights, &mInputs, &mPhysics, &mSounds};
 
     void sortComponents();
-    void removeComponent(CType type, int eID);
 
     // OpenGL init functions
     void initVertexBuffers();
@@ -112,7 +113,6 @@ private:
     MeshComponent *LoadMesh(std::string fileName);
     void setMesh(MeshComponent *mesh, int eID);
     bool readFile(std::string fileName);
-
     bool readTriangleFile(std::string filename);
     MeshComponent *LoadTriangleMesh(std::string fileName);
 

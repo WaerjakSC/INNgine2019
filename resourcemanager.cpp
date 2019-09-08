@@ -9,10 +9,16 @@
 
 ResourceManager::ResourceManager(MainWindow *window) : mainWindow(window) {
 }
-
+ResourceManager::ResourceManager() {
+}
 ResourceManager &ResourceManager::instance(MainWindow *window) {
 
     static ResourceManager *mInstance = new ResourceManager(window);
+    return *mInstance;
+}
+
+ResourceManager &ResourceManager::instance() {
+    static ResourceManager *mInstance = new ResourceManager();
     return *mInstance;
 }
 
@@ -27,6 +33,8 @@ ResourceManager::~ResourceManager() {
     for (auto map : mCompIndex) { // Not sure if this is necessary, I need to brush up on pointers again...
         delete map;
     }
+    for (auto &comp : mComponents)
+        delete comp;
 }
 /**
  * @brief ResourceManager::sortComponents

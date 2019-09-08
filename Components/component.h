@@ -22,7 +22,7 @@ public:
     virtual ~Component();
 
     virtual void init();
-    virtual void update(float dt);
+    virtual void update(float dt = 0.0f);
 
     CType type() const;
 
@@ -30,7 +30,6 @@ public:
 
 protected:
     CType mType;
-
 };
 
 #endif // COMPONENT_H
