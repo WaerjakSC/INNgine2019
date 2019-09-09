@@ -1,13 +1,14 @@
 #include "rendersystem.h"
-
+#include "renderview.h"
 RenderSystem::RenderSystem() {
     factory = &ResourceManager::instance();
     mRenderCompIDs.emplace_back(factory->getCompIndex().at(Transform));
     mRenderCompIDs.emplace_back(factory->getCompIndex().at(Material));
     mRenderCompIDs.emplace_back(factory->getCompIndex().at(Mesh));
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
-    mViableEntities = getViableEntities();
-    connectComponents();
+
+    std::tie(mViableEntities, transforms, mats, meshes) = (factory->getRenderView()->getComponents());
+    //    connectComponents();
 }
 void RenderSystem::iterateEntity(int eID) {
     for (auto cOffset : mRenderCompIDs) {
@@ -51,8 +52,10 @@ std::vector<int> RenderSystem::getViableEntities() {
 }
 
 void RenderSystem::render() {
-    for (auto entityID : mViableEntities) {
-        iterateEntity(entityID);
+    for (int i = 0; i < mViableEntities.size(); i++) {
+        transforms.at(i)->update();
+        mats.at(i)->update();
+        meshes.at(i)->update();
     }
 }
 /**

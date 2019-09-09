@@ -17,7 +17,7 @@ class MaterialComponent : public Component {
 public:
     MaterialComponent();
 
-    void update(float dt);
+    void update(float dt = 0.0f);
 
     void setShader(Shader *getShader);
     void setTextureUnit(const GLuint &textureUnit);

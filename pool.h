@@ -30,9 +30,10 @@ public:
         mComponentList.pop_back();
         mEntityIndices.at(removedEntityID) = -1; // Set entity location to an invalid value.
     }
-    const std::vector<Type> &getComponents() { return &mComponentList; } // Direct access to the components
+    std::vector<Type> &getComponents() { return &mComponentList; } // Direct access to the components
     const std::vector<int> getEntityList() { return mEntityList; }
     const std::vector<int> getEntityIndices() { return mEntityIndices; }
+    Type *getComponent(int eID) { return *mComponentList.at(mEntityIndices.at(eID)); }
 
     /**
      * @brief For checking if the pool contains a given entity

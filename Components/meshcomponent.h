@@ -12,7 +12,7 @@ public:
 
     virtual ~MeshComponent();
 
-    virtual void update(float dt);
+    virtual void update(float dt = 0.0f);
 
     GLuint mVAO{0};
     GLuint mVBO{0};

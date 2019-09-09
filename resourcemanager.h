@@ -11,7 +11,7 @@
 #include "Shaders/shader.h"
 #include "pool.h"
 #include "texture.h"
-
+class RenderView;
 // Resource manager work in progress
 struct meshData {
     meshData() = default;
@@ -65,6 +65,8 @@ public:
 
     std::vector<std::map<int, int> *> getCompIndex() const;
 
+    RenderView *getRenderView() const;
+
 private:
     // Private constructor
     ResourceManager();
@@ -112,7 +114,9 @@ private:
     std::vector<std::map<int, int> *> mCompIndex{&mTransforms, &mMaterials, &mMeshes, &mLights, &mInputs, &mPhysics, &mSounds};
 
     Pool<MeshComponent> mMeshComps;
-
+    Pool<MaterialComponent> mMatComps;
+    Pool<TransformComponent> mTransComps;
+    RenderView *mRenderView;
     void sortComponents();
 
     // OpenGL init functions

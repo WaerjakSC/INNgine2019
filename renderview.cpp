@@ -1,6 +1,6 @@
 #include "renderview.h"
 
-RenderView::RenderView(Pool<MeshComponent> *mesh, Pool<MaterialComponent> *mat, Pool<TransformComponent> *tf)
+RenderView::RenderView(Pool<TransformComponent> *tf, Pool<MaterialComponent> *mat, Pool<MeshComponent> *mesh)
     : meshpool(mesh), matpool(mat), transpool(tf) {
 }
 CType RenderView::getSmallestPool() {
@@ -22,6 +22,7 @@ CType RenderView::getSmallestPool() {
 std::vector<int> RenderView::getViableEntities() {
     std::vector<int> viableEntities;
     std::vector<int> entityList;
+
     if (getSmallestPool() == Mesh) {
         entityList = meshpool->getEntityList();
         for (auto entity : entityList) {                                                        // Iterate through the dense list of the smallest pool
@@ -47,5 +48,15 @@ std::vector<int> RenderView::getViableEntities() {
     return viableEntities;
 }
 
-std::tuple<MeshComponent &, MaterialComponent &, TransformComponent &> RenderView::getComponents() {
+std::tuple<std::vector<int>, std::vector<TransformComponent *>, std::vector<MaterialComponent *>, std::vector<MeshComponent *>> RenderView::getComponents() {
+    std::vector<MeshComponent *> meshes;
+    std::vector<MaterialComponent *> mats;
+    std::vector<TransformComponent *> transforms;
+    std::vector<int> entities = getViableEntities();
+    for (auto entity : entities) {
+        transforms.push_back(transpool->getComponent(entity));
+        mats.push_back(matpool->getComponent(entity));
+        meshes.push_back(meshpool->getComponent(entity));
+    }
+    return std::make_tuple(entities, transforms, mats, meshes);
 }

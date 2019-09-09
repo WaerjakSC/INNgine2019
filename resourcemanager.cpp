@@ -5,10 +5,14 @@
 #include "billboard.h"
 #include "innpch.h"
 #include "lightobject.h"
+#include "renderview.h"
 #include <QDebug>
-
 ResourceManager::ResourceManager() {
-    mMeshComps.addEntity(0);
+    mRenderView = new RenderView(&mTransComps, &mMatComps, &mMeshComps);
+}
+
+RenderView *ResourceManager::getRenderView() const {
+    return mRenderView;
 }
 
 std::vector<std::map<int, int> *> ResourceManager::getCompIndex() const {
@@ -149,6 +153,7 @@ void ResourceManager::addComponent(CType type, int eID) {
             break;
         case Mesh:
             // Creates an empty Mesh object -- for use with hardcoded objects mostly.
+            mMeshComps.addEntity(eID);
             mComponents.emplace_back(new MeshComponent());
             break;
         case Light:

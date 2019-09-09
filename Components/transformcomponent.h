@@ -6,7 +6,7 @@
 class TransformComponent : public Component {
 public:
     TransformComponent();
-    virtual void update(float dt);
+    virtual void update(float dt = 0.0f);
 
     gsl::Matrix4x4 matrix() const;
 

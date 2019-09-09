@@ -20,6 +20,9 @@ private:
     std::vector<std::map<int, int> *> mRenderCompIDs;
     ResourceManager *factory{nullptr};
     std::vector<int> mViableEntities;
+    std::vector<TransformComponent *> transforms;
+    std::vector<MaterialComponent *> mats;
+    std::vector<MeshComponent *> meshes;
     std::vector<int> getViableEntities();
     void iterateEntity(int eID);
     void connectComponents();
