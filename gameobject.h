@@ -14,7 +14,6 @@ public:
     std::string mName;
 
     GLuint eID;
-    bool hasComponents{false};
 
     virtual void update();
 

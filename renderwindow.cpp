@@ -34,7 +34,8 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
         mContext = nullptr;
         qDebug() << "Context could not be made - quitting this application";
     }
-    mInput = new InputComponent(mMainWindow);
+    mInput = new InputComponent();
+    mInput->setMainWindow(mMainWindow);
     //Make the gameloop timer:
     mRenderTimer = new QTimer(this);
 }

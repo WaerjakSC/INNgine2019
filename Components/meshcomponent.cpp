@@ -13,14 +13,18 @@ MeshComponent::~MeshComponent() {
 }
 
 void MeshComponent::update(float dt) {
-    //    glUseProgram(mShader->getProgram());
-    //    glBindVertexArray(mVAO);
-    //    if (mIndiceCount > 0)
-    //        glDrawElements(mDrawType, mIndiceCount, GL_UNSIGNED_INT, nullptr);
-    //    else
-    //        glDrawArrays(mDrawType, 0, mVerticeCount);
 }
 
 void MeshComponent::setShader(Shader *shader) {
     mShader = shader;
+}
+
+void MeshComponent::copyOpenGLData(const MeshComponent &other) {
+    mVAO = other.mVAO;
+    mVBO = other.mVBO;
+    mEAB = other.mEAB; //holds the indices (Element Array Buffer - EAB)
+
+    mVerticeCount = other.mVerticeCount;
+    mIndiceCount = other.mIndiceCount;
+    mDrawType = other.mDrawType;
 }

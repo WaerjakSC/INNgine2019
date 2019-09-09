@@ -24,8 +24,8 @@ private:
     std::vector<MaterialComponent *> mats;
     std::vector<MeshComponent *> meshes;
     std::vector<int> getViableEntities();
-    void iterateEntity(int eID);
     void connectComponents();
+    void iterateEntities();
 };
 
 #endif // RENDERSYSTEM_H

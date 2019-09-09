@@ -3,14 +3,14 @@
 #include <QKeyEvent>
 
 // InputComponent handling user inputs (moved from renderwindow and implemented here)
-InputComponent::InputComponent(MainWindow *mainWindow) : mMainWindow(mainWindow) {
+InputComponent::InputComponent() {
     mType = CType::Input;
 }
 
 // Updates each game loop/tick
 void InputComponent::update(float dt) {
 }
-
+void InputComponent::setMainWindow(MainWindow *mainWindow) { mMainWindow = mainWindow; }
 // Code initialization (Similar to Unity's void Start()), separating the constructor and code initialization
 void InputComponent::init() {
 }
@@ -63,9 +63,8 @@ void InputComponent::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-
-void InputComponent::keyReleaseEvent(QKeyEvent *event){
-    if(event->key() == Qt::Key_W){
+void InputComponent::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_W) {
         W = false;
     }
 
@@ -115,8 +114,7 @@ void InputComponent::keyReleaseEvent(QKeyEvent *event){
     }
 }
 
-
-void InputComponent::mousePressEvent(QMouseEvent *event){
+void InputComponent::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton)
         RMB = true;
     if (event->button() == Qt::LeftButton)
@@ -125,8 +123,7 @@ void InputComponent::mousePressEvent(QMouseEvent *event){
         MMB = true;
 }
 
-
-void InputComponent::mouseReleaseEvent(QMouseEvent *event){
+void InputComponent::mouseReleaseEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton)
         RMB = false;
     if (event->button() == Qt::LeftButton)

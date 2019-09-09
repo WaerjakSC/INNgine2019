@@ -2,18 +2,23 @@
 #include "renderview.h"
 RenderSystem::RenderSystem() {
     factory = &ResourceManager::instance();
-    mRenderCompIDs.emplace_back(factory->getCompIndex().at(Transform));
-    mRenderCompIDs.emplace_back(factory->getCompIndex().at(Material));
-    mRenderCompIDs.emplace_back(factory->getCompIndex().at(Mesh));
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
 
-    std::tie(mViableEntities, transforms, mats, meshes) = (factory->getRenderView()->getComponents());
+    std::tie(mViableEntities, transforms, mats, meshes) = (factory->getRenderView()->getComponents()); // viable entities won't update in this class
     //    connectComponents();
 }
-void RenderSystem::iterateEntity(int eID) {
-    for (auto cOffset : mRenderCompIDs) {
-        int componentLocation = factory->getEntityStart().at(eID) + cOffset->at(eID);
-        factory->getComponents().at(componentLocation)->update();
+void RenderSystem::iterateEntities() {
+    for (int i = 0; i < mViableEntities.size(); i++) {
+        transforms.at(i)->update();
+        initializeOpenGLFunctions();
+        glUseProgram(mats.at(i)->getShader()->getProgram());
+        mats.at(i)->update();
+        glBindVertexArray(meshes.at(i)->mVAO);
+        if (meshes.at(i)->mIndiceCount > 0)
+            glDrawElements(meshes.at(i)->mDrawType, meshes.at(i)->mIndiceCount, GL_UNSIGNED_INT, nullptr);
+        else
+            glDrawArrays(meshes.at(i)->mDrawType, 0, meshes.at(i)->mVerticeCount);
+        meshes.at(i)->update();
     }
 }
 /**
@@ -52,11 +57,7 @@ std::vector<int> RenderSystem::getViableEntities() {
 }
 
 void RenderSystem::render() {
-    for (int i = 0; i < mViableEntities.size(); i++) {
-        transforms.at(i)->update();
-        mats.at(i)->update();
-        meshes.at(i)->update();
-    }
+    iterateEntities();
 }
 /**
  * @brief RenderSystem::connectComponents VERY temporary function just to make things render
@@ -64,7 +65,7 @@ void RenderSystem::render() {
 void RenderSystem::connectComponents() {
     for (auto entity : mViableEntities) {
         Shader *shader = static_cast<MaterialComponent *>(factory->getComponent(Material, entity))->getShader();
-        gsl::Matrix4x4 model = static_cast<TransformComponent *>(factory->getComponent(Transform, entity))->matrix();
+        gsl::Matrix4x4 *model = static_cast<TransformComponent *>(factory->getComponent(Transform, entity))->matrix();
         static_cast<MaterialComponent *>(factory->getComponent(Material, entity))->setMatrix(model);
         static_cast<MeshComponent *>(factory->getComponent(Mesh, entity))->setShader(shader);
     }

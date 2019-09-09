@@ -7,11 +7,10 @@
 
 class InputComponent : public Component {
 public:
-
     virtual void update(float dt);
     virtual void init();
 
-    InputComponent(MainWindow *mainWindow);
+    InputComponent();
 
     bool W{false};
     bool A{false};
@@ -37,6 +36,8 @@ public:
     void keyReleaseEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+
+    void setMainWindow(MainWindow *mainWindow);
 
 private:
     void handleInput();

@@ -24,6 +24,8 @@ public:
 
     void setShader(Shader *shader);
 
+    void copyOpenGLData(const MeshComponent &comp);
+
 private:
     Shader *mShader{nullptr};
 };

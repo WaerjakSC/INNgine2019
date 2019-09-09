@@ -14,19 +14,6 @@ ResourceManager::ResourceManager() {
 RenderView *ResourceManager::getRenderView() const {
     return mRenderView;
 }
-
-std::vector<std::map<int, int> *> ResourceManager::getCompIndex() const {
-    return mCompIndex;
-}
-
-std::vector<int> ResourceManager::getEntityStart() const {
-    return mEntityStart;
-}
-
-std::vector<Component *> ResourceManager::getComponents() const {
-    return mComponents;
-}
-
 ResourceManager &ResourceManager::instance() {
 
     static ResourceManager *mInstance = new ResourceManager();
@@ -41,33 +28,6 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : Textures) {
         delete texture.second;
     }
-    for (auto map : mCompIndex) { // Not sure if this is necessary, I need to brush up on pointers again...
-        delete map;
-    }
-    for (auto &comp : mComponents)
-        delete comp;
-}
-/**
- * @brief ResourceManager::sortComponents
- * Repairs the mComponents vector so all the components of each entity lie in succession
- * Consider repairing any time you add to or remove from an old entity
- */
-void ResourceManager::sortComponents() {
-    std::vector<Component *> temp = mComponents;
-    int lastEntity{0};
-    for (int i = 0; i < mEntityStart.size(); i++) { // For all gameobjects
-        int nOffset{0};                             // new offset from gameobject
-        for (std::map<int, int> *component : mCompIndex) {
-            auto search = component->find(i);                                                        // find out if the gameobject owns this component and retrieve its current offset
-            if (search != component->end()) {                                                        // if so...
-                temp.at(lastEntity + nOffset) = mComponents.at(mEntityStart.at(i) + search->second); // save the actual component at the new location.
-                component->at(i) = nOffset;                                                          // replace the old offset with the new
-                nOffset++;                                                                           // increment the new offset
-            }
-        }
-        mEntityStart.at(i) = lastEntity + nOffset; // value should be equal to last entity index + last component of entity's index
-    }
-    std::swap(mComponents, temp); // Swap temp and mComponents to get an updated vector
 }
 /**
  * @brief ResourceManager::removeComponent - Remove a component and update tables.
@@ -77,56 +37,73 @@ void ResourceManager::sortComponents() {
  * @param eID entity ID
  */
 void ResourceManager::removeComponent(CType type, int eID) {
-    if (eID < mGameObjects.size() && hasComponent(type, eID)) {
-        // Get the index start of the last entity
-        // then, get the type of the last component
-        // You can now change the index to that component to the index of the removed (swapped and popped) component
-        int oldComponentIndex = mEntityStart.at(eID) + mCompIndex.at(type)->at(eID); // Entity start point + offset of component of type, owned by entity
-        int lastEntity = mEntityStart.back();                                        // Location of the last entity
-        CType lastCompType = mComponents.back()->type();                             // Type of the last component owned by last entity in the mComponents array.
-        std::swap(mComponents.at(oldComponentIndex), mComponents.back());
-        mComponents.pop_back();
-        mCompIndex.at(lastCompType)->at(mEntityStart.size() - 1) = oldComponentIndex - lastEntity;
-    } else {
-        qDebug() << "No GameObject with this ID exists.";
-    }
-    if (!hasComponents(eID))
-        mGameObjects.at(eID)->hasComponents = false;
-}
-int ResourceManager::largestOffset(int eID) {
-    int lOffset{0}; // largest offset from gameobject
-    for (std::map<int, int> *component : mCompIndex) {
-        auto search = component->find(eID); // find out if the gameobject owns this component and retrieve its current offset
-        if (search != component->end()) {   // if so...
-            if (search->second > lOffset)
-                lOffset = search->second; // increment the new offset
+    if (eID <= -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
+        eID = mGameObjects.size() - 1;
+    // If gameobject exists in vector and the component doesn't already exist on object
+    if (eID < mGameObjects.size()) {
+        switch (type) {
+        case Transform:
+            mTransComps.remove(eID);
+            break;
+        case Material:
+            mMatComps.remove(eID);
+            break;
+        case Mesh:
+            mMeshComps.remove(eID);
+            for (auto it = mMeshMap.begin(); it != mMeshMap.end(); ++it) {
+                if (it->second == eID)
+                    it->second = -1; // Somewhat unfortunately, if you remove the mesh containing the original data,
+                                     // there's currently no way of replacing the eID pointed to in the meshmap with another mesh of the same type.
+                                     // Optionally I could simply save a copy of each unique mesh elsewhere and copy that onto other meshes when desired.
+            }
+            break;
+        case Light:
+            mLightComps.remove(eID);
+            break;
+        case Input:
+            mInputComps.remove(eID);
+            break;
+        case Physics:
+            mPhysicsComps.remove(eID);
+            break;
+        case Sound:
+            mSoundComps.remove(eID);
+            break;
+        default:
+            qDebug() << "Unknown Type.";
         }
-    }
-    return lOffset;
+    } else
+        qDebug() << "No GameObject with this ID exists or Component already exists.";
 }
 Component *ResourceManager::getComponent(CType type, int eID) {
-    if (eID <= -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
+    if (eID <= -1) // This means an eID wasn't given, assumes you want to simply get a component from the last gameobject.
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
-    if (eID < mGameObjects.size() && hasComponent(type, eID))
-        return mComponents.at(mEntityStart.at(eID) + mCompIndex.at(type)->at(eID));
+    if (eID < mGameObjects.size())
+        switch (type) {
+        case Transform:
+            return mTransComps.get(eID);
+        case Material:
+            return mMatComps.get(eID);
+        case Mesh:
+            return mMeshComps.get(eID);
+        case Light:
+            return mLightComps.get(eID);
+        case Input:
+            return mInputComps.get(eID);
+        case Physics:
+            return mPhysicsComps.get(eID);
+        case Sound:
+            return mSoundComps.get(eID);
+        default:
+            qDebug() << "Unknown Type.";
+        }
     else {
         qDebug() << "No GameObject with this ID exists.";
         return 0;
     }
 }
 
-bool ResourceManager::hasComponent(CType type, int eID) {
-    auto search = mCompIndex.at(type)->find(eID);
-    return search != mCompIndex.at(type)->end();
-}
-bool ResourceManager::hasComponents(int eID) {
-    for (std::map<int, int> *component : mCompIndex) {
-        if (component->find(eID) != component->end())
-            return true;
-    }
-    return false;
-}
 /**
  * @brief ResourceManager::addComponent - Generic component creator
  * @note I don't like how this adds components at the moment. Over time as components are added/removed from old entities, the offset will become pretty massive and
@@ -137,43 +114,37 @@ bool ResourceManager::hasComponents(int eID) {
 void ResourceManager::addComponent(CType type, int eID) {
     if (eID <= -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
         eID = mGameObjects.size() - 1;
-    if (!hasComponents(eID)) {
-        mEntityStart.push_back(mComponents.size());
-        mGameObjects.at(eID)->hasComponents = true;
-    }
     // If gameobject exists in vector and the component doesn't already exist on object
-    if (eID < mGameObjects.size() && !hasComponent(type, eID)) {
-        mCompIndex.at(type)->emplace(eID, mComponents.size() - mEntityStart.at(eID));
+    if (eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
-            mComponents.emplace_back(new TransformComponent());
+            mTransComps.add(eID);
             break;
         case Material:
-            mComponents.emplace_back(new MaterialComponent());
+            mMatComps.add(eID);
             break;
         case Mesh:
             // Creates an empty Mesh object -- for use with hardcoded objects mostly.
-            mMeshComps.addEntity(eID);
-            mComponents.emplace_back(new MeshComponent());
+            mMeshComps.add(eID);
             break;
         case Light:
-            mComponents.emplace_back(new LightingComponent());
+            mLightComps.add(eID);
             break;
         case Input:
-            mComponents.emplace_back(new InputComponent(mMainWindow));
+            mInputComps.add(eID);
             break;
         case Physics:
-            mComponents.emplace_back(new PhysicsComponent());
+            mPhysicsComps.add(eID);
             break;
         case Sound:
-            mComponents.emplace_back(new SoundComponent());
+            mSoundComps.add(eID);
             break;
         }
     } else
         qDebug() << "No GameObject with this ID exists or Component already exists.";
 }
 /**
- * @brief ResourceManager::addMeshComponent - If you don't want a default, empty mesh component,
+ * @brief ResourceManager::addMeshComponent - If you know the mesh you want at construction
  * i.e. for prefabs and similar
  * @param name
  * @param eID
@@ -186,11 +157,9 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
     setMesh(LoadMesh(name), eID);
 }
 void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
-    if (eID <= -1) // This means a eID wasn't given, assumes you want to simply get a component from the last gameobject.
-        eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
-    if (eID < mGameObjects.size() && hasComponent(Mesh, eID)) {
-        mComponents.back() = mesh;
+    if (eID < mGameObjects.size()) {
+        mMeshComps.get(eID)->copyOpenGLData(*mesh);
     }
 }
 /**
@@ -224,13 +193,12 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    static_cast<MaterialComponent *>(mComponents.at(mMaterials.at(eID)))->setShader(Shaders[Color]);
-    MeshComponent *xyzMesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.at(eID)));
-    xyzMesh->mVerticeCount = mMeshData.mVertices.size();
-    xyzMesh->mDrawType = GL_LINES;
+    mMatComps.get(eID)->setShader(Shaders[Color]);
+    mMeshComps.get(eID)->mVerticeCount = mMeshData.mVertices.size();
+    mMeshComps.get(eID)->mDrawType = GL_LINES;
 
     // set up buffers (equivalent to init() from before)
-    initVertexBuffers();
+    initVertexBuffers(mMeshComps.get(eID));
     glBindVertexArray(0);
     return eID;
 }
@@ -293,16 +261,16 @@ GLuint ResourceManager::makeSkyBox() {
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
 
-    MaterialComponent *skyMat = static_cast<MaterialComponent *>(mComponents.at(mMaterials.at(eID)));
+    MaterialComponent *skyMat = mMatComps.get(eID);
     skyMat->setShader(Shaders[Tex]);
     skyMat->setTextureUnit(Textures["skybox.bmp"]->id()); // Could just hardcode int 2 here but this seems more readable?
-    MeshComponent *skyMesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.at(eID)));
+    MeshComponent *skyMesh = mMeshComps.get(eID);
     skyMesh->mVerticeCount = mMeshData.mVertices.size();
     skyMesh->mIndiceCount = mMeshData.mIndices.size();
     skyMesh->mDrawType = GL_TRIANGLES;
 
-    initVertexBuffers();
-    initIndexBuffers();
+    initVertexBuffers(skyMesh);
+    initIndexBuffers(skyMesh);
 
     glBindVertexArray(0);
 
@@ -315,11 +283,12 @@ GLuint ResourceManager::makeSkyBox() {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
+    GLuint eID = makeGameObject(fileName);
+
     mMeshData.Clear();
 
     initializeOpenGLFunctions();
 
-    GLuint eID = makeGameObject(fileName);
     addComponent(Transform);
     addComponent(Material);
     addComponent(Mesh);
@@ -348,16 +317,16 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
-    MaterialComponent *billBoardMat = static_cast<MaterialComponent *>(mComponents.at(mMaterials.at(eID)));
+    MaterialComponent *billBoardMat = mMatComps.get(eID);
     billBoardMat->setTextureUnit(Textures["hund.bmp"]->id());
     billBoardMat->setShader(Shaders[Tex]);
     billBoardMat->setColor(gsl::Vector3D(0.7f, 0.6f, 0.1f));
 
-    MeshComponent *billBoardMesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.at(eID)));
+    MeshComponent *billBoardMesh = mMeshComps.get(eID);
     billBoardMesh->mVerticeCount = mMeshData.mVertices.size();
     billBoardMesh->mDrawType = GL_TRIANGLE_STRIP;
 
-    initVertexBuffers();
+    initVertexBuffers(billBoardMesh);
 
     glBindVertexArray(0);
     return eID;
@@ -376,13 +345,13 @@ GLuint ResourceManager::makeOctBall(int n) {
 
     makeUnitOctahedron(mRecursions);
 
-    MeshComponent *OctMesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.at(eID)));
+    MeshComponent *OctMesh = mMeshComps.get(eID);
     OctMesh->mVerticeCount = mMeshData.mVertices.size();
     OctMesh->mIndiceCount = mMeshData.mIndices.size();
     OctMesh->mDrawType = GL_TRIANGLES;
 
-    initVertexBuffers();
-    initIndexBuffers();
+    initVertexBuffers(OctMesh);
+    initIndexBuffers(OctMesh);
 
     glBindVertexArray(0);
     return eID;
@@ -414,25 +383,26 @@ GLuint ResourceManager::makeLightObject() {
                                1, 3, 2,
                                3, 0, 2,
                                0, 3, 1});
-    MaterialComponent *lightMat = static_cast<MaterialComponent *>(mComponents.at(mMaterials.at(eID)));
+    MaterialComponent *lightMat = mMatComps.get(eID);
     lightMat->setTextureUnit(Textures["white.bmp"]->id());
     lightMat->setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
     lightMat->setShader(Shaders[Tex]);
 
-    MeshComponent *lightMesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.at(eID)));
+    MeshComponent *lightMesh = mMeshComps.get(eID);
     lightMesh->mVerticeCount = mMeshData.mVertices.size();
     lightMesh->mIndiceCount = mMeshData.mIndices.size();
     lightMesh->mDrawType = GL_TRIANGLES;
 
-    initVertexBuffers();
-    initIndexBuffers();
+    initVertexBuffers(lightMesh);
+    initIndexBuffers(lightMesh);
 
     glBindVertexArray(0);
     return eID;
 }
-
-void ResourceManager::initVertexBuffers() {
-    MeshComponent *mesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.rbegin()->second));
+/**
+ * @brief opengl init - initialize the given mesh's buffers and arrays
+ */
+void ResourceManager::initVertexBuffers(MeshComponent *mesh) {
     //Vertex Array Object - VAO
     glGenVertexArrays(1, &mesh->mVAO);
     glBindVertexArray(mesh->mVAO);
@@ -455,9 +425,11 @@ void ResourceManager::initVertexBuffers() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
 }
-
-void ResourceManager::initIndexBuffers() {
-    MeshComponent *mesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.rbegin()->second));
+/**
+ * @brief opengl init for glDrawElements - initialize the given mesh's index buffer
+ * @param mesh
+ */
+void ResourceManager::initIndexBuffers(MeshComponent *mesh) {
     glGenBuffers(1, &mesh->mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
@@ -502,15 +474,6 @@ Shader *ResourceManager::GetShader(ShaderType type) {
 
 Texture *ResourceManager::GetTexture(std::string fileName) {
     return Textures[fileName];
-}
-/**
- * @brief ResourceManager::GetMesh - Use this function if you know you've already loaded the mesh.
- * @param name
- * @return
- */
-MeshComponent *ResourceManager::GetMesh(std::string name) {
-    MeshComponent *mesh = static_cast<MeshComponent *>(mComponents.at(mMeshes.at(mMeshMap[name])));
-    return mesh;
 }
 
 bool ResourceManager::readFile(std::string fileName) {
@@ -649,13 +612,13 @@ bool ResourceManager::readFile(std::string fileName) {
     //being a nice boy and closing the file after use
     fileIn.close();
 
-    MeshComponent *mesh = static_cast<MeshComponent *>(mComponents.back());
+    MeshComponent *mesh = mMeshComps.getLast();
     mesh->mVerticeCount = mMeshData.mVertices.size();
     mesh->mIndiceCount = mMeshData.mIndices.size();
     mesh->mDrawType = GL_TRIANGLES;
 
-    initVertexBuffers();
-    initIndexBuffers();
+    initVertexBuffers(mesh);
+    initIndexBuffers(mesh);
 
     qDebug() << "Obj file read: " << QString::fromStdString(fileName);
     return true;
@@ -670,26 +633,27 @@ MeshComponent *ResourceManager::LoadMesh(std::string fileName) {
 
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {
-        return static_cast<MeshComponent *>(mComponents.at(mMeshes[search->second])); // Return a copy of the mesh it wants if already stored
+        if (search->second != -1)
+            return mMeshComps.get(search->second); // Return a copy of the mesh it wants if already stored
     }
     if (!readFile(fileName)) { // Should run readFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = mMeshes.size() - 1;                 // MeshComponent has already been added to the vector, subtract size() by 1 to get the last index.
-    return static_cast<MeshComponent *>(mComponents.back()); // the mesh at the back is the latest creation
+    mMeshMap[fileName] = mMeshComps.getEntityIndices().back(); // The value of the last entity added to the component pool index is the latest unique mesh
+    return mMeshComps.getLast();                               // the mesh at the back is the latest creation
 }
 MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {
-        return static_cast<MeshComponent *>(mComponents.at(mMeshes[search->second])); // Return a copy of the mesh it wants if already stored
+        return mMeshComps.get(search->second); // Return a copy of the mesh it wants if already stored
     }
     if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = mMeshes.size() - 1;                 // MeshComponent has already been added to the vector, subtract size() by 1 to get the last index.
-    return static_cast<MeshComponent *>(mComponents.back()); // the mesh at the back is the latest creation
+    mMeshMap[fileName] = mMeshComps.getEntityIndices().back(); // The value of the last entity added to the component pool index is the latest unique mesh
+    return mMeshComps.getLast();                               // the mesh at the back is the latest creation
 }
 
 bool ResourceManager::readTriangleFile(std::string fileName) {
@@ -711,11 +675,10 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        initVertexBuffers();
-
-        MeshComponent *mesh = static_cast<MeshComponent *>(mComponents.back());
+        MeshComponent *mesh = mMeshComps.getLast();
         mesh->mVerticeCount = mMeshData.mVertices.size();
         mesh->mDrawType = GL_TRIANGLES;
+        initVertexBuffers(mesh);
         return true;
     } else {
         qDebug() << "Could not open file for reading: " << QString::fromStdString(fileName);
