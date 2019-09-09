@@ -7,13 +7,16 @@
 
 class RenderView {
 public:
-    RenderView();
+    RenderView(Pool<MeshComponent> *mesh, Pool<MaterialComponent> *mat, Pool<TransformComponent> *tf);
 
+    std::vector<int> getViableEntities();
+    std::tuple<MeshComponent &, MaterialComponent &, TransformComponent &> getComponents();
     // RenderSystem View? Get all entities that own these three component types
 private:
-    std::vector<Pool<MeshComponent> *> meshpool;
-    std::vector<Pool<MaterialComponent> *> matpool;
-    std::vector<Pool<TransformComponent> *> transpool;
+    Pool<MeshComponent> *meshpool;
+    Pool<MaterialComponent> *matpool;
+    Pool<TransformComponent> *transpool;
+    CType getSmallestPool();
 };
 
 #endif // RENDERVIEW_H

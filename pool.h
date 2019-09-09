@@ -40,9 +40,10 @@ public:
      * @param eID
      * @return
      */
-    bool hasComponent(int eID) {
+    bool has(int eID) {
         return mEntityIndices.at(eID) != -1;
     }
+    size_t size() { return mEntityList.size(); }
 
 private:
     std::vector<int> mEntityIndices; // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
