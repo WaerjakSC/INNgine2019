@@ -6,7 +6,7 @@
 #include <QOpenGLFunctions_4_1_Core>
 class MaterialComponent;
 class Shader;
-class MeshComponent : protected QOpenGLFunctions_4_1_Core, public Component {
+class MeshComponent : public Component {
 public:
     MeshComponent();
 

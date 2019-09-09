@@ -9,6 +9,7 @@
 
 #include "Components/comppch.h"
 #include "Shaders/shader.h"
+#include "pool.h"
 #include "texture.h"
 
 // Resource manager work in progress
@@ -109,6 +110,8 @@ private:
     std::vector<Component *> mComponents;   // Dense Set of Components initially sorted by entity
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
     std::vector<std::map<int, int> *> mCompIndex{&mTransforms, &mMaterials, &mMeshes, &mLights, &mInputs, &mPhysics, &mSounds};
+
+    Pool<MeshComponent> mMeshComps;
 
     void sortComponents();
 

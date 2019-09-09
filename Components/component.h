@@ -14,9 +14,9 @@ enum CType {
 /**
  * @brief The Component class is the base class for all components.
  */
-class Component : public QObject {
+class Component {
 public:
-    Component();
+    Component() = default;
     virtual ~Component();
 
     virtual void init();

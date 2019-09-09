@@ -8,6 +8,7 @@
 #include <QDebug>
 
 ResourceManager::ResourceManager() {
+    mMeshComps.addEntity(0);
 }
 
 std::vector<std::map<int, int> *> ResourceManager::getCompIndex() const {

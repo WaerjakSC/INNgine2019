@@ -10,8 +10,8 @@ public:
 
     gsl::Matrix4x4 matrix() const;
 
-signals:
-    void matrixChanged(const gsl::Matrix4x4 matrix);
+    //signals:
+    //    void matrixChanged(const gsl::Matrix4x4 matrix);
 
 private:
     gsl::Matrix4x4 mMatrix; // not sure how to handle the model matrix yet

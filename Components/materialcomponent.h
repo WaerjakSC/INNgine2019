@@ -27,8 +27,8 @@ public:
 
     void setMatrix(const gsl::Matrix4x4 &matrix);
 
-public slots:
-    void updatedMatrix(gsl::Matrix4x4 *matrix) { mMatrix = matrix; }
+    //public slots:
+    //    void updatedMatrix(gsl::Matrix4x4 *matrix) { mMatrix = matrix; }
 
 protected:
     MaterialData material;
