@@ -180,7 +180,7 @@ void RenderWindow::init() {
     factory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
-    mRenderer = new RenderSystem();
+    mRenderer = new RenderSystem(factory.getShaders());
 }
 
 ///Called each frame - doing the rendering
@@ -224,19 +224,6 @@ void RenderWindow::render() {
 
     //    calculateFramerate();
 }
-
-//void RenderWindow::setupPlainShader() {
-//    mMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "mMatrix");
-//    vMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "vMatrix");
-//    pMatrixUniform0 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Color)->getProgram(), "pMatrix");
-//}
-
-//void RenderWindow::setupTextureShader() {
-//    mMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "mMatrix");
-//    vMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "vMatrix");
-//    pMatrixUniform1 = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "pMatrix");
-//    mTextureUniform = glGetUniformLocation(ResourceManager::GetShader(ShaderType::Tex)->getProgram(), "textureSampler");
-//}
 
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized

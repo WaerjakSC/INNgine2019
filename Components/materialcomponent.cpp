@@ -1,5 +1,4 @@
 #include "materialcomponent.h"
-#include "Shaders/shader.h"
 
 MaterialComponent::MaterialComponent() {
     mType = CType::Material;
@@ -7,17 +6,16 @@ MaterialComponent::MaterialComponent() {
 }
 
 void MaterialComponent::update(float dt) {
-    mShader->transmitUniformData(&mMatrix, &material);
 }
 
-void MaterialComponent::setShader(Shader *shader) {
+void MaterialComponent::setShader(ShaderType shader) {
     mShader = shader;
 }
 void MaterialComponent::setColor(const gsl::Vector3D &color) {
     material.mObjectColor = color;
 }
 
-Shader *MaterialComponent::getShader() const {
+ShaderType MaterialComponent::getShader() const {
     return mShader;
 }
 

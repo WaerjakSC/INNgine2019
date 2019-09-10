@@ -1,4 +1,5 @@
 #include "resourcemanager.h"
+#include "Components/meshcomponent.h"
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
@@ -9,6 +10,10 @@
 #include <QDebug>
 ResourceManager::ResourceManager() {
     mRenderView = new RenderView(&mTransComps, &mMatComps, &mMeshComps);
+}
+
+std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
+    return Shaders;
 }
 
 RenderView *ResourceManager::getRenderView() const {
@@ -193,7 +198,7 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    mMatComps.get(eID)->setShader(Shaders[Color]);
+    mMatComps.get(eID)->setShader(Color);
     mMeshComps.get(eID)->mVerticeCount = mMeshData.mVertices.size();
     mMeshComps.get(eID)->mDrawType = GL_LINES;
 
@@ -262,7 +267,7 @@ GLuint ResourceManager::makeSkyBox() {
                               });
 
     MaterialComponent *skyMat = mMatComps.get(eID);
-    skyMat->setShader(Shaders[Tex]);
+    skyMat->setShader(Tex);
 
     skyMat->setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
     skyMat->mMatrix.scale(15.f);
@@ -321,7 +326,7 @@ GLuint ResourceManager::makeBillBoard() {
                                });
     MaterialComponent *billBoardMat = mMatComps.get(eID);
     billBoardMat->setTextureUnit(Textures["hund.bmp"]->id() - 1);
-    billBoardMat->setShader(Shaders[Tex]);
+    billBoardMat->setShader(Tex);
     billBoardMat->setColor(gsl::Vector3D(0.7f, 0.6f, 0.1f));
 
     MeshComponent *billBoardMesh = mMeshComps.get(eID);
@@ -388,7 +393,7 @@ GLuint ResourceManager::makeLightObject() {
     MaterialComponent *lightMat = mMatComps.get(eID);
     lightMat->setTextureUnit(Textures["white.bmp"]->id() - 1);
     lightMat->setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
-    lightMat->setShader(Shaders[Tex]);
+    lightMat->setShader(Tex);
 
     MeshComponent *lightMesh = mMeshComps.get(eID);
     lightMesh->mVerticeCount = mMeshData.mVertices.size();

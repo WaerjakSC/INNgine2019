@@ -1,7 +1,5 @@
 #ifndef RENDERVIEW_H
 #define RENDERVIEW_H
-#include "Components/meshcomponent.h"
-#include "Components/transformcomponent.h"
 #include "pool.h"
 #include <vector>
 

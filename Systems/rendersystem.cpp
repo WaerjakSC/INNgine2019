@@ -1,6 +1,6 @@
 #include "rendersystem.h"
 #include "renderview.h"
-RenderSystem::RenderSystem() {
+RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     factory = &ResourceManager::instance();
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
 
@@ -11,14 +11,16 @@ void RenderSystem::iterateEntities() {
     for (int i = 0; i < mViableEntities.size(); i++) {
         transforms.at(i)->update();
         initializeOpenGLFunctions();
-        glUseProgram(mats.at(i)->getShader()->getProgram());
+        ShaderType type = mats.at(i)->getShader();
+        glUseProgram(mShaders[type]->getProgram());
+        mShaders[type]->transmitUniformData(transforms.at(i)->matrix(), mats.at(i)->material);
         mats.at(i)->update();
         glBindVertexArray(meshes.at(i)->mVAO);
+        meshes.at(i)->update();
         if (meshes.at(i)->mIndiceCount > 0)
             glDrawElements(meshes.at(i)->mDrawType, meshes.at(i)->mIndiceCount, GL_UNSIGNED_INT, nullptr);
         else
             glDrawArrays(meshes.at(i)->mDrawType, 0, meshes.at(i)->mVerticeCount);
-        meshes.at(i)->update();
     }
 }
 

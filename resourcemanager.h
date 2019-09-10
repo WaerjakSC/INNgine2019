@@ -1,17 +1,14 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include "Components/meshcomponent.h"
-#include "Shaders/shader.h"
-#include "gameobject.h"
-#include "texture.h"
-#include <QOpenGLFunctions_4_1_Core>
-
 #include "Components/comppch.h"
 #include "Shaders/shader.h"
 #include "pool.h"
 #include "texture.h"
+#include <QOpenGLFunctions_4_1_Core>
+
 class RenderView;
+class GameObject;
 // Resource manager work in progress
 struct meshData {
     meshData() = default;
@@ -54,6 +51,8 @@ public:
     GLuint makeLightObject();
 
     RenderView *getRenderView() const;
+
+    std::map<ShaderType, Shader *> getShaders() const;
 
 private:
     // Private constructor
