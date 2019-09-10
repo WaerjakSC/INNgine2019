@@ -13,7 +13,7 @@ void RenderSystem::iterateEntities() {
         initializeOpenGLFunctions();
         ShaderType type = mats.at(i)->getShader();
         glUseProgram(mShaders[type]->getProgram());
-        mShaders[type]->transmitUniformData(transforms.at(i)->matrix(), mats.at(i)->material);
+        mShaders[type]->transmitUniformData(transforms.at(i)->matrix(), &mats.at(i)->material);
         mats.at(i)->update();
         glBindVertexArray(meshes.at(i)->mVAO);
         meshes.at(i)->update();

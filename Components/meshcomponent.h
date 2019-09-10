@@ -22,12 +22,7 @@ public:
     GLuint mIndiceCount{0};
     GLenum mDrawType{0};
 
-    void setShader(Shader *shader);
-
     void copyOpenGLData(const MeshComponent &comp);
-
-private:
-    Shader *mShader{nullptr};
 };
 
 #endif // MESHCOMPONENT_H

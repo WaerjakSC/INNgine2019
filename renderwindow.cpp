@@ -91,9 +91,9 @@ void RenderWindow::init() {
     factory.setMainWindow(mMainWindow);
 
     //Compile shaders:
-    factory.LoadShader(ShaderType::Color);
-    factory.LoadShader(ShaderType::Tex);
-    factory.LoadShader(ShaderType::Phong);
+    factory.LoadShader(Color);
+    factory.LoadShader(Tex);
+    factory.LoadShader(Phong);
 
     //**********************  Texture stuff: **********************
 
@@ -152,7 +152,7 @@ void RenderWindow::init() {
     //testing triangle surface class
     GLuint boxID = factory.makeTriangleSurface("box2.txt");
     // This is pretty wordy :/
-    static_cast<MaterialComponent *>(factory.getComponent(Material, boxID))->setShader(factory.GetShader(Color));
+    static_cast<MaterialComponent *>(factory.getComponent(Material, boxID))->setShader(Color);
     //    temp = new GameObject("TriangleSurface");
     //    auto *tempMesh = new MeshComponent(ResourceManager::LoadMesh("box2.txt"));
     //    temp->addComponent(tempMesh);
@@ -166,7 +166,7 @@ void RenderWindow::init() {
     factory.addComponent(Transform);
     factory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
     factory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
-    static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(factory.GetShader(Phong));
+    static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(Phong);
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
 

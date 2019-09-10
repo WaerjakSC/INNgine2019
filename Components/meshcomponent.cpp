@@ -15,10 +15,6 @@ MeshComponent::~MeshComponent() {
 void MeshComponent::update(float dt) {
 }
 
-void MeshComponent::setShader(Shader *shader) {
-    mShader = shader;
-}
-
 void MeshComponent::copyOpenGLData(const MeshComponent &other) {
     mVAO = other.mVAO;
     mVBO = other.mVBO;
