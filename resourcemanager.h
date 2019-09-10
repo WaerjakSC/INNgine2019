@@ -34,6 +34,9 @@ public:
 
     virtual ~ResourceManager();
 
+    GLuint makePlane();
+    GLuint makeCube();
+
 private:
     // Private constructor
     ResourceManager();
