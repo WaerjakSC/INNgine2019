@@ -26,6 +26,7 @@ public:
     Shader *getShader() const;
 
     void setMatrix(const gsl::Matrix4x4 &matrix);
+    gsl::Matrix4x4 mMatrix;
 
     //public slots:
     //    void updatedMatrix(gsl::Matrix4x4 *matrix) { mMatrix = matrix; }
@@ -33,7 +34,6 @@ public:
 protected:
     MaterialData material;
     Shader *mShader{nullptr};
-    gsl::Matrix4x4 mMatrix;
 };
 
 #endif // MATERIALCOMPONENT_H

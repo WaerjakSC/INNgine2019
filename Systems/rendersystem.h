@@ -9,22 +9,15 @@
 class RenderSystem : public QOpenGLFunctions_4_1_Core {
 public:
     RenderSystem();
-    // Each map in mCompIndex contains a list of entities with that component
-    // Get the smallest map of componentIndices and check for overlaps in the other maps
-    // RenderSystem needs:
-    // Access to Mesh, Material, Transform (or at least mMatrix)
-    // mEntityStart might need to be a static object or something
+
     void render();
 
 private:
-    std::vector<std::map<int, int> *> mRenderCompIDs;
     ResourceManager *factory{nullptr};
     std::vector<int> mViableEntities;
     std::vector<TransformComponent *> transforms;
     std::vector<MaterialComponent *> mats;
     std::vector<MeshComponent *> meshes;
-    std::vector<int> getViableEntities();
-    void connectComponents();
     void iterateEntities();
 };
 

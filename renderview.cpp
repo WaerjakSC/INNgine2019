@@ -9,7 +9,7 @@ CType RenderView::getSmallestPool() {
         matS = true;
         smallest = transpool->size();
     };
-    if (transpool->size() < smallest) { // If transpool is smaller than either one, set meshS to false and matS to false
+    if (transpool->size() < smallest) {
         return Transform;
     }
     if (matS)
@@ -52,8 +52,8 @@ std::tuple<std::vector<int>, std::vector<TransformComponent *>, std::vector<Mate
     std::vector<int> entities = getViableEntities();
     for (auto entity : entities) {
         transforms.emplace_back(transpool->get(entity));
-        mats.push_back(matpool->get(entity));
-        meshes.push_back(meshpool->get(entity));
+        mats.emplace_back(matpool->get(entity));
+        meshes.emplace_back(meshpool->get(entity));
     }
     return std::make_tuple(entities, transforms, mats, meshes);
 }

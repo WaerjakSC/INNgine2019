@@ -16,7 +16,12 @@ public:
      * @param entityID
      */
     void add(int entityID) {
-        assert(!has(entityID));                       // Make sure the entityID is unique.
+        assert(!has(entityID)); // Make sure the entityID is unique.
+        if (entityID > mEntityIndices.size()) {
+            for (GLuint i = mEntityIndices.size(); i < entityID; i++) {
+                mEntityIndices.push_back(-1);
+            }
+        }
         mEntityIndices.push_back(mEntityList.size()); // entity list size is location of new entityID
         mEntityList.push_back(entityID);
         mComponentList.push_back(new Type());

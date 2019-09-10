@@ -3,6 +3,7 @@
 
 MaterialComponent::MaterialComponent() {
     mType = CType::Material;
+    mMatrix.setToIdentity();
 }
 
 void MaterialComponent::update(float dt) {

@@ -263,7 +263,9 @@ GLuint ResourceManager::makeSkyBox() {
 
     MaterialComponent *skyMat = mMatComps.get(eID);
     skyMat->setShader(Shaders[Tex]);
-    skyMat->setTextureUnit(Textures["skybox.bmp"]->id()); // Could just hardcode int 2 here but this seems more readable?
+
+    skyMat->setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
+    skyMat->mMatrix.scale(15.f);
     MeshComponent *skyMesh = mMeshComps.get(eID);
     skyMesh->mVerticeCount = mMeshData.mVertices.size();
     skyMesh->mIndiceCount = mMeshData.mIndices.size();
@@ -318,7 +320,7 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
     MaterialComponent *billBoardMat = mMatComps.get(eID);
-    billBoardMat->setTextureUnit(Textures["hund.bmp"]->id());
+    billBoardMat->setTextureUnit(Textures["hund.bmp"]->id() - 1);
     billBoardMat->setShader(Shaders[Tex]);
     billBoardMat->setColor(gsl::Vector3D(0.7f, 0.6f, 0.1f));
 
@@ -384,7 +386,7 @@ GLuint ResourceManager::makeLightObject() {
                                3, 0, 2,
                                0, 3, 1});
     MaterialComponent *lightMat = mMatComps.get(eID);
-    lightMat->setTextureUnit(Textures["white.bmp"]->id());
+    lightMat->setTextureUnit(Textures["white.bmp"]->id() - 1);
     lightMat->setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
     lightMat->setShader(Shaders[Tex]);
 

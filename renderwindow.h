@@ -64,7 +64,7 @@ private:
 
     GameObject *mPlayer; //the controllable object
 
-    LightObject *mLight;
+    GLuint mLight;
 
     InputComponent *mInput;
 

@@ -138,7 +138,7 @@ void RenderWindow::init() {
     //    //    temp->mRenderWindow = this; // Not sure if needed
     //    mGameObjects.emplace_back(temp);
 
-    factory.makeLightObject();
+    mLight = factory.makeLightObject();
     //    mLight = new Light("Light");
     //    temp = mLight;
     //    temp->init();
@@ -366,7 +366,7 @@ void RenderWindow::handleInput() {
             mCurrentCamera->updateHeight(-mCameraSpeed);
         if (mInput->E)
             mCurrentCamera->updateHeight(mCameraSpeed);
-    } else {
+    } /* else { // Doesn't work atm, need to fix transformcomponents and stuff
         if (mInput->W)
             mLight->mMatrix.translateZ(-mCameraSpeed);
         if (mInput->S)
@@ -379,7 +379,7 @@ void RenderWindow::handleInput() {
             mLight->mMatrix.translateY(mCameraSpeed);
         if (mInput->E)
             mLight->mMatrix.translateY(-mCameraSpeed);
-    }
+    }*/
 }
 
 void RenderWindow::mousePressEvent(QMouseEvent *event) {
