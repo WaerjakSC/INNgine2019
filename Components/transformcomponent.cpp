@@ -2,6 +2,7 @@
 
 TransformComponent::TransformComponent() {
     mType = CType::Transform;
+    mMatrix.setToIdentity();
 }
 
 void TransformComponent::update(float dt) {

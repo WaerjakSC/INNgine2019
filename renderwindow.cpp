@@ -115,51 +115,13 @@ void RenderWindow::init() {
 
     factory.makeSkyBox();
 
-    //    temp = new OctahedronBall(2);
-    //    temp->init();
-    //    temp->setShader(mShaderProgram[0]);
-    //    temp->mMatrix.scale(0.5f, 0.5f, 0.5f);
-    //    temp->mName = "Ball";
-    //    mVisualObjects.push_back(temp);
-    //    mPlayer = temp;
-
-    //    temp = new GameObject("Cube");
-    //    temp->addComponent(new SkyBox());
-    //    temp->init();
-    //    temp->setShaders(ResourceManager::GetShader(ShaderType::Tex));
-    //    temp->mMatrix.scale(15.f);
-    //    mGameObjects.emplace_back(temp);
-
     factory.makeBillBoard();
-    //    temp->addComponent(new BillBoard());
-    //    temp->init();
-    //    temp->setShaders(ResourceManager::GetShader(ShaderType::Tex));
-    //    temp->mMatrix.translate(4.f, 0.f, -3.5f);
-    //    //    temp->mRenderWindow = this; // Not sure if needed
-    //    mGameObjects.emplace_back(temp);
 
     mLight = factory.makeLightObject();
-    //    mLight = new Light("Light");
-    //    temp = mLight;
-    //    temp->init();
-    //    temp->setShaders(ResourceManager::GetShader(ShaderType::Tex));
-    //    temp->mMatrix.translate(2.5f, 3.f, 0.f);
-    //    temp->mMatrix.rotateY(180.f);
-    //    temp->mRenderWindow = this;
-
-    //    dynamic_cast<PhongShader *>(ResourceManager::GetShader(ShaderType::Phong))->setLight(mLight);
 
     //testing triangle surface class
     GLuint boxID = factory.makeTriangleSurface("box2.txt");
-    // This is pretty wordy :/
     static_cast<MaterialComponent *>(factory.getComponent(Material, boxID))->setShader(Color);
-    //    temp = new GameObject("TriangleSurface");
-    //    auto *tempMesh = new MeshComponent(ResourceManager::LoadMesh("box2.txt"));
-    //    temp->addComponent(tempMesh);
-    //    temp->init();
-    //    temp->mMatrix.rotateY(180.f);
-    //    temp->setShaders(ResourceManager::GetShader(ShaderType::Color));
-    //    mGameObjects.emplace_back(temp);
 
     //one monkey
     factory.makeGameObject("Monkey");

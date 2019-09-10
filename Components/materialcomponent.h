@@ -27,10 +27,6 @@ public:
     virtual void setColor(const gsl::Vector3D &color);
 
     ShaderType getShader() const;
-
-    void setMatrix(const gsl::Matrix4x4 &matrix);
-    gsl::Matrix4x4 mMatrix;
-
     //public slots:
     //    void updatedMatrix(gsl::Matrix4x4 *matrix) { mMatrix = matrix; }
 

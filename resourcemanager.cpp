@@ -270,7 +270,7 @@ GLuint ResourceManager::makeSkyBox() {
     skyMat->setShader(Tex);
 
     skyMat->setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
-    skyMat->mMatrix.scale(15.f);
+    mTransComps.get(eID)->matrix()->scale(15.f);
     MeshComponent *skyMesh = mMeshComps.get(eID);
     skyMesh->mVerticeCount = mMeshData.mVertices.size();
     skyMesh->mIndiceCount = mMeshData.mIndices.size();
@@ -324,6 +324,7 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
+    mTransComps.get(eID)->matrix()->translate(4.f, 0.f, -3.5f);
     MaterialComponent *billBoardMat = mMatComps.get(eID);
     billBoardMat->setTextureUnit(Textures["hund.bmp"]->id() - 1);
     billBoardMat->setShader(Tex);
@@ -344,6 +345,7 @@ GLuint ResourceManager::makeOctBall(int n) {
     mMeshData.Clear();
     initializeOpenGLFunctions();
     addComponent(Mesh, eID);
+    addComponent(Material, eID);
 
     GLint mRecursions = n;
     GLint mIndex = 0;
@@ -352,10 +354,12 @@ GLuint ResourceManager::makeOctBall(int n) {
 
     makeUnitOctahedron(mRecursions);
 
+    mTransComps.get(eID)->matrix()->scale(0.5f, 0.5f, 0.5f);
     MeshComponent *OctMesh = mMeshComps.get(eID);
     OctMesh->mVerticeCount = mMeshData.mVertices.size();
     OctMesh->mIndiceCount = mMeshData.mIndices.size();
     OctMesh->mDrawType = GL_TRIANGLES;
+    mMatComps.get(eID)->setShader(Color);
 
     initVertexBuffers(OctMesh);
     initIndexBuffers(OctMesh);
@@ -390,6 +394,9 @@ GLuint ResourceManager::makeLightObject() {
                                1, 3, 2,
                                3, 0, 2,
                                0, 3, 1});
+    mTransComps.get(eID)->matrix()->translate(2.5f, 3.f, 0.f);
+    mTransComps.get(eID)->matrix()->rotateY(180.f);
+
     MaterialComponent *lightMat = mMatComps.get(eID);
     lightMat->setTextureUnit(Textures["white.bmp"]->id() - 1);
     lightMat->setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
