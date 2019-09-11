@@ -69,13 +69,13 @@ private:
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
 
     // Component pools
-    Pool<MeshComponent> mMeshComps;
-    Pool<MaterialComponent> mMatComps;
-    Pool<TransformComponent> mTransComps;
-    Pool<LightingComponent> mLightComps;
-    Pool<InputComponent> mInputComps;
-    Pool<PhysicsComponent> mPhysicsComps;
-    Pool<SoundComponent> mSoundComps;
+    Pool<MeshComponent> mMeshes;
+    Pool<MaterialComponent> mMaterials;
+    Pool<TransformComponent> mTransforms;
+    Pool<LightingComponent> mLights;
+    Pool<InputComponent> mInputs;
+    Pool<PhysicsComponent> mPhysics;
+    Pool<SoundComponent> mSounds;
     // View class for collecting the components rendersystem needs
     RenderView *mRenderView;
 

@@ -9,7 +9,7 @@
 #include "renderview.h"
 #include <QDebug>
 ResourceManager::ResourceManager() {
-    mRenderView = new RenderView(&mTransComps, &mMatComps, &mMeshComps);
+    mRenderView = new RenderView(&mTransforms, &mMaterials, &mMeshes);
 }
 
 std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
@@ -48,25 +48,25 @@ void ResourceManager::removeComponent(CType type, int eID) {
     if (eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
-            mTransComps.remove(eID);
+            mTransforms.remove(eID);
             break;
         case Material:
-            mMatComps.remove(eID);
+            mMaterials.remove(eID);
             break;
         case Mesh:
-            mMeshComps.remove(eID);
+            mMeshes.remove(eID);
             break;
         case Light:
-            mLightComps.remove(eID);
+            mLights.remove(eID);
             break;
         case Input:
-            mInputComps.remove(eID);
+            mInputs.remove(eID);
             break;
         case Physics:
-            mPhysicsComps.remove(eID);
+            mPhysics.remove(eID);
             break;
         case Sound:
-            mSoundComps.remove(eID);
+            mSounds.remove(eID);
             break;
         default:
             qDebug() << "Unknown Type.";
@@ -81,19 +81,19 @@ Component *ResourceManager::getComponent(CType type, int eID) {
     if (eID < mGameObjects.size())
         switch (type) {
         case Transform:
-            return mTransComps.get(eID);
+            return mTransforms.get(eID);
         case Material:
-            return mMatComps.get(eID);
+            return mMaterials.get(eID);
         case Mesh:
-            return mMeshComps.get(eID);
+            return mMeshes.get(eID);
         case Light:
-            return mLightComps.get(eID);
+            return mLights.get(eID);
         case Input:
-            return mInputComps.get(eID);
+            return mInputs.get(eID);
         case Physics:
-            return mPhysicsComps.get(eID);
+            return mPhysics.get(eID);
         case Sound:
-            return mSoundComps.get(eID);
+            return mSounds.get(eID);
         default:
             qDebug() << "Unknown Type.";
         }
@@ -117,26 +117,26 @@ void ResourceManager::addComponent(CType type, int eID) {
     if (eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
-            mTransComps.add(eID);
+            mTransforms.add(eID);
             break;
         case Material:
-            mMatComps.add(eID);
+            mMaterials.add(eID);
             break;
         case Mesh:
             // Creates an empty Mesh object -- for use with hardcoded objects mostly.
-            mMeshComps.add(eID);
+            mMeshes.add(eID);
             break;
         case Light:
-            mLightComps.add(eID);
+            mLights.add(eID);
             break;
         case Input:
-            mInputComps.add(eID);
+            mInputs.add(eID);
             break;
         case Physics:
-            mPhysicsComps.add(eID);
+            mPhysics.add(eID);
             break;
         case Sound:
-            mSoundComps.add(eID);
+            mSounds.add(eID);
             break;
         }
     } else
@@ -158,7 +158,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
     if (eID < mGameObjects.size()) {
-        mMeshComps.get(eID)->copyOpenGLData(*mesh);
+        mMeshes.get(eID)->copyOpenGLData(*mesh);
     }
 }
 /**
@@ -192,12 +192,12 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    mMatComps.get(eID)->setShader(Color);
-    mMeshComps.get(eID)->mVerticeCount = mMeshData.mVertices.size();
-    mMeshComps.get(eID)->mDrawType = GL_LINES;
+    mMaterials.get(eID)->setShader(Color);
+    mMeshes.get(eID)->mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.get(eID)->mDrawType = GL_LINES;
 
     // set up buffers (equivalent to init() from before)
-    initVertexBuffers(mMeshComps.get(eID));
+    initVertexBuffers(mMeshes.get(eID));
     glBindVertexArray(0);
     return eID;
 }
@@ -260,12 +260,12 @@ GLuint ResourceManager::makeSkyBox() {
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
 
-    MaterialComponent *skyMat = mMatComps.get(eID);
+    MaterialComponent *skyMat = mMaterials.get(eID);
     skyMat->setShader(Tex);
 
     skyMat->setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
-    mTransComps.get(eID)->matrix()->scale(15.f);
-    MeshComponent *skyMesh = mMeshComps.get(eID);
+    mTransforms.get(eID)->matrix()->scale(15.f);
+    MeshComponent *skyMesh = mMeshes.get(eID);
     skyMesh->mVerticeCount = mMeshData.mVertices.size();
     skyMesh->mIndiceCount = mMeshData.mIndices.size();
     skyMesh->mDrawType = GL_TRIANGLES;
@@ -318,13 +318,13 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
-    mTransComps.get(eID)->matrix()->translate(4.f, 0.f, -3.5f);
-    MaterialComponent *billBoardMat = mMatComps.get(eID);
+    mTransforms.get(eID)->matrix()->translate(4.f, 0.f, -3.5f);
+    MaterialComponent *billBoardMat = mMaterials.get(eID);
     billBoardMat->setTextureUnit(Textures["hund.bmp"]->id() - 1);
     billBoardMat->setShader(Tex);
     billBoardMat->setColor(gsl::Vector3D(0.7f, 0.6f, 0.1f));
 
-    MeshComponent *billBoardMesh = mMeshComps.get(eID);
+    MeshComponent *billBoardMesh = mMeshes.get(eID);
     billBoardMesh->mVerticeCount = mMeshData.mVertices.size();
     billBoardMesh->mDrawType = GL_TRIANGLE_STRIP;
 
@@ -348,12 +348,12 @@ GLuint ResourceManager::makeOctBall(int n) {
 
     makeUnitOctahedron(mRecursions);
 
-    mTransComps.get(eID)->matrix()->scale(0.5f, 0.5f, 0.5f);
-    MeshComponent *OctMesh = mMeshComps.get(eID);
+    mTransforms.get(eID)->matrix()->scale(0.5f, 0.5f, 0.5f);
+    MeshComponent *OctMesh = mMeshes.get(eID);
     OctMesh->mVerticeCount = mMeshData.mVertices.size();
     OctMesh->mIndiceCount = mMeshData.mIndices.size();
     OctMesh->mDrawType = GL_TRIANGLES;
-    mMatComps.get(eID)->setShader(Color);
+    mMaterials.get(eID)->setShader(Color);
 
     initVertexBuffers(OctMesh);
     initIndexBuffers(OctMesh);
@@ -388,15 +388,15 @@ GLuint ResourceManager::makeLightObject() {
                                1, 3, 2,
                                3, 0, 2,
                                0, 3, 1});
-    mTransComps.get(eID)->matrix()->translate(2.5f, 3.f, 0.f);
-    mTransComps.get(eID)->matrix()->rotateY(180.f);
+    mTransforms.get(eID)->matrix()->translate(2.5f, 3.f, 0.f);
+    mTransforms.get(eID)->matrix()->rotateY(180.f);
 
-    MaterialComponent *lightMat = mMatComps.get(eID);
+    MaterialComponent *lightMat = mMaterials.get(eID);
     lightMat->setTextureUnit(Textures["white.bmp"]->id() - 1);
     lightMat->setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
     lightMat->setShader(Tex);
 
-    MeshComponent *lightMesh = mMeshComps.get(eID);
+    MeshComponent *lightMesh = mMeshes.get(eID);
     lightMesh->mVerticeCount = mMeshData.mVertices.size();
     lightMesh->mIndiceCount = mMeshData.mIndices.size();
     lightMesh->mDrawType = GL_TRIANGLES;
@@ -620,7 +620,7 @@ bool ResourceManager::readFile(std::string fileName) {
     //being a nice boy and closing the file after use
     fileIn.close();
 
-    MeshComponent *mesh = mMeshComps.getLast();
+    MeshComponent *mesh = mMeshes.getLast();
     mesh->mVerticeCount = mMeshData.mVertices.size();
     mesh->mIndiceCount = mMeshData.mIndices.size();
     mesh->mDrawType = GL_TRIANGLES;
@@ -647,8 +647,8 @@ MeshComponent *ResourceManager::LoadMesh(std::string fileName) {
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = *mMeshComps.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
-    return mMeshComps.getLast();                // the mesh at the back is the latest creation
+    mMeshMap[fileName] = *mMeshes.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return mMeshes.getLast();                // the mesh at the back is the latest creation
 }
 MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
     auto search = mMeshMap.find(fileName);
@@ -659,8 +659,8 @@ MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = *mMeshComps.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
-    return mMeshComps.getLast();                // the mesh at the back is the latest creation
+    mMeshMap[fileName] = *mMeshes.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return mMeshes.getLast();                // the mesh at the back is the latest creation
 }
 
 bool ResourceManager::readTriangleFile(std::string fileName) {
@@ -682,7 +682,7 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        MeshComponent *mesh = mMeshComps.getLast();
+        MeshComponent *mesh = mMeshes.getLast();
         mesh->mVerticeCount = mMeshData.mVertices.size();
         mesh->mDrawType = GL_TRIANGLES;
         initVertexBuffers(mesh);
