@@ -5,6 +5,7 @@
 
 #include "Components/inputcomponent.h"
 #include "gameobject.h"
+#include "resourcemanager.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>
@@ -38,6 +39,7 @@ public:
 
 private slots:
     void render();
+    void updateScene();
 
 private:
     void init();
@@ -45,23 +47,9 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    Texture *mTexture[4]{nullptr};      //We can hold 4 textures
-    Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
-
-    void setupPlainShader();
-    GLint mMatrixUniform0{-1};
-    GLint vMatrixUniform0{-1};
-    GLint pMatrixUniform0{-1};
-
-    void setupTextureShader();
-    GLint mMatrixUniform1{-1};
-    GLint vMatrixUniform1{-1};
-    GLint pMatrixUniform1{-1};
-    GLint mTextureUniform{-1};
-
     std::vector<GameObject *> mGameObjects;
     RenderSystem *mRenderer;
-
+    ResourceManager &factory;
     GameObject *mPlayer; //the controllable object
 
     GLuint mLight;

@@ -59,6 +59,8 @@ public:
     GLuint makePlane();
     GLuint makeCube();
 
+    std::vector<GameObject *> getGameObjects() const;
+
 private:
     // Private constructor
     ResourceManager();

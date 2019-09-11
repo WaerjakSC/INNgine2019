@@ -18,10 +18,9 @@
 #include "Shaders/textureshader.h"
 #include "Systems/rendersystem.h"
 #include "lightobject.h"
-#include "resourcemanager.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
-    : mContext(nullptr), mInitialized(false), mMainWindow(mainWindow) {
+    : mContext(nullptr), mInitialized(false), factory(ResourceManager::instance()), mMainWindow(mainWindow) {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
     setFormat(format);
@@ -34,6 +33,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
         mContext = nullptr;
         qDebug() << "Context could not be made - quitting this application";
     }
+    // Create Resource Manager instance
     mInput = new InputComponent();
     mInput->setMainWindow(mMainWindow);
     //Make the gameloop timer:
@@ -86,8 +86,6 @@ void RenderWindow::init() {
     glEnable(GL_CULL_FACE);               //draws only front side of models - usually what you want -
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
-    // Create Resource Manager instance
-    ResourceManager &factory = ResourceManager::instance();
     factory.setMainWindow(mMainWindow);
 
     //Compile shaders:
@@ -186,6 +184,10 @@ void RenderWindow::render() {
     //    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
 
     //    calculateFramerate();
+}
+
+void RenderWindow::updateScene() {
+    factory.getGameObjects();
 }
 
 //This function is called from Qt when window is exposed (shown)

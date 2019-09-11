@@ -77,3 +77,6 @@ void MainWindow::init() {
 void MainWindow::on_pushButton_clicked() {
     mRenderWindow->toggleWireframe();
 }
+void MainWindow::onGameObjectsChanged() {
+    //    ui->SceneHierarchy
+}

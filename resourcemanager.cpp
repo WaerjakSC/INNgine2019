@@ -12,6 +12,10 @@ ResourceManager::ResourceManager() {
     mRenderView = new RenderView(&mTransforms, &mMaterials, &mMeshes);
 }
 
+std::vector<GameObject *> ResourceManager::getGameObjects() const {
+    return mGameObjects;
+}
+
 std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
     return Shaders;
 }
