@@ -59,9 +59,6 @@ public:
     GLuint makePlane();
     GLuint makeCube();
 
-    GLuint makePlane();
-    GLuint makeCube();
-
 private:
     // Private constructor
     ResourceManager();

@@ -539,101 +539,6 @@ void ResourceManager::initIndexBuffers(MeshComponent *mesh) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
 }
 
-GLuint ResourceManager::makePlane()
-{
-    Luint eID = makeGameObject("Plane");
-        addComponent(Transform);
-        addComponent(Material);
-        addComponent(Mesh);
-
-        initializeOpenGLFunctions();
-        mMeshData.Clear();
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 0.f, 0.f, 1.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, 0.5f, 0.f, 0.f, 1.f});
-
-        // Once VAO and VBO have been generated, mMesh data can be discarded.
-        mMatComps.get(eID)->setShader(Shaders[Color]);
-        mMeshComps.get(eID)->mVerticeCount = mMeshData.mVertices.size();
-        mMeshComps.get(eID)->mDrawType = GL_LINES;
-
-        // set up buffers (equivalent to init() from before)
-        initVertexBuffers(mMeshComps.get(eID));
-        glBindVertexArray(0);
-        return eID;
-}
-
-GLuint ResourceManager::makeCube()
-{
-    Luint eID = makeGameObject("Cube");
-        addComponent(Transform);
-        addComponent(Material);
-        addComponent(Mesh);
-
-        initializeOpenGLFunctions();
-        mMeshData.Clear();
-        // Top
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
-
-        //front
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
-
-        // Right
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
-
-        //Back
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
-
-        //Left
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 0.f, 1.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
-
-        //Bottom
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 0.f, 1.f});
-        mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
-
-        // Once VAO and VBO have been generated, mMesh data can be discarded.
-        mMatComps.get(eID)->setShader(Shaders[Color]);
-        mMeshComps.get(eID)->mVerticeCount = mMeshData.mVertices.size();
-        mMeshComps.get(eID)->mDrawType = GL_LINES;
-
-        // set up buffers (equivalent to init() from before)
-        initVertexBuffers(mMeshComps.get(eID));
-        glBindVertexArray(0);
-        return eID;
-}
-
 void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
     if (Shaders.find(type) == Shaders.end()) {
         std::string shaderName;
@@ -926,4 +831,3 @@ void ResourceManager::makeUnitOctahedron(GLint recursions) {
     subDivide(v5, v4, v3, recursions);
     subDivide(v5, v1, v4, recursions);
 }
-
