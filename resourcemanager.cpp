@@ -55,12 +55,6 @@ void ResourceManager::removeComponent(CType type, int eID) {
             break;
         case Mesh:
             mMeshComps.remove(eID);
-            for (auto it = mMeshMap.begin(); it != mMeshMap.end(); ++it) {
-                if (it->second == eID)
-                    it->second = -1; // Somewhat unfortunately, if you remove the mesh containing the original data,
-                                     // there's currently no way of replacing the eID pointed to in the meshmap with another mesh of the same type.
-                                     // Optionally I could simply save a copy of each unique mesh elsewhere and copy that onto other meshes when desired.
-            }
             break;
         case Light:
             mLightComps.remove(eID);
@@ -647,27 +641,26 @@ MeshComponent *ResourceManager::LoadMesh(std::string fileName) {
 
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {
-        if (search->second != -1)
-            return mMeshComps.get(search->second); // Return a copy of the mesh it wants if already stored
+        return &search->second; // Return a copy of the mesh it wants if already stored
     }
     if (!readFile(fileName)) { // Should run readFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = mMeshComps.getEntityIndices().back(); // The value of the last entity added to the component pool index is the latest unique mesh
-    return mMeshComps.getLast();                               // the mesh at the back is the latest creation
+    mMeshMap[fileName] = *mMeshComps.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return mMeshComps.getLast();                // the mesh at the back is the latest creation
 }
 MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {
-        return mMeshComps.get(search->second); // Return a copy of the mesh it wants if already stored
+        return &search->second; // Return a copy of the mesh it wants if already stored
     }
     if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = mMeshComps.getEntityIndices().back(); // The value of the last entity added to the component pool index is the latest unique mesh
-    return mMeshComps.getLast();                               // the mesh at the back is the latest creation
+    mMeshMap[fileName] = *mMeshComps.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return mMeshComps.getLast();                // the mesh at the back is the latest creation
 }
 
 bool ResourceManager::readTriangleFile(std::string fileName) {

@@ -61,7 +61,7 @@ private:
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;
     std::map<std::string, Texture *> Textures;
-    std::map<std::string, int> mMeshMap; // Holds the entityID of each unique mesh
+    std::map<std::string, MeshComponent> mMeshMap; // Holds the entityID of each unique mesh
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;
