@@ -66,10 +66,11 @@ private:
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;
     std::map<std::string, Texture *> Textures;
-    std::map<std::string, MeshComponent> mMeshMap; // Holds the entityID of each unique mesh
+    std::map<std::string, MeshComponent> mMeshMap; // Holds each unique mesh for easy access
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;
+
     MainWindow *mMainWindow;
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
 

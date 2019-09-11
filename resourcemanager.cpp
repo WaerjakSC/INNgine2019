@@ -152,7 +152,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
         eID = mGameObjects.size() - 1;
     }
     addComponent(Mesh, eID);
-    setMesh(LoadMesh(name), eID);
+    setMesh(name, eID);
 }
 void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
@@ -164,7 +164,8 @@ void ResourceManager::setMesh(std::string name, int eID) {
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
         mMeshes.get(eID)->copyOpenGLData(search->second);
-    }
+    } else
+        LoadMesh(name);
 }
 /**
  * @brief ResourceManager::makeGameObject
@@ -208,65 +209,11 @@ GLuint ResourceManager::makeCube() {
     addComponent(Transform);
     addComponent(Material);
     addComponent(Mesh);
-
-    initializeOpenGLFunctions();
-    mMeshData.Clear();
-    // Top
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
-
-    //front
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
-
-    // Right
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
-
-    //Back
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
-
-    //Left
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
-
-    //Bottom
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
+    setMesh("cube.obj", eID);
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
     mMaterials.get(eID)->setShader(Color);
-    mMeshes.get(eID)->mVerticeCount = mMeshData.mVertices.size();
-    mMeshes.get(eID)->mDrawType = GL_TRIANGLES;
 
-    // set up buffers (equivalent to init() from before)
-    initVertexBuffers(mMeshes.get(eID));
-    glBindVertexArray(0);
     return eID;
 }
 /**

@@ -60,6 +60,6 @@ CMakeLists.txt.user*
 
 #Assets
 *.bmp
-*.obj
 *.txt
 INNgine2019.pro.user
+Assets/Meshes/monkey.obj
