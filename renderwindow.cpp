@@ -129,6 +129,7 @@ void RenderWindow::init() {
     factory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
     factory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
     static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(Phong);
+    //    factory.makeCube();
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
 

@@ -31,12 +31,12 @@ HEADERS += \
     Components/inputcomponent.h \
     Assets/Meshes/trianglesurface.h \
     Systems/rendersystem.h \
+    Views/renderview.h \
     constants.h \
     billboard.h \
     gameobject.h \
     lightobject.h \
     pool.h \
-    renderview.h \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
@@ -70,11 +70,11 @@ SOURCES += main.cpp \
     Components/inputcomponent.cpp \
     Assets/Meshes/trianglesurface.cpp \
     Systems/rendersystem.cpp \
+    Views/renderview.cpp \
     billboard.cpp \
     gameobject.cpp \
     lightobject.cpp \
     pool.cpp \
-    renderview.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \

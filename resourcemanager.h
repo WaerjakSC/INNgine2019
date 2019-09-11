@@ -54,6 +54,11 @@ public:
 
     std::map<ShaderType, Shader *> getShaders() const;
 
+    void setMesh(std::string name, int eID);
+
+    GLuint makePlane();
+    GLuint makeCube();
+
 private:
     // Private constructor
     ResourceManager();

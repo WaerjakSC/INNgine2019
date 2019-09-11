@@ -3,10 +3,10 @@
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
+#include "Views/renderview.h"
 #include "billboard.h"
 #include "innpch.h"
 #include "lightobject.h"
-#include "renderview.h"
 #include <QDebug>
 ResourceManager::ResourceManager() {
     mRenderView = new RenderView(&mTransforms, &mMaterials, &mMeshes);
@@ -101,6 +101,7 @@ Component *ResourceManager::getComponent(CType type, int eID) {
         qDebug() << "No GameObject with this ID exists.";
         return 0;
     }
+    return 0;
 }
 
 /**
@@ -161,6 +162,12 @@ void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
         mMeshes.get(eID)->copyOpenGLData(*mesh);
     }
 }
+void ResourceManager::setMesh(std::string name, int eID) {
+    auto search = mMeshMap.find(name);
+    if (search != mMeshMap.end()) {
+        mMeshes.get(eID)->copyOpenGLData(search->second);
+    }
+}
 /**
  * @brief ResourceManager::makeGameObject
  * @param name Name of the gameobject. Leave blank if no name desired.
@@ -172,7 +179,98 @@ GLuint ResourceManager::makeGameObject(std::string name) {
     mGameObjects.emplace_back(new GameObject(eID, name));
     return eID;
 }
+GLuint ResourceManager::makePlane() {
+    GLuint eID = makeGameObject("Plane");
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
 
+    initializeOpenGLFunctions();
+    mMeshData.Clear();
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, 0.5f, 0.f, 0.f, 1.f});
+
+    // Once VAO and VBO have been generated, mMesh data can be discarded.
+    mMaterials.get(eID)->setShader(Color);
+    mMeshes.get(eID)->mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.get(eID)->mDrawType = GL_TRIANGLES;
+
+    // set up buffers (equivalent to init() from before)
+    initVertexBuffers(mMeshes.get(eID));
+    glBindVertexArray(0);
+    return eID;
+}
+
+GLuint ResourceManager::makeCube() {
+    GLuint eID = makeGameObject("Cube");
+    addComponent(Transform);
+    addComponent(Material);
+    addComponent(Mesh);
+
+    initializeOpenGLFunctions();
+    mMeshData.Clear();
+    // Top
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
+
+    //front
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
+
+    // Right
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, -0.5f, 0.f, 0.f, 1.f});
+
+    //Back
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
+
+    //Left
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.5f, 0.5f, 0.f, 0.f, 1.f});
+
+    //Bottom
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, 0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, 0.5f, 0.f, 0.f, 1.f});
+    mMeshData.mVertices.push_back(Vertex{-0.5f, -0.5f, -0.5f, 0.f, 0.f, 1.f});
+
+    // Once VAO and VBO have been generated, mMesh data can be discarded.
+    mMaterials.get(eID)->setShader(Color);
+    mMeshes.get(eID)->mVerticeCount = mMeshData.mVertices.size();
+    mMeshes.get(eID)->mDrawType = GL_TRIANGLES;
+
+    // set up buffers (equivalent to init() from before)
+    initVertexBuffers(mMeshes.get(eID));
+    glBindVertexArray(0);
+    return eID;
+}
 /**
  * @brief ResourceManager::makeXYZ - Creates basic XYZ lines
  */
