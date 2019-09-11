@@ -36,8 +36,6 @@ ResourceManager::~ResourceManager() {
 }
 /**
  * @brief ResourceManager::removeComponent - Remove a component and update tables.
- * Swaps the removed component with the last item in the vector then pops it out. Results in no re-arranging of the vector, but causes fragmentation to occur over time.
- * Should you wish, you can run sortComponents() to fix this fragmentation.
  * @param type Type of component to remove
  * @param eID entity ID
  */
