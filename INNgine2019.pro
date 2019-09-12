@@ -7,7 +7,7 @@ TARGET      = INNgine2019
 
 PRECOMPILED_HEADER = innpch.h
 
-INCLUDEPATH += ./GSL ./Components ./Shaders ./Systems ./Views
+INCLUDEPATH += ./GSL ./Components ./Shaders ./Systems ./Views .\GUI
 
 win32 {
     INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
@@ -28,6 +28,8 @@ HEADERS += \
     GSL/vector4d.h \
     GSL/gsl_math.h \
     GSL/math_constants.h \
+    GUI/hierarchymodel.h \
+    GUI/hierarchyview.h \
     Shaders/colorshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
@@ -68,6 +70,8 @@ SOURCES += main.cpp \
     GSL/vector3d.cpp \
     GSL/vector4d.cpp \
     GSL/gsl_math.cpp \
+    GUI/hierarchymodel.cpp \
+    GUI/hierarchyview.cpp \
     Shaders/colorshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \

@@ -7,6 +7,7 @@
 class QWidget;
 class RenderWindow;
 class GameObject;
+class HierarchyModel;
 namespace Ui {
 class MainWindow;
 }
@@ -31,7 +32,7 @@ private:
     void init();
     Ui::MainWindow *ui;
 
-    QStringListModel *hierarchy;
+    HierarchyModel *hierarchy;
     GameObject *selectedEntity;
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;

@@ -17,6 +17,7 @@
 #include "constants.h"
 #include "gltypes.h"
 #include "gsl_math.h"
+#include "hierarchyview.h"
 #include "math_constants.h"
 #include "matrix2x2.h"
 #include "matrix3x3.h"

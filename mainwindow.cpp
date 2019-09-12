@@ -1,7 +1,7 @@
 #include "mainwindow.h"
+#include "GUI/hierarchymodel.h"
 #include "innpch.h"
 #include "ui_mainwindow.h"
-
 #include <QDesktopWidget>
 #include <QSurfaceFormat>
 
@@ -18,7 +18,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::init() {
-    hierarchy = new QStringListModel();
+    hierarchy = new HierarchyModel();
     ui->SceneHierarchy->setModel(hierarchy);
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
@@ -78,6 +78,8 @@ void MainWindow::init() {
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
     connect(ui->SceneHierarchy, &QListView::clicked, this, &MainWindow::onGameObjectClicked);
+    //    connect(ui->SceneHierarchy, &QListView::dropEvent, this, &MainWindow::onGameObjectClicked);
+
     connect(hierarchy, &QStringListModel::dataChanged, this, &MainWindow::onNameChanged);
 }
 
@@ -105,9 +107,16 @@ void MainWindow::onGameObjectsChanged() {
     //    ui->SceneHierarchy
 }
 void MainWindow::insertGameObjects(std::vector<GameObject *> entities) {
-    QStringList list;
+    QStandardItem *parentItem = hierarchy->invisibleRootItem();
+    int idx = 0;
     for (auto entity : entities) {
-        list << QString::fromStdString(entity->mName);
+        QStandardItem *item = new QStandardItem(QString(QString::fromStdString(entity->mName)));
+        parentItem->appendRow(item);
+        parentItem = item;
+        idx++;
+        //        if(entity->hasParent)
+        //                {
+        //                    // With the entityID of parent, find the row of that item and use parent->appendRow(item);
+        //                }
     }
-    hierarchy->setStringList(list);
 }
