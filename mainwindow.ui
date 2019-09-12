@@ -22,24 +22,25 @@
         <item>
          <widget class="QListView" name="SceneHierarchy">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-            <horstretch>0</horstretch>
+           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+            <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="dragEnabled">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="OpenGLLayout"/>
+         <layout class="QVBoxLayout" name="OpenGLLayout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetFixedSize</enum>
+          </property>
+         </layout>
         </item>
         <item>
          <widget class="QTreeView" name="Properties">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-            <horstretch>0</horstretch>
+           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+            <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
@@ -52,7 +53,7 @@
         <item>
          <widget class="QListView" name="ProjectFolders">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -62,7 +63,7 @@
         <item>
          <widget class="QListView" name="FolderView">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -81,7 +82,7 @@
      <x>0</x>
      <y>0</y>
      <width>1299</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
