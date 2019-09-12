@@ -64,7 +64,9 @@ void MainWindow::init() {
     //We put the RenderWindow inside a QWidget so we can put in into a
     //layout that is made in the .ui-file
     mRenderWindowContainer = QWidget::createWindowContainer(mRenderWindow);
-
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mRenderWindowContainer->setSizePolicy(sizePolicy);
+    mRenderWindowContainer->setMinimumSize(QSize(200, 200));
     //OpenGLLayout is made in the .ui-file!
     ui->OpenGLLayout->addWidget(mRenderWindowContainer);
 
