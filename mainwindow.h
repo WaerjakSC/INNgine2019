@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStringListModel>
 
 class QWidget;
 class RenderWindow;
@@ -30,6 +31,7 @@ private:
     void init();
     Ui::MainWindow *ui;
 
+    QStringListModel *hierarchy;
     GameObject *selectedEntity;
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;

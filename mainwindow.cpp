@@ -18,6 +18,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::init() {
+    hierarchy = new QStringListModel();
+    ui->SceneHierarchy->setModel(hierarchy);
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
 
@@ -74,7 +76,7 @@ void MainWindow::init() {
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
     connect(ui->SceneHierarchy, &QListView::clicked, this, &MainWindow::onGameObjectClicked);
-    connect(ui->hierarchy, &QStringListModel::dataChanged, this, &MainWindow::onNameChanged);
+    connect(hierarchy, &QStringListModel::dataChanged, this, &MainWindow::onNameChanged);
 }
 
 //Example of a slot called from the button on the top of the program.
@@ -83,7 +85,7 @@ void MainWindow::on_pushButton_clicked() {
 }
 
 void MainWindow::onGameObjectClicked(const QModelIndex &index) {
-    QString data = ui->hierarchy->data(index).toString();
+    QString data = hierarchy->data(index).toString();
     for (auto entity : mRenderWindow->factory().getGameObjects()) {
         if (QString::fromStdString(entity->mName) == data) {
             selectedEntity = entity;
@@ -95,7 +97,7 @@ void MainWindow::onGameObjectClicked(const QModelIndex &index) {
     // Implement properties(components) list update here
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
-    selectedEntity->mName = ui->hierarchy->data(index).toString().toStdString();
+    selectedEntity->mName = hierarchy->data(index).toString().toStdString();
 }
 void MainWindow::onGameObjectsChanged() {
     //    ui->SceneHierarchy
@@ -105,5 +107,5 @@ void MainWindow::insertGameObjects(std::vector<GameObject *> entities) {
     for (auto entity : entities) {
         list << QString::fromStdString(entity->mName);
     }
-    ui->hierarchy->setStringList(list);
+    hierarchy->setStringList(list);
 }
