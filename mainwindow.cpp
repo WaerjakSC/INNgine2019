@@ -72,18 +72,32 @@ void MainWindow::init() {
 
     //Set size of program in % of available screen
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
+
+    connect(ui->SceneHierarchy, &QListView::clicked, this, &MainWindow::onGameObjectClicked);
 }
 
 //Example of a slot called from the button on the top of the program.
 void MainWindow::on_pushButton_clicked() {
     mRenderWindow->toggleWireframe();
 }
+
+void MainWindow::onGameObjectClicked(const QModelIndex &index) {
+    QString data = ui->hierarchy->data(index).toString();
+    for (auto entity : mRenderWindow->factory().getGameObjects()) {
+        if (QString::fromStdString(entity->mName) == data) {
+            selectedEntity = entity;
+            break;
+        }
+    }
+    qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
+}
 void MainWindow::onGameObjectsChanged() {
     //    ui->SceneHierarchy
 }
 void MainWindow::insertGameObjects(std::vector<GameObject *> entities) {
-    for (size_t i = 0; i < entities.size(); i++) {
-        QModelIndex index = ui->hierarchy->index(i + 1);
-        ui->hierarchy->setData(index, QString::fromStdString(entities.at(i)->mName));
+    QStringList list;
+    for (auto entity : entities) {
+        list << QString::fromStdString(entity->mName);
     }
+    ui->hierarchy->setStringList(list);
 }

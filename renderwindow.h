@@ -37,6 +37,8 @@ public:
     void checkForGLerrors();
     void setCameraSpeed(float value);
 
+    ResourceManager &factory() const;
+
 private slots:
     void render();
     void updateScene();
@@ -49,7 +51,7 @@ private:
 
     std::vector<GameObject *> mGameObjects;
     RenderSystem *mRenderer;
-    ResourceManager &factory;
+    ResourceManager &mFactory;
     GameObject *mPlayer; //the controllable object
 
     GLuint mLight;

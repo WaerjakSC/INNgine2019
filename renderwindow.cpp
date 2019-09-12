@@ -20,7 +20,7 @@
 #include "lightobject.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
-    : mContext(nullptr), mInitialized(false), factory(ResourceManager::instance()), mMainWindow(mainWindow) {
+    : mContext(nullptr), mInitialized(false), mFactory(ResourceManager::instance()), mMainWindow(mainWindow) {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
     setFormat(format);
@@ -86,47 +86,47 @@ void RenderWindow::init() {
     glEnable(GL_CULL_FACE);               //draws only front side of models - usually what you want -
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
-    factory.setMainWindow(mMainWindow);
+    mFactory.setMainWindow(mMainWindow);
 
     //Compile shaders:
-    factory.LoadShader(Color);
-    factory.LoadShader(Tex);
-    factory.LoadShader(Phong);
+    mFactory.LoadShader(Color);
+    mFactory.LoadShader(Tex);
+    mFactory.LoadShader(Phong);
 
     //**********************  Texture stuff: **********************
 
-    factory.LoadTexture("white.bmp");
-    factory.LoadTexture("hund.bmp", 1);
-    factory.LoadTexture("skybox.bmp", 2);
+    mFactory.LoadTexture("white.bmp");
+    mFactory.LoadTexture("hund.bmp", 1);
+    mFactory.LoadTexture("skybox.bmp", 2);
 
     //Set the textures loaded to a texture unit
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, factory.GetTexture("white.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory.GetTexture("white.bmp")->id());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, factory.GetTexture("hund.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory.GetTexture("hund.bmp")->id());
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, factory.GetTexture("skybox.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory.GetTexture("skybox.bmp")->id());
 
     //********************** Making the objects to be drawn **********************
     // Nothing will render for now, but at least the factory can make the objects.
-    factory.makeXYZ();
+    mFactory.makeXYZ();
 
-    factory.makeSkyBox();
+    mFactory.makeSkyBox();
 
-    factory.makeBillBoard();
+    mFactory.makeBillBoard();
 
-    mLight = factory.makeLightObject();
+    mLight = mFactory.makeLightObject();
 
     //testing triangle surface class
-    GLuint boxID = factory.makeTriangleSurface("box2.txt");
-    static_cast<MaterialComponent *>(factory.getComponent(Material, boxID))->setShader(Color);
+    GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
+    static_cast<MaterialComponent *>(mFactory.getComponent(Material, boxID))->setShader(Color);
 
     //one monkey
-    factory.makeGameObject("Monkey");
-    factory.addComponent(Transform);
-    factory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
-    factory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
-    static_cast<MaterialComponent *>(factory.getComponent(Material))->setShader(Phong);
+    mFactory.makeGameObject("Monkey");
+    mFactory.addComponent(Transform);
+    mFactory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
+    mFactory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
+    static_cast<MaterialComponent *>(mFactory.getComponent(Material))->setShader(Phong);
     //    factory.makeCube();
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
@@ -138,11 +138,15 @@ void RenderWindow::init() {
     //    mCurrentCamera->pitch(5.f);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    factory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
-    factory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    factory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
-    mRenderer = new RenderSystem(factory.getShaders());
-    mMainWindow->insertGameObjects(factory.getGameObjects());
+    mFactory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
+    mFactory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
+    mFactory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+    mRenderer = new RenderSystem(mFactory.getShaders());
+    mMainWindow->insertGameObjects(mFactory.getGameObjects());
+}
+
+ResourceManager &RenderWindow::factory() const {
+    return mFactory;
 }
 
 ///Called each frame - doing the rendering
@@ -188,7 +192,7 @@ void RenderWindow::render() {
 }
 
 void RenderWindow::updateScene() {
-    factory.getGameObjects();
+    mFactory.getGameObjects();
 }
 
 //This function is called from Qt when window is exposed (shown)
