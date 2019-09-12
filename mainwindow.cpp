@@ -62,6 +62,7 @@ void MainWindow::init() {
     //We put the RenderWindow inside a QWidget so we can put in into a
     //layout that is made in the .ui-file
     mRenderWindowContainer = QWidget::createWindowContainer(mRenderWindow);
+
     //OpenGLLayout is made in the .ui-file!
     ui->OpenGLLayout->addWidget(mRenderWindowContainer);
 

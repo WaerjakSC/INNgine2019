@@ -14,7 +14,7 @@ public:
 
     gsl::Vector3D mPosition{0};
     gsl::Vector3D mRotation{0};
-    gsl::Vector3D mScale{0};
+    gsl::Vector3D mScale{1};
 
     int parentID = -1;
 
@@ -30,8 +30,6 @@ public:
 
 private:
     gsl::Matrix4x4 mMatrix;
-
-
 };
 
 #endif // TRANSFORMCOMPONENT_H
