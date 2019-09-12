@@ -74,6 +74,7 @@ void MainWindow::init() {
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
     connect(ui->SceneHierarchy, &QListView::clicked, this, &MainWindow::onGameObjectClicked);
+    connect(ui->hierarchy, &QStringListModel::dataChanged, this, &MainWindow::onNameChanged);
 }
 
 //Example of a slot called from the button on the top of the program.
@@ -90,6 +91,11 @@ void MainWindow::onGameObjectClicked(const QModelIndex &index) {
         }
     }
     qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
+
+    // Implement properties(components) list update here
+}
+void MainWindow::onNameChanged(const QModelIndex &index) {
+    selectedEntity->mName = ui->hierarchy->data(index).toString().toStdString();
 }
 void MainWindow::onGameObjectsChanged() {
     //    ui->SceneHierarchy
