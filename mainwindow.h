@@ -5,7 +5,7 @@
 
 class QWidget;
 class RenderWindow;
-
+class GameObject;
 namespace Ui {
 class MainWindow;
 }
@@ -17,6 +17,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void insertGameObjects(std::vector<GameObject *> entities);
 public slots:
     void onGameObjectsChanged();
 private slots:

@@ -142,6 +142,7 @@ void RenderWindow::init() {
     factory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
     factory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
     mRenderer = new RenderSystem(factory.getShaders());
+    mMainWindow->insertGameObjects(factory.getGameObjects());
 }
 
 ///Called each frame - doing the rendering

@@ -14,7 +14,6 @@
 #include <vector>
 
 //Own stuff
-#include "Shaders/shader.h"
 #include "constants.h"
 #include "gltypes.h"
 #include "gsl_math.h"
@@ -22,6 +21,7 @@
 #include "matrix2x2.h"
 #include "matrix3x3.h"
 #include "matrix4x4.h"
+#include "shader.h"
 #include "vector2d.h"
 #include "vector3d.h"
 #include "vector4d.h"

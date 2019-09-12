@@ -81,3 +81,9 @@ void MainWindow::on_pushButton_clicked() {
 void MainWindow::onGameObjectsChanged() {
     //    ui->SceneHierarchy
 }
+void MainWindow::insertGameObjects(std::vector<GameObject *> entities) {
+    for (size_t i = 0; i < entities.size(); i++) {
+        QModelIndex index = ui->hierarchy->index(i + 1);
+        ui->hierarchy->setData(index, QString::fromStdString(entities.at(i)->mName));
+    }
+}

@@ -7,7 +7,13 @@ TARGET      = INNgine2019
 
 PRECOMPILED_HEADER = innpch.h
 
-INCLUDEPATH +=  ./GSL
+INCLUDEPATH += ./GSL ./Components ./Shaders ./Systems ./Views
+
+win32 {
+    INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
+    LIBS *= $(OPENAL_HOME)\\libs\\Win64\\libOpenAL32.dll.a
+}
+
 HEADERS += \
     Components/lightingcomponent.h \
     Components/materialcomponent.h \
@@ -29,6 +35,7 @@ HEADERS += \
     Components/component.h \
     Components/meshcomponent.h \
     Components/inputcomponent.h \
+    Components/comppch.h \
     Assets/Meshes/trianglesurface.h \
     Systems/rendersystem.h \
     Views/renderview.h \
