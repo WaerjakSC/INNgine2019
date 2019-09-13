@@ -84,10 +84,6 @@ void MainWindow::init() {
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
 }
 
-//Example of a slot called from the button on the top of the program.
-void MainWindow::on_pushButton_clicked() {
-    mRenderWindow->toggleWireframe();
-}
 void MainWindow::onParentChanged(const QModelIndex &parent) {
     QString data = hierarchy->data(parent).toString();
     if (data != "") {
@@ -146,7 +142,6 @@ void MainWindow::insertGameObjects(std::vector<int> entities) {
             int parentID = dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, object->eID))->parentID;
             if (parentID != -1) {
                 QString parent = QString::fromStdString(mRenderWindow->factory().getGameObject(entities.at(parentID))->mName);
-                qDebug() << parent;
                 forEach(hierarchy, parent, item);
             } else
                 parentItem->appendRow(item);

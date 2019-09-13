@@ -49,6 +49,7 @@ public:
     GLuint makeBillBoard();
     GLuint makeOctBall(int n);
     GLuint makeLightObject();
+    GLuint make3DObject(std::string name, ShaderType type = Phong);
 
     RenderView *getRenderView() const;
 

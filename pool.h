@@ -17,8 +17,8 @@ public:
      */
     void add(int entityID) {
         assert(!has(entityID)); // Make sure the entityID is unique.
-        if (entityID > mEntityIndices.size()) {
-            for (GLuint i = mEntityIndices.size(); i < entityID; i++) {
+        if ((size_t)entityID > mEntityIndices.size()) {
+            for (size_t i = mEntityIndices.size(); i < (size_t)entityID; i++) {
                 mEntityIndices.push_back(-1);
             }
         }
@@ -51,7 +51,12 @@ public:
      */
     Type *get(int eID) {
         assert(has(eID));
-        return mComponentList.at(mEntityIndices.at(eID));
+        if (has(eID)) {
+            return mComponentList.at(mEntityIndices.at(eID));
+        } else {
+            qDebug() << "Entity not found!";
+            return mComponentList.at(mEntityIndices.back());
+        }
     }
     /**
      * @brief get the last component in the pool, aka the latest creation

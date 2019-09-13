@@ -8,7 +8,7 @@ RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(sh
     //    connectComponents();
 }
 void RenderSystem::iterateEntities() {
-    for (int i = 0; i < mViableEntities.size(); i++) {
+    for (size_t i = 0; i < mViableEntities.size(); i++) {
         transforms.at(i)->update();
         initializeOpenGLFunctions();
         ShaderType type = mats.at(i)->getShader();

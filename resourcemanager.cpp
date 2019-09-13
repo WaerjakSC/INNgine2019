@@ -55,7 +55,7 @@ void ResourceManager::removeComponent(CType type, int eID) {
     if (eID <= -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component doesn't already exist on object
-    if (eID < mGameObjects.size()) {
+    if ((size_t)eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
             mTransforms.remove(eID);
@@ -88,7 +88,7 @@ Component *ResourceManager::getComponent(CType type, int eID) {
     if (eID <= -1) // This means an eID wasn't given, assumes you want to simply get a component from the last gameobject.
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component actually exists
-    if (eID < mGameObjects.size())
+    if ((size_t)eID < mGameObjects.size())
         switch (type) {
         case Transform:
             return mTransforms.get(eID);
@@ -125,7 +125,7 @@ void ResourceManager::addComponent(CType type, int eID) {
     if (eID <= -1) // This means a eID wasn't given, assumes you want to simply add to the latest gameobject.
         eID = mGameObjects.size() - 1;
     // If gameobject exists in vector and the component doesn't already exist on object
-    if (eID < mGameObjects.size()) {
+    if ((size_t)eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
             mTransforms.add(eID);
@@ -160,7 +160,7 @@ void ResourceManager::addComponent(CType type, int eID) {
  * @param eID
  */
 void ResourceManager::addMeshComponent(std::string name, int eID) {
-    if (eID <= -1 || eID > mGameObjects.size() - 1) {
+    if (eID <= -1 || (size_t)eID > mGameObjects.size() - 1) {
         eID = mGameObjects.size() - 1;
     }
     addComponent(Mesh, eID);
@@ -168,7 +168,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 }
 void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
-    if (eID < mGameObjects.size()) {
+    if ((size_t)eID < mGameObjects.size()) {
         mMeshes.get(eID)->copyOpenGLData(*mesh);
     }
 }

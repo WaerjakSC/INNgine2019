@@ -5,7 +5,7 @@ MovementSystem::MovementSystem(Pool<TransformComponent> *trans) {
 }
 
 void MovementSystem::update() {
-    for (int i = 0; i < transpool->size(); i++) {
+    for (size_t i = 0; i < transpool->size(); i++) {
 
         if (transpool->getComponents().at(i)->mMatrixOutdated) {
             transpool->getComponents().at(i)->updateMatrix();
