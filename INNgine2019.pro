@@ -40,6 +40,7 @@ HEADERS += \
     Components/comppch.h \
     Assets/Meshes/trianglesurface.h \
     Systems/rendersystem.h \
+    Systems/movementsystem.h \
     Views/renderview.h \
     constants.h \
     billboard.h \
@@ -81,6 +82,7 @@ SOURCES += main.cpp \
     Components/inputcomponent.cpp \
     Assets/Meshes/trianglesurface.cpp \
     Systems/rendersystem.cpp \
+    Systems/movementsystem.cpp \
     Views/renderview.cpp \
     billboard.cpp \
     gameobject.cpp \

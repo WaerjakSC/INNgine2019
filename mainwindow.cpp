@@ -1,11 +1,10 @@
 #include "mainwindow.h"
 #include "GUI/hierarchymodel.h"
 #include "innpch.h"
+#include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include <QDesktopWidget>
 #include <QSurfaceFormat>
-
-#include "renderwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -20,6 +19,7 @@ MainWindow::~MainWindow() {
 void MainWindow::init() {
     hierarchy = new HierarchyModel();
     ui->SceneHierarchy->setModel(hierarchy);
+    hView = ui->SceneHierarchy;
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
 
@@ -77,17 +77,35 @@ void MainWindow::init() {
     //Set size of program in % of available screen
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
-    connect(ui->SceneHierarchy, &QListView::clicked, this, &MainWindow::onGameObjectClicked);
+    connect(ui->SceneHierarchy, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
     //    connect(ui->SceneHierarchy, &QListView::dropEvent, this, &MainWindow::onGameObjectClicked);
 
     connect(hierarchy, &QStringListModel::dataChanged, this, &MainWindow::onNameChanged);
+    connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
+    connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
 }
 
 //Example of a slot called from the button on the top of the program.
 void MainWindow::on_pushButton_clicked() {
     mRenderWindow->toggleWireframe();
 }
-
+void MainWindow::onParentChanged(const QModelIndex &parent) {
+    QString data = hierarchy->data(parent).toString();
+    int parentID;
+    for (auto entity : mRenderWindow->factory().getGameObjects()) {
+        if (QString::fromStdString(entity->mName) == data) {
+            parentID = entity->eID;
+            break;
+        }
+    }
+    //    // Hooo boy... This sets the parent ID in the dragged entity to be the ID of the entity it was dropped onto.
+    TransformComponent *comp = dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, selectedEntity->eID));
+    if (comp) {
+        comp->parentID = parentID;
+        qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
+        qDebug() << "New Parent Name: " + data + ". ID: " + QString::number(comp->parentID);
+    }
+}
 void MainWindow::onGameObjectClicked(const QModelIndex &index) {
     QString data = hierarchy->data(index).toString();
     for (auto entity : mRenderWindow->factory().getGameObjects()) {
@@ -100,19 +118,38 @@ void MainWindow::onGameObjectClicked(const QModelIndex &index) {
 
     // Implement properties(components) list update here
 }
+void MainWindow::onGameObjectDragged(const QString &text) {
+    qDebug() << text;
+    for (auto entity : mRenderWindow->factory().getGameObjects()) {
+        if (QString::fromStdString(entity->mName) == text) {
+            selectedEntity = entity;
+            break;
+        }
+    }
+    qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
+}
 void MainWindow::onNameChanged(const QModelIndex &index) {
-    selectedEntity->mName = hierarchy->data(index).toString().toStdString();
+    if (selectedEntity)
+        selectedEntity->mName = hierarchy->data(index).toString().toStdString();
 }
 void MainWindow::onGameObjectsChanged() {
     //    ui->SceneHierarchy
 }
+/**
+ * @brief Initial insertion of gameobjects, such as those made in an init function or read from a level file.
+ * @param entities
+ */
 void MainWindow::insertGameObjects(std::vector<GameObject *> entities) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     int idx = 0;
     for (auto entity : entities) {
-        QStandardItem *item = new QStandardItem(QString(QString::fromStdString(entity->mName)));
+        QStandardItem *item;
+        if (entity->mName == "")
+            item = new QStandardItem(QString("GameObject")) /*.arg(idx)*/;
+        else
+            item = new QStandardItem(QString(QString::fromStdString(entity->mName))) /*.arg(idx)*/;
         parentItem->appendRow(item);
-        parentItem = item;
+        //        parentItem = item;
         idx++;
         //        if(entity->hasParent)
         //                {

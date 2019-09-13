@@ -8,6 +8,7 @@ class QWidget;
 class RenderWindow;
 class GameObject;
 class HierarchyModel;
+class HierarchyView;
 namespace Ui {
 class MainWindow;
 }
@@ -28,12 +29,17 @@ private slots:
 
     void onNameChanged(const QModelIndex &index);
 
+    void onParentChanged(const QModelIndex &index);
+
+    void onGameObjectDragged(const QString &text);
+
 private:
     void init();
     Ui::MainWindow *ui;
 
     HierarchyModel *hierarchy;
-    GameObject *selectedEntity;
+    HierarchyView *hView;
+    GameObject *selectedEntity{nullptr};
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
 };

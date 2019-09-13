@@ -41,7 +41,7 @@ public:
         mComponentList.pop_back();
         mEntityIndices.at(removedEntityID) = -1; // Set entity location to an invalid value.
     }
-    std::vector<Type> &getComponents() { return &mComponentList; } // Direct access to the components
+    std::vector<Type *> getComponents() { return mComponentList; } // Direct access to the components
     const std::vector<int> getEntityList() { return mEntityList; }
     const std::vector<int> getEntityIndices() { return mEntityIndices; }
     Type *get(int eID) {

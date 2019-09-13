@@ -9,5 +9,7 @@ void HierarchyView::dragEnterEvent(QDragEnterEvent *event) {
 }
 void HierarchyView::dropEvent(QDropEvent *event) {
     QTreeView::dropEvent(event);
-    //    qDebug() << event->mimeData()->text();
+    //        qDebug() << QTreeView::currentIndex().data();
+    emit QTreeView::currentIndex().data();
+    //        qDebug() << event->mimeData()->text();
 }
