@@ -1,24 +1,29 @@
 #ifndef MOVEMENTSYSTEM_H
 #define MOVEMENTSYSTEM_H
 
+#include "pool.h"
+
 
 class MovementSystem
 {
 public:
-    MovementSystem();
+    MovementSystem(Pool<TransformComponent> *trans);
     void update();
 
-    /*
-     * Remove from transformcomponent and implement here later
-     *
-    void setPosition(gsl::Vector3D &position);
-    void setPosition(float xIn, float yIn, float zIn);
-    void setScale(gsl::Vector3D &scale);
-    void setRotation(gsl::Vector3D &rotation);
 
-    gsl::Matrix4x4 multiplyByParent(gsl::Matrix4x4 matrixIn);
+
+    void setPosition(int eID, gsl::Vector3D &position);
+    void setPosition(int eID, float xIn, float yIn, float zIn);
+    void setScale(int eID, gsl::Vector3D &scale);
+    void setRotation(int eID, gsl::Vector3D &rotation);
+
+    gsl::Matrix4x4 multiplyByParent(int eID, int pID);
     void updateMatrix();
-    */
+
+private:
+
+    Pool<TransformComponent> *transpool;
+
 };
 
 #endif // MOVEMENTSYSTEM_H
