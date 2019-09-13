@@ -3,14 +3,10 @@
 
 #include "pool.h"
 
-
-class MovementSystem
-{
+class MovementSystem {
 public:
     MovementSystem(Pool<TransformComponent> *trans);
     void update();
-
-
 
     void setPosition(int eID, gsl::Vector3D &position);
     void setPosition(int eID, float xIn, float yIn, float zIn);
@@ -21,9 +17,7 @@ public:
     void updateMatrix();
 
 private:
-
     Pool<TransformComponent> *transpool;
-
 };
 
 #endif // MOVEMENTSYSTEM_H

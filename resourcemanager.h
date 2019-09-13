@@ -61,6 +61,15 @@ public:
 
     std::vector<GameObject *> getGameObjects() const;
 
+    Pool<TransformComponent> &getTransforms();
+
+    GameObject *getGameObject(int eID);
+    void removeGameObject(int eID);
+
+    std::vector<int> getGameObjectIndex() const;
+
+    void setParent(int eID, int parentID);
+
 private:
     // Private constructor
     ResourceManager();
@@ -74,6 +83,7 @@ private:
     meshData mMeshData;
 
     MainWindow *mMainWindow;
+    std::vector<int> mGameObjectIndex;      // Holds the sparse array for gameobjects.
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
 
     // Component pools

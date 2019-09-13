@@ -17,6 +17,7 @@ class Shader;
 class MainWindow;
 class LightObject;
 class RenderSystem;
+class MovementSystem;
 
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
@@ -51,6 +52,7 @@ private:
 
     std::vector<GameObject *> mGameObjects;
     RenderSystem *mRenderer;
+    MovementSystem *mMoveSys;
     ResourceManager &mFactory;
     GameObject *mPlayer; //the controllable object
 

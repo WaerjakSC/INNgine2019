@@ -12,6 +12,14 @@ ResourceManager::ResourceManager() {
     mRenderView = new RenderView(&mTransforms, &mMaterials, &mMeshes);
 }
 
+std::vector<int> ResourceManager::getGameObjectIndex() const {
+    return mGameObjectIndex;
+}
+
+Pool<TransformComponent> &ResourceManager::getTransforms() {
+    return mTransforms;
+}
+
 std::vector<GameObject *> ResourceManager::getGameObjects() const {
     return mGameObjects;
 }
@@ -179,8 +187,31 @@ void ResourceManager::setMesh(std::string name, int eID) {
 GLuint ResourceManager::makeGameObject(std::string name) {
     GLuint eID = mNumGameObjects;
     mNumGameObjects++;
+    mGameObjectIndex.emplace_back(mGameObjects.size());
     mGameObjects.emplace_back(new GameObject(eID, name));
+
     return eID;
+}
+/**
+ * @brief Set the parent of a gameobject (or rather its transform component).
+ * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
+ * For now, make sure you create items in the order you want them to be parented, i.e. Parent first, then Children.
+ * @param eID
+ * @param parentID
+ */
+void ResourceManager::setParent(int eID, int parentID) {
+    mTransforms.get(eID)->parentID = parentID;
+}
+GameObject *ResourceManager::getGameObject(int eID) {
+    assert((size_t)eID < mGameObjectIndex.size());
+    return mGameObjects.at(mGameObjectIndex.at(eID));
+}
+void ResourceManager::removeGameObject(int eID) {
+    assert((size_t)eID < mGameObjectIndex.size());
+    mGameObjectIndex.at(mGameObjects.back()->eID) = mGameObjectIndex.at(eID); // Set the index to point to the location after swap
+    std::swap(mGameObjects.at(mGameObjectIndex[eID]), mGameObjects.back());   // Swap the removed with the last, then pop out the last.
+    mGameObjects.pop_back();
+    mGameObjectIndex.at(eID) = -1; // Set entity location to an invalid value.
 }
 GLuint ResourceManager::makePlane() {
     GLuint eID = makeGameObject("Plane");
@@ -349,6 +380,7 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
 GLuint ResourceManager::makeBillBoard() {
     GLuint eID = mNumGameObjects;
     ++mNumGameObjects;
+    mGameObjectIndex.emplace_back(mGameObjects.size());
     mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
     addComponent(Transform);
     addComponent(Material);
@@ -412,6 +444,7 @@ GLuint ResourceManager::makeOctBall(int n) {
 GLuint ResourceManager::makeLightObject() {
     GLuint eID = mNumGameObjects;
     ++mNumGameObjects;
+    mGameObjectIndex.emplace_back(mGameObjects.size());
     mGameObjects.emplace_back(new LightObject(eID, "Light"));
     addComponent(Transform);
     addComponent(Material);
@@ -452,6 +485,20 @@ GLuint ResourceManager::makeLightObject() {
     initIndexBuffers(lightMesh);
 
     glBindVertexArray(0);
+    return eID;
+}
+/**
+ * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
+ * @param name
+ * @param type
+ * @return The entity ID of the gameobject.
+ */
+GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
+    GLuint eID = makeGameObject(name);
+    addComponent(Transform);
+    addComponent(Material);
+    addMeshComponent(name, Mesh);
+    mMaterials.get(eID)->setShader(type);
     return eID;
 }
 /**

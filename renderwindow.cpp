@@ -16,6 +16,7 @@
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
+#include "Systems/movementsystem.h"
 #include "Systems/rendersystem.h"
 #include "lightobject.h"
 
@@ -120,13 +121,14 @@ void RenderWindow::init() {
     //testing triangle surface class
     GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory.getComponent(Material, boxID))->setShader(Color);
-
     //one monkey
-    mFactory.makeGameObject("Monkey");
+    GLuint monkey = mFactory.makeGameObject("Monkey");
     mFactory.addComponent(Transform);
     mFactory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
     mFactory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
     static_cast<MaterialComponent *>(mFactory.getComponent(Material))->setShader(Phong);
+    mFactory.setParent(monkey, boxID);
+
     //    factory.makeCube();
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
@@ -142,7 +144,8 @@ void RenderWindow::init() {
     mFactory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
     mFactory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
     mRenderer = new RenderSystem(mFactory.getShaders());
-    mMainWindow->insertGameObjects(mFactory.getGameObjects());
+    mMoveSys = new MovementSystem(&mFactory.getTransforms());
+    mMainWindow->insertGameObjects(mFactory.getGameObjectIndex());
 }
 
 ResourceManager &RenderWindow::factory() const {
@@ -170,6 +173,7 @@ void RenderWindow::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mRenderer->render();
+    mMoveSys->update();
 
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time

@@ -9,6 +9,7 @@ class RenderWindow;
 class GameObject;
 class HierarchyModel;
 class HierarchyView;
+class QStandardItem;
 namespace Ui {
 class MainWindow;
 }
@@ -20,7 +21,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void insertGameObjects(std::vector<GameObject *> entities);
+    void insertGameObjects(std::vector<int> entities);
 public slots:
     void onGameObjectsChanged();
 private slots:
@@ -42,6 +43,7 @@ private:
     GameObject *selectedEntity{nullptr};
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
+    void forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent = QModelIndex());
 };
 
 #endif // MAINWINDOW_H

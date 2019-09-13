@@ -44,10 +44,19 @@ public:
     std::vector<Type *> getComponents() { return mComponentList; } // Direct access to the components
     const std::vector<int> getEntityList() { return mEntityList; }
     const std::vector<int> getEntityIndices() { return mEntityIndices; }
+    /**
+     * @brief get the component belonging to entity with given ID.
+     * @param eID
+     * @return
+     */
     Type *get(int eID) {
         assert(has(eID));
         return mComponentList.at(mEntityIndices.at(eID));
     }
+    /**
+     * @brief get the last component in the pool, aka the latest creation
+     * @return
+     */
     Type *getLast() {
         return mComponentList.back();
     }
