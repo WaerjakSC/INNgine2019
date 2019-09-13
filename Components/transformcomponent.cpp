@@ -15,30 +15,7 @@ gsl::Matrix4x4 *TransformComponent::matrix() {
     return &mMatrix;
 }
 
-void TransformComponent::setPosition(gsl::Vector3D &position) {
-    mMatrixOutdated = true;
-    mPosition = position;
-}
 
-void TransformComponent::setPosition(float xIn, float yIn, float zIn) {
-    mMatrixOutdated = true;
-    mPosition.x = xIn;
-    mPosition.y = yIn;
-    mPosition.z = zIn;
-}
-
-void TransformComponent::setScale(gsl::Vector3D &scale) {
-    mMatrixOutdated = true;
-    mScale = scale;
-}
-
-void TransformComponent::setRotation(gsl::Vector3D &rotation) {
-    mMatrixOutdated = true;
-    mRotation = rotation;
-}
-
-gsl::Matrix4x4 TransformComponent::multiplyByParent(gsl::Matrix4x4 matrixIn) {
-}
 
 void TransformComponent::updateMatrix() {
     if (mMatrixOutdated) {
