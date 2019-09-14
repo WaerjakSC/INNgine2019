@@ -87,7 +87,6 @@ SOURCES += main.cpp \
     billboard.cpp \
     gameobject.cpp \
     lightobject.cpp \
-    pool.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \

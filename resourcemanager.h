@@ -96,7 +96,7 @@ private:
     Pool<PhysicsComponent> mPhysics;
     Pool<SoundComponent> mSounds;
     // View class for collecting the components rendersystem needs
-    RenderView *mRenderView;
+    RenderView *mRenderView; // TODO: Give RenderView Material and MeshComponent pools
 
     // OpenGL init functions
     void initVertexBuffers(MeshComponent *mesh);

@@ -179,7 +179,37 @@ void ResourceManager::setMesh(std::string name, int eID) {
         LoadMesh(name);
 }
 /**
- * @brief ResourceManager::makeGameObject
+ * @brief Set the parent of a gameobject (or rather its transform component).
+ * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
+ * For now, make sure you create items in the order you want them to be parented, i.e. Parent first, then Children.
+ * @param eID
+ * @param parentID
+ */
+void ResourceManager::setParent(int eID, int parentID) {
+    mTransforms.get(eID)->parentID = parentID;
+}
+/**
+ * @brief Get a pointer to the entity with the specified ID.
+ * @param eID
+ * @return
+ */
+GameObject *ResourceManager::getGameObject(int eID) {
+    assert((size_t)eID < mGameObjectIndex.size());
+    return mGameObjects.at(mGameObjectIndex.at(eID));
+}
+/**
+ * @brief TODO: make sure to tell all Pools to remove this gameobject from their lists.
+ * @param eID - entityID
+ */
+void ResourceManager::removeGameObject(int eID) {
+    assert((size_t)eID < mGameObjectIndex.size());
+    mGameObjectIndex.at(mGameObjects.back()->eID) = mGameObjectIndex.at(eID); // Set the index to point to the location after swap
+    std::swap(mGameObjects.at(mGameObjectIndex[eID]), mGameObjects.back());   // Swap the removed with the last, then pop out the last.
+    mGameObjects.pop_back();
+    mGameObjectIndex.at(eID) = -1; // Set entity location to an invalid value.
+}
+/**
+ * @brief Make a generic game object with no components attached.
  * @param name Name of the gameobject. Leave blank if no name desired.
  * @return Returns the entity ID for use in adding components or other tasks.
  */
@@ -192,26 +222,23 @@ GLuint ResourceManager::makeGameObject(std::string name) {
     return eID;
 }
 /**
- * @brief Set the parent of a gameobject (or rather its transform component).
- * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
- * For now, make sure you create items in the order you want them to be parented, i.e. Parent first, then Children.
- * @param eID
- * @param parentID
+ * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
+ * @param name
+ * @param type
+ * @return The entity ID of the gameobject.
  */
-void ResourceManager::setParent(int eID, int parentID) {
-    mTransforms.get(eID)->parentID = parentID;
+GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
+    GLuint eID = makeGameObject(name);
+    addComponent(Transform);
+    addComponent(Material);
+    addMeshComponent(name, eID);
+    mMaterials.get(eID)->setShader(type);
+    return eID;
 }
-GameObject *ResourceManager::getGameObject(int eID) {
-    assert((size_t)eID < mGameObjectIndex.size());
-    return mGameObjects.at(mGameObjectIndex.at(eID));
-}
-void ResourceManager::removeGameObject(int eID) {
-    assert((size_t)eID < mGameObjectIndex.size());
-    mGameObjectIndex.at(mGameObjects.back()->eID) = mGameObjectIndex.at(eID); // Set the index to point to the location after swap
-    std::swap(mGameObjects.at(mGameObjectIndex[eID]), mGameObjects.back());   // Swap the removed with the last, then pop out the last.
-    mGameObjects.pop_back();
-    mGameObjectIndex.at(eID) = -1; // Set entity location to an invalid value.
-}
+/**
+ * @brief Plane prefab -- should fix coloring at some point
+ * @return
+ */
 GLuint ResourceManager::makePlane() {
     GLuint eID = makeGameObject("Plane");
     addComponent(Transform);
@@ -237,7 +264,10 @@ GLuint ResourceManager::makePlane() {
     glBindVertexArray(0);
     return eID;
 }
-
+/**
+ * @brief Cube prefab
+ * @return
+ */
 GLuint ResourceManager::makeCube() {
     GLuint eID = makeGameObject("Cube");
     addComponent(Transform);
@@ -251,7 +281,7 @@ GLuint ResourceManager::makeCube() {
     return eID;
 }
 /**
- * @brief ResourceManager::makeXYZ - Creates basic XYZ lines
+ * @brief Creates basic XYZ lines
  */
 GLuint ResourceManager::makeXYZ() {
     GLuint eID = makeGameObject("XYZ");
@@ -278,7 +308,10 @@ GLuint ResourceManager::makeXYZ() {
     glBindVertexArray(0);
     return eID;
 }
-
+/**
+ * @brief Prefab skybox for editor
+ * @return
+ */
 GLuint ResourceManager::makeSkyBox() {
     GLuint eID = makeGameObject("Cube");
     addComponent(Transform);
@@ -356,7 +389,7 @@ GLuint ResourceManager::makeSkyBox() {
 }
 
 /**
- * @brief ResourceManager::makeTriangleSurface - Reads a .txt file for vertices. Remember to add a material component!
+ * @brief Reads a .txt file for vertices.
  * @param fileName
  * @return Returns the entity id
  */
@@ -375,7 +408,10 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
 
     return eID;
 }
-
+/**
+ * @brief Billboard prefab
+ * @return
+ */
 GLuint ResourceManager::makeBillBoard() {
     GLuint eID = mNumGameObjects;
     ++mNumGameObjects;
@@ -411,7 +447,11 @@ GLuint ResourceManager::makeBillBoard() {
     glBindVertexArray(0);
     return eID;
 }
-
+/**
+ * @brief Sphere prefab
+ * @param n - number of recursions. Increase number for "rounder" sphere
+ * @return
+ */
 GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = makeGameObject("Ball");
     mMeshData.Clear();
@@ -439,7 +479,10 @@ GLuint ResourceManager::makeOctBall(int n) {
     glBindVertexArray(0);
     return eID;
 }
-
+/**
+ * @brief Light object prefab -- not fully implemented yet
+ * @return
+ */
 GLuint ResourceManager::makeLightObject() {
     GLuint eID = mNumGameObjects;
     ++mNumGameObjects;
@@ -487,20 +530,6 @@ GLuint ResourceManager::makeLightObject() {
     return eID;
 }
 /**
- * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
- * @param name
- * @param type
- * @return The entity ID of the gameobject.
- */
-GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
-    GLuint eID = makeGameObject(name);
-    addComponent(Transform);
-    addComponent(Material);
-    addMeshComponent(name, eID);
-    mMaterials.get(eID)->setShader(type);
-    return eID;
-}
-/**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */
 void ResourceManager::initVertexBuffers(MeshComponent *mesh) {
@@ -535,7 +564,11 @@ void ResourceManager::initIndexBuffers(MeshComponent *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
 }
-
+/**
+ * @brief Load shader for the first time if it's not already in storage.
+ * @param type
+ * @param geometryPath
+ */
 void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
     if (Shaders.find(type) == Shaders.end()) {
         std::string shaderName;
@@ -560,7 +593,11 @@ void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
         qDebug() << "ResourceManager: Shader already loaded, ignoring...";
     }
 }
-
+/**
+ * @brief Load texture if it's not already in storage.
+ * @param fileName
+ * @param textureUnit
+ */
 void ResourceManager::LoadTexture(std::string fileName, GLuint textureUnit) {
     if (Textures.find(fileName) == Textures.end()) {
         Textures[fileName] = new Texture(fileName, textureUnit);
@@ -576,7 +613,11 @@ Shader *ResourceManager::GetShader(ShaderType type) {
 Texture *ResourceManager::GetTexture(std::string fileName) {
     return Textures[fileName];
 }
-
+/**
+ * @brief Read .obj file.
+ * @param fileName
+ * @return
+ */
 bool ResourceManager::readFile(std::string fileName) {
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
@@ -743,6 +784,7 @@ MeshComponent *ResourceManager::LoadMesh(std::string fileName) {
     mMeshMap[fileName] = *mMeshes.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
     return mMeshes.getLast();                // the mesh at the back is the latest creation
 }
+
 MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {

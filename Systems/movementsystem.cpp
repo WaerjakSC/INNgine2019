@@ -3,20 +3,21 @@
 MovementSystem::MovementSystem(Pool<TransformComponent> *trans) {
     transpool = trans;
 }
-
+// multiplyByParent doesn't seem to work properly atm -- Implement showing transform component in properties first
 void MovementSystem::update() {
     for (size_t i = 0; i < transpool->size(); i++) {
-
         if (transpool->getComponents().at(i)->mMatrixOutdated) {
             transpool->getComponents().at(i)->updateMatrix();
         }
+    }
+    for (size_t i = 0; i < transpool->size(); i++) {
         if (transpool->getComponents().at(i)->parentID != -1) {
             multiplyByParent(transpool->getEntityList().at(i), transpool->getComponents().at(i)->parentID);
         }
     }
 }
 
-void MovementSystem::setPosition(int eID, gsl::Vector3D &position) {
+void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
     transpool->get(eID)->mMatrixOutdated = true;
 
     transpool->get(eID)->mPosition = position;
@@ -29,12 +30,12 @@ void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {
     transpool->get(eID)->mPosition.z = zIn;
 }
 
-void MovementSystem::setScale(int eID, gsl::Vector3D &scale) {
+void MovementSystem::setScale(int eID, gsl::Vector3D scale) {
     transpool->get(eID)->mMatrixOutdated = true;
     transpool->get(eID)->mScale = scale;
 }
 
-void MovementSystem::setRotation(int eID, gsl::Vector3D &rotation) {
+void MovementSystem::setRotation(int eID, gsl::Vector3D rotation) {
     transpool->get(eID)->mMatrixOutdated = true;
     transpool->get(eID)->mRotation = rotation;
 }

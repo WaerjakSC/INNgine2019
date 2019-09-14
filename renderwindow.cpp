@@ -111,21 +111,17 @@ void RenderWindow::init() {
     //********************** Making the objects to be drawn **********************
     // Nothing will render for now, but at least the factory can make the objects.
     mFactory.makeXYZ();
-
     mFactory.makeSkyBox();
-
     mFactory.makeBillBoard();
-
     mLight = mFactory.makeLightObject();
-
     //testing triangle surface class
     GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory.getComponent(Material, boxID))->setShader(Color);
-    //one monkey -- crashes atm
+    //one monkey
     GLuint monkey = mFactory.make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
     mFactory.setParent(monkey, boxID);
 
-    //    factory.makeCube();
+    //    mFactory.makeCube();
     //    temp->mMatrix.scale(0.5f);
     //    temp->mMatrix.translate(3.f, 2.f, -2.f);
 
@@ -142,6 +138,9 @@ void RenderWindow::init() {
     mRenderer = new RenderSystem(mFactory.getShaders());
     mMoveSys = new MovementSystem(&mFactory.getTransforms());
     mMainWindow->insertGameObjects(mFactory.getGameObjectIndex());
+    mMoveSys->setPosition(monkey, gsl::Vector3D(1.3f, 1.3f, -3.5f));
+    mMoveSys->setScale(monkey, gsl::Vector3D(0.5f, 0.5f, 0.5f));
+    mMoveSys->setPosition(boxID, gsl::Vector3D(-3.3f, 7.3f, -3.5f));
 }
 
 ResourceManager &RenderWindow::factory() const {
