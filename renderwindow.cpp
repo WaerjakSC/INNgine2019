@@ -327,20 +327,20 @@ void RenderWindow::handleInput() {
             mCurrentCamera->updateHeight(-mCameraSpeed);
         if (mInput->E)
             mCurrentCamera->updateHeight(mCameraSpeed);
-    } /* else { // Doesn't work atm, need to fix transformcomponents and stuff
+    } else { // Doesn't work atm, need to fix transformcomponents and stuff
         if (mInput->W)
-            mLight->mMatrix.translateZ(-mCameraSpeed);
+            mMoveSys->moveZ(mLight, -mCameraSpeed);
         if (mInput->S)
-            mLight->mMatrix.translateZ(mCameraSpeed);
+            mMoveSys->moveZ(mLight, mCameraSpeed);
         if (mInput->D)
-            mLight->mMatrix.translateX(mCameraSpeed);
+            mMoveSys->moveX(mLight, mCameraSpeed);
         if (mInput->A)
-            mLight->mMatrix.translateX(-mCameraSpeed);
+            mMoveSys->moveX(mLight, -mCameraSpeed);
         if (mInput->Q)
-            mLight->mMatrix.translateY(mCameraSpeed);
+            mMoveSys->moveY(mLight, mCameraSpeed);
         if (mInput->E)
-            mLight->mMatrix.translateY(-mCameraSpeed);
-    }*/
+            mMoveSys->moveY(mLight, -mCameraSpeed);
+    }
 }
 
 void RenderWindow::mousePressEvent(QMouseEvent *event) {

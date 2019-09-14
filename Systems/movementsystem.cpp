@@ -17,8 +17,19 @@ void MovementSystem::update() {
 
 void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
     transpool->get(eID)->mMatrixOutdated = true;
-
     transpool->get(eID)->mPosition = position;
+}
+void MovementSystem::moveX(int eID, float xIn) {
+    transpool->get(eID)->mMatrixOutdated = true;
+    transpool->get(eID)->mPosition.x += xIn;
+}
+void MovementSystem::moveY(int eID, float yIn) {
+    transpool->get(eID)->mMatrixOutdated = true;
+    transpool->get(eID)->mPosition.y += yIn;
+}
+void MovementSystem::moveZ(int eID, float zIn) {
+    transpool->get(eID)->mMatrixOutdated = true;
+    transpool->get(eID)->mPosition.z += zIn;
 }
 
 void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {

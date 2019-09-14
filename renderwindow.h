@@ -50,7 +50,6 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    std::vector<GameObject *> mGameObjects;
     RenderSystem *mRenderer;
     MovementSystem *mMoveSys;
     ResourceManager &mFactory;

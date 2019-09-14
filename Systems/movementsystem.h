@@ -16,6 +16,10 @@ public:
     gsl::Matrix4x4 multiplyByParent(int eID, int pID);
     void updateMatrix();
 
+    void moveX(int eID, float xIn);
+    void moveY(int eID, float yIn);
+    void moveZ(int eID, float zIn);
+
 private:
     Pool<TransformComponent> *transpool;
 };
