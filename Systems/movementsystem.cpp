@@ -8,11 +8,9 @@ void MovementSystem::update() {
     for (size_t i = 0; i < transpool->size(); i++) {
         if (transpool->getComponents().at(i)->mMatrixOutdated) {
             transpool->getComponents().at(i)->updateMatrix();
-        }
-    }
-    for (size_t i = 0; i < transpool->size(); i++) {
-        if (transpool->getComponents().at(i)->parentID != -1) {
-            multiplyByParent(transpool->getEntityList().at(i), transpool->getComponents().at(i)->parentID);
+            if (transpool->getComponents().at(i)->parentID != -1) {
+                transpool->getComponents().at(i)->matrix() = multiplyByParent(transpool->getEntityList().at(i), transpool->getComponents().at(i)->parentID);
+            }
         }
     }
 }
@@ -41,10 +39,5 @@ void MovementSystem::setRotation(int eID, gsl::Vector3D rotation) {
 }
 
 gsl::Matrix4x4 MovementSystem::multiplyByParent(int eID, int pID) {
-    if (transpool->get(pID)->parentID != -1)
-        return multiplyByParent(eID, transpool->get(pID)->parentID);
-    else {
-        gsl::Matrix4x4 tempMatrix = *transpool->get(eID)->matrix() * *transpool->get(pID)->matrix();
-        return tempMatrix;
-    }
+    return transpool->get(pID)->matrix() * transpool->get(eID)->matrix();
 }

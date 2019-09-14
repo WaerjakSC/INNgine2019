@@ -374,7 +374,6 @@ GLuint ResourceManager::makeSkyBox() {
     skyMat->setShader(Tex);
 
     skyMat->setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
-    mTransforms.get(eID)->matrix()->scale(15.f);
     MeshComponent *skyMesh = mMeshes.get(eID);
     skyMesh->mVerticeCount = mMeshData.mVertices.size();
     skyMesh->mIndiceCount = mMeshData.mIndices.size();
@@ -432,7 +431,6 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
-    mTransforms.get(eID)->matrix()->translate(4.f, 0.f, -3.5f);
     MaterialComponent *billBoardMat = mMaterials.get(eID);
     billBoardMat->setTextureUnit(Textures["hund.bmp"]->id() - 1);
     billBoardMat->setShader(Tex);
@@ -466,7 +464,7 @@ GLuint ResourceManager::makeOctBall(int n) {
 
     makeUnitOctahedron(mRecursions);
 
-    mTransforms.get(eID)->matrix()->scale(0.5f, 0.5f, 0.5f);
+    //    mTransforms.get(eID)->matrix().scale(0.5f, 0.5f, 0.5f);
     MeshComponent *OctMesh = mMeshes.get(eID);
     OctMesh->mVerticeCount = mMeshData.mVertices.size();
     OctMesh->mIndiceCount = mMeshData.mIndices.size();
@@ -510,8 +508,6 @@ GLuint ResourceManager::makeLightObject() {
                                1, 3, 2,
                                3, 0, 2,
                                0, 3, 1});
-    mTransforms.get(eID)->matrix()->translate(2.5f, 3.f, 0.f);
-    mTransforms.get(eID)->matrix()->rotateY(180.f);
 
     MaterialComponent *lightMat = mMaterials.get(eID);
     lightMat->setTextureUnit(Textures["white.bmp"]->id() - 1);

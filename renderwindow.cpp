@@ -19,6 +19,7 @@
 #include "Systems/movementsystem.h"
 #include "Systems/rendersystem.h"
 #include "lightobject.h"
+typedef gsl::Vector3D vec3;
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false), mFactory(ResourceManager::instance()), mMainWindow(mainWindow) {
@@ -111,8 +112,8 @@ void RenderWindow::init() {
     //********************** Making the objects to be drawn **********************
     // Nothing will render for now, but at least the factory can make the objects.
     mFactory.makeXYZ();
-    mFactory.makeSkyBox();
-    mFactory.makeBillBoard();
+    GLuint skybox = mFactory.makeSkyBox();
+    GLuint billboard = mFactory.makeBillBoard();
     mLight = mFactory.makeLightObject();
     //testing triangle surface class
     GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
@@ -127,7 +128,7 @@ void RenderWindow::init() {
 
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
-    mCurrentCamera->setPosition(gsl::Vector3D(1.f, 1.f, 4.4f));
+    mCurrentCamera->setPosition(vec3(1.f, 1.f, 4.4f));
     //    mCurrentCamera->yaw(45.f);
     //    mCurrentCamera->pitch(5.f);
 
@@ -138,9 +139,13 @@ void RenderWindow::init() {
     mRenderer = new RenderSystem(mFactory.getShaders());
     mMoveSys = new MovementSystem(&mFactory.getTransforms());
     mMainWindow->insertGameObjects(mFactory.getGameObjectIndex());
-    mMoveSys->setPosition(monkey, gsl::Vector3D(1.3f, 1.3f, -3.5f));
-    mMoveSys->setScale(monkey, gsl::Vector3D(0.5f, 0.5f, 0.5f));
-    mMoveSys->setPosition(boxID, gsl::Vector3D(-3.3f, 7.3f, -3.5f));
+    mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
+    mMoveSys->setPosition(mLight, 2.5f, 3.f, 0.f);
+    mMoveSys->setRotation(mLight, vec3(0.0f, 180.f, 0.0f));
+    mMoveSys->setPosition(billboard, vec3(4.f, 0.f, -3.5f));
+    mMoveSys->setScale(skybox, 15);
+    mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
+    mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
 }
 
 ResourceManager &RenderWindow::factory() const {
@@ -167,8 +172,8 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mRenderer->render();
     mMoveSys->update();
+    mRenderer->render();
 
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time

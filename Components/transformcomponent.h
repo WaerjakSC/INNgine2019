@@ -10,7 +10,7 @@ public:
     virtual void update(float dt = 0.0f);
     bool mMatrixOutdated{true};
 
-    gsl::Matrix4x4 *matrix();
+    gsl::Matrix4x4 &matrix();
 
     gsl::Vector3D mPosition{0};
     gsl::Vector3D mRotation{0};

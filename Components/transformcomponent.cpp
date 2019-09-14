@@ -8,14 +8,12 @@ TransformComponent::TransformComponent() {
 void TransformComponent::update(float dt) {
 }
 
-gsl::Matrix4x4 *TransformComponent::matrix() {
+gsl::Matrix4x4 &TransformComponent::matrix() {
     if (mMatrixOutdated) {
         updateMatrix();
     }
-    return &mMatrix;
+    return mMatrix;
 }
-
-
 
 void TransformComponent::updateMatrix() {
     if (mMatrixOutdated) {
