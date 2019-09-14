@@ -22,6 +22,9 @@ public:
     ~MainWindow();
 
     void insertGameObjects(std::vector<int> entities);
+    QAction *makeCube;
+signals:
+    void made3DObject();
 public slots:
     void onGameObjectsChanged();
 private slots:
@@ -32,6 +35,8 @@ private slots:
     void onParentChanged(const QModelIndex &index);
 
     void onGameObjectDragged(const QString &text);
+
+    void make3DCube();
 
 private:
     void init();

@@ -4,7 +4,7 @@ RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(sh
     factory = &ResourceManager::instance();
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
 
-    std::tie(mViableEntities, transforms, mats, meshes) = (factory->getRenderView()->getComponents()); // viable entities won't update in this class
+    updateEntities();
     //    connectComponents();
 }
 void RenderSystem::iterateEntities() {
@@ -26,4 +26,7 @@ void RenderSystem::iterateEntities() {
 
 void RenderSystem::render() {
     iterateEntities();
+}
+void RenderSystem::updateEntities() {
+    std::tie(mViableEntities, transforms, mats, meshes) = (factory->getRenderView()->getComponents());
 }

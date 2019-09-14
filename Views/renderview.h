@@ -14,6 +14,7 @@ private:
     Pool<MeshComponent> *meshpool;
     Pool<MaterialComponent> *matpool;
     Pool<TransformComponent> *transpool;
+    std::vector<int> mViableEntities;
     CType getSmallestPool();
 };
 

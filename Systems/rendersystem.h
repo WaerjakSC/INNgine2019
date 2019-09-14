@@ -4,11 +4,14 @@
 #include "resourcemanager.h"
 #include <QOpenGLFunctions_4_1_Core>
 
-class RenderSystem : public QOpenGLFunctions_4_1_Core {
+class RenderSystem : public QObject, public QOpenGLFunctions_4_1_Core {
+    Q_OBJECT
 public:
     RenderSystem(std::map<ShaderType, Shader *> shaders);
 
     void render();
+public slots:
+    void updateEntities();
 
 private:
     ResourceManager *factory{nullptr};

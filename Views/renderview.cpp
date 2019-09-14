@@ -49,11 +49,11 @@ std::tuple<std::vector<int>, std::vector<TransformComponent *>, std::vector<Mate
     std::vector<MeshComponent *> meshes;
     std::vector<MaterialComponent *> mats;
     std::vector<TransformComponent *> transforms;
-    std::vector<int> entities = getViableEntities();
-    for (auto entity : entities) {
+    mViableEntities = getViableEntities();
+    for (auto entity : mViableEntities) {
         transforms.emplace_back(transpool->get(entity));
         mats.emplace_back(matpool->get(entity));
         meshes.emplace_back(meshpool->get(entity));
     }
-    return std::make_tuple(entities, transforms, mats, meshes);
+    return std::make_tuple(mViableEntities, transforms, mats, meshes);
 }

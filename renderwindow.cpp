@@ -18,6 +18,7 @@
 #include "Shaders/textureshader.h"
 #include "Systems/movementsystem.h"
 #include "Systems/rendersystem.h"
+#include "Views/renderview.h"
 #include "lightobject.h"
 typedef gsl::Vector3D vec3;
 
@@ -146,10 +147,7 @@ void RenderWindow::init() {
     mMoveSys->setScale(skybox, 15);
     mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
-}
-
-ResourceManager &RenderWindow::factory() const {
-    return mFactory;
+    connect(mMainWindow, &MainWindow::made3DObject, mRenderer, &RenderSystem::updateEntities);
 }
 
 ///Called each frame - doing the rendering
@@ -198,7 +196,13 @@ void RenderWindow::render() {
 void RenderWindow::updateScene() {
     mFactory.getGameObjects();
 }
+RenderSystem *RenderWindow::renderer() const {
+    return mRenderer;
+}
 
+ResourceManager &RenderWindow::factory() const {
+    return mFactory;
+}
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized
 //exposeEvent is a overridden function from QWindow that we inherit from

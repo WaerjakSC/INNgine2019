@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "GUI/hierarchymodel.h"
+#include "Systems/rendersystem.h"
 #include "innpch.h"
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
@@ -21,6 +22,9 @@ void MainWindow::init() {
     hierarchy = new HierarchyModel();
     ui->SceneHierarchy->setModel(hierarchy);
     hView = ui->SceneHierarchy;
+    QAction *makeCube = new QAction(tr("Make Cube"), this);
+    connect(makeCube, &QAction::triggered, this, &MainWindow::make3DCube);
+    ui->mainToolBar->addAction(makeCube);
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
 
@@ -83,7 +87,10 @@ void MainWindow::init() {
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
 }
-
+void MainWindow::make3DCube() {
+    mRenderWindow->factory().makeCube();
+    emit made3DObject();
+}
 void MainWindow::onParentChanged(const QModelIndex &parent) {
     QString data = hierarchy->data(parent).toString();
     if (data != "") {

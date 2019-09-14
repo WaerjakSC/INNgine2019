@@ -40,6 +40,8 @@ public:
 
     ResourceManager &factory() const;
 
+    RenderSystem *renderer() const;
+
 private slots:
     void render();
     void updateScene();
