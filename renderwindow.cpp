@@ -121,12 +121,8 @@ void RenderWindow::init() {
     //testing triangle surface class
     GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory.getComponent(Material, boxID))->setShader(Color);
-    //one monkey
-    GLuint monkey = mFactory.makeGameObject("Monkey");
-    mFactory.addComponent(Transform);
-    mFactory.addComponent(Material);         // To-do: Make unique functions for each type of component for more precise creation
-    mFactory.addMeshComponent("monkey.obj"); // Showing that you can access the last created gameobject without using an eID
-    static_cast<MaterialComponent *>(mFactory.getComponent(Material))->setShader(Phong);
+    //one monkey -- crashes atm
+    GLuint monkey = mFactory.make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
     mFactory.setParent(monkey, boxID);
 
     //    factory.makeCube();

@@ -497,7 +497,7 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
     GLuint eID = makeGameObject(name);
     addComponent(Transform);
     addComponent(Material);
-    addMeshComponent(name, Mesh);
+    addMeshComponent(name, eID);
     mMaterials.get(eID)->setShader(type);
     return eID;
 }
