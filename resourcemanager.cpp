@@ -154,10 +154,9 @@ void ResourceManager::addComponent(CType type, int eID) {
         qDebug() << "No GameObject with this ID exists or Component already exists.";
 }
 /**
- * @brief ResourceManager::addMeshComponent - If you know the mesh you want at construction
- * i.e. for prefabs and similar
- * @param name
- * @param eID
+ * @brief If you know the mesh you want at construction i.e. for prefabs and similar
+ * @param name - name of the file you want to read
+ * @param eID - entityID
  */
 void ResourceManager::addMeshComponent(std::string name, int eID) {
     if (eID <= -1 || (size_t)eID > mGameObjects.size() - 1) {
