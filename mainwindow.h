@@ -48,6 +48,7 @@ private:
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
     void forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent = QModelIndex());
+    void createActions();
 };
 
 #endif // MAINWINDOW_H

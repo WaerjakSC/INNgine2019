@@ -4,6 +4,7 @@
 #include "innpch.h"
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
+#include <QComboBox>
 #include <QDesktopWidget>
 #include <QStandardItem>
 #include <QSurfaceFormat>
@@ -22,9 +23,9 @@ void MainWindow::init() {
     hierarchy = new HierarchyModel();
     ui->SceneHierarchy->setModel(hierarchy);
     hView = ui->SceneHierarchy;
-    QAction *makeCube = new QAction(tr("Make Cube"), this);
-    connect(makeCube, &QAction::triggered, this, &MainWindow::make3DCube);
-    ui->mainToolBar->addAction(makeCube);
+
+    createActions();
+
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
 
@@ -86,6 +87,16 @@ void MainWindow::init() {
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
+}
+void MainWindow::createActions() {
+    QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
+    QMenu *make3D = gameObject->addMenu(tr("3D Object"));
+    QAction *makeCube = new QAction(tr("Cube"), this);
+    make3D->addAction(makeCube);
+
+    //    ui->mainToolBar->addWidget(objectCreation);
+    ui->mainToolBar->setMovable(false);
+    connect(makeCube, &QAction::triggered, this, &MainWindow::make3DCube);
 }
 void MainWindow::make3DCube() {
     mRenderWindow->factory().makeCube();
