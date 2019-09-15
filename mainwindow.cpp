@@ -83,7 +83,7 @@ void MainWindow::init() {
     //Set size of program in % of available screen
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
-    connect(hierarchy, &QStringListModel::dataChanged, this, &MainWindow::onNameChanged);
+    connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
@@ -97,10 +97,10 @@ void MainWindow::createActions() {
     //    ui->mainToolBar->addWidget(objectCreation);
     ui->mainToolBar->setMovable(false);
     connect(makeCube, &QAction::triggered, this, &MainWindow::make3DCube);
+    connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
 }
 void MainWindow::make3DCube() {
-    mRenderWindow->factory().makeCube();
-    emit made3DObject();
+    emit made3DObject(mRenderWindow->factory().makeCube());
 }
 void MainWindow::onParentChanged(const QModelIndex &parent) {
     QString data = hierarchy->data(parent).toString();
@@ -140,8 +140,11 @@ void MainWindow::onNameChanged(const QModelIndex &index) {
     if (selectedEntity)
         selectedEntity->mName = hierarchy->data(index).toString().toStdString();
 }
-void MainWindow::onGameObjectsChanged() {
-    //    ui->SceneHierarchy
+void MainWindow::onGameObjectsChanged(GLuint entity) {
+    QStandardItem *parentItem = hierarchy->invisibleRootItem();
+    GameObject *object = mRenderWindow->factory().getGameObject(entity);
+    QStandardItem *item = new QStandardItem(QString(QString::fromStdString(object->mName)));
+    parentItem->appendRow(item);
 }
 /**
  * @brief Initial insertion of gameobjects, such as those made in an init function or read from a level file.

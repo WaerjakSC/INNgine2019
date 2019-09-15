@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "gltypes.h"
 #include <QMainWindow>
 #include <QStringListModel>
 
@@ -24,13 +25,13 @@ public:
     void insertGameObjects(std::vector<int> entities);
     QAction *makeCube;
 signals:
-    void made3DObject();
+    void made3DObject(GLuint eID);
 public slots:
-    void onGameObjectsChanged();
 private slots:
     void onGameObjectClicked(const QModelIndex &index);
 
     void onNameChanged(const QModelIndex &index);
+    void onGameObjectsChanged(GLuint entity);
 
     void onParentChanged(const QModelIndex &index);
 
