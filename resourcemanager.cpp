@@ -187,6 +187,7 @@ void ResourceManager::setMesh(std::string name, int eID) {
  */
 void ResourceManager::setParent(int eID, int parentID) {
     mTransforms.get(eID)->parentID = parentID;
+    mTransforms.get(parentID)->addChild(eID);
 }
 /**
  * @brief Get a pointer to the entity with the specified ID.

@@ -159,6 +159,10 @@ void RenderWindow::init() {
     connect(mFactory.getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
 }
 
+MovementSystem *RenderWindow::movement() const {
+    return mMoveSys;
+}
+
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
     //calculate the time since last render-call

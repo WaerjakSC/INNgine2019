@@ -27,3 +27,12 @@ void TransformComponent::updateMatrix() {
         mMatrixOutdated = false;
     }
 }
+
+std::vector<int> TransformComponent::children() const {
+    return mChildren;
+}
+
+void TransformComponent::addChild(const GLuint childID) {
+    mChildren.emplace_back(childID);
+    hasChildren = true;
+}

@@ -2,13 +2,13 @@
 #include "GUI/hierarchymodel.h"
 #include "Systems/rendersystem.h"
 #include "innpch.h"
+#include "movementsystem.h"
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include <QComboBox>
 #include <QDesktopWidget>
 #include <QStandardItem>
 #include <QSurfaceFormat>
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     init();
@@ -117,9 +117,12 @@ void MainWindow::onParentChanged(const QModelIndex &parent) {
     QString data = hierarchy->data(parent).toString();
     if (data != "") {
         int parentID;
+        // Find gameobject in resourcemanager and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
         for (auto entity : mRenderWindow->factory().getGameObjects()) {
             if (QString::fromStdString(entity->mName) == data) {
                 parentID = entity->eID;
+                dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, parentID))->addChild(selectedEntity->eID);
+                mRenderWindow->movement()->iterateChildren(parentID);
                 break;
             }
         }

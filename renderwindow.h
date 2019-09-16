@@ -42,6 +42,8 @@ public:
 
     RenderSystem *renderer() const;
 
+    MovementSystem *movement() const;
+
 private slots:
     void render();
     void updateScene();

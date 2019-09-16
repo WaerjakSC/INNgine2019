@@ -28,8 +28,14 @@ public:
     gsl::Matrix4x4 multiplyByParent(gsl::Matrix4x4 matrixIn);
     void updateMatrix();
 
+    std::vector<int> children() const;
+
+    void addChild(const GLuint childID);
+
 private:
     gsl::Matrix4x4 mMatrix;
+    std::vector<int> mChildren;
+    bool hasChildren{false};
 };
 
 #endif // TRANSFORMCOMPONENT_H
