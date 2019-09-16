@@ -137,9 +137,15 @@ void RenderWindow::init() {
     mFactory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     mFactory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
     mFactory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+
+    // Set up the systems.
     mRenderer = new RenderSystem(mFactory.getShaders());
     mMoveSys = new MovementSystem(&mFactory.getTransforms());
+
+    // Add game objects to the scene hierarchy GUI
     mMainWindow->insertGameObjects(mFactory.getGameObjectIndex());
+
+    // Initial positional setup.
     mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
     mMoveSys->setPosition(mLight, 2.5f, 3.f, 0.f);
     mMoveSys->setRotation(mLight, vec3(0.0f, 180.f, 0.0f));
@@ -147,6 +153,8 @@ void RenderWindow::init() {
     mMoveSys->setScale(skybox, 15);
     mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
+
+    // Set up connections between MainWindow options and related systems.
     connect(mMainWindow, &MainWindow::made3DObject, mFactory.getRenderView(), &RenderView::addEntity);
     connect(mFactory.getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
 }
