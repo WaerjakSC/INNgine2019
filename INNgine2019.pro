@@ -50,11 +50,14 @@ HEADERS += \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
+    soundmanager.h \
+    soundsource.h \
     triangle.h \
     texture.h \
     vertex.h \
     camera.h \
-    gltypes.h
+    gltypes.h \
+    wavfilehandler.h
 #    innpch.h \
 
 
@@ -90,10 +93,13 @@ SOURCES += main.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
+    soundmanager.cpp \
+    soundsource.cpp \
     triangle.cpp \
     texture.cpp \
     vertex.cpp \
-    camera.cpp
+    camera.cpp \
+    wavfilehandler.cpp
 
 FORMS += \
     mainwindow.ui
