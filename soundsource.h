@@ -11,7 +11,8 @@
 #endif
 
 #include <string>
-//#include "vector3d.h"
+
+typedef gsl::Vector3D Vector3;
 
 /// One sound source.
 /**
@@ -45,17 +46,17 @@ public:
     **/
     bool loadWave(std::string filePath);
 
-    void setPosition(gsl::Vector3D newPos);             ///< Sets source position from Vector3.
-    gsl::Vector3D getPosition() {return mPosition;}     ///< Returns source position as Vector3.
-    void setVelocity(gsl::Vector3D newVel);             ///< Sets source velocity from Vector3.
-    gsl::Vector3D getVelocity() {return mVelocity;}     ///< Returns source velocity as Vector3.
+    void setPosition(Vector3 newPos);             ///< Sets source position from Vector3.
+    Vector3 getPosition() {return mPosition;}     ///< Returns source position as Vector3.
+    void setVelocity(Vector3 newVel);             ///< Sets source velocity from Vector3.
+    Vector3 getVelocity() {return mVelocity;}     ///< Returns source velocity as Vector3.
 
 private:
     std::string mName;          ///< The name of the sound source (Not used).
     ALuint mSource;             ///< The sound source.
     ALuint mBuffer;             ///< The data buffer.
-    gsl::Vector3D mPosition;    ///< Vector containing source position.
-    gsl::Vector3D mVelocity;    ///< Vector containing source velocity.
+    Vector3 mPosition;    ///< Vector containing source position.
+    Vector3 mVelocity;    ///< Vector containing source velocity.
     bool checkError(std::string name);
 };
 

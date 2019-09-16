@@ -18,6 +18,7 @@ class MainWindow;
 class LightObject;
 class RenderSystem;
 class MovementSystem;
+class SoundSource;
 
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
@@ -37,12 +38,16 @@ public:
 
     void checkForGLerrors();
     void setCameraSpeed(float value);
+    void soundTest();
 
     ResourceManager &factory() const;
 
     RenderSystem *renderer() const;
 
     MovementSystem *movement() const;
+
+    SoundSource* mStereoSound{};
+
 
 private slots:
     void render();

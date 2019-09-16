@@ -9,6 +9,12 @@
 #include <QTimer>
 #include <chrono>
 
+#include "soundmanager.h"
+#include "soundsource.h"
+#include <iostream>
+#include <thread>   //for sleep_for
+
+
 #include "mainwindow.h"
 
 #include "Assets/Meshes/trianglesurface.h"
@@ -157,6 +163,42 @@ void RenderWindow::init() {
     // Set up connections between MainWindow options and related systems.
     connect(mMainWindow, &MainWindow::made3DObject, mFactory.getRenderView(), &RenderView::addEntity);
     connect(mFactory.getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
+
+    // -----------Sound test-----------
+    //Some sounds...
+
+
+
+    //makes the soundmanager
+    //it is a Singleton!!!
+    SoundManager::getInstance()->init();
+
+    //loads the sounds
+    //Vector - placement - no effect on stereo sound
+    //parameters:
+    //createSource(std::string name, Vector3 pos, std::string filePath, bool loop, float gain)
+
+    /*)
+    mStereoSound = SoundManager::getInstance()->createSource(
+                "Stereo", Vector3(0.0f, 0.0f, 0.0f),
+                "../INNgine2019/Assets/stereo.wav", true, 1.0f);
+
+
+
+    mLaserSound = SoundManager::getInstance()->createSource(
+                "Laser", Vector3(20.0f, 0.0f, 0.0f),
+                "../Sound/Assets/laser.wav", false, 0.7f);
+
+
+    mSong = SoundManager::getInstance()->createSource(
+                "Caravan", Vector3(0.0f, 0.0f, 0.0f),
+                "../Sound/Assets/Caravan_mono.wav", false, 1.0f);
+               */
+
+    mStereoSound = SoundManager::getInstance()->createSource(
+                "Explosion", Vector3(0.0f, 0.0f, 0.0f),
+                "../INNgine2019/Assets/explosion.wav", false, 1.0f);
+
 }
 
 MovementSystem *RenderWindow::movement() const {
@@ -185,6 +227,7 @@ void RenderWindow::render() {
 
     mMoveSys->update();
     mRenderer->render();
+    SoundManager::getInstance()->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
 
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -328,9 +371,25 @@ void RenderWindow::setCameraSpeed(float value) {
         mCameraSpeed = 0.3f;
 }
 
+void RenderWindow::soundTest()
+{
+
+    //plays the sounds
+    mStereoSound->play();
+    mStereoSound->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+   // std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+   // mExplosionSound->play();
+   // std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+   // mLaserSound->play();
+
+}
+
 void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
+    if(mInput->L){
+        soundTest();
+    }
     if (mInput->RMB) {
         if (mInput->W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
@@ -342,8 +401,11 @@ void RenderWindow::handleInput() {
             mCurrentCamera->moveRight(-mCameraSpeed);
         if (mInput->Q)
             mCurrentCamera->updateHeight(-mCameraSpeed);
-        if (mInput->E)
+        if (mInput->E){
             mCurrentCamera->updateHeight(mCameraSpeed);
+            //Must cleanly shut down the soundmanager
+            SoundManager::getInstance()->cleanUp();
+        }
     } else { // Doesn't work atm, need to fix transformcomponents and stuff
         if (mInput->W)
             mMoveSys->moveZ(mLight, -mCameraSpeed);
@@ -395,3 +457,5 @@ void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
     mMouseXlast = event->pos().x();
     mMouseYlast = event->pos().y();
 }
+
+

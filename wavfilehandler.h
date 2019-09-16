@@ -1,7 +1,8 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
 
-#include <cstdint>          //does not work well on mac
+#include <cstdint>    //does not work well on mac
+//#include <stdint.h>     //using this on Mac instead of cstdint. not a totally clean solution
 #include <string>
 #include <cstdio>
 

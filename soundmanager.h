@@ -13,7 +13,8 @@
 #include <string>
 #include <vector>
 #include "soundsource.h"
-// #include "vector3d.h"
+
+typedef gsl::Vector3D Vector3;
 
 /// Class handling OpenAL setup and management of sound sources.
 /**
@@ -24,16 +25,16 @@ class SoundManager
 public:
     struct SoundListener
     {
-        gsl::Vector3D pos;
-        gsl::Vector3D vel;
-        gsl::Vector3D dir;
-        gsl::Vector3D up;
+        Vector3 pos;
+        Vector3 vel;
+        Vector3 dir;
+        Vector3 up;
         SoundListener()
         {
-            pos = gsl::Vector3D(0.0f, 0.0f, 0.0f);
-            vel = gsl::Vector3D(0.0f, 0.0f, 0.0f);
-            dir = gsl::Vector3D(0.0f, 0.0f, 1.0f);
-            up = gsl::Vector3D(0.0f, 1.0f, 0.0f);
+            pos = Vector3(0.0f, 0.0f, 0.0f);
+            vel = Vector3(0.0f, 0.0f, 0.0f);
+            dir = Vector3(0.0f, 0.0f, 1.0f);
+            up = Vector3(0.0f, 1.0f, 0.0f);
             //Could be something like this, if Vector3-class had support support:
             //pos = Vector3::ZERO;
             //vel = Vector3::ZERO;
@@ -61,8 +62,8 @@ public:
         \param File path relative to execution directory.
         \param Boolean to see if sound should loop or not.
     **/
-    SoundSource* createSource(std::string name, gsl::Vector3D pos, std::string filePath = "", bool loop = false, float gain = 1.0);
-    void updateListener(gsl::Vector3D pos, gsl::Vector3D vel, gsl::Vector3D dir, gsl::Vector3D up);
+    SoundSource* createSource(std::string name, Vector3 pos, std::string filePath = "", bool loop = false, float gain = 1.0);
+    void updateListener(Vector3 pos, Vector3 vel, Vector3 dir, Vector3 up);
 
 private:
     SoundManager();                         ///< Private constructor.

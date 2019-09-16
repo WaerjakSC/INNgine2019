@@ -77,7 +77,7 @@ bool SoundManager::checkError()
     return true;
 }
 
-SoundSource* SoundManager::createSource(std::string name, gsl::Vector3D pos, std::string filePath, bool loop, float gain)
+SoundSource* SoundManager::createSource(std::string name, Vector3 pos, std::string filePath, bool loop, float gain)
 {
     SoundSource* tempPtr = new SoundSource(name, loop, gain);
     tempPtr->setPosition(pos);
@@ -86,7 +86,7 @@ SoundSource* SoundManager::createSource(std::string name, gsl::Vector3D pos, std
     return tempPtr;
 }
 
-void SoundManager::updateListener(gsl::Vector3D pos, gsl::Vector3D vel, gsl::Vector3D dir, gsl::Vector3D up)
+void SoundManager::updateListener(Vector3 pos, Vector3 vel, Vector3 dir, Vector3 up)
 {
     ALfloat posVec[3];
     ALfloat velVec[3];
