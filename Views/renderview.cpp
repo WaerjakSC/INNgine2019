@@ -16,40 +16,47 @@ CType RenderView::getSmallestPool() {
         return Material;
     return Mesh;
 }
-std::vector<int> RenderView::getViableEntities() {
-    std::vector<int> viableEntities;
+void RenderView::getViableEntities() {
     std::vector<int> entityList;
-
+    mViableEntities.clear();
     if (getSmallestPool() == Mesh) {
         entityList = meshpool->getEntityList();
         for (auto entity : entityList) {                                                        // Iterate through the dense list of the smallest pool
             if (matpool->has(entityList.at(entity)) && transpool->has(entityList.at(entity))) { // If they exist in the other pools, add that entityID to the list of viable entities
-                viableEntities.push_back(entity);
+                mViableEntities.push_back(entity);
             }
         }
     } else if (getSmallestPool() == Material) {
         entityList = matpool->getEntityList();
         for (auto entity : entityList) {
             if (meshpool->has(entityList.at(entity)) && transpool->has(entityList.at(entity))) {
-                viableEntities.push_back(entity);
+                mViableEntities.push_back(entity);
             }
         }
     } else {
         entityList = transpool->getEntityList();
         for (auto entity : entityList) {
             if (matpool->has(entityList.at(entity)) && meshpool->has(entityList.at(entity))) {
-                viableEntities.push_back(entity);
+                mViableEntities.push_back(entity);
             }
         }
     }
-    return viableEntities;
 }
 
+/**
+ * @brief Update RenderView with the new entity
+ * @param entityID
+ * @return
+ */
+void RenderView::addEntity(int entityID) {
+    mViableEntities.emplace_back(entityID);
+    emit updateSystem(std::make_tuple(entityID, transpool->get(entityID), matpool->get(entityID), meshpool->get(entityID)));
+}
 std::tuple<std::vector<int>, std::vector<TransformComponent *>, std::vector<MaterialComponent *>, std::vector<MeshComponent *>> RenderView::getComponents() {
     std::vector<MeshComponent *> meshes;
     std::vector<MaterialComponent *> mats;
     std::vector<TransformComponent *> transforms;
-    mViableEntities = getViableEntities();
+    getViableEntities();
     for (auto entity : mViableEntities) {
         transforms.emplace_back(transpool->get(entity));
         mats.emplace_back(matpool->get(entity));

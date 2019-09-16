@@ -11,16 +11,17 @@ public:
 
     void render();
 public slots:
-    void updateEntities();
+    void newEntity(std::tuple<int, TransformComponent *, MaterialComponent *, MeshComponent *> entity);
 
 private:
     ResourceManager *factory{nullptr};
     std::vector<int> mViableEntities;
-    std::vector<TransformComponent *> transforms;
-    std::vector<MaterialComponent *> mats;
-    std::vector<MeshComponent *> meshes;
+    std::vector<TransformComponent *> mTransforms;
+    std::vector<MaterialComponent *> mMaterials;
+    std::vector<MeshComponent *> mMeshes;
     std::map<ShaderType, Shader *> mShaders;
     void iterateEntities();
+    void updateEntities();
 };
 
 #endif // RENDERSYSTEM_H

@@ -147,7 +147,8 @@ void RenderWindow::init() {
     mMoveSys->setScale(skybox, 15);
     mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
-    connect(mMainWindow, &MainWindow::made3DObject, mRenderer, &RenderSystem::updateEntities);
+    connect(mMainWindow, &MainWindow::made3DObject, mFactory.getRenderView(), &RenderView::addEntity);
+    connect(mFactory.getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
 }
 
 ///Called each frame - doing the rendering
