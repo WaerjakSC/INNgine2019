@@ -454,8 +454,9 @@ GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = makeGameObject("Ball");
     mMeshData.Clear();
     initializeOpenGLFunctions();
-    addComponent(Mesh, eID);
+    addComponent(Transform, eID);
     addComponent(Material, eID);
+    addComponent(Mesh, eID);
 
     GLint mRecursions = n;
     GLint mIndex = 0;

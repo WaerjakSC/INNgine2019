@@ -47,7 +47,9 @@ public:
     GLuint makeSkyBox();
     GLuint makeTriangleSurface(std::string fileName);
     GLuint makeBillBoard();
-    GLuint makeOctBall(int n);
+    GLuint makeOctBall(int n = 3);
+    GLuint makePlane();
+    GLuint makeCube();
     GLuint makeLightObject();
     GLuint make3DObject(std::string name, ShaderType type = Phong);
 
@@ -56,9 +58,6 @@ public:
     std::map<ShaderType, Shader *> getShaders() const;
 
     void setMesh(std::string name, int eID);
-
-    GLuint makePlane();
-    GLuint makeCube();
 
     std::vector<GameObject *> getGameObjects() const;
 

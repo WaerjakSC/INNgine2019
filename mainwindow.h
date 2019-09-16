@@ -23,7 +23,6 @@ public:
     ~MainWindow();
 
     void insertGameObjects(std::vector<int> entities);
-    QAction *makeCube;
 signals:
     void made3DObject(GLuint eID);
 public slots:
@@ -37,7 +36,11 @@ private slots:
 
     void onGameObjectDragged(const QString &text);
 
-    void make3DCube();
+    void makeCube();
+
+    void makeSphere();
+
+    void makePlane();
 
 private:
     void init();

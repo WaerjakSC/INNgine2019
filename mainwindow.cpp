@@ -91,15 +91,26 @@ void MainWindow::init() {
 void MainWindow::createActions() {
     QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
     QMenu *make3D = gameObject->addMenu(tr("3D Object"));
-    QAction *makeCube = new QAction(tr("Cube"), this);
-    make3D->addAction(makeCube);
-
+    QAction *cube = new QAction(tr("Cube"), this);
+    make3D->addAction(cube);
+    QAction *sphere = new QAction(tr("Sphere"), this);
+    make3D->addAction(sphere);
+    QAction *plane = new QAction(tr("Plane"), this);
+    make3D->addAction(plane);
     //    ui->mainToolBar->addWidget(objectCreation);
     ui->mainToolBar->setMovable(false);
-    connect(makeCube, &QAction::triggered, this, &MainWindow::make3DCube);
+    connect(cube, &QAction::triggered, this, &MainWindow::makeCube);
+    connect(sphere, &QAction::triggered, this, &MainWindow::makeSphere);
+    connect(plane, &QAction::triggered, this, &MainWindow::makePlane);
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
 }
-void MainWindow::make3DCube() {
+void MainWindow::makePlane() {
+    emit made3DObject(mRenderWindow->factory().makePlane());
+}
+void MainWindow::makeSphere() {
+    emit made3DObject(mRenderWindow->factory().makeOctBall());
+}
+void MainWindow::makeCube() {
     emit made3DObject(mRenderWindow->factory().makeCube());
 }
 void MainWindow::onParentChanged(const QModelIndex &parent) {
