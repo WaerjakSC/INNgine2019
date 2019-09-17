@@ -59,6 +59,5 @@ CMakeLists.txt.user*
 .DS_Store
 
 #Assets
-*.bmp
 INNgine2019.pro.user
-Assets/Meshes/monkey.obj
+*.wav

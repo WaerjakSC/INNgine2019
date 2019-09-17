@@ -105,35 +105,35 @@ void MainWindow::createActions() {
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
 }
 void MainWindow::makePlane() {
-    emit made3DObject(mRenderWindow->factory().makePlane());
+    emit made3DObject(mRenderWindow->factory()->makePlane());
 }
 void MainWindow::makeSphere() {
-    emit made3DObject(mRenderWindow->factory().makeOctBall());
+    emit made3DObject(mRenderWindow->factory()->makeOctBall());
 }
 void MainWindow::makeCube() {
-    emit made3DObject(mRenderWindow->factory().makeCube());
+    emit made3DObject(mRenderWindow->factory()->makeCube());
 }
 void MainWindow::onParentChanged(const QModelIndex &parent) {
     QString data = hierarchy->data(parent).toString();
     if (data != "") {
         int parentID;
         // Find gameobject in resourcemanager and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-        for (auto entity : mRenderWindow->factory().getGameObjects()) {
+        for (auto entity : mRenderWindow->factory()->getGameObjects()) {
             if (QString::fromStdString(entity->mName) == data) {
                 parentID = entity->eID;
-                dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, parentID))->addChild(selectedEntity->eID);
+                dynamic_cast<TransformComponent *>(mRenderWindow->factory()->getComponent(Transform, parentID))->addChild(selectedEntity->eID);
                 mRenderWindow->movement()->iterateChildren(parentID);
                 break;
             }
         }
         //    // Hooo boy... This sets the parent ID in the dragged entity to be the ID of the entity it was dropped onto.
-        TransformComponent *comp = dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, selectedEntity->eID));
+        TransformComponent *comp = dynamic_cast<TransformComponent *>(mRenderWindow->factory()->getComponent(Transform, selectedEntity->eID));
         if (comp) {
             comp->parentID = parentID;
             qDebug() << "New Parent Name: " + data + ". ID: " + QString::number(comp->parentID);
         }
     } else // Implies the item was dropped to the top node, aka it no longer has a parent. (or rather the parent is the top node which is empty)
-        dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, selectedEntity->eID))->parentID = -1;
+        dynamic_cast<TransformComponent *>(mRenderWindow->factory()->getComponent(Transform, selectedEntity->eID))->parentID = -1;
 }
 void MainWindow::onGameObjectClicked(const QModelIndex &index) {
     QString data = hierarchy->data(index).toString();
@@ -142,7 +142,7 @@ void MainWindow::onGameObjectClicked(const QModelIndex &index) {
     // Implement properties(components) list update here
 }
 void MainWindow::onGameObjectDragged(const QString &text) {
-    for (auto entity : mRenderWindow->factory().getGameObjects()) {
+    for (auto entity : mRenderWindow->factory()->getGameObjects()) {
         if (QString::fromStdString(entity->mName) == text) {
             selectedEntity = entity;
             break;
@@ -156,7 +156,7 @@ void MainWindow::onNameChanged(const QModelIndex &index) {
 }
 void MainWindow::onGameObjectsChanged(GLuint entity) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
-    GameObject *object = mRenderWindow->factory().getGameObject(entity);
+    GameObject *object = mRenderWindow->factory()->getGameObject(entity);
     QStandardItem *item = new QStandardItem(QString(QString::fromStdString(object->mName)));
     parentItem->appendRow(item);
 }
@@ -168,15 +168,15 @@ void MainWindow::insertGameObjects(std::vector<int> entities) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     for (auto entity : entities) {
         if (entity != -1) {
-            GameObject *object = mRenderWindow->factory().getGameObject(entity);
+            GameObject *object = mRenderWindow->factory()->getGameObject(entity);
             QStandardItem *item;
             if (object->mName == "")
                 item = new QStandardItem(QString("GameObject")) /*.arg(idx)*/;
             else
                 item = new QStandardItem(QString(QString::fromStdString(object->mName))) /*.arg(idx)*/;
-            int parentID = dynamic_cast<TransformComponent *>(mRenderWindow->factory().getComponent(Transform, object->eID))->parentID;
+            int parentID = dynamic_cast<TransformComponent *>(mRenderWindow->factory()->getComponent(Transform, object->eID))->parentID;
             if (parentID != -1) {
-                QString parent = QString::fromStdString(mRenderWindow->factory().getGameObject(entities.at(parentID))->mName);
+                QString parent = QString::fromStdString(mRenderWindow->factory()->getGameObject(entities.at(parentID))->mName);
                 forEach(hierarchy, parent, item);
             } else
                 parentItem->appendRow(item);

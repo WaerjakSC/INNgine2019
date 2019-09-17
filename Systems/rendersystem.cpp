@@ -1,7 +1,7 @@
 #include "rendersystem.h"
 #include "Views/renderview.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
-    factory = &ResourceManager::instance();
+    factory = ResourceManager::instance();
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
 
     updateEntities();

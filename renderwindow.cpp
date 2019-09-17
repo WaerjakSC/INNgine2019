@@ -125,8 +125,8 @@ void RenderWindow::init() {
     GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory->getComponent(Material, boxID))->setShader(Color);
     //one gnome
-    GLuint gnome = mFactory->make3DObject("gnome.obj", Phong); // Simple creation of item by using factory
-    mFactory->setParent(gnome, boxID);
+    //    GLuint gnome = mFactory->make3DObject("gnome.obj", Phong); // Simple creation of item by using factory
+    //    mFactory->setParent(gnome, boxID);
 
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
@@ -147,12 +147,12 @@ void RenderWindow::init() {
     mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
 
     // Initial positional setup.
-    mMoveSys->setPosition(gnome, vec3(1.3f, 1.3f, -3.5f));
+    //    mMoveSys->setPosition(gnome, vec3(1.3f, 1.3f, -3.5f));
+    //    mMoveSys->setScale(gnome, vec3(0.1f, 0.1f, 0.1f));
     mMoveSys->setPosition(mLight, 2.5f, 3.f, 0.f);
     mMoveSys->setRotation(mLight, vec3(0.0f, 180.f, 0.0f));
     mMoveSys->setPosition(billboard, vec3(4.f, 0.f, -3.5f));
     mMoveSys->setScale(skybox, 15);
-    mMoveSys->setScale(gnome, vec3(0.1f, 0.1f, 0.1f));
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
 
     // Set up connections between MainWindow options and related systems.
@@ -170,23 +170,23 @@ void RenderWindow::init() {
     /*)
     mStereoSound = mSoundManager->createSource(
                 "Stereo", Vector3(0.0f, 0.0f, 0.0f),
-                "../INNgine2019/Assets/stereo.wav", true, 1.0f);
+                "../INNgine2019/Assets/Sounds/stereo.wav", true, 1.0f);
 
 
 
     mLaserSound = mSoundManager->createSource(
                 "Laser", Vector3(20.0f, 0.0f, 0.0f),
-                "../Sound/Assets/laser.wav", false, 0.7f);
+                "../Sound/Assets/Sounds/laser.wav", false, 0.7f);
 
 
     mSong = mSoundManager->createSource(
                 "Caravan", Vector3(0.0f, 0.0f, 0.0f),
-                "../Sound/Assets/Caravan_mono.wav", false, 1.0f);
+                "../Sound/Assets/Sounds/Caravan_mono.wav", false, 1.0f);
                */
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-        "../INNgine2019/Assets/explosion.wav", false, 1.0f);
+        "../INNgine2019/Assets/Sounds/gnomed.wav", false, 1.0f);
 }
 
 ///Called each frame - doing the rendering
