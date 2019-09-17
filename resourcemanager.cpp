@@ -437,9 +437,9 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
     MaterialComponent *billBoardMat = mMaterials.get(eID);
-    billBoardMat->setTextureUnit(Textures["hund.bmp"]->id() - 1);
+    billBoardMat->setTextureUnit(Textures["gnome.bmp"]->id() - 1);
     billBoardMat->setShader(Tex);
-    billBoardMat->setColor(gsl::Vector3D(0.7f, 0.6f, 0.1f));
+    billBoardMat->setColor(gsl::Vector3D(1.0f, 1.0f, 1.0f));
 
     MeshComponent *billBoardMesh = mMeshes.get(eID);
     billBoardMesh->mVerticeCount = mMeshData.mVertices.size();

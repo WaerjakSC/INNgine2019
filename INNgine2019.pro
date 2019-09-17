@@ -7,7 +7,7 @@ TARGET      = INNgine2019
 
 PRECOMPILED_HEADER = innpch.h
 
-INCLUDEPATH += ./GSL ./Components ./Shaders ./Systems ./Views .\GUI
+INCLUDEPATH += ./GSL ./Components ./Shaders ./Systems ./Views .\GUI .\Sound
 
 win32 {
     INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
@@ -42,6 +42,7 @@ HEADERS += \
     Systems/rendersystem.h \
     Systems/movementsystem.h \
     Views/renderview.h \
+    Sound/soundmanager.h \
     constants.h \
     billboard.h \
     gameobject.h \
@@ -50,7 +51,6 @@ HEADERS += \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
-    soundmanager.h \
     soundsource.h \
     triangle.h \
     texture.h \
@@ -87,13 +87,13 @@ SOURCES += main.cpp \
     Systems/rendersystem.cpp \
     Systems/movementsystem.cpp \
     Views/renderview.cpp \
+    Sound/soundmanager.cpp \
     billboard.cpp \
     gameobject.cpp \
     lightobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
-    soundmanager.cpp \
     soundsource.cpp \
     triangle.cpp \
     texture.cpp \

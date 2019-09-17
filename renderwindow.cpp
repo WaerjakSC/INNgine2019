@@ -105,14 +105,14 @@ void RenderWindow::init() {
     //**********************  Texture stuff: **********************
 
     mFactory->LoadTexture("white.bmp");
-    mFactory->LoadTexture("hund.bmp", 1);
+    mFactory->LoadTexture("gnome.bmp", 1);
     mFactory->LoadTexture("skybox.bmp", 2);
 
     //Set the textures loaded to a texture unit
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("white.bmp")->id());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("hund.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("gnome.bmp")->id());
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("skybox.bmp")->id());
 
