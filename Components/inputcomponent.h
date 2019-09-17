@@ -16,6 +16,7 @@ public:
     bool A{false};
     bool S{false};
     bool D{false};
+    bool L{false};
     bool UP{false}; //Arrow keys
     bool DOWN{false};
     bool LEFT{false};

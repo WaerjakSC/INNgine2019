@@ -125,9 +125,9 @@ void RenderWindow::init() {
     //testing triangle surface class
     GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory.getComponent(Material, boxID))->setShader(Color);
-    //one monkey
-    GLuint monkey = mFactory.make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
-    mFactory.setParent(monkey, boxID);
+    //one gnome
+    GLuint gnome = mFactory.make3DObject("gnome.obj", Phong); // Simple creation of item by using factory
+    mFactory.setParent(gnome, boxID);
 
     //    mFactory.makeCube();
     //    temp->mMatrix.scale(0.5f);
@@ -152,12 +152,12 @@ void RenderWindow::init() {
     mMainWindow->insertGameObjects(mFactory.getGameObjectIndex());
 
     // Initial positional setup.
-    mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
+    mMoveSys->setPosition(gnome, vec3(1.3f, 1.3f, -3.5f));
     mMoveSys->setPosition(mLight, 2.5f, 3.f, 0.f);
     mMoveSys->setRotation(mLight, vec3(0.0f, 180.f, 0.0f));
     mMoveSys->setPosition(billboard, vec3(4.f, 0.f, -3.5f));
     mMoveSys->setScale(skybox, 15);
-    mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
+    mMoveSys->setScale(gnome, vec3(0.1f, 0.1f, 0.1f));
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
 
     // Set up connections between MainWindow options and related systems.
