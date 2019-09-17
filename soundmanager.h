@@ -10,9 +10,9 @@
 #include <OpenAL/alc.h>
 #endif
 
+#include "soundsource.h"
 #include <string>
 #include <vector>
-#include "soundsource.h"
 
 typedef gsl::Vector3D Vector3;
 
@@ -20,17 +20,14 @@ typedef gsl::Vector3D Vector3;
 /**
     Singleton class that creates and destroys sound sources.
 **/
-class SoundManager
-{
+class SoundManager {
 public:
-    struct SoundListener
-    {
+    struct SoundListener {
         Vector3 pos;
         Vector3 vel;
         Vector3 dir;
         Vector3 up;
-        SoundListener()
-        {
+        SoundListener() {
             pos = Vector3(0.0f, 0.0f, 0.0f);
             vel = Vector3(0.0f, 0.0f, 0.0f);
             dir = Vector3(0.0f, 0.0f, 1.0f);
@@ -43,7 +40,7 @@ public:
         }
     };
 
-    static SoundManager* getInstance()          ///< Get pointer to singleton instance.
+    static SoundManager *getInstance() ///< Get pointer to singleton instance.
     {
         if (!mInstance)
             mInstance = new SoundManager();
@@ -62,24 +59,24 @@ public:
         \param File path relative to execution directory.
         \param Boolean to see if sound should loop or not.
     **/
-    SoundSource* createSource(std::string name, Vector3 pos, std::string filePath = "", bool loop = false, float gain = 1.0);
+    SoundSource *createSource(std::string name, Vector3 pos, std::string filePath = "", bool loop = false, float gain = 1.0);
     void updateListener(Vector3 pos, Vector3 vel, Vector3 dir, Vector3 up);
 
 private:
-    SoundManager();                         ///< Private constructor.
-    SoundManager(SoundManager const&);      ///< Private copy constructor.
-    void operator=(SoundManager const&);    ///< Private class assignment operator.
-    static SoundManager* mInstance;         ///< Singleton instance pointer.
+    SoundManager();                       ///< Private constructor.
+    SoundManager(SoundManager const &);   ///< Private copy constructor.
+    void operator=(SoundManager const &); ///< Private class assignment operator.
+    static SoundManager *mInstance;       ///< Singleton instance pointer.
     /// Debug function.
     /**
         Checks for and outputs OpenAL errors.
     **/
     bool checkError();
 
-    ALCdevice* mDevice;                 ///< Pointer to the ALC Device.
-    ALCcontext* mContext;               ///< Pointer to the ALC Context.
+    ALCdevice *mDevice;   ///< Pointer to the ALC Device.
+    ALCcontext *mContext; ///< Pointer to the ALC Context.
 
-    SoundListener mListener;               ///< The listener data structure. (Temporary)
+    SoundListener mListener; ///< The listener data structure. (Temporary)
 };
 
 #endif

@@ -10,6 +10,7 @@
 #include <OpenAL/alc.h>
 #endif
 
+#include "vector3d.h"
 #include <string>
 
 typedef gsl::Vector3D Vector3;
@@ -20,8 +21,7 @@ typedef gsl::Vector3D Vector3;
     Intended to play a single clip.
     Does not support streaming audio (yet).
 **/
-class SoundSource
-{
+class SoundSource {
 public:
     /// Constructor.
     /**
@@ -46,17 +46,17 @@ public:
     **/
     bool loadWave(std::string filePath);
 
-    void setPosition(Vector3 newPos);             ///< Sets source position from Vector3.
-    Vector3 getPosition() {return mPosition;}     ///< Returns source position as Vector3.
-    void setVelocity(Vector3 newVel);             ///< Sets source velocity from Vector3.
-    Vector3 getVelocity() {return mVelocity;}     ///< Returns source velocity as Vector3.
+    void setPosition(Vector3 newPos);           ///< Sets source position from Vector3.
+    Vector3 getPosition() { return mPosition; } ///< Returns source position as Vector3.
+    void setVelocity(Vector3 newVel);           ///< Sets source velocity from Vector3.
+    Vector3 getVelocity() { return mVelocity; } ///< Returns source velocity as Vector3.
 
 private:
-    std::string mName;          ///< The name of the sound source (Not used).
-    ALuint mSource;             ///< The sound source.
-    ALuint mBuffer;             ///< The data buffer.
-    Vector3 mPosition;    ///< Vector containing source position.
-    Vector3 mVelocity;    ///< Vector containing source velocity.
+    std::string mName; ///< The name of the sound source (Not used).
+    ALuint mSource;    ///< The sound source.
+    ALuint mBuffer;    ///< The data buffer.
+    Vector3 mPosition; ///< Vector containing source position.
+    Vector3 mVelocity; ///< Vector containing source velocity.
     bool checkError(std::string name);
 };
 

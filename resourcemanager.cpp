@@ -790,7 +790,7 @@ MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
     }
     if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
-        return 0;
+        return new MeshComponent;
     }
     mMeshMap[fileName] = *mMeshes.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
     return mMeshes.getLast();                // the mesh at the back is the latest creation

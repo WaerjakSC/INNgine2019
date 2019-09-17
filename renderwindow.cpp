@@ -12,8 +12,7 @@
 #include "soundmanager.h"
 #include "soundsource.h"
 #include <iostream>
-#include <thread>   //for sleep_for
-
+#include <thread> //for sleep_for
 
 #include "mainwindow.h"
 
@@ -50,10 +49,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
 }
 
 RenderWindow::~RenderWindow() {
-    for (int i = 0; i < 4; ++i) {
-        //if (mShaderProgram[i])
-        //    delete mShaderProgram[i];
-    }
+    SoundManager::getInstance()->cleanUp();
 }
 
 /// Sets up the general OpenGL stuff and the buffers needed to render a triangle
@@ -167,8 +163,6 @@ void RenderWindow::init() {
     // -----------Sound test-----------
     //Some sounds...
 
-
-
     //makes the soundmanager
     //it is a Singleton!!!
     SoundManager::getInstance()->init();
@@ -196,9 +190,8 @@ void RenderWindow::init() {
                */
 
     mStereoSound = SoundManager::getInstance()->createSource(
-                "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-                "../INNgine2019/Assets/explosion.wav", false, 1.0f);
-
+        "Explosion", Vector3(0.0f, 0.0f, 0.0f),
+        "../INNgine2019/Assets/explosion.wav", false, 1.0f);
 }
 
 MovementSystem *RenderWindow::movement() const {
@@ -371,23 +364,21 @@ void RenderWindow::setCameraSpeed(float value) {
         mCameraSpeed = 0.3f;
 }
 
-void RenderWindow::soundTest()
-{
+void RenderWindow::soundTest() {
 
     //plays the sounds
     mStereoSound->play();
     mStereoSound->setPosition(Vector3(0.0f, 0.0f, 0.0f));
-   // std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-   // mExplosionSound->play();
-   // std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-   // mLaserSound->play();
-
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+    // mExplosionSound->play();
+    // std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    // mLaserSound->play();
 }
 
 void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
-    if(mInput->L){
+    if (mInput->L) {
         soundTest();
     }
     if (mInput->RMB) {
@@ -401,7 +392,7 @@ void RenderWindow::handleInput() {
             mCurrentCamera->moveRight(-mCameraSpeed);
         if (mInput->Q)
             mCurrentCamera->updateHeight(-mCameraSpeed);
-        if (mInput->E){
+        if (mInput->E) {
             mCurrentCamera->updateHeight(mCameraSpeed);
             //Must cleanly shut down the soundmanager
             SoundManager::getInstance()->cleanUp();
@@ -457,5 +448,3 @@ void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
     mMouseXlast = event->pos().x();
     mMouseYlast = event->pos().y();
 }
-
-
