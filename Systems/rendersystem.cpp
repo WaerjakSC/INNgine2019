@@ -1,5 +1,6 @@
 #include "rendersystem.h"
 #include "Views/renderview.h"
+#include "billboard.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     factory = ResourceManager::instance();
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
@@ -13,6 +14,10 @@ void RenderSystem::iterateEntities() {
         mTransforms.at(i)->update();
         initializeOpenGLFunctions();
         ShaderType type = mMaterials.at(i)->getShader();
+        // If entity is a billboard, additionally run the update function for that
+        BillBoard *billboard = dynamic_cast<BillBoard *>(factory->getGameObject(i));
+        if (billboard)
+            billboard->update(mTransforms.at(i), mShaders[type]); // This probably causes some performance problems but idk how else to do this atm
         glUseProgram(mShaders[type]->getProgram());
         mShaders[type]->transmitUniformData(&mTransforms.at(i)->matrix(), &mMaterials.at(i)->material);
         mMaterials.at(i)->update();

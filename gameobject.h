@@ -9,8 +9,6 @@ public:
     GameObject(GLuint ID, std::string name = "");
     ~GameObject();
 
-    gsl::Matrix4x4 mMatrix;
-
     std::string mName;
 
     GLuint eID;

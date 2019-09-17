@@ -2,25 +2,22 @@
 #define BILLBOARD_H
 
 #include "gameobject.h"
-#include "vector3d.h"
 class TransformComponent;
-class MaterialComponent;
+class Shader;
 class BillBoard : public GameObject {
 
 public:
     BillBoard(GLuint eID, std::string name);
-    ~BillBoard();
 
-    virtual void update() override;
-
-    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
+    //    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
 
     void setConstantYUp(bool constantUp);
 
-    void update(MaterialComponent *material, TransformComponent *transform);
+    void update(TransformComponent *transform, Shader *shader);
 
 private:
-    gsl::Vector3D normal{0.f, 0.f, -1.f};
+    using GameObject::update;
+    //    gsl::Vector3D normal{0.f, 0.f, -1.f};
 
     bool mConstantYUp{true};
     bool mNormalVersion{false}; //flip between two ways to calculate forward direction
