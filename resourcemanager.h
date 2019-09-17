@@ -21,7 +21,7 @@ struct meshData {
 };
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
 public:
-    static ResourceManager &instance();
+    static ResourceManager *instance();
     virtual ~ResourceManager();
 
     // Loads and generates shader (takes name and the shader)
@@ -73,6 +73,9 @@ public:
 private:
     // Private constructor
     ResourceManager();
+
+    static ResourceManager *mInstance;
+
     GLuint mNumGameObjects{0};
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;

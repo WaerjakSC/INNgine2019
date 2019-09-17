@@ -28,7 +28,9 @@
 typedef gsl::Vector3D vec3;
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
-    : mContext(nullptr), mInitialized(false), mFactory(ResourceManager::instance()), mMainWindow(mainWindow) {
+    : mContext(nullptr), mInitialized(false),
+      mFactory(ResourceManager::instance()), mSoundManager(SoundManager::instance()),
+      mMainWindow(mainWindow) {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
     setFormat(format);
@@ -49,7 +51,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
 }
 
 RenderWindow::~RenderWindow() {
-    SoundManager::getInstance()->cleanUp();
+    SoundManager::instance()->cleanUp();
 }
 
 /// Sets up the general OpenGL stuff and the buffers needed to render a triangle
@@ -91,43 +93,40 @@ void RenderWindow::init() {
     glEnable(GL_CULL_FACE);               //draws only front side of models - usually what you want -
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
-    mFactory.setMainWindow(mMainWindow);
-
+    mFactory->setMainWindow(mMainWindow);
+    //makes the soundmanager
+    //it is a Singleton!
+    mSoundManager->init();
     //Compile shaders:
-    mFactory.LoadShader(Color);
-    mFactory.LoadShader(Tex);
-    mFactory.LoadShader(Phong);
+    mFactory->LoadShader(Color);
+    mFactory->LoadShader(Tex);
+    mFactory->LoadShader(Phong);
 
     //**********************  Texture stuff: **********************
 
-    mFactory.LoadTexture("white.bmp");
-    mFactory.LoadTexture("hund.bmp", 1);
-    mFactory.LoadTexture("skybox.bmp", 2);
+    mFactory->LoadTexture("white.bmp");
+    mFactory->LoadTexture("hund.bmp", 1);
+    mFactory->LoadTexture("skybox.bmp", 2);
 
     //Set the textures loaded to a texture unit
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mFactory.GetTexture("white.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("white.bmp")->id());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mFactory.GetTexture("hund.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("hund.bmp")->id());
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mFactory.GetTexture("skybox.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("skybox.bmp")->id());
 
     //********************** Making the objects to be drawn **********************
-    // Nothing will render for now, but at least the factory can make the objects.
-    mFactory.makeXYZ();
-    GLuint skybox = mFactory.makeSkyBox();
-    GLuint billboard = mFactory.makeBillBoard();
-    mLight = mFactory.makeLightObject();
-    //testing triangle surface class
-    GLuint boxID = mFactory.makeTriangleSurface("box2.txt");
-    static_cast<MaterialComponent *>(mFactory.getComponent(Material, boxID))->setShader(Color);
-    //one gnome
-    GLuint gnome = mFactory.make3DObject("gnome.obj", Phong); // Simple creation of item by using factory
-    mFactory.setParent(gnome, boxID);
+    mFactory->makeXYZ();
+    GLuint skybox = mFactory->makeSkyBox();
+    GLuint billboard = mFactory->makeBillBoard();
+    mLight = mFactory->makeLightObject();
 
-    //    mFactory.makeCube();
-    //    temp->mMatrix.scale(0.5f);
-    //    temp->mMatrix.translate(3.f, 2.f, -2.f);
+    GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
+    static_cast<MaterialComponent *>(mFactory->getComponent(Material, boxID))->setShader(Color);
+    //one gnome
+    GLuint gnome = mFactory->make3DObject("gnome.obj", Phong); // Simple creation of item by using factory
+    mFactory->setParent(gnome, boxID);
 
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
@@ -136,16 +135,16 @@ void RenderWindow::init() {
     //    mCurrentCamera->pitch(5.f);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    mFactory.GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
-    mFactory.GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    mFactory.GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+    mFactory->GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
+    mFactory->GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
+    mFactory->GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
 
     // Set up the systems.
-    mRenderer = new RenderSystem(mFactory.getShaders());
-    mMoveSys = new MovementSystem(&mFactory.getTransforms());
+    mRenderer = new RenderSystem(mFactory->getShaders());
+    mMoveSys = new MovementSystem(&mFactory->getTransforms());
 
     // Add game objects to the scene hierarchy GUI
-    mMainWindow->insertGameObjects(mFactory.getGameObjectIndex());
+    mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
 
     // Initial positional setup.
     mMoveSys->setPosition(gnome, vec3(1.3f, 1.3f, -3.5f));
@@ -157,15 +156,11 @@ void RenderWindow::init() {
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
 
     // Set up connections between MainWindow options and related systems.
-    connect(mMainWindow, &MainWindow::made3DObject, mFactory.getRenderView(), &RenderView::addEntity);
-    connect(mFactory.getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
+    connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
+    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
 
     // -----------Sound test-----------
     //Some sounds...
-
-    //makes the soundmanager
-    //it is a Singleton!!!
-    SoundManager::getInstance()->init();
 
     //loads the sounds
     //Vector - placement - no effect on stereo sound
@@ -173,40 +168,29 @@ void RenderWindow::init() {
     //createSource(std::string name, Vector3 pos, std::string filePath, bool loop, float gain)
 
     /*)
-    mStereoSound = SoundManager::getInstance()->createSource(
+    mStereoSound = mSoundManager->createSource(
                 "Stereo", Vector3(0.0f, 0.0f, 0.0f),
                 "../INNgine2019/Assets/stereo.wav", true, 1.0f);
 
 
 
-    mLaserSound = SoundManager::getInstance()->createSource(
+    mLaserSound = mSoundManager->createSource(
                 "Laser", Vector3(20.0f, 0.0f, 0.0f),
                 "../Sound/Assets/laser.wav", false, 0.7f);
 
 
-    mSong = SoundManager::getInstance()->createSource(
+    mSong = mSoundManager->createSource(
                 "Caravan", Vector3(0.0f, 0.0f, 0.0f),
                 "../Sound/Assets/Caravan_mono.wav", false, 1.0f);
                */
 
-    mStereoSound = SoundManager::getInstance()->createSource(
+    mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
         "../INNgine2019/Assets/explosion.wav", false, 1.0f);
 }
 
-MovementSystem *RenderWindow::movement() const {
-    return mMoveSys;
-}
-
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
-    //calculate the time since last render-call
-    //this should be the same as xxx in the mRenderTimer->start(xxx) set in RenderWindow::exposeEvent(...)
-    //    auto now = std::chrono::high_resolution_clock::now();
-    //    std::chrono::duration<float> duration = now - mLastTime;
-    //    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
-    //    mLastTime = now;
-
     //input
     handleInput();
 
@@ -220,7 +204,7 @@ void RenderWindow::render() {
 
     mMoveSys->update();
     mRenderer->render();
-    SoundManager::getInstance()->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
+    mSoundManager->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
 
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -235,22 +219,28 @@ void RenderWindow::render() {
     // and wait for vsync.
     //    auto start = std::chrono::high_resolution_clock::now();
     mContext->swapBuffers(this);
-    //    auto end = std::chrono::high_resolution_clock::now();
-    //    std::chrono::duration<float> duration = end - start;
-    //    std::cout << "Chrono deltaTime " << duration.count()*1000 << " ms" << std::endl;
-
-    //    calculateFramerate();
 }
 
 void RenderWindow::updateScene() {
-    mFactory.getGameObjects();
+    mFactory->getGameObjects();
 }
 RenderSystem *RenderWindow::renderer() const {
     return mRenderer;
 }
-
-ResourceManager &RenderWindow::factory() const {
+MovementSystem *RenderWindow::movement() const {
+    return mMoveSys;
+}
+ResourceManager *RenderWindow::factory() const {
     return mFactory;
+}
+
+SoundManager *RenderWindow::soundManager() const {
+    return mSoundManager;
+}
+void RenderWindow::soundTest() {
+    //plays the sounds
+    mStereoSound->play();
+    mStereoSound->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 }
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized
@@ -364,17 +354,6 @@ void RenderWindow::setCameraSpeed(float value) {
         mCameraSpeed = 0.3f;
 }
 
-void RenderWindow::soundTest() {
-
-    //plays the sounds
-    mStereoSound->play();
-    mStereoSound->setPosition(Vector3(0.0f, 0.0f, 0.0f));
-    // std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-    // mExplosionSound->play();
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-    // mLaserSound->play();
-}
-
 void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
@@ -395,7 +374,7 @@ void RenderWindow::handleInput() {
         if (mInput->E) {
             mCurrentCamera->updateHeight(mCameraSpeed);
             //Must cleanly shut down the soundmanager
-            SoundManager::getInstance()->cleanUp();
+            SoundManager::instance()->cleanUp();
         }
     } else { // Doesn't work atm, need to fix transformcomponents and stuff
         if (mInput->W)

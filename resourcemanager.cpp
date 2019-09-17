@@ -8,6 +8,9 @@
 #include "innpch.h"
 #include "lightobject.h"
 #include <QDebug>
+
+ResourceManager *ResourceManager::mInstance = NULL;
+
 ResourceManager::ResourceManager() {
     mRenderView = new RenderView(&mTransforms, &mMaterials, &mMeshes);
 }
@@ -31,10 +34,11 @@ std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
 RenderView *ResourceManager::getRenderView() const {
     return mRenderView;
 }
-ResourceManager &ResourceManager::instance() {
+ResourceManager *ResourceManager::instance() {
 
-    static ResourceManager *mInstance = new ResourceManager();
-    return *mInstance;
+    if (!mInstance)
+        mInstance = new ResourceManager();
+    return mInstance;
 }
 
 // Do resource manager stuff -- Aka actually delete the pointers after application end

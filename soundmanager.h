@@ -40,7 +40,7 @@ public:
         }
     };
 
-    static SoundManager *getInstance() ///< Get pointer to singleton instance.
+    static SoundManager *instance() ///< Get pointer to singleton instance.
     {
         if (!mInstance)
             mInstance = new SoundManager();
