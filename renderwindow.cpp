@@ -186,7 +186,8 @@ void RenderWindow::init() {
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-        "../INNgine2019/Assets/Sounds/gnomed.wav", false, 1.0f);
+        "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
+    soundTest();
 }
 
 ///Called each frame - doing the rendering
@@ -240,7 +241,7 @@ SoundManager *RenderWindow::soundManager() const {
 void RenderWindow::soundTest() {
     //plays the sounds
     mStereoSound->play();
-    mStereoSound->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+    mStereoSound->setPosition(Vector3(4.f, 2.f, -3.5f));
 }
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized
@@ -357,9 +358,9 @@ void RenderWindow::setCameraSpeed(float value) {
 void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
-    if (mInput->L) {
-        soundTest();
-    }
+                                   //    if (mInput->L) {
+                                   //        soundTest();
+                                   //    }
     if (mInput->RMB) {
         if (mInput->W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
@@ -373,8 +374,8 @@ void RenderWindow::handleInput() {
             mCurrentCamera->updateHeight(-mCameraSpeed);
         if (mInput->E) {
             mCurrentCamera->updateHeight(mCameraSpeed);
-            //Must cleanly shut down the soundmanager
-            SoundManager::instance()->cleanUp();
+            //            //Must cleanly shut down the soundmanager
+            //            SoundManager::instance()->cleanUp();
         }
     } else { // Doesn't work atm, need to fix transformcomponents and stuff
         if (mInput->W)
