@@ -27,6 +27,10 @@ public:
 
     gsl::Vector3D forward() const;
 
+    void setPitch(float newPitch);
+    void setYaw(float newYaw);
+    void goTo(gsl::Vector3D target);
+
 private:
     gsl::Vector3D mForward{0.f, 0.f, -1.f};
     gsl::Vector3D mRight{1.f, 0.f, 0.f};

@@ -23,9 +23,11 @@ public:
     ~MainWindow();
 
     void insertGameObjects(std::vector<int> entities);
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 signals:
     void made3DObject(GLuint eID);
-    void doubleClick(GLuint eID);
+    void goToLoc(GLuint eID);
 public slots:
 private slots:
     void onGameObjectClicked(const QModelIndex &index);
@@ -43,7 +45,7 @@ private slots:
 
     void makePlane();
 
-    void onDoubleClickedEntity(const QModelIndex &index);
+    void goToObject();
 
 private:
     void init();

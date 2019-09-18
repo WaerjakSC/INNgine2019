@@ -14,7 +14,32 @@ void Camera::pitch(float degrees) {
     mPitch -= degrees;
     updateForwardVector();
 }
+void Camera::setPitch(float newPitch) {
+    mPitch = newPitch;
+    updateForwardVector();
+}
+void Camera::setYaw(float newYaw) {
+    mPitch = newYaw;
+    updateForwardVector();
+}
+/**
+ * @brief go to location
+ * @param target
+ */
+void Camera::goTo(gsl::Vector3D target) {
+    gsl::Vector3D targetDistance = target;
+    targetDistance.z += 7.f; // Set position a distance away from the target
+    const gsl::Vector3D position = target + targetDistance;
+    const gsl::Vector3D direction = (position - target).normalized();
+    gsl::Matrix4x4 temp;
+    temp.lookAt(position, target, mUp);
+    temp.inverse();
 
+    mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
+    mPitch = gsl::rad2degf(gsl::asin(-direction.y));
+    mPosition = position;
+    updateForwardVector();
+}
 void Camera::yaw(float degrees) {
     // rotate around mUp
     mYaw -= degrees;

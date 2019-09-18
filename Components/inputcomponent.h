@@ -23,6 +23,7 @@ public:
     bool RIGHT{false};
     bool Q{false};
     bool E{false};
+    bool F{false};
     bool C{false};
     bool LSHIFT{false};
     bool SPACE{false};

@@ -191,9 +191,11 @@ void ResourceManager::setMesh(std::string name, int eID) {
  * @param parentID
  */
 void ResourceManager::setParent(int eID, int parentID) {
-    //    mTransforms.get(eID)->mMatrixOutdated = true;
-    mTransforms.get(eID)->parentID = parentID;
-    mTransforms.get(parentID)->addChild(eID);
+    if (mTransforms.get(eID)->parentID != -1) // Make sure to remove the child from its old parent if it had one
+        mTransforms.get(mTransforms.get(eID)->parentID)->removeChild(eID);
+    mTransforms.get(eID)->parentID = parentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
+    if (parentID != -1)
+        mTransforms.get(parentID)->addChild(eID);
 }
 /**
  * @brief Get a pointer to the entity with the specified ID.

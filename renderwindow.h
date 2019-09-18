@@ -50,9 +50,12 @@ public:
     SoundSource *mStereoSound{};
 
     SoundManager *soundManager() const;
-
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 public slots:
     void goToObject(int eID);
+signals:
+    void goToSignal();
 private slots:
     void render();
     void updateScene();
@@ -110,8 +113,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
+
     void wheelEvent(QWheelEvent *event) override;
 };
 

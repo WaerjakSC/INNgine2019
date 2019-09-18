@@ -362,9 +362,9 @@ void RenderWindow::setCameraSpeed(float value) {
 void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
-                                   //    if (mInput->L) {
-                                   //        soundTest();
-                                   //    }
+    if (mInput->F) {
+        emit goToSignal();
+    }
     if (mInput->RMB) {
         if (mInput->W)
             mCurrentCamera->setSpeed(-mCameraSpeed);

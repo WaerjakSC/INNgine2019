@@ -20,6 +20,12 @@ public:
     void moveY(int eID, float yIn);
     void moveZ(int eID, float zIn);
 
+    gsl::Vector3D getPosition(int eID);
+
+    gsl::Vector3D getRelativePosition(int eID);
+
+    bool hasParent(int eID);
+
 private:
     Pool<TransformComponent> *transpool;
 };

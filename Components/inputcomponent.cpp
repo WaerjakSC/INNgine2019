@@ -22,10 +22,12 @@ void InputComponent::keyPressEvent(QKeyEvent *event) {
     {
         mMainWindow->close();
     }
-    if(event->key() == Qt::Key_L){
+    if (event->key() == Qt::Key_L) {
         L = true;
     }
-
+    if (event->key() == Qt::Key_F) {
+        F = true;
+    }
     if (event->key() == Qt::Key_W) {
         W = true;
     }
@@ -71,10 +73,12 @@ void InputComponent::keyReleaseEvent(QKeyEvent *event) {
         W = false;
     }
 
-    if(event->key() == Qt::Key_L){
+    if (event->key() == Qt::Key_L) {
         L = false;
     }
-
+    if (event->key() == Qt::Key_F) {
+        F = false;
+    }
     if (event->key() == Qt::Key_S) {
         S = false;
     }

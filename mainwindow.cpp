@@ -23,6 +23,7 @@ void MainWindow::init() {
     hierarchy = new HierarchyModel();
     ui->SceneHierarchy->setModel(hierarchy);
     hView = ui->SceneHierarchy;
+    hView->setMainWindow(this);
 
     createActions();
 
@@ -87,20 +88,12 @@ void MainWindow::init() {
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
-    // Set up go to object when doubleclicked in hierarchy -- temporary
-    connect(hView, &HierarchyView::doubleClicked, this, &MainWindow::onDoubleClickedEntity);
-    connect(this, &MainWindow::doubleClick, mRenderWindow, &RenderWindow::goToObject);
+    connect(mRenderWindow, &RenderWindow::goToSignal, this, &MainWindow::goToObject);
 }
-void MainWindow::onDoubleClickedEntity(const QModelIndex &index) {
-    QString data = hierarchy->data(index).toString();
-    if (data != "") {
-        // Find gameobject in resourcemanager and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-        for (auto entity : mRenderWindow->factory()->getGameObjects()) {
-            if (QString::fromStdString(entity->mName) == data) { // Checking by name necessitates unique names
-                emit doubleClick(entity->eID);
-            }
-        }
-    }
+
+void MainWindow::goToObject() {
+    if (selectedEntity)
+        mRenderWindow->goToObject(selectedEntity->eID);
 }
 void MainWindow::createActions() {
     QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
@@ -117,6 +110,16 @@ void MainWindow::createActions() {
     connect(sphere, &QAction::triggered, this, &MainWindow::makeSphere);
     connect(plane, &QAction::triggered, this, &MainWindow::makePlane);
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_F)
+        mRenderWindow->keyPressEvent(event);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_F)
+        mRenderWindow->keyReleaseEvent(event);
 }
 void MainWindow::makePlane() {
     emit made3DObject(mRenderWindow->factory()->makePlane());

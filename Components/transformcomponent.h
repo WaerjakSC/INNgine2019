@@ -32,6 +32,7 @@ public:
     std::vector<int> children() const;
 
     void addChild(const GLuint childID);
+    void removeChild(const GLuint childID);
 
 private:
     gsl::Matrix4x4 mMatrix;

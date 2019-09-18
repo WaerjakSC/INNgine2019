@@ -36,3 +36,14 @@ void TransformComponent::addChild(const GLuint childID) {
     mChildren.emplace_back(childID);
     hasChildren = true;
 }
+
+void TransformComponent::removeChild(const GLuint childID) {
+    for (auto child : mChildren) {
+        if (child == (int)childID) {
+            std::swap(child, mChildren.back());
+            mChildren.pop_back();
+        }
+    }
+    if (mChildren.empty())
+        hasChildren = false;
+}

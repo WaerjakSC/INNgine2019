@@ -2,16 +2,14 @@
 #define VECTOR3D_H
 
 #include "gltypes.h"
-#include <cmath>
-#include <iostream>
 #include <QDebug>
 #include <QVector3D>
+#include <cmath>
+#include <iostream>
 
-namespace gsl
-{
+namespace gsl {
 
-class Vector3D
-{
+class Vector3D {
 public:
     //Constructors
     Vector3D(GLfloat x_in = 0.f, GLfloat y_in = 0.f, GLfloat z_in = 0.f);
@@ -19,14 +17,16 @@ public:
     Vector3D(const double v);
 
     //Operators
-    const Vector3D& operator=(const Vector3D &rhs);     // v = v
-    Vector3D operator+(const Vector3D &rhs) const;      // v + v
-    Vector3D operator-(const Vector3D &rhs) const;      // v - v
-    Vector3D& operator+=(const Vector3D &rhs);          // v += v
-    Vector3D& operator-=(const Vector3D &rhs);          // v -= v
+    const Vector3D &operator=(const Vector3D &rhs); // v = v
+    Vector3D operator+(const Vector3D &rhs) const;  // v + v
+    Vector3D operator-(const Vector3D &rhs) const;  // v - v
+    Vector3D &operator+=(const Vector3D &rhs);      // v += v
+    Vector3D &operator-=(const Vector3D &rhs);      // v -= v
     Vector3D operator-() const;                     // -v
     Vector3D operator*(GLfloat rhs) const;          // v * f
-    Vector3D operator^(const Vector3D& rhs) const; // v x v  - cross product
+    Vector3D operator^(const Vector3D &rhs) const;  // v x v  - cross product
+    bool operator==(const Vector3D &compared) const;
+    bool operator!=(const Vector3D &compared) const;
 
     //Functions
     GLfloat length() const;
@@ -53,25 +53,21 @@ public:
     GLfloat *yP();
     GLfloat *zP();
 
-
     //Friend functions
-    friend std::ostream& operator<<(std::ostream &output, const Vector3D &rhs )
-    {
+    friend std::ostream &operator<<(std::ostream &output, const Vector3D &rhs) {
         output << "X = " << rhs.x << ", Y = " << rhs.y << ", Z = " << rhs.z;
         return output;
     }
 
     //OEF: Adding these again to be able to debug easier. cout does not print until program is finished!
-    friend QDebug operator<<(QDebug out, const Vector3D &rhs)
-    {
+    friend QDebug operator<<(QDebug out, const Vector3D &rhs) {
         out << "(" << rhs.x << "," << rhs.y << "," << rhs.z << ")";
-        return  out;
-    }        //    QVector3D getQVector() const;   //for use with qDebug()
+        return out;
+    } //    QVector3D getQVector() const;   //for use with qDebug()
 
-    QVector3D getQVector() const
-    {
+    QVector3D getQVector() const {
         return QVector3D(x, y, z);
-    }   //for use with qDebug()
+    } //for use with qDebug()
 
     //private:  //Making these public to avoid having to do things like setY(getY()+3) etc.
     GLfloat x;
@@ -79,6 +75,6 @@ public:
     GLfloat z;
 };
 
-} //namespace
+} // namespace gsl
 
 #endif // VECTOR3D_H

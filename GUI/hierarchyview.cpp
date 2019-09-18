@@ -1,4 +1,5 @@
 #include "hierarchyview.h"
+#include "mainwindow.h"
 #include <QDebug>
 #include <QDropEvent>
 #include <QMimeData>
@@ -10,4 +11,16 @@ void HierarchyView::dragEnterEvent(QDragEnterEvent *event) {
 }
 void HierarchyView::dropEvent(QDropEvent *event) {
     QTreeView::dropEvent(event);
+}
+void HierarchyView::setMainWindow(MainWindow *window) {
+    mMainWindow = window;
+}
+void HierarchyView::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_F)
+        mMainWindow->keyPressEvent(event);
+}
+
+void HierarchyView::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_F)
+        mMainWindow->keyReleaseEvent(event);
 }

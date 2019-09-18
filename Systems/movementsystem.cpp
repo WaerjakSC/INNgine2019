@@ -4,10 +4,17 @@ MovementSystem::MovementSystem(Pool<TransformComponent> *trans) : transpool(tran
 }
 void MovementSystem::update() {
     for (size_t i = 0; i < transpool->size(); i++) {
-        if (transpool->getComponents().at(i)->mMatrixOutdated) {
-            transpool->getComponents().at(i)->updateMatrix();
-            if (transpool->getComponents().at(i)->parentID != -1) {
-                transpool->getComponents().at(i)->matrix() = multiplyByParent(transpool->getEntityList().at(i), transpool->getComponents().at(i)->parentID);
+        TransformComponent *comp = transpool->getComponents().at(i);
+        if (comp->mMatrixOutdated) {
+            comp->updateMatrix();
+            if (comp->parentID != -1) {
+                comp->matrix() = multiplyByParent(transpool->getEntityList().at(i), comp->parentID);
+                if (comp->mPosition != getPosition(transpool->getEntityList().at(i))) {
+                    comp->mPosition = getPosition(transpool->getEntityList().at(i)); // Position from the multiplied matrix should be the global position.
+                    comp->mMatrixOutdated = true;
+                }
+            } else {
+                comp->mRelativePosition = gsl::Vector3D(0);
             }
         }
     }
@@ -21,32 +28,83 @@ void MovementSystem::iterateChildren(int eID) {
         transpool->get(entity)->mMatrixOutdated = true;
     }
 }
+/**
+ * @brief Get global position of object
+ * @param eID
+ * @return
+ */
+gsl::Vector3D MovementSystem::getPosition(int eID) {
+    if (hasParent(eID)) {
+        GLuint parentID = transpool->get(eID)->parentID;
+        return transpool->get(parentID)->mPosition + transpool->get(eID)->mRelativePosition;
+    }
+    return transpool->get(eID)->mPosition;
+}
+/**
+ * @brief Get relative position of object (null-vector if no parent)
+ * @param eID
+ * @return
+ */
+gsl::Vector3D MovementSystem::getRelativePosition(int eID) {
+    return transpool->get(eID)->mRelativePosition;
+}
+/**
+ * @brief Sets relative position if parented to an object -- otherwise sets global position.
+ * @param eID
+ * @param position
+ */
 void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
     transpool->get(eID)->mMatrixOutdated = true;
-    transpool->get(eID)->mPosition = position;
+    if (hasParent(eID)) {
+        transpool->get(eID)->mRelativePosition = position;
+    } else {
+        transpool->get(eID)->mPosition = position;
+    }
     iterateChildren(eID);
+}
+/**
+ * @brief Sets relative position if parented to an object -- otherwise sets global position.
+ * @param eID
+ * @param position
+ */
+void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {
+    transpool->get(eID)->mMatrixOutdated = true;
+    if (hasParent(eID)) {
+        transpool->get(eID)->mRelativePosition.x = xIn;
+        transpool->get(eID)->mRelativePosition.y = yIn;
+        transpool->get(eID)->mRelativePosition.z = zIn;
+    } else {
+        transpool->get(eID)->mPosition.x = xIn;
+        transpool->get(eID)->mPosition.y = yIn;
+        transpool->get(eID)->mPosition.z = zIn;
+    }
+    iterateChildren(eID);
+}
+bool MovementSystem::hasParent(int eID) {
+    return transpool->get(eID)->parentID != -1;
 }
 void MovementSystem::moveX(int eID, float xIn) {
     transpool->get(eID)->mMatrixOutdated = true;
-    transpool->get(eID)->mPosition.x += xIn;
+    if (hasParent(eID))
+        transpool->get(eID)->mRelativePosition.x += xIn;
+    else
+        transpool->get(eID)->mPosition.x += xIn;
     iterateChildren(eID);
 }
 void MovementSystem::moveY(int eID, float yIn) {
     transpool->get(eID)->mMatrixOutdated = true;
-    transpool->get(eID)->mPosition.y += yIn;
+    if (hasParent(eID))
+        transpool->get(eID)->mRelativePosition.y += yIn;
+    else
+        transpool->get(eID)->mPosition.y += yIn;
     iterateChildren(eID);
 }
 void MovementSystem::moveZ(int eID, float zIn) {
     transpool->get(eID)->mMatrixOutdated = true;
-    transpool->get(eID)->mPosition.z += zIn;
-    iterateChildren(eID);
-}
-
-void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {
-    transpool->get(eID)->mMatrixOutdated = true;
-    transpool->get(eID)->mPosition.x = xIn;
-    transpool->get(eID)->mPosition.y = yIn;
-    transpool->get(eID)->mPosition.z = zIn;
+    if (hasParent(eID))
+        transpool->get(eID)->mRelativePosition.z += zIn;
+    else
+        transpool->get(eID)->mPosition.z += zIn;
     iterateChildren(eID);
 }
 
