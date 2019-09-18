@@ -11,8 +11,8 @@ RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(sh
 // To-do: Render only entities that want to be rendered.
 void RenderSystem::iterateEntities() {
     for (size_t i = 0; i < mViableEntities.size(); i++) {
-        mTransforms.at(i)->update();
         initializeOpenGLFunctions();
+        mTransforms.at(i)->update();
         ShaderType type = mMaterials.at(i)->getShader();
         // If entity is a billboard, additionally run the update function for that
         BillBoard *billboard = dynamic_cast<BillBoard *>(factory->getGameObject(i));
@@ -20,8 +20,8 @@ void RenderSystem::iterateEntities() {
             billboard->update(mTransforms.at(i), mShaders[type]); // This probably causes some performance problems but idk how else to do this atm
         glUseProgram(mShaders[type]->getProgram());
         mShaders[type]->transmitUniformData(&mTransforms.at(i)->matrix(), &mMaterials.at(i)->material);
-        mMaterials.at(i)->update();
         glBindVertexArray(mMeshes.at(i)->mVAO);
+        mMaterials.at(i)->update();
         mMeshes.at(i)->update();
         if (mMeshes.at(i)->mIndiceCount > 0)
             glDrawElements(mMeshes.at(i)->mDrawType, mMeshes.at(i)->mIndiceCount, GL_UNSIGNED_INT, nullptr);

@@ -1,9 +1,7 @@
 #include "movementsystem.h"
 
-MovementSystem::MovementSystem(Pool<TransformComponent> *trans) {
-    transpool = trans;
+MovementSystem::MovementSystem(Pool<TransformComponent> *trans) : transpool(trans) {
 }
-// multiplyByParent doesn't seem to work properly atm -- Implement showing transform component in properties first
 void MovementSystem::update() {
     for (size_t i = 0; i < transpool->size(); i++) {
         if (transpool->getComponents().at(i)->mMatrixOutdated) {
