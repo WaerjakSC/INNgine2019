@@ -97,6 +97,23 @@ public:
         mEntityList.clear();
         mComponentList.clear();
     }
+    // Comparison operator overloads
+    template <typename Type2>
+    bool operator>(Pool<Type2> &other) {
+        return size() > other.size();
+    }
+    template <typename Type2>
+    bool operator<(Pool<Type2> &other) {
+        return size() < other.size();
+    }
+    template <typename Type2>
+    bool operator>=(Pool<Type2> &other) {
+        return size() >= other.size();
+    }
+    template <typename Type2>
+    bool operator<=(Pool<Type2> &other) {
+        return size() <= other.size();
+    }
 
 private:
     std::vector<int> mEntityIndices; // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList

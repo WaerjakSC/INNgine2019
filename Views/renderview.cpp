@@ -3,18 +3,17 @@ RenderView::RenderView(Pool<TransformComponent> *tf, Pool<MaterialComponent> *ma
     : meshpool(mesh), matpool(mat), transpool(tf) {
 }
 CType RenderView::getSmallestPool() {
-    bool matS{false};
-    size_t smallest = meshpool->size(); // start with the smallest being one of the pools
-    if (matpool->size() < smallest) {   // If it turns out matpool is smaller, set it to that one and set matS to true
-        matS = true;
-        smallest = transpool->size();
-    };
-    if (transpool->size() < smallest) {
-        return Transform;
-    }
-    if (matS)
-        return Material;
-    return Mesh;
+    if (*matpool <= *meshpool) // If material pool is smaller than or equal to mesh pool
+    {
+        if (*matpool <= *transpool) // If also smaller than transpool
+            return Material;
+        else
+            return Transform;           // If not smaller than transpool, transpool must be smallest.
+    } else if (*meshpool <= *transpool) // If material pool is larger than mesh pool, check if mesh pool is smaller than or equal to transform pool
+    {
+        return Mesh;
+    } else
+        return Transform; // If the two above checks fail then just return the transform pool.
 }
 void RenderView::getViableEntities() {
     std::vector<int> entityList;
