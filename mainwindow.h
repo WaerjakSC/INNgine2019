@@ -25,6 +25,7 @@ public:
     void insertGameObjects(std::vector<int> entities);
 signals:
     void made3DObject(GLuint eID);
+    void doubleClick(GLuint eID);
 public slots:
 private slots:
     void onGameObjectClicked(const QModelIndex &index);
@@ -41,6 +42,8 @@ private slots:
     void makeSphere();
 
     void makePlane();
+
+    void onDoubleClickedEntity(const QModelIndex &index);
 
 private:
     void init();

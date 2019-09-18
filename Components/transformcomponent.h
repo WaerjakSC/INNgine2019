@@ -13,6 +13,7 @@ public:
     gsl::Matrix4x4 &matrix();
 
     gsl::Vector3D mPosition{0};
+    gsl::Vector3D mRelativePosition{0};
     gsl::Vector3D mRotation{0};
     gsl::Vector3D mScale{1};
 

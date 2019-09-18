@@ -6,7 +6,6 @@
 #include "Views/renderview.h"
 #include "billboard.h"
 #include "innpch.h"
-#include "lightobject.h"
 #include <QDebug>
 
 ResourceManager *ResourceManager::mInstance = NULL;
@@ -192,6 +191,7 @@ void ResourceManager::setMesh(std::string name, int eID) {
  * @param parentID
  */
 void ResourceManager::setParent(int eID, int parentID) {
+    //    mTransforms.get(eID)->mMatrixOutdated = true;
     mTransforms.get(eID)->parentID = parentID;
     mTransforms.get(parentID)->addChild(eID);
 }
@@ -320,7 +320,7 @@ GLuint ResourceManager::makeXYZ() {
  * @return
  */
 GLuint ResourceManager::makeSkyBox() {
-    GLuint eID = makeGameObject("Cube");
+    GLuint eID = makeGameObject("Skybox");
     addComponent(Transform);
     addComponent(Material);
     addComponent(Mesh);

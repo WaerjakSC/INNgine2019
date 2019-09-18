@@ -223,7 +223,9 @@ void RenderWindow::render() {
     //    auto start = std::chrono::high_resolution_clock::now();
     mContext->swapBuffers(this);
 }
-
+void RenderWindow::goToObject(int eID) {
+    mCurrentCamera->goTo(mMoveSys->getPosition(eID));
+}
 void RenderWindow::updateScene() {
     mFactory->getGameObjects();
 }

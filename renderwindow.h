@@ -51,6 +51,8 @@ public:
 
     SoundManager *soundManager() const;
 
+public slots:
+    void goToObject(int eID);
 private slots:
     void render();
     void updateScene();

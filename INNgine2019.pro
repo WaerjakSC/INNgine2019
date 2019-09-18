@@ -47,7 +47,6 @@ HEADERS += \
     constants.h \
     billboard.h \
     gameobject.h \
-    lightobject.h \
     pool.h \
     renderwindow.h \
     resourcemanager.h \
@@ -92,7 +91,6 @@ SOURCES += main.cpp \
     Sound/soundmanager.cpp \
     billboard.cpp \
     gameobject.cpp \
-    lightobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
