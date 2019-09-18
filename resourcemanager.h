@@ -62,6 +62,7 @@ public:
     std::vector<GameObject *> getGameObjects() const;
 
     Pool<TransformComponent> &getTransforms();
+    Pool<LightComponent> &getLights();
 
     GameObject *getGameObject(int eID);
     void removeGameObject(int eID);
@@ -93,7 +94,7 @@ private:
     Pool<MeshComponent> mMeshes;
     Pool<MaterialComponent> mMaterials;
     Pool<TransformComponent> mTransforms;
-    Pool<LightingComponent> mLights;
+    Pool<LightComponent> mLights;
     Pool<InputComponent> mInputs;
     Pool<PhysicsComponent> mPhysics;
     Pool<SoundComponent> mSounds;

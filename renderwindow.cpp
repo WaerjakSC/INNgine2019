@@ -21,10 +21,10 @@
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
+#include "Systems/lightsystem.h"
 #include "Systems/movementsystem.h"
 #include "Systems/rendersystem.h"
 #include "Views/renderview.h"
-#include "lightobject.h"
 typedef gsl::Vector3D vec3;
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
@@ -125,8 +125,8 @@ void RenderWindow::init() {
     GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory->getComponent(Material, boxID))->setShader(Color);
     //one gnome
-    //    GLuint gnome = mFactory->make3DObject("gnome.obj", Phong); // Simple creation of item by using factory
-    //    mFactory->setParent(gnome, boxID);
+    GLuint gnome = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
+                                                                //    mFactory->setParent(gnome, boxID);
 
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
@@ -137,12 +137,13 @@ void RenderWindow::init() {
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     mFactory->GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     mFactory->GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    mFactory->GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+    PhongShader *phong = static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong));
+    phong->setCurrentCamera(mCurrentCamera);
 
     // Set up the systems.
     mRenderer = new RenderSystem(mFactory->getShaders());
     mMoveSys = new MovementSystem(&mFactory->getTransforms());
-
+    mLightSys = new LightSystem(&mFactory->getLights(), &mFactory->getTransforms(), phong);
     // Add game objects to the scene hierarchy GUI
     mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
 
@@ -205,6 +206,7 @@ void RenderWindow::render() {
 
     mMoveSys->update();
     mRenderer->render();
+    mLightSys->update();
     mSoundManager->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
 
     //Calculate framerate before

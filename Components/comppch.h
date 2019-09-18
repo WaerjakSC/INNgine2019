@@ -3,7 +3,7 @@
 
 // Component headers
 #include "inputcomponent.h"
-#include "lightingcomponent.h"
+#include "lightcomponent.h"
 #include "materialcomponent.h"
 #include "meshcomponent.h"
 #include "physicscomponent.h"

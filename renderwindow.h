@@ -20,7 +20,7 @@ class RenderSystem;
 class MovementSystem;
 class SoundSource;
 class SoundManager;
-
+class LightSystem;
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
 /// We also inherit from QOpenGLFunctions, to get access to the OpenGL functions
@@ -63,6 +63,8 @@ private:
 
     RenderSystem *mRenderer;
     MovementSystem *mMoveSys;
+    LightSystem *mLightSys;
+
     ResourceManager *mFactory;
     SoundManager *mSoundManager;
     GameObject *mPlayer; //the controllable object

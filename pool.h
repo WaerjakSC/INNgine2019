@@ -46,6 +46,8 @@ public:
     const std::vector<int> getEntityIndices() { return mEntityIndices; }
     /**
      * @brief get the component belonging to entity with given ID.
+     * Some minor additional overhead due to going through mEntityIndices first -
+     * if you know you want to use all the entities in the Pool you may want getComponents() instead
      * @param eID
      * @return
      */
@@ -78,10 +80,15 @@ public:
         return false;
     }
     /**
-     * @brief size
-     * @return Size of the dense arrays.
+     * @brief Actual number of components in list.
+     * @return
      */
     size_t size() { return mEntityList.size(); }
+    /**
+     * @brief Size of the sparse array.
+     * @return
+     */
+    size_t extent() { return mEntityIndices.size(); }
     /**
      * @brief Reset the arrays to empty.
      */

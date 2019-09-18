@@ -15,7 +15,7 @@ win32 {
 }
 
 HEADERS += \
-    Components/lightingcomponent.h \
+    Components/lightcomponent.h \
     Components/materialcomponent.h \
     Components/physicscomponent.h \
     Components/soundcomponent.h \
@@ -39,6 +39,7 @@ HEADERS += \
     Components/inputcomponent.h \
     Components/comppch.h \
     Assets/Meshes/trianglesurface.h \
+    Systems/lightsystem.h \
     Systems/rendersystem.h \
     Systems/movementsystem.h \
     Views/renderview.h \
@@ -62,7 +63,7 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
-    Components/lightingcomponent.cpp \
+    Components/lightcomponent.cpp \
     Components/materialcomponent.cpp \
     Components/physicscomponent.cpp \
     Components/soundcomponent.cpp \
@@ -84,6 +85,7 @@ SOURCES += main.cpp \
     Components/meshcomponent.cpp \
     Components/inputcomponent.cpp \
     Assets/Meshes/trianglesurface.cpp \
+    Systems/lightsystem.cpp \
     Systems/rendersystem.cpp \
     Systems/movementsystem.cpp \
     Views/renderview.cpp \

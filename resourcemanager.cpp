@@ -18,7 +18,9 @@ ResourceManager::ResourceManager() {
 std::vector<int> ResourceManager::getGameObjectIndex() const {
     return mGameObjectIndex;
 }
-
+Pool<LightComponent> &ResourceManager::getLights() {
+    return mLights;
+}
 Pool<TransformComponent> &ResourceManager::getTransforms() {
     return mTransforms;
 }
@@ -488,13 +490,11 @@ GLuint ResourceManager::makeOctBall(int n) {
  * @return
  */
 GLuint ResourceManager::makeLightObject() {
-    GLuint eID = mNumGameObjects;
-    ++mNumGameObjects;
-    mGameObjectIndex.emplace_back(mGameObjects.size());
-    mGameObjects.emplace_back(new LightObject(eID, "Light"));
+    GLuint eID = makeGameObject("Light");
     addComponent(Transform);
     addComponent(Material);
     addComponent(Mesh);
+    addComponent(Light);
 
     initializeOpenGLFunctions();
 

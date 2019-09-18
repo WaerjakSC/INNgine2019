@@ -18,16 +18,19 @@ struct LightData {
 
 /**
  * @brief The LightingComponent class holds relevant info for objects that should light the environment
- * - Inherits from MaterialComponent, use the same slot (aka don't make one lightingcomp and one materialcomp)
  */
-class LightingComponent : public Component {
+class LightComponent : public Component {
 public:
-    LightingComponent();
+    LightComponent();
     virtual void update(float dt);
 
     //    void draw(gsl::Matrix4x4 &mMatrix);
 
     //    void setColor(const gsl::Vector3D &color);
+
+    LightData getLight() const;
+
+    void setLightColor(const gsl::Vector3D &color);
 
 private:
     LightData light;

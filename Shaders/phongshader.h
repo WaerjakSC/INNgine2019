@@ -8,9 +8,7 @@ public:
     PhongShader(const std::string shaderName, const GLchar *geometryPath = nullptr);
     virtual ~PhongShader() override;
 
-    void transmitUniformData(gsl::Matrix4x4 *modelMatrix, LightData *light) override;
-
-    //    void setLight(Light *light);
+    void updateLightUniforms(gsl::Matrix4x4 *modelMatrix, const LightData &light);
 
 private:
     //    GLint textureUniform{-1};
