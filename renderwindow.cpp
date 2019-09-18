@@ -124,9 +124,9 @@ void RenderWindow::init() {
 
     GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
     static_cast<MaterialComponent *>(mFactory->getComponent(Material, boxID))->setShader(Color);
-    //one gnome
-    GLuint gnome = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
-                                                                //    mFactory->setParent(gnome, boxID);
+    //one monkey
+    GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
+    mFactory->setParent(monkey, boxID);
 
     //********************** Set up camera **********************
     mCurrentCamera = new Camera();
@@ -148,8 +148,8 @@ void RenderWindow::init() {
     mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
 
     // Initial positional setup.
-    //    mMoveSys->setPosition(gnome, vec3(1.3f, 1.3f, -3.5f));
-    //    mMoveSys->setScale(gnome, vec3(0.1f, 0.1f, 0.1f));
+    mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
+    mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
     mMoveSys->setPosition(mLight, 2.5f, 3.f, 0.f);
     mMoveSys->setRotation(mLight, vec3(0.0f, 180.f, 0.0f));
     mMoveSys->setPosition(billboard, vec3(4.f, 0.f, -3.5f));
