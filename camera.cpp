@@ -27,13 +27,9 @@ void Camera::setYaw(float newYaw) {
  * @param target
  */
 void Camera::goTo(gsl::Vector3D target) {
-    gsl::Vector3D targetDistance = target;
-    targetDistance.z += 7.f; // Set position a distance away from the target
+    gsl::Vector3D targetDistance{0, 0, 5};
     const gsl::Vector3D position = target + targetDistance;
     const gsl::Vector3D direction = (position - target).normalized();
-    gsl::Matrix4x4 temp;
-    temp.lookAt(position, target, mUp);
-    temp.inverse();
 
     mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
     mPitch = gsl::rad2degf(gsl::asin(-direction.y));
