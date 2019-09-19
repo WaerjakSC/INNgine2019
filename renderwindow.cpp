@@ -123,6 +123,12 @@ void RenderWindow::init() {
     mLightSys = std::make_shared<LightSystem>(mFactory->transformPool(), static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong)));
     mFactory->setLightSystem(mLightSys);
 
+    //********************** Set up camera **********************
+    mCurrentCamera = new Camera();
+    mCurrentCamera->setPosition(vec3(1.f, 1.f, 4.4f));
+    //    mCurrentCamera->yaw(45.f);
+    //    mCurrentCamera->pitch(5.f);
+
     //********************** Making the objects to be drawn **********************
     mFactory->makeXYZ();
     GLuint skybox = mFactory->makeSkyBox();
@@ -134,12 +140,6 @@ void RenderWindow::init() {
     //one monkey
     GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
     mFactory->setParent(monkey, boxID);
-
-    //********************** Set up camera **********************
-    mCurrentCamera = new Camera();
-    mCurrentCamera->setPosition(vec3(1.f, 1.f, 4.4f));
-    //    mCurrentCamera->yaw(45.f);
-    //    mCurrentCamera->pitch(5.f);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     mFactory->GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
@@ -235,9 +235,6 @@ RenderSystem *RenderWindow::renderer() const {
 }
 MovementSystem *RenderWindow::movement() const {
     return mMoveSys.get();
-}
-ResourceManager *RenderWindow::factory() const {
-    return mFactory;
 }
 
 SoundManager *RenderWindow::soundManager() const {
@@ -379,10 +376,8 @@ void RenderWindow::handleInput() {
             mCurrentCamera->updateHeight(-mCameraSpeed);
         if (mInput->E) {
             mCurrentCamera->updateHeight(mCameraSpeed);
-            //            //Must cleanly shut down the soundmanager
-            //            SoundManager::instance()->cleanUp();
         }
-    } else { // Doesn't work atm, need to fix transformcomponents and stuff
+    } else {
         if (mInput->W)
             mMoveSys->moveZ(mLight, -mCameraSpeed);
         if (mInput->S)

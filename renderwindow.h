@@ -41,8 +41,6 @@ public:
     void setCameraSpeed(float value);
     void soundTest();
 
-    ResourceManager *factory() const;
-
     RenderSystem *renderer() const;
 
     MovementSystem *movement() const;
@@ -54,11 +52,11 @@ public:
     void keyReleaseEvent(QKeyEvent *event) override;
 public slots:
     void goToObject(int eID);
-signals:
-    void goToSignal();
 private slots:
     void render();
     void updateScene();
+signals:
+    void goToSignal();
 
 private:
     void init();
