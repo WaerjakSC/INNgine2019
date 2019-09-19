@@ -66,8 +66,8 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    RenderSystem *mRenderer;
-    MovementSystem *mMoveSys;
+    std::unique_ptr<RenderSystem> mRenderer;
+    std::unique_ptr<MovementSystem> mMoveSys;
     std::shared_ptr<LightSystem> mLightSys;
 
     ResourceManager *mFactory;

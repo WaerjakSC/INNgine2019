@@ -118,8 +118,8 @@ void RenderWindow::init() {
     glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("skybox.bmp")->id());
 
     // Set up the systems.
-    mRenderer = new RenderSystem(mFactory->getShaders());
-    mMoveSys = new MovementSystem(mFactory->transformPool());
+    mRenderer = std::make_unique<RenderSystem>(mFactory->getShaders());
+    mMoveSys = std::make_unique<MovementSystem>(mFactory->transformPool());
     mLightSys = std::make_shared<LightSystem>(mFactory->transformPool(), static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong)));
     mFactory->setLightSystem(mLightSys);
 
@@ -159,7 +159,7 @@ void RenderWindow::init() {
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
     // Set up connections between MainWindow options and related systems.
     connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
-    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);
+    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer.get(), &RenderSystem::newEntity);
 
     // -----------Sound test-----------
     //Some sounds...
@@ -231,10 +231,10 @@ void RenderWindow::updateScene() {
     mFactory->getGameObjects();
 }
 RenderSystem *RenderWindow::renderer() const {
-    return mRenderer;
+    return mRenderer.get();
 }
 MovementSystem *RenderWindow::movement() const {
-    return mMoveSys;
+    return mMoveSys.get();
 }
 ResourceManager *RenderWindow::factory() const {
     return mFactory;
