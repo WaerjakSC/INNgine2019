@@ -38,12 +38,13 @@ HEADERS += \
     Components/meshcomponent.h \
     Components/inputcomponent.h \
     Components/comppch.h \
-    Assets/Meshes/trianglesurface.h \
     Systems/lightsystem.h \
     Systems/rendersystem.h \
     Systems/movementsystem.h \
     Views/renderview.h \
     Sound/soundmanager.h \
+    Sound/soundsource.h \
+    Sound/wavfilehandler.h \
     constants.h \
     billboard.h \
     gameobject.h \
@@ -51,14 +52,11 @@ HEADERS += \
     renderwindow.h \
     resourcemanager.h \
     mainwindow.h \
-    soundsource.h \
     triangle.h \
     texture.h \
     vertex.h \
     camera.h \
-    gltypes.h \
-    wavfilehandler.h
-#    innpch.h \
+    gltypes.h
 
 
 SOURCES += main.cpp \
@@ -83,23 +81,23 @@ SOURCES += main.cpp \
     Components/component.cpp \
     Components/meshcomponent.cpp \
     Components/inputcomponent.cpp \
-    Assets/Meshes/trianglesurface.cpp \
     Systems/lightsystem.cpp \
     Systems/rendersystem.cpp \
     Systems/movementsystem.cpp \
     Views/renderview.cpp \
     Sound/soundmanager.cpp \
+    Sound/soundsource.cpp \
+    Sound/wavfilehandler.cpp \
     billboard.cpp \
     gameobject.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     resourcemanager.cpp \
-    soundsource.cpp \
     triangle.cpp \
     texture.cpp \
     vertex.cpp \
-    camera.cpp \
-    wavfilehandler.cpp
+    camera.cpp
+
 
 FORMS += \
     mainwindow.ui
