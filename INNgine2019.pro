@@ -172,3 +172,6 @@ DISTFILES += \
     GSL/README.md \
     README.md \
     Shaders/textureshader.vert
+
+ RESOURCES += \
+ icons.qrc
