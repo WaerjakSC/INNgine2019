@@ -196,17 +196,15 @@ void Matrix4x4::setPosition(GLfloat x, GLfloat y, GLfloat z) {
 Vector3D Matrix4x4::getPosition() {
     return gsl::Vector3D(matrix[3], matrix[7], matrix[11]);
 }
-Vector3D Matrix4x4::getDirection() {
-    return gsl::Vector3D(matrix[2], matrix[6], matrix[10]);
-}
+
 void Matrix4x4::rotateX(GLfloat degrees) {
     GLfloat rad = deg2radf(degrees);
 
     Matrix4x4 temp =
         {
             1.f, 0.f, 0.f, 0.f,
-            0.f, std::cos(rad), std::sin(rad), 0.f,
-            0.f, -std::sin(rad), std::cos(rad), 0.f,
+            0.f, std::cos(rad), -std::sin(rad), 0.f,
+            0.f, std::sin(rad), std::cos(rad), 0.f,
             0.f, 0.f, 0.f, 1.f};
 
     *this = (*this) * temp;
@@ -217,9 +215,9 @@ void Matrix4x4::rotateY(GLfloat degrees) {
 
     Matrix4x4 temp =
         {
-            std::cos(rad), 0.f, -std::sin(rad), 0.f,
+            std::cos(rad), 0.f, std::sin(rad), 0.f,
             0.f, 1.f, 0.f, 0.f,
-            std::sin(rad), 0.f, std::cos(rad), 0.f,
+            -std::sin(rad), 0.f, std::cos(rad), 0.f,
             0.f, 0.f, 0.f, 1.f};
 
     *this = (*this) * temp;
@@ -230,8 +228,8 @@ void Matrix4x4::rotateZ(GLfloat degrees) {
 
     Matrix4x4 temp =
         {
-            std::cos(rad), std::sin(rad), 0.f, 0.f,
-            -std::sin(rad), std::cos(rad), 0.f, 0.f,
+            std::cos(rad), -std::sin(rad), 0.f, 0.f,
+            std::sin(rad), std::cos(rad), 0.f, 0.f,
             0.f, 0.f, 1.f, 0.f,
             0.f, 0.f, 0.f, 1.f};
 
