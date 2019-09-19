@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/img">
-        <file>Assets/Textures/gnomedsplash.jpg</file>
+        <file>Assets/Icons/gnomedsplash.jpg</file>
     </qresource>
 </RCC>

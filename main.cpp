@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
     QSplashScreen *mSplash = new QSplashScreen;
-    mSplash->setPixmap(QPixmap(":/img/Assets/Textures/gnomedsplash.jpg")); // splash picture
+    mSplash->setPixmap(QPixmap(":/img/Assets/Icons/gnomedsplash.jpg")); // splash picture
     mSplash->show();
 
     //Makes the Qt MainWindow and shows it.
