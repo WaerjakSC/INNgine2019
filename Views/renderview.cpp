@@ -1,7 +1,10 @@
 #include "renderview.h"
-RenderView::RenderView(Pool<TransformComponent> *tf, Pool<MaterialComponent> *mat, Pool<MeshComponent> *mesh)
-    : mMeshPool(mesh), mMaterialPool(mat), mTransformPool(tf) {
+
+RenderView::RenderView(std::shared_ptr<Pool<TransformComponent>> tf) : mTransformPool(tf) {
+    mMaterialPool = std::make_unique<Pool<MaterialComponent>>();
+    mMeshPool = std::make_unique<Pool<MeshComponent>>();
 }
+
 CType RenderView::getSmallestPool() {
     if (*mMaterialPool <= *mMeshPool) // If material pool is smaller than or equal to mesh pool
     {
@@ -15,6 +18,7 @@ CType RenderView::getSmallestPool() {
     } else
         return Transform; // If the two above checks fail then just return the transform pool.
 }
+
 std::vector<int> RenderView::getViableEntities() {
     std::vector<int> entityList;
     mViableEntities.clear();
@@ -57,6 +61,13 @@ std::vector<int> RenderView::getViableEntities() {
 void RenderView::addEntity(int entityID) {
     mViableEntities.emplace_back(entityID);
     emit updateSystem(std::make_tuple(entityID, mTransformPool->get(entityID), mMaterialPool->get(entityID), mMeshPool->get(entityID)));
+}
+
+Pool<MeshComponent> *RenderView::getMeshPool() const {
+    return mMeshPool.get();
+}
+Pool<MaterialComponent> *RenderView::getMaterialPool() const {
+    return mMaterialPool.get();
 }
 std::tuple<std::vector<int>, std::vector<TransformComponent *>, std::vector<MaterialComponent *>, std::vector<MeshComponent *>> RenderView::getComponents() {
     std::vector<MeshComponent *> meshes;

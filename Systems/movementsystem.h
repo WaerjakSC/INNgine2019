@@ -2,10 +2,10 @@
 #define MOVEMENTSYSTEM_H
 
 #include "pool.h"
-
+#include <memory>
 class MovementSystem {
 public:
-    MovementSystem(Pool<TransformComponent> *trans);
+    MovementSystem(std::shared_ptr<Pool<TransformComponent>> trans);
     void update();
 
     void setPosition(int eID, gsl::Vector3D position);
@@ -27,7 +27,7 @@ public:
     bool hasParent(int eID);
 
 private:
-    Pool<TransformComponent> *transpool;
+    std::shared_ptr<Pool<TransformComponent>> mTransformPool;
 };
 
 #endif // MOVEMENTSYSTEM_H

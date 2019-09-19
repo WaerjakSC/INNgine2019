@@ -11,7 +11,7 @@
 #include <QTimer>
 #include <QWindow>
 #include <chrono>
-
+#include <memory>
 class QOpenGLContext;
 class Shader;
 class MainWindow;
@@ -68,7 +68,7 @@ private:
 
     RenderSystem *mRenderer;
     MovementSystem *mMoveSys;
-    LightSystem *mLightSys;
+    std::shared_ptr<LightSystem> mLightSys;
 
     ResourceManager *mFactory;
     SoundManager *mSoundManager;

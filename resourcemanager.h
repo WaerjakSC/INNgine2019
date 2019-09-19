@@ -6,8 +6,10 @@
 #include "pool.h"
 #include "texture.h"
 #include <QOpenGLFunctions_4_1_Core>
+#include <memory>
 
 class RenderView;
+class LightSystem;
 class GameObject;
 // Resource manager work in progress
 struct meshData {
@@ -53,16 +55,11 @@ public:
     GLuint makeLightObject();
     GLuint make3DObject(std::string name, ShaderType type = Phong);
 
-    RenderView *getRenderView() const;
-
     std::map<ShaderType, Shader *> getShaders() const;
 
     void setMesh(std::string name, int eID);
 
     std::vector<GameObject *> getGameObjects() const;
-
-    Pool<TransformComponent> &getTransforms();
-    Pool<LightComponent> &getLights();
 
     GameObject *getGameObject(int eID);
     void removeGameObject(int eID);
@@ -70,6 +67,12 @@ public:
     std::vector<int> getGameObjectIndex() const;
 
     void setParent(int eID, int parentID);
+
+    RenderView *getRenderView() const;
+
+    std::shared_ptr<Pool<TransformComponent>> transformPool() const;
+
+    void setLightSystem(const std::shared_ptr<LightSystem> &lightSystem);
 
 private:
     // Private constructor
@@ -89,17 +92,23 @@ private:
     MainWindow *mMainWindow;
     std::vector<int> mGameObjectIndex;      // Holds the sparse array for gameobjects.
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
-
+    // Systems
+    std::shared_ptr<LightSystem> mLightSystem;
     // Component pools
-    Pool<MeshComponent> mMeshes;
-    Pool<MaterialComponent> mMaterials;
-    Pool<TransformComponent> mTransforms;
-    Pool<LightComponent> mLights;
+
+    //============ Partially owned by MovementSystem ============
+    std::shared_ptr<Pool<TransformComponent>> mTransforms;
+
     Pool<InputComponent> mInputs;
     Pool<PhysicsComponent> mPhysics;
     Pool<SoundComponent> mSounds;
+    // Access functions -- The pools below are fully owned by their respective view or system
+    Pool<MeshComponent> *meshPool();
+    Pool<MaterialComponent> *matPool();
+    Pool<LightComponent> *lightPool();
+
     // View class for collecting the components rendersystem needs
-    RenderView *mRenderView; // TODO: Give RenderView Material and MeshComponent pools
+    std::unique_ptr<RenderView> mRenderView; // TODO: Give RenderView Material and MeshComponent pools
 
     // OpenGL init functions
     void initVertexBuffers(MeshComponent *mesh);

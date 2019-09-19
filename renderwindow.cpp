@@ -25,6 +25,7 @@
 #include "Systems/movementsystem.h"
 #include "Systems/rendersystem.h"
 #include "Views/renderview.h"
+
 typedef gsl::Vector3D vec3;
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
@@ -116,6 +117,12 @@ void RenderWindow::init() {
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("skybox.bmp")->id());
 
+    // Set up the systems.
+    mRenderer = new RenderSystem(mFactory->getShaders());
+    mMoveSys = new MovementSystem(mFactory->transformPool());
+    mLightSys = std::make_shared<LightSystem>(mFactory->transformPool(), static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong)));
+    mFactory->setLightSystem(mLightSys);
+
     //********************** Making the objects to be drawn **********************
     mFactory->makeXYZ();
     GLuint skybox = mFactory->makeSkyBox();
@@ -137,13 +144,8 @@ void RenderWindow::init() {
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     mFactory->GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     mFactory->GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    PhongShader *phong = static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong));
-    phong->setCurrentCamera(mCurrentCamera);
+    mFactory->GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
 
-    // Set up the systems.
-    mRenderer = new RenderSystem(mFactory->getShaders());
-    mMoveSys = new MovementSystem(&mFactory->getTransforms());
-    mLightSys = new LightSystem(&mFactory->getLights(), &mFactory->getTransforms(), phong);
     // Add game objects to the scene hierarchy GUI
     mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
 
@@ -155,7 +157,6 @@ void RenderWindow::init() {
     mMoveSys->setPosition(billboard, vec3(4.f, 0.f, -3.5f));
     mMoveSys->setScale(skybox, 15);
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
-
     // Set up connections between MainWindow options and related systems.
     connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
     connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer, &RenderSystem::newEntity);

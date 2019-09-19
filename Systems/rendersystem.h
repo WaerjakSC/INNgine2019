@@ -20,6 +20,7 @@ private:
     std::vector<MaterialComponent *> mMaterials;
     std::vector<MeshComponent *> mMeshes;
     std::map<ShaderType, Shader *> mShaders;
+    bool mOutOfDate{true};
     void iterateEntities();
     void updateEntities();
 };

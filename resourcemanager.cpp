@@ -3,43 +3,20 @@
 #include "Shaders/colorshader.h"
 #include "Shaders/phongshader.h"
 #include "Shaders/textureshader.h"
+#include "Systems/lightsystem.h"
 #include "Views/renderview.h"
 #include "billboard.h"
 #include "innpch.h"
 #include <QDebug>
 
-ResourceManager *ResourceManager::mInstance = NULL;
+ResourceManager *ResourceManager::mInstance = nullptr;
 
 ResourceManager::ResourceManager() {
-    mRenderView = new RenderView(&mTransforms, &mMaterials, &mMeshes);
-}
+    // Initialize shared pointers
+    mTransforms = std::make_shared<Pool<TransformComponent>>();
 
-std::vector<int> ResourceManager::getGameObjectIndex() const {
-    return mGameObjectIndex;
-}
-Pool<LightComponent> &ResourceManager::getLights() {
-    return mLights;
-}
-Pool<TransformComponent> &ResourceManager::getTransforms() {
-    return mTransforms;
-}
-
-std::vector<GameObject *> ResourceManager::getGameObjects() const {
-    return mGameObjects;
-}
-
-std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
-    return Shaders;
-}
-
-RenderView *ResourceManager::getRenderView() const {
-    return mRenderView;
-}
-ResourceManager *ResourceManager::instance() {
-
-    if (!mInstance)
-        mInstance = new ResourceManager();
-    return mInstance;
+    // Set up Views
+    mRenderView = std::make_unique<RenderView>(mTransforms);
 }
 
 // Do resource manager stuff -- Aka actually delete the pointers after application end
@@ -50,6 +27,12 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : Textures) {
         delete texture.second;
     }
+}
+ResourceManager *ResourceManager::instance() {
+
+    if (!mInstance)
+        mInstance = new ResourceManager();
+    return mInstance;
 }
 /**
  * @brief ResourceManager::removeComponent - Remove a component and update tables.
@@ -63,16 +46,16 @@ void ResourceManager::removeComponent(CType type, int eID) {
     if ((size_t)eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
-            mTransforms.remove(eID);
+            mTransforms->remove(eID);
             break;
         case Material:
-            mMaterials.remove(eID);
+            matPool()->remove(eID);
             break;
         case Mesh:
-            mMeshes.remove(eID);
+            meshPool()->remove(eID);
             break;
         case Light:
-            mLights.remove(eID);
+            lightPool()->remove(eID);
             break;
         case Input:
             mInputs.remove(eID);
@@ -96,13 +79,13 @@ Component *ResourceManager::getComponent(CType type, int eID) {
     if ((size_t)eID < mGameObjects.size())
         switch (type) {
         case Transform:
-            return mTransforms.get(eID);
+            return mTransforms->get(eID);
         case Material:
-            return mMaterials.get(eID);
+            return matPool()->get(eID);
         case Mesh:
-            return mMeshes.get(eID);
+            return meshPool()->get(eID);
         case Light:
-            return mLights.get(eID);
+            return lightPool()->get(eID);
         case Input:
             return mInputs.get(eID);
         case Physics:
@@ -133,17 +116,17 @@ void ResourceManager::addComponent(CType type, int eID) {
     if ((size_t)eID < mGameObjects.size()) {
         switch (type) {
         case Transform:
-            mTransforms.add(eID);
+            mTransforms->add(eID);
             break;
         case Material:
-            mMaterials.add(eID);
+            matPool()->add(eID);
             break;
         case Mesh:
             // Creates an empty Mesh object -- for use with hardcoded objects mostly.
-            mMeshes.add(eID);
+            meshPool()->add(eID);
             break;
         case Light:
-            mLights.add(eID);
+            lightPool()->add(eID);
             break;
         case Input:
             mInputs.add(eID);
@@ -173,13 +156,13 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
     if ((size_t)eID < mGameObjects.size()) {
-        mMeshes.get(eID)->copyOpenGLData(*mesh);
+        meshPool()->get(eID)->copyOpenGLData(*mesh);
     }
 }
 void ResourceManager::setMesh(std::string name, int eID) {
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
-        mMeshes.get(eID)->copyOpenGLData(search->second);
+        meshPool()->get(eID)->copyOpenGLData(search->second);
     } else
         LoadMesh(name);
 }
@@ -191,11 +174,11 @@ void ResourceManager::setMesh(std::string name, int eID) {
  * @param parentID
  */
 void ResourceManager::setParent(int eID, int parentID) {
-    if (mTransforms.get(eID)->parentID != -1) // Make sure to remove the child from its old parent if it had one
-        mTransforms.get(mTransforms.get(eID)->parentID)->removeChild(eID);
-    mTransforms.get(eID)->parentID = parentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
+    if (mTransforms->get(eID)->parentID != -1) // Make sure to remove the child from its old parent if it had one
+        mTransforms->get(mTransforms->get(eID)->parentID)->removeChild(eID);
+    mTransforms->get(eID)->parentID = parentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
     if (parentID != -1)
-        mTransforms.get(parentID)->addChild(eID);
+        mTransforms->get(parentID)->addChild(eID);
 }
 /**
  * @brief Get a pointer to the entity with the specified ID.
@@ -241,7 +224,7 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
     addComponent(Transform);
     addComponent(Material);
     addMeshComponent(name, eID);
-    mMaterials.get(eID)->setShader(type);
+    matPool()->get(eID)->setShader(type);
     return eID;
 }
 /**
@@ -264,12 +247,12 @@ GLuint ResourceManager::makePlane() {
     mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, 0.5f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    mMaterials.get(eID)->setShader(Color);
-    mMeshes.get(eID)->mVerticeCount = mMeshData.mVertices.size();
-    mMeshes.get(eID)->mDrawType = GL_TRIANGLES;
+    matPool()->get(eID)->setShader(Color);
+    meshPool()->get(eID)->mVerticeCount = mMeshData.mVertices.size();
+    meshPool()->get(eID)->mDrawType = GL_TRIANGLES;
 
     // set up buffers (equivalent to init() from before)
-    initVertexBuffers(mMeshes.get(eID));
+    initVertexBuffers(meshPool()->get(eID));
     glBindVertexArray(0);
     return eID;
 }
@@ -285,7 +268,7 @@ GLuint ResourceManager::makeCube() {
     setMesh("cube.obj", eID);
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    mMaterials.get(eID)->setShader(Color);
+    matPool()->get(eID)->setShader(Color);
 
     return eID;
 }
@@ -308,12 +291,12 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    mMaterials.get(eID)->setShader(Color);
-    mMeshes.get(eID)->mVerticeCount = mMeshData.mVertices.size();
-    mMeshes.get(eID)->mDrawType = GL_LINES;
+    matPool()->get(eID)->setShader(Color);
+    meshPool()->get(eID)->mVerticeCount = mMeshData.mVertices.size();
+    meshPool()->get(eID)->mDrawType = GL_LINES;
 
     // set up buffers (equivalent to init() from before)
-    initVertexBuffers(mMeshes.get(eID));
+    initVertexBuffers(meshPool()->get(eID));
     glBindVertexArray(0);
     return eID;
 }
@@ -379,11 +362,11 @@ GLuint ResourceManager::makeSkyBox() {
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
 
-    MaterialComponent *skyMat = mMaterials.get(eID);
+    MaterialComponent *skyMat = matPool()->get(eID);
     skyMat->setShader(Tex);
 
     skyMat->setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
-    MeshComponent *skyMesh = mMeshes.get(eID);
+    MeshComponent *skyMesh = meshPool()->get(eID);
     skyMesh->mVerticeCount = mMeshData.mVertices.size();
     skyMesh->mIndiceCount = mMeshData.mIndices.size();
     skyMesh->mDrawType = GL_TRIANGLES;
@@ -440,12 +423,12 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
-    MaterialComponent *billBoardMat = mMaterials.get(eID);
+    MaterialComponent *billBoardMat = matPool()->get(eID);
     billBoardMat->setTextureUnit(Textures["gnome.bmp"]->id() - 1);
     billBoardMat->setShader(Tex);
     billBoardMat->setColor(gsl::Vector3D(1.0f, 1.0f, 1.0f));
 
-    MeshComponent *billBoardMesh = mMeshes.get(eID);
+    MeshComponent *billBoardMesh = meshPool()->get(eID);
     billBoardMesh->mVerticeCount = mMeshData.mVertices.size();
     billBoardMesh->mDrawType = GL_TRIANGLE_STRIP;
 
@@ -475,11 +458,11 @@ GLuint ResourceManager::makeOctBall(int n) {
     makeUnitOctahedron(mRecursions);
 
     //    mTransforms.get(eID)->matrix().scale(0.5f, 0.5f, 0.5f);
-    MeshComponent *OctMesh = mMeshes.get(eID);
+    MeshComponent *OctMesh = meshPool()->get(eID);
     OctMesh->mVerticeCount = mMeshData.mVertices.size();
     OctMesh->mIndiceCount = mMeshData.mIndices.size();
     OctMesh->mDrawType = GL_TRIANGLES;
-    mMaterials.get(eID)->setShader(Color);
+    matPool()->get(eID)->setShader(Color);
 
     initVertexBuffers(OctMesh);
     initIndexBuffers(OctMesh);
@@ -517,12 +500,12 @@ GLuint ResourceManager::makeLightObject() {
                                3, 0, 2,
                                0, 3, 1});
 
-    MaterialComponent *lightMat = mMaterials.get(eID);
+    MaterialComponent *lightMat = matPool()->get(eID);
     lightMat->setTextureUnit(Textures["white.bmp"]->id() - 1);
     lightMat->setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
     lightMat->setShader(Tex);
 
-    MeshComponent *lightMesh = mMeshes.get(eID);
+    MeshComponent *lightMesh = meshPool()->get(eID);
     lightMesh->mVerticeCount = mMeshData.mVertices.size();
     lightMesh->mIndiceCount = mMeshData.mIndices.size();
     lightMesh->mDrawType = GL_TRIANGLES;
@@ -758,7 +741,7 @@ bool ResourceManager::readFile(std::string fileName) {
     //being a nice boy and closing the file after use
     fileIn.close();
 
-    MeshComponent *mesh = mMeshes.getLast();
+    MeshComponent *mesh = meshPool()->getLast();
     mesh->mVerticeCount = mMeshData.mVertices.size();
     mesh->mIndiceCount = mMeshData.mIndices.size();
     mesh->mDrawType = GL_TRIANGLES;
@@ -785,8 +768,8 @@ MeshComponent *ResourceManager::LoadMesh(std::string fileName) {
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return 0;
     }
-    mMeshMap[fileName] = *mMeshes.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
-    return mMeshes.getLast();                // the mesh at the back is the latest creation
+    mMeshMap[fileName] = *meshPool()->getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return meshPool()->getLast();                // the mesh at the back is the latest creation
 }
 
 MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
@@ -798,8 +781,8 @@ MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return new MeshComponent;
     }
-    mMeshMap[fileName] = *mMeshes.getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
-    return mMeshes.getLast();                // the mesh at the back is the latest creation
+    mMeshMap[fileName] = *meshPool()->getLast(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return meshPool()->getLast();                // the mesh at the back is the latest creation
 }
 
 bool ResourceManager::readTriangleFile(std::string fileName) {
@@ -821,7 +804,7 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        MeshComponent *mesh = mMeshes.getLast();
+        MeshComponent *mesh = meshPool()->getLast();
         mesh->mVerticeCount = mMeshData.mVertices.size();
         mesh->mDrawType = GL_TRIANGLES;
         initVertexBuffers(mesh);
@@ -831,6 +814,44 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         return false;
     }
 }
+//=========================== GETTERS ===========================//
+Pool<MeshComponent> *ResourceManager::meshPool() {
+    return mRenderView->getMeshPool();
+}
+Pool<MaterialComponent> *ResourceManager::matPool() {
+    return mRenderView->getMaterialPool();
+}
+Pool<LightComponent> *ResourceManager::lightPool() {
+    return mLightSystem->lightPool();
+}
+std::shared_ptr<Pool<TransformComponent>> ResourceManager::transformPool() const {
+    return mTransforms;
+}
+void ResourceManager::setLightSystem(const std::shared_ptr<LightSystem> &lightSystem) {
+    mLightSystem = lightSystem;
+}
+
+/**
+ * @brief Get a raw pointer to mRenderView -- ResourceManager owns this as a unique_ptr
+ * @return
+ */
+RenderView *ResourceManager::getRenderView() const {
+    return mRenderView.get();
+}
+
+std::vector<int> ResourceManager::getGameObjectIndex() const {
+    return mGameObjectIndex;
+}
+
+std::vector<GameObject *> ResourceManager::getGameObjects() const {
+    return mGameObjects;
+}
+
+std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
+    return Shaders;
+}
+
+//=========================== Octahedron Functions =========================== //
 void ResourceManager::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3) {
     mMeshData.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
     mMeshData.mVertices.push_back(Vertex(v2, v2, gsl::Vector2D(1.f, 0.f)));

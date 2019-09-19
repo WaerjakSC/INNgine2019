@@ -1,17 +1,19 @@
 #ifndef LIGHTSYSTEM_H
 #define LIGHTSYSTEM_H
 #include "pool.h"
-
+#include <memory>
 class PhongShader;
 class LightSystem {
 public:
-    LightSystem(Pool<LightComponent> *lights, Pool<TransformComponent> *transforms, PhongShader *shader);
+    LightSystem(std::shared_ptr<Pool<TransformComponent>> transforms, PhongShader *shader);
 
     void update();
 
+    Pool<LightComponent> *lightPool() const;
+
 private:
-    Pool<LightComponent> *mLightPool;
-    Pool<TransformComponent> *mTransforms;
+    std::unique_ptr<Pool<LightComponent>> mLightPool;
+    std::shared_ptr<Pool<TransformComponent>> mTransformPool;
     PhongShader *mPhong;
 };
 

@@ -4,8 +4,6 @@
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     factory = ResourceManager::instance();
     // To-do: Implement signal/slot behavior to update the list of entities needed to render
-
-    updateEntities();
     //    connectComponents();
 }
 // To-do: Render only entities that want to be rendered.
@@ -31,10 +29,13 @@ void RenderSystem::iterateEntities() {
 }
 
 void RenderSystem::render() {
+    if (mOutOfDate)
+        updateEntities();
     iterateEntities();
 }
 void RenderSystem::updateEntities() {
     std::tie(mViableEntities, mTransforms, mMaterials, mMeshes) = (factory->getRenderView()->getComponents());
+    mOutOfDate = false;
 }
 void RenderSystem::newEntity(std::tuple<int, TransformComponent *, MaterialComponent *, MeshComponent *> entity) {
     mViableEntities.emplace_back(std::get<0>(entity));
