@@ -94,9 +94,9 @@ private:
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
     // Systems
     std::shared_ptr<LightSystem> mLightSystem;
-    // Component pools
 
-    //============ Partially owned by MovementSystem ============
+    // Component pools
+    // Partially owned by MovementSystem
     std::shared_ptr<Pool<TransformComponent>> mTransforms;
 
     Pool<InputComponent> mInputs;
@@ -107,8 +107,8 @@ private:
     Pool<MaterialComponent> *matPool();
     Pool<LightComponent> *lightPool();
 
-    // View class for collecting the components rendersystem needs
-    std::unique_ptr<RenderView> mRenderView; // TODO: Give RenderView Material and MeshComponent pools
+    // View class for collecting the components RenderSystem needs
+    std::unique_ptr<RenderView> mRenderView; // Should this belong to RenderSystem?
 
     // OpenGL init functions
     void initVertexBuffers(MeshComponent *mesh);

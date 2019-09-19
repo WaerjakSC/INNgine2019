@@ -7,7 +7,7 @@
 class GameObject {
 public:
     GameObject(GLuint ID, std::string name = "");
-    ~GameObject();
+    virtual ~GameObject();
 
     std::string mName;
 

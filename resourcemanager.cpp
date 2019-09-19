@@ -27,9 +27,10 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : Textures) {
         delete texture.second;
     }
+    for (auto &entity : mGameObjects)
+        delete entity;
 }
 ResourceManager *ResourceManager::instance() {
-
     if (!mInstance)
         mInstance = new ResourceManager();
     return mInstance;
