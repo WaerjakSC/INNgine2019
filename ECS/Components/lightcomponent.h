@@ -1,7 +1,7 @@
 #ifndef LIGHTINGCOMPONENT_H
 #define LIGHTINGCOMPONENT_H
 
-#include "GSL/gsl_math.h"
+#include "gsl_math.h"
 #include "materialcomponent.h"
 
 struct LightData {

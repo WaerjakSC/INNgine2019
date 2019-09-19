@@ -1,7 +1,7 @@
 
 #include "phongshader.h"
-#include "Components/lightcomponent.h"
 #include "innpch.h"
+#include "lightcomponent.h"
 
 PhongShader::PhongShader(const std::string shaderName, const GLchar *geometryPath)
     : Shader(shaderName, geometryPath) {

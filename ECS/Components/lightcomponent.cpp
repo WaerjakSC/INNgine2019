@@ -1,5 +1,5 @@
 #include "lightcomponent.h"
-#include "Shaders/shader.h"
+#include "shader.h"
 LightComponent::LightComponent() {
     light.mObjectColor = gsl::Vector3D{1.f, 1.f, 1.f};
     mType = CType::Light;

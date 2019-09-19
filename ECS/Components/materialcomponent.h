@@ -1,8 +1,8 @@
 #ifndef MATERIALCOMPONENT_H
 #define MATERIALCOMPONENT_H
 
-#include "Shaders/shader.h"
 #include "component.h"
+#include "shader.h"
 #include "vector3d.h"
 #include <QOpenGLFunctions_4_1_Core>
 

@@ -3,8 +3,8 @@
 
 #include "camera.h"
 
-#include "Components/inputcomponent.h"
 #include "gameobject.h"
+#include "inputcomponent.h"
 #include "resourcemanager.h"
 #include "texture.h"
 #include <QElapsedTimer>

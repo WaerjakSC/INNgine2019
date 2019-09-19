@@ -16,15 +16,14 @@
 
 #include "mainwindow.h"
 
-#include "Assets/Meshes/trianglesurface.h"
-#include "Components/meshcomponent.h"
-#include "Shaders/colorshader.h"
-#include "Shaders/phongshader.h"
-#include "Shaders/textureshader.h"
-#include "Systems/lightsystem.h"
-#include "Systems/movementsystem.h"
-#include "Systems/rendersystem.h"
-#include "Views/renderview.h"
+#include "colorshader.h"
+#include "lightsystem.h"
+#include "meshcomponent.h"
+#include "movementsystem.h"
+#include "phongshader.h"
+#include "rendersystem.h"
+#include "renderview.h"
+#include "textureshader.h"
 
 typedef gsl::Vector3D vec3;
 

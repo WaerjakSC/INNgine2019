@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-#include "GUI/hierarchymodel.h"
 #include "Systems/rendersystem.h"
+#include "hierarchymodel.h"
 #include "innpch.h"
 #include "movementsystem.h"
 #include "renderwindow.h"

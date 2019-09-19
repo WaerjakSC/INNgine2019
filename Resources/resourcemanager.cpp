@@ -1,12 +1,12 @@
 #include "resourcemanager.h"
-#include "Components/meshcomponent.h"
-#include "Shaders/colorshader.h"
-#include "Shaders/phongshader.h"
-#include "Shaders/textureshader.h"
-#include "Systems/lightsystem.h"
-#include "Views/renderview.h"
 #include "billboard.h"
+#include "colorshader.h"
 #include "innpch.h"
+#include "lightsystem.h"
+#include "meshcomponent.h"
+#include "phongshader.h"
+#include "renderview.h"
+#include "textureshader.h"
 #include <QDebug>
 
 ResourceManager *ResourceManager::mInstance = nullptr;
