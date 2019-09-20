@@ -5,9 +5,14 @@
 #include "movementsystem.h"
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
+#include "verticalscrollarea.h"
 #include <QComboBox>
 #include <QDesktopWidget>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QRadioButton>
 #include <QStandardItem>
+#include <QStyleFactory>
 #include <QSurfaceFormat>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -24,6 +29,8 @@ void MainWindow::init() {
     ui->SceneHierarchy->setModel(hierarchy);
     hView = ui->SceneHierarchy;
     hView->setMainWindow(this);
+    scrollArea = new VerticalScrollArea();
+    ui->horizontalTopLayout->addWidget(scrollArea);
 
     createActions();
 
@@ -88,12 +95,12 @@ void MainWindow::init() {
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
-    connect(mRenderWindow, &RenderWindow::goToSignal, this, &MainWindow::goToObject);
+    connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
 }
 
-void MainWindow::goToObject() {
+void MainWindow::snapToObject() {
     if (selectedEntity)
-        mRenderWindow->goToObject(selectedEntity->eID);
+        mRenderWindow->snapToObject(selectedEntity->eID);
 }
 void MainWindow::createActions() {
     QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
@@ -110,6 +117,188 @@ void MainWindow::createActions() {
     connect(sphere, &QAction::triggered, this, &MainWindow::makeSphere);
     connect(plane, &QAction::triggered, this, &MainWindow::makePlane);
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
+}
+/**
+ * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
+ */
+void MainWindow::setupComponentList() {
+    scrollArea->clearLayout();
+    std::vector<Component *> components = ResourceManager::instance()->getComponents(selectedEntity->eID);
+    for (auto component : components) {
+        switch (component->type()) { // Will add other components eventually
+        case Transform:
+            setupTransformSettings(dynamic_cast<TransformComponent *>(component));
+        }
+    }
+}
+void MainWindow::setupTransformSettings(TransformComponent *component) {
+    QStyle *fusion = QStyleFactory::create("fusion");
+    QGroupBox *box = new QGroupBox(tr("Transform"));
+    box->setAlignment(Qt::AlignCenter);
+    box->setStyle(fusion);
+
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    posBox->setStyle(fusion);
+    posBox->setFlat(true);
+
+    QHBoxLayout *position = new QHBoxLayout;
+    position->setMargin(1);
+    // Set up the Position Display
+    for (int i = 0; i < 6; i++) {
+        if (i % 2 == 0) {
+            QLabel *label = new QLabel(box);
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("X:");
+                break;
+            case 2:
+                label->setText("Y:");
+                break;
+            case 4:
+                label->setText("Z:");
+                break;
+            }
+            position->addWidget(label);
+        } else {
+            QDoubleSpinBox *val = new QDoubleSpinBox(box);
+            val->setDecimals(1);
+            val->setRange(-5000, 5000);
+            val->setMaximumWidth(58);
+            val->setStyle(fusion);
+            switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
+            case 1:
+                if (component->parentID != -1)
+                    val->setValue(component->mRelativePosition.x);
+                else
+                    val->setValue(component->mPosition.x);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
+                break;
+            case 3:
+                if (component->parentID != -1)
+                    val->setValue(component->mRelativePosition.y);
+                else
+                    val->setValue(component->mPosition.y);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
+                break;
+            case 5:
+                if (component->parentID != -1)
+                    val->setValue(component->mRelativePosition.z);
+                else
+                    val->setValue(component->mPosition.z);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
+                break;
+            }
+            position->addWidget(val);
+        }
+    }
+    posBox->setLayout(position);
+    grid->addWidget(posBox, 0, 0);
+
+    QGroupBox *rotBox = new QGroupBox(tr("Rotation"));
+    rotBox->setStyle(fusion);
+    rotBox->setFlat(true);
+
+    QHBoxLayout *rotation = new QHBoxLayout;
+    rotation->setMargin(1);
+    // Set up the Rotation Display
+    for (int i = 0; i < 6; i++) {
+        if (i % 2 == 0) {
+            QLabel *label = new QLabel(box);
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("X:");
+                break;
+            case 2:
+                label->setText("Y:");
+                break;
+            case 4:
+                label->setText("Z:");
+                break;
+            }
+            rotation->addWidget(label);
+        } else {
+            QDoubleSpinBox *val = new QDoubleSpinBox(box);
+            val->setDecimals(1);
+            val->setRange(-180, 180);
+            val->setWrapping(true);
+            val->setMaximumWidth(58);
+            val->setStyle(fusion);
+            switch (i) {
+            case 1:
+                val->setValue(component->mRotation.x);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
+                break;
+            case 3:
+                val->setValue(component->mRotation.y);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationY(double)));
+                break;
+            case 5:
+                val->setValue(component->mRotation.z);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationZ(double)));
+                break;
+            }
+            rotation->addWidget(val);
+        }
+    }
+    rotBox->setLayout(rotation);
+    grid->addWidget(rotBox, 1, 0);
+
+    QGroupBox *scaleBox = new QGroupBox(tr("Scale"));
+    scaleBox->setStyle(fusion);
+    scaleBox->setFlat(true);
+
+    QHBoxLayout *scale = new QHBoxLayout;
+    scale->setMargin(1);
+    // Set up the Rotation Display
+    for (int i = 0; i < 6; i++) {
+        if (i % 2 == 0) {
+            QLabel *label = new QLabel(box);
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("X:");
+                break;
+            case 2:
+                label->setText("Y:");
+                break;
+            case 4:
+                label->setText("Z:");
+                break;
+            }
+            scale->addWidget(label);
+        } else { // TODO: Add lock to scale other parts proportionally
+            QDoubleSpinBox *val = new QDoubleSpinBox(box);
+            val->setDecimals(1);
+            val->setRange(0.1, 100);
+            val->setSingleStep(0.1f);
+            val->setMaximumWidth(58);
+            val->setStyle(fusion);
+            switch (i) {
+            case 1:
+                val->setValue(component->mScale.x);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
+                break;
+            case 3:
+                val->setValue(component->mScale.y);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleY(double)));
+                break;
+            case 5:
+                val->setValue(component->mScale.z);
+                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleZ(double)));
+                break;
+            }
+            scale->addWidget(val);
+        }
+    }
+    scaleBox->setLayout(scale);
+    grid->addWidget(scaleBox, 2, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -150,6 +339,7 @@ void MainWindow::onParentChanged(const QModelIndex &parent) {
 void MainWindow::onGameObjectClicked(const QModelIndex &index) {
     QString data = hierarchy->data(index).toString();
     onGameObjectDragged(data);
+    setupComponentList();
 
     // Implement properties(components) list update here
 }
@@ -217,4 +407,31 @@ void MainWindow::forEach(QAbstractItemModel *model, QString parentName, QStandar
             forEach(model, parentName, child, index);
         }
     }
+}
+void MainWindow::setPositionX(double xIn) {
+    mRenderWindow->movement()->setPositionX(selectedEntity->eID, xIn);
+}
+void MainWindow::setPositionY(double yIn) {
+    mRenderWindow->movement()->setPositionY(selectedEntity->eID, yIn);
+}
+void MainWindow::setPositionZ(double zIn) {
+    mRenderWindow->movement()->setPositionZ(selectedEntity->eID, zIn);
+}
+void MainWindow::setRotationX(double xIn) {
+    mRenderWindow->movement()->setRotationX(selectedEntity->eID, xIn);
+}
+void MainWindow::setRotationY(double yIn) {
+    mRenderWindow->movement()->setRotationY(selectedEntity->eID, yIn);
+}
+void MainWindow::setRotationZ(double zIn) {
+    mRenderWindow->movement()->setRotationZ(selectedEntity->eID, zIn);
+}
+void MainWindow::setScaleX(double xIn) {
+    mRenderWindow->movement()->setScaleX(selectedEntity->eID, xIn);
+}
+void MainWindow::setScaleY(double yIn) {
+    mRenderWindow->movement()->setScaleY(selectedEntity->eID, yIn);
+}
+void MainWindow::setScaleZ(double zIn) {
+    mRenderWindow->movement()->setScaleZ(selectedEntity->eID, zIn);
 }

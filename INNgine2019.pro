@@ -78,6 +78,7 @@ HEADERS += \
     GUI/hierarchymodel.h \
     GUI/hierarchyview.h \
 #
+    GUI/verticalscrollarea.h \
     Shaders/colorshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
@@ -127,6 +128,7 @@ SOURCES += main.cpp \
     GUI/hierarchymodel.cpp \
     GUI/hierarchyview.cpp \
 #
+    GUI/verticalscrollarea.cpp \
     Shaders/colorshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \

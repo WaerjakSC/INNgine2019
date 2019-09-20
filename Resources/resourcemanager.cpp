@@ -102,11 +102,33 @@ Component *ResourceManager::getComponent(CType type, int eID) {
     }
     return 0;
 }
-
+/**
+ * @brief Must be updated manually if a new component type is added.
+ * Returns all components owned by the entity.
+ * Use dynamic casts to access the actual component types.
+ * @param eID
+ * @return
+ */
+std::vector<Component *> ResourceManager::getComponents(int eID) {
+    std::vector<Component *> components;
+    if (mTransforms->has(eID))
+        components.emplace_back(mTransforms->get(eID));
+    if (matPool()->has(eID))
+        components.emplace_back(matPool()->get(eID));
+    if (meshPool()->has(eID))
+        components.emplace_back(meshPool()->get(eID));
+    if (lightPool()->has(eID))
+        components.emplace_back(lightPool()->get(eID));
+    if (mInputs.has(eID))
+        components.emplace_back(mInputs.get(eID));
+    if (mPhysics.has(eID))
+        components.emplace_back(mPhysics.get(eID));
+    if (mSounds.has(eID))
+        components.emplace_back(mSounds.get(eID));
+    return components;
+}
 /**
  * @brief ResourceManager::addComponent - Generic component creator
- * @note I don't like how this adds components at the moment. Over time as components are added/removed from old entities, the offset will become pretty massive and
- * components owned by each entity will no longer be laid out neatly in order.
  * @param type Component type enum
  * @param eID Entity ID
  */

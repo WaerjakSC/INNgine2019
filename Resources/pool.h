@@ -57,7 +57,7 @@ public:
             return mComponentList.at(mEntityIndices.at(eID));
         } else {
             qDebug() << "Entity not found!";
-            return mComponentList.at(mEntityIndices.back());
+            return nullptr;
         }
     }
     /**

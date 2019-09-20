@@ -51,12 +51,12 @@ public:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 public slots:
-    void goToObject(int eID);
+    void snapToObject(int eID);
 private slots:
     void render();
     void updateScene();
 signals:
-    void goToSignal();
+    void snapSignal();
 
 private:
     void init();

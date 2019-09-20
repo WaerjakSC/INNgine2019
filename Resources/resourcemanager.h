@@ -74,6 +74,8 @@ public:
 
     void setLightSystem(const std::shared_ptr<LightSystem> &lightSystem);
 
+    std::vector<Component *> getComponents(int eID);
+
 private:
     // Private constructor
     ResourceManager();

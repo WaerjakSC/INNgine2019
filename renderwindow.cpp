@@ -160,31 +160,6 @@ void RenderWindow::init() {
     connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
     connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer.get(), &RenderSystem::newEntity);
 
-    // -----------Sound test-----------
-    //Some sounds...
-
-    //loads the sounds
-    //Vector - placement - no effect on stereo sound
-    //parameters:
-    //createSource(std::string name, Vector3 pos, std::string filePath, bool loop, float gain)
-
-    /*)
-    mStereoSound = mSoundManager->createSource(
-                "Stereo", Vector3(0.0f, 0.0f, 0.0f),
-                "../INNgine2019/Assets/Sounds/stereo.wav", true, 1.0f);
-
-
-
-    mLaserSound = mSoundManager->createSource(
-                "Laser", Vector3(20.0f, 0.0f, 0.0f),
-                "../Sound/Assets/Sounds/laser.wav", false, 0.7f);
-
-
-    mSong = mSoundManager->createSource(
-                "Caravan", Vector3(0.0f, 0.0f, 0.0f),
-                "../Sound/Assets/Sounds/Caravan_mono.wav", false, 1.0f);
-               */
-
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
         "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
@@ -223,7 +198,7 @@ void RenderWindow::render() {
     //    auto start = std::chrono::high_resolution_clock::now();
     mContext->swapBuffers(this);
 }
-void RenderWindow::goToObject(int eID) {
+void RenderWindow::snapToObject(int eID) {
     mCurrentCamera->goTo(mMoveSys->getPosition(eID));
 }
 void RenderWindow::updateScene() {
@@ -360,7 +335,7 @@ void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
     if (mInput->F) {
-        emit goToSignal();
+        emit snapSignal();
     }
     if (mInput->RMB) {
         if (mInput->W)

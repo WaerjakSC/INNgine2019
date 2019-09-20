@@ -10,7 +10,9 @@ class RenderWindow;
 class GameObject;
 class HierarchyModel;
 class HierarchyView;
+class VerticalScrollArea;
 class QStandardItem;
+class TransformComponent;
 namespace Ui {
 class MainWindow;
 }
@@ -45,7 +47,19 @@ private slots:
 
     void makePlane();
 
-    void goToObject();
+    void snapToObject();
+
+    void setPositionX(double xIn);
+    void setPositionY(double yIn);
+    void setPositionZ(double zIn);
+
+    void setRotationX(double xIn);
+    void setRotationY(double yIn);
+    void setRotationZ(double zIn);
+
+    void setScaleX(double xIn);
+    void setScaleY(double yIn);
+    void setScaleZ(double zIn);
 
 private:
     void init();
@@ -53,11 +67,14 @@ private:
 
     HierarchyModel *hierarchy;
     HierarchyView *hView;
+    VerticalScrollArea *scrollArea;
     GameObject *selectedEntity{nullptr};
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
     void forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
+    void setupComponentList();
+    void setupTransformSettings(TransformComponent *component);
 };
 
 #endif // MAINWINDOW_H
