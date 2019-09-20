@@ -111,8 +111,25 @@ void MainWindow::createActions() {
     make3D->addAction(sphere);
     QAction *plane = new QAction(tr("Plane"), this);
     make3D->addAction(plane);
-    //    ui->mainToolBar->addWidget(objectCreation);
+    // Component menu actions don't do anything *yet* //
+    QMenu *components = ui->menuBar->addMenu(tr("&Components")); // Maybe disable specific component if selected entity has that component already
+    QAction *transform = new QAction(tr("Transform"), this);
+    components->addAction(transform);
+    QAction *material = new QAction(tr("Material"), this);
+    components->addAction(material);
+    QAction *mesh = new QAction(tr("Mesh"), this); // Somewhere along this action path should let you choose the mesh file to use/import
+    components->addAction(mesh);
+    QAction *light = new QAction(tr("Light"), this);
+    components->addAction(light);
+    QAction *input = new QAction(tr("Input"), this);
+    components->addAction(input);
+    QAction *physics = new QAction(tr("Physics"), this);
+    components->addAction(physics);
+    QAction *sound = new QAction(tr("Sound"), this);
+    components->addAction(sound);
+
     ui->mainToolBar->setMovable(false);
+
     connect(cube, &QAction::triggered, this, &MainWindow::makeCube);
     connect(sphere, &QAction::triggered, this, &MainWindow::makeSphere);
     connect(plane, &QAction::triggered, this, &MainWindow::makePlane);
