@@ -137,6 +137,7 @@ void MainWindow::createActions() {
 }
 /**
  * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
+ * @todo Dynamically update selected entity transforms etc when they change outside of the component panel
  */
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();

@@ -82,33 +82,39 @@ void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {
     iterateChildren(eID);
 }
 void MovementSystem::setPositionX(int eID, float xIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
+    gsl::Vector3D newPos;
     if (hasParent(eID)) {
-        mTransformPool->get(eID)->mRelativePosition.x = xIn;
+        newPos = mTransformPool->get(eID)->mRelativePosition;
+        newPos.x = xIn;
     } else {
-        mTransformPool->get(eID)->mPosition.x = xIn;
+        newPos = mTransformPool->get(eID)->mPosition;
+        newPos.x = xIn;
     }
-    iterateChildren(eID);
+    setPosition(eID, newPos);
 }
 
 void MovementSystem::setPositionY(int eID, float yIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
+    gsl::Vector3D newPos;
     if (hasParent(eID)) {
-        mTransformPool->get(eID)->mRelativePosition.y = yIn;
+        newPos = mTransformPool->get(eID)->mRelativePosition;
+        newPos.y = yIn;
     } else {
-        mTransformPool->get(eID)->mPosition.y = yIn;
+        newPos = mTransformPool->get(eID)->mPosition;
+        newPos.y = yIn;
     }
-    iterateChildren(eID);
+    setPosition(eID, newPos);
 }
 
 void MovementSystem::setPositionZ(int eID, float zIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
+    gsl::Vector3D newPos;
     if (hasParent(eID)) {
-        mTransformPool->get(eID)->mRelativePosition.z = zIn;
+        newPos = mTransformPool->get(eID)->mRelativePosition;
+        newPos.z = zIn;
     } else {
-        mTransformPool->get(eID)->mPosition.z = zIn;
+        newPos = mTransformPool->get(eID)->mPosition;
+        newPos.z = zIn;
     }
-    iterateChildren(eID);
+    setPosition(eID, newPos);
 }
 bool MovementSystem::hasParent(int eID) {
     return mTransformPool->get(eID)->parentID != -1;
