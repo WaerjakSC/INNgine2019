@@ -2,9 +2,10 @@
 #define MOVEMENTSYSTEM_H
 
 #include "pool.h"
+#include <QObject>
 #include <memory>
-class MovementSystem {
-
+class MovementSystem : public QObject {
+    Q_OBJECT
 public:
     MovementSystem(std::shared_ptr<Pool<TransformComponent>> trans);
     void update();
@@ -39,6 +40,10 @@ public:
     void setScaleX(int eID, float xIn);
     void setScaleY(int eID, float yIn);
     void setScaleZ(int eID, float zIn);
+signals:
+    void positionChanged(gsl::Vector3D newPos);
+    void scaleChanged(gsl::Vector3D newScale);
+    void rotationChanged(gsl::Vector3D newRot);
 
 private:
     std::shared_ptr<Pool<TransformComponent>> mTransformPool;

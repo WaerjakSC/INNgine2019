@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "gltypes.h"
+#include "vector3d.h"
 #include <QMainWindow>
 #include <QStringListModel>
 
@@ -30,6 +31,15 @@ public:
 signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
+    void posX(GLfloat xIn);
+    void posY(GLfloat yIn);
+    void posZ(GLfloat zIn);
+    void rotX(GLfloat xIn);
+    void rotY(GLfloat yIn);
+    void rotZ(GLfloat zIn);
+    void scaleX(GLfloat xIn);
+    void scaleY(GLfloat yIn);
+    void scaleZ(GLfloat zIn);
 public slots:
 private slots:
     void onGameObjectClicked(const QModelIndex &index);
@@ -60,6 +70,9 @@ private slots:
     void setScaleX(double xIn);
     void setScaleY(double yIn);
     void setScaleZ(double zIn);
+    void updatePositionVals(gsl::Vector3D newPos);
+    void updateRotationVals(gsl::Vector3D newRot);
+    void updateScaleVals(gsl::Vector3D newScale);
 
 private:
     void init();

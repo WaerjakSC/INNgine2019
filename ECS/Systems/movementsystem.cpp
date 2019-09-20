@@ -62,6 +62,7 @@ void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
         mTransformPool->get(eID)->mPosition = position;
     }
     iterateChildren(eID);
+    emit positionChanged(position);
 }
 /**
  * @brief Sets relative position if parented to an object -- otherwise sets global position.
@@ -69,17 +70,7 @@ void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
  * @param position
  */
 void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    if (hasParent(eID)) {
-        mTransformPool->get(eID)->mRelativePosition.x = xIn;
-        mTransformPool->get(eID)->mRelativePosition.y = yIn;
-        mTransformPool->get(eID)->mRelativePosition.z = zIn;
-    } else {
-        mTransformPool->get(eID)->mPosition.x = xIn;
-        mTransformPool->get(eID)->mPosition.y = yIn;
-        mTransformPool->get(eID)->mPosition.z = zIn;
-    }
-    iterateChildren(eID);
+    setPosition(eID, gsl::Vector3D{xIn, yIn, zIn});
 }
 void MovementSystem::setPositionX(int eID, float xIn) {
     gsl::Vector3D newPos;
@@ -120,70 +111,80 @@ bool MovementSystem::hasParent(int eID) {
     return mTransformPool->get(eID)->parentID != -1;
 }
 void MovementSystem::moveX(int eID, float xIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    if (hasParent(eID))
-        mTransformPool->get(eID)->mRelativePosition.x += xIn;
-    else
-        mTransformPool->get(eID)->mPosition.x += xIn;
-    iterateChildren(eID);
+    gsl::Vector3D newPos;
+    if (hasParent(eID)) {
+        newPos = mTransformPool->get(eID)->mRelativePosition;
+        newPos.x += xIn;
+    } else {
+        newPos = mTransformPool->get(eID)->mPosition;
+        newPos.x += xIn;
+    }
+    setPosition(eID, newPos);
 }
 void MovementSystem::moveY(int eID, float yIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    if (hasParent(eID))
-        mTransformPool->get(eID)->mRelativePosition.y += yIn;
-    else
-        mTransformPool->get(eID)->mPosition.y += yIn;
-    iterateChildren(eID);
+    gsl::Vector3D newPos;
+    if (hasParent(eID)) {
+        newPos = mTransformPool->get(eID)->mRelativePosition;
+        newPos.y += yIn;
+    } else {
+        newPos = mTransformPool->get(eID)->mPosition;
+        newPos.y += yIn;
+    }
+    setPosition(eID, newPos);
 }
 void MovementSystem::moveZ(int eID, float zIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    if (hasParent(eID))
-        mTransformPool->get(eID)->mRelativePosition.z += zIn;
-    else
-        mTransformPool->get(eID)->mPosition.z += zIn;
-    iterateChildren(eID);
-}
-
-void MovementSystem::setScale(int eID, gsl::Vector3D scale) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mScale = scale;
-    iterateChildren(eID);
+    gsl::Vector3D newPos;
+    if (hasParent(eID)) {
+        newPos = mTransformPool->get(eID)->mRelativePosition;
+        newPos.z += zIn;
+    } else {
+        newPos = mTransformPool->get(eID)->mPosition;
+        newPos.z += zIn;
+    }
+    setPosition(eID, newPos);
 }
 
 void MovementSystem::setRotation(int eID, gsl::Vector3D rotation) {
     mTransformPool->get(eID)->mMatrixOutdated = true;
     mTransformPool->get(eID)->mRotation = rotation;
     iterateChildren(eID);
+    emit rotationChanged(rotation);
 }
 void MovementSystem::setRotationX(int eID, float xIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mRotation.x = xIn;
-    iterateChildren(eID);
+    gsl::Vector3D newRot = mTransformPool->get(eID)->mRotation;
+    newRot.x = xIn;
+    setRotation(eID, newRot);
 }
 void MovementSystem::setRotationY(int eID, float yIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mRotation.y = yIn;
-    iterateChildren(eID);
+    gsl::Vector3D newRot = mTransformPool->get(eID)->mRotation;
+    newRot.y = yIn;
+    setRotation(eID, newRot);
 }
 void MovementSystem::setRotationZ(int eID, float zIn) {
+    gsl::Vector3D newRot = mTransformPool->get(eID)->mRotation;
+    newRot.z = zIn;
+    setRotation(eID, newRot);
+}
+void MovementSystem::setScale(int eID, gsl::Vector3D scale) {
     mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mRotation.z = zIn;
+    mTransformPool->get(eID)->mScale = scale;
     iterateChildren(eID);
+    emit scaleChanged(scale);
 }
 void MovementSystem::setScaleX(int eID, float xIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mScale.x = xIn;
-    iterateChildren(eID);
+    gsl::Vector3D newScale = mTransformPool->get(eID)->mScale;
+    newScale.x = xIn;
+    setScale(eID, newScale);
 }
 void MovementSystem::setScaleY(int eID, float yIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mScale.y = yIn;
-    iterateChildren(eID);
+    gsl::Vector3D newScale = mTransformPool->get(eID)->mScale;
+    newScale.y = yIn;
+    setScale(eID, newScale);
 }
 void MovementSystem::setScaleZ(int eID, float zIn) {
-    mTransformPool->get(eID)->mMatrixOutdated = true;
-    mTransformPool->get(eID)->mScale.z = zIn;
-    iterateChildren(eID);
+    gsl::Vector3D newScale = mTransformPool->get(eID)->mScale;
+    newScale.z = zIn;
+    setScale(eID, newScale);
 }
 gsl::Matrix4x4 MovementSystem::multiplyByParent(int eID, int pID) {
     return mTransformPool->get(pID)->matrix() * mTransformPool->get(eID)->matrix();
