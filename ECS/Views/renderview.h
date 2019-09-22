@@ -16,7 +16,7 @@ public:
 public slots:
     //    void addEntity(int entityID);
 signals:
-    void updateSystem(std::tuple<int, TransformComponent *, MaterialComponent *, MeshComponent *>);
+    void updateSystem(std::tuple<int, Transform *, Material *, Mesh *>);
 
 private:
     //    std::unique_ptr<Pool<MeshComponent>> mMeshPool;

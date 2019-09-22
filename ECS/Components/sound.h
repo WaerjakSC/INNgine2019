@@ -3,9 +3,9 @@
 
 #include "component.h"
 
-class SoundComponent : public Component {
+class Sound : public Component {
 public:
-    SoundComponent();
+    Sound();
     virtual void update(float dt);
 };
 

@@ -156,15 +156,16 @@ void MainWindow::createActions() {
  */
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();
+    // Probably err, just scrap this and re-do it some other way...
     std::vector<Component *> components = Registry::instance()->getComponents(selectedEntity->eID);
     for (auto component : components) {
         switch (component->type()) { // Will add other components eventually
-        case Transform:
-            setupTransformSettings(dynamic_cast<TransformComponent *>(component));
+        case CType::Transform:
+            setupTransformSettings(dynamic_cast<Transform *>(component));
         }
     }
 }
-void MainWindow::setupTransformSettings(TransformComponent *component) {
+void MainWindow::setupTransformSettings(Transform *component) {
     QStyle *fusion = QStyleFactory::create("fusion");
     QGroupBox *box = new QGroupBox(tr("Transform"));
     box->setAlignment(Qt::AlignCenter);
@@ -423,7 +424,7 @@ void MainWindow::insertGameObjects(std::vector<int> entities) {
                 item = new QStandardItem(QString("GameObject")) /*.arg(idx)*/;
             else
                 item = new QStandardItem(QString(QString::fromStdString(object->mName))) /*.arg(idx)*/;
-            int parentID = Registry::instance()->getComponent<TransformComponent>(object->eID).parentID;
+            int parentID = Registry::instance()->getComponent<Transform>(object->eID).parentID;
             if (parentID != -1) {
                 QString parent = QString::fromStdString(ResourceManager::instance()->getGameObject(entities.at(parentID))->mName);
                 forEach(hierarchy, parent, item);

@@ -1,13 +1,13 @@
 #include "billboard.h"
 #include "camera.h"
-#include "transformcomponent.h"
+#include "transform.h"
 
 BillBoard::BillBoard(GLuint eID, std::string name) : GameObject(eID, name) {
 
     setConstantYUp(true);
 }
 
-void BillBoard::update(TransformComponent *transform, Shader *shader) {
+void BillBoard::update(Transform *transform, Shader *shader) {
     // find direction between this and camera
     gsl::Vector3D direction{};
     if (mNormalVersion) {

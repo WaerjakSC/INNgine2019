@@ -4,7 +4,7 @@
 #include "camera.h"
 
 #include "gameobject.h"
-#include "inputcomponent.h"
+#include "input.h"
 #include "resourcemanager.h"
 #include "texture.h"
 #include <QElapsedTimer>
@@ -76,7 +76,7 @@ private:
 
     GLuint mLight;
 
-    InputComponent *mInput;
+    Input *mInput;
 
     Camera *mCurrentCamera{nullptr};
 

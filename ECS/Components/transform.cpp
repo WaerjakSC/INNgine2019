@@ -1,21 +1,21 @@
-#include "transformcomponent.h"
+#include "transform.h"
 
-TransformComponent::TransformComponent() {
+Transform::Transform() {
     mType = CType::Transform;
     mMatrix.setToIdentity();
 }
 
-void TransformComponent::update(float dt) {
+void Transform::update(float dt) {
 }
 
-gsl::Matrix4x4 &TransformComponent::matrix() {
+gsl::Matrix4x4 &Transform::matrix() {
     if (mMatrixOutdated) {
         updateMatrix();
     }
     return mMatrix;
 }
 
-void TransformComponent::updateMatrix() {
+void Transform::updateMatrix() {
     if (mMatrixOutdated) {
         //calculate matrix from position, scale, rotation
         mMatrix.setToIdentity();
@@ -28,16 +28,16 @@ void TransformComponent::updateMatrix() {
     }
 }
 
-std::vector<int> TransformComponent::children() const {
+std::vector<int> Transform::children() const {
     return mChildren;
 }
 
-void TransformComponent::addChild(const GLuint childID) {
+void Transform::addChild(const GLuint childID) {
     mChildren.emplace_back(childID);
     hasChildren = true;
 }
 
-void TransformComponent::removeChild(const GLuint childID) {
+void Transform::removeChild(const GLuint childID) {
     for (auto child : mChildren) {
         if (child == (int)childID) {
             std::swap(child, mChildren.back());

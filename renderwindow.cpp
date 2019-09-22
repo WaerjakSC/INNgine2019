@@ -1,5 +1,5 @@
 #include "renderwindow.h"
-#include "Components/inputcomponent.h"
+#include "Components/input.h"
 #include "innpch.h"
 #include <QKeyEvent>
 #include <QOpenGLContext>
@@ -18,7 +18,7 @@
 
 #include "colorshader.h"
 #include "lightsystem.h"
-#include "meshcomponent.h"
+#include "mesh.h"
 #include "movementsystem.h"
 #include "phongshader.h"
 #include "registry.h"
@@ -45,7 +45,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
         qDebug() << "Context could not be made - quitting this application";
     }
     // Create Resource Manager instance
-    mInput = new InputComponent();
+    mInput = new Input();
     mInput->setMainWindow(mMainWindow);
     //Make the gameloop timer:
     mRenderTimer = new QTimer(this);
@@ -136,7 +136,7 @@ void RenderWindow::init() {
     mLight = mFactory->makeLightObject();
 
     GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
-    mRegistry->getComponent<MaterialComponent>(boxID).setShader(Color);
+    mRegistry->getComponent<Material>(boxID).setShader(Color);
     //one monkey
     GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
     mMoveSys->setParent(monkey, boxID);

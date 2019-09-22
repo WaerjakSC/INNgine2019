@@ -25,25 +25,25 @@ void Registry::entityDestroyed(int entityID) {
  */
 std::vector<Component *> Registry::getComponents(int entityID) {
     std::vector<Component *> components;
-    Pool<TransformComponent> *transforms = getComponentArray<TransformComponent>().get();
+    Pool<Transform> *transforms = getComponentArray<Transform>().get();
     if (transforms->has(entityID))
         components.push_back(&transforms->get(entityID));
-    Pool<MaterialComponent> *materials = getComponentArray<MaterialComponent>().get();
+    Pool<Material> *materials = getComponentArray<Material>().get();
     if (materials->has(entityID))
         components.push_back(&materials->get(entityID));
-    Pool<MeshComponent> *meshes = getComponentArray<MeshComponent>().get();
+    Pool<Mesh> *meshes = getComponentArray<Mesh>().get();
     if (meshes->has(entityID))
         components.push_back(&meshes->get(entityID));
-    Pool<LightComponent> *lights = getComponentArray<LightComponent>().get();
+    Pool<Light> *lights = getComponentArray<Light>().get();
     if (lights->has(entityID))
         components.push_back(&lights->get(entityID));
-    Pool<InputComponent> *inputs = getComponentArray<InputComponent>().get();
+    Pool<Input> *inputs = getComponentArray<Input>().get();
     if (inputs->has(entityID))
         components.push_back(&inputs->get(entityID));
-    Pool<PhysicsComponent> *physics = getComponentArray<PhysicsComponent>().get();
+    Pool<Physics> *physics = getComponentArray<Physics>().get();
     if (physics->has(entityID))
         components.push_back(&physics->get(entityID));
-    Pool<SoundComponent> *sound = getComponentArray<SoundComponent>().get();
+    Pool<Sound> *sound = getComponentArray<Sound>().get();
     if (sound->has(entityID))
         components.push_back(&sound->get(entityID));
     return components;

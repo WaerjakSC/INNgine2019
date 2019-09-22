@@ -9,11 +9,11 @@ public:
 
     void update();
 
-    Pool<LightComponent> *lightPool() const;
+    Pool<Light> *lightPool() const;
 
 private:
-    std::shared_ptr<Pool<LightComponent>> mLightPool;
-    std::shared_ptr<Pool<TransformComponent>> mTransforms;
+    std::shared_ptr<Pool<Light>> mLightPool;
+    std::shared_ptr<Pool<Transform>> mTransforms;
     PhongShader *mPhong;
 };
 

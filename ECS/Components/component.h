@@ -1,7 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include "matrix4x4.h"
-enum CType {
+enum class CType {
     Transform = 0,
     Material = 1,
     Mesh = 2,

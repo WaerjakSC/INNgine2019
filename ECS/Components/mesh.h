@@ -4,13 +4,13 @@
 #include "matrix4x4.h"
 #include "vertex.h"
 #include <QOpenGLFunctions_4_1_Core>
-class MaterialComponent;
+class Material;
 class Shader;
-class MeshComponent : public Component {
+class Mesh : public Component {
 public:
-    MeshComponent();
+    Mesh();
 
-    virtual ~MeshComponent();
+    virtual ~Mesh();
 
     virtual void update(float dt = 0.0f);
 
@@ -22,7 +22,7 @@ public:
     GLuint mIndiceCount{0};
     GLenum mDrawType{0};
 
-    void copyOpenGLData(const MeshComponent &comp);
+    void copyOpenGLData(const Mesh &comp);
 };
 
 #endif // MESHCOMPONENT_H

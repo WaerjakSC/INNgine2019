@@ -2,7 +2,7 @@
 #define LIGHTINGCOMPONENT_H
 
 #include "gsl_math.h"
-#include "materialcomponent.h"
+#include "material.h"
 
 struct LightData {
     GLfloat mAmbientStrength{0.3f};
@@ -19,9 +19,9 @@ struct LightData {
 /**
  * @brief The LightingComponent class holds relevant info for objects that should light the environment
  */
-class LightComponent : public Component {
+class Light : public Component {
 public:
-    LightComponent();
+    Light();
     virtual void update(float dt);
 
     //    void draw(gsl::Matrix4x4 &mMatrix);

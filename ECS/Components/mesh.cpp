@@ -1,21 +1,21 @@
-#include "meshcomponent.h"
+#include "mesh.h"
 #include "innpch.h"
-#include "materialcomponent.h"
-MeshComponent::MeshComponent() {
+#include "material.h"
+Mesh::Mesh() {
     mType = CType::Mesh;
 }
 
-MeshComponent::~MeshComponent() {
+Mesh::~Mesh() {
     //    if (mVAO != 0)
     //        glDeleteVertexArrays(1, &mVAO);
     //    if (mVBO != 0)
     //        glDeleteBuffers(1, &mVBO);
 }
 
-void MeshComponent::update(float dt) {
+void Mesh::update(float dt) {
 }
 
-void MeshComponent::copyOpenGLData(const MeshComponent &other) {
+void Mesh::copyOpenGLData(const Mesh &other) {
     mVAO = other.mVAO;
     mVBO = other.mVBO;
     mEAB = other.mEAB; //holds the indices (Element Array Buffer - EAB)

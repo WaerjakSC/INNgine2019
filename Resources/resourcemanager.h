@@ -79,7 +79,7 @@ private:
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;
     std::map<std::string, Texture *> Textures;
-    std::map<std::string, MeshComponent> mMeshMap; // Holds each unique mesh for easy access
+    std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;
@@ -94,15 +94,15 @@ private:
     //    std::unique_ptr<RenderView> mRenderView; // Should this belong to RenderSystem?
 
     // OpenGL init functions
-    void initVertexBuffers(MeshComponent *mesh);
-    void initIndexBuffers(MeshComponent *mesh);
+    void initVertexBuffers(Mesh *mesh);
+    void initIndexBuffers(Mesh *mesh);
 
     // Reads and loads mesh
     void LoadMesh(std::string fileName);
-    void setMesh(MeshComponent *mesh, int eID);
+    void setMesh(Mesh *mesh, int eID);
     bool readFile(std::string fileName);
     bool readTriangleFile(std::string filename);
-    MeshComponent *LoadTriangleMesh(std::string fileName);
+    Mesh *LoadTriangleMesh(std::string fileName);
 
     // OctahedronBall functions
     void makeUnitOctahedron(GLint recursions);

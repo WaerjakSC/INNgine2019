@@ -4,9 +4,9 @@
 #include "renderview.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     factory = ResourceManager::instance();
-    mMaterialPool = Registry::instance()->registerComponent<MaterialComponent>();
-    mMeshPool = Registry::instance()->registerComponent<MeshComponent>();
-    mTransformPool = Registry::instance()->registerComponent<TransformComponent>();
+    mMaterialPool = Registry::instance()->registerComponent<Material>();
+    mMeshPool = Registry::instance()->registerComponent<Mesh>();
+    mTransformPool = Registry::instance()->registerComponent<Transform>();
 }
 /**
  * @brief RenderSystem::iterateEntities

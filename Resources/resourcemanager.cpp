@@ -3,7 +3,7 @@
 #include "colorshader.h"
 #include "innpch.h"
 #include "lightsystem.h"
-#include "meshcomponent.h"
+#include "mesh.h"
 #include "phongshader.h"
 #include "registry.h"
 #include "renderview.h"
@@ -14,13 +14,13 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
-    registry->registerComponent<TransformComponent>();
-    registry->registerComponent<MaterialComponent>();
-    registry->registerComponent<MeshComponent>();
-    registry->registerComponent<LightComponent>();
-    registry->registerComponent<InputComponent>();
-    registry->registerComponent<PhysicsComponent>();
-    registry->registerComponent<SoundComponent>();
+    registry->registerComponent<Transform>();
+    registry->registerComponent<Material>();
+    registry->registerComponent<Mesh>();
+    registry->registerComponent<Light>();
+    registry->registerComponent<Input>();
+    registry->registerComponent<Physics>();
+    registry->registerComponent<Sound>();
 
     // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
@@ -57,19 +57,19 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
     if (eID <= -1 || (size_t)eID > mGameObjects.size() - 1) {
         eID = mGameObjects.size() - 1;
     }
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Mesh>(eID);
     setMesh(name, eID);
 }
-void ResourceManager::setMesh(MeshComponent *mesh, int eID) {
+void ResourceManager::setMesh(Mesh *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
     if ((size_t)eID < mGameObjects.size()) {
-        registry->getComponent<MeshComponent>(eID).copyOpenGLData(*mesh);
+        registry->getComponent<Mesh>(eID).copyOpenGLData(*mesh);
     }
 }
 void ResourceManager::setMesh(std::string name, int eID) {
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
-        registry->getComponent<MeshComponent>(eID).copyOpenGLData(search->second);
+        registry->getComponent<Mesh>(eID).copyOpenGLData(search->second);
     } else
         LoadMesh(name);
 }
@@ -116,10 +116,10 @@ GLuint ResourceManager::makeGameObject(std::string name) {
  */
 GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
     GLuint eID = makeGameObject(name);
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
     addMeshComponent(name, eID);
-    registry->getComponent<MaterialComponent>(eID).setShader(type);
+    registry->getComponent<Material>(eID).setShader(type);
     return eID;
 }
 /**
@@ -128,9 +128,9 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
  */
 GLuint ResourceManager::makePlane() {
     GLuint eID = makeGameObject("Plane");
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
 
     initializeOpenGLFunctions();
     mMeshData.Clear();
@@ -142,8 +142,8 @@ GLuint ResourceManager::makePlane() {
     mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, 0.5f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    registry->getComponent<MaterialComponent>(eID).setShader(Color);
-    auto &mesh = registry->getComponent<MeshComponent>(eID);
+    registry->getComponent<Material>(eID).setShader(Color);
+    auto &mesh = registry->getComponent<Mesh>(eID);
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mDrawType = GL_TRIANGLES;
 
@@ -158,13 +158,13 @@ GLuint ResourceManager::makePlane() {
  */
 GLuint ResourceManager::makeCube() {
     GLuint eID = makeGameObject("Cube");
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
     setMesh("cube.obj", eID);
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    registry->getComponent<MaterialComponent>(eID).setShader(Color);
+    registry->getComponent<Material>(eID).setShader(Color);
 
     return eID;
 }
@@ -173,9 +173,9 @@ GLuint ResourceManager::makeCube() {
  */
 GLuint ResourceManager::makeXYZ() {
     GLuint eID = makeGameObject("XYZ");
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
 
     initializeOpenGLFunctions();
     mMeshData.Clear();
@@ -187,8 +187,8 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    registry->getComponent<MaterialComponent>(eID).setShader(Color);
-    auto &mesh = registry->getComponent<MeshComponent>(eID);
+    registry->getComponent<Material>(eID).setShader(Color);
+    auto &mesh = registry->getComponent<Mesh>(eID);
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mDrawType = GL_LINES;
 
@@ -203,9 +203,9 @@ GLuint ResourceManager::makeXYZ() {
  */
 GLuint ResourceManager::makeSkyBox() {
     GLuint eID = makeGameObject("Skybox");
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
 
     //    temp->mMatrix.scale(15.f);
     initializeOpenGLFunctions();
@@ -259,11 +259,11 @@ GLuint ResourceManager::makeSkyBox() {
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
 
-    auto &skyMat = registry->getComponent<MaterialComponent>(eID);
+    auto &skyMat = registry->getComponent<Material>(eID);
     skyMat.setShader(Tex);
 
     skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
-    auto &skyMesh = registry->getComponent<MeshComponent>(eID);
+    auto &skyMesh = registry->getComponent<Mesh>(eID);
     skyMesh.mVerticeCount = mMeshData.mVertices.size();
     skyMesh.mIndiceCount = mMeshData.mIndices.size();
     skyMesh.mDrawType = GL_TRIANGLES;
@@ -288,9 +288,9 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
 
     initializeOpenGLFunctions();
 
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
     setMesh(LoadTriangleMesh(fileName), eID);
     glBindVertexArray(0);
 
@@ -305,9 +305,9 @@ GLuint ResourceManager::makeBillBoard() {
     ++mNumGameObjects;
     mGameObjectIndex.emplace_back(mGameObjects.size());
     mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
 
     initializeOpenGLFunctions();
 
@@ -320,12 +320,12 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
-    auto &billBoardMat = registry->getComponent<MaterialComponent>(eID);
+    auto &billBoardMat = registry->getComponent<Material>(eID);
     billBoardMat.setTextureUnit(Textures["gnome.bmp"]->id() - 1);
     billBoardMat.setShader(Tex);
     billBoardMat.setColor(gsl::Vector3D(1.0f, 1.0f, 1.0f));
 
-    auto &billBoardMesh = registry->getComponent<MeshComponent>(eID);
+    auto &billBoardMesh = registry->getComponent<Mesh>(eID);
     billBoardMesh.mVerticeCount = mMeshData.mVertices.size();
     billBoardMesh.mDrawType = GL_TRIANGLE_STRIP;
 
@@ -343,9 +343,9 @@ GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = makeGameObject("Ball");
     mMeshData.Clear();
     initializeOpenGLFunctions();
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
 
     GLint mRecursions = n;
     GLint mIndex = 0;
@@ -355,11 +355,11 @@ GLuint ResourceManager::makeOctBall(int n) {
     makeUnitOctahedron(mRecursions);
 
     //    mTransforms.get(eID)->matrix().scale(0.5f, 0.5f, 0.5f);
-    auto &octMesh = registry->getComponent<MeshComponent>(eID);
+    auto &octMesh = registry->getComponent<Mesh>(eID);
     octMesh.mVerticeCount = mMeshData.mVertices.size();
     octMesh.mIndiceCount = mMeshData.mIndices.size();
     octMesh.mDrawType = GL_TRIANGLES;
-    registry->getComponent<MaterialComponent>(eID).setShader(Color);
+    registry->getComponent<Material>(eID).setShader(Color);
 
     initVertexBuffers(&octMesh);
     initIndexBuffers(&octMesh);
@@ -373,10 +373,10 @@ GLuint ResourceManager::makeOctBall(int n) {
  */
 GLuint ResourceManager::makeLightObject() {
     GLuint eID = makeGameObject("Light");
-    registry->addComponent<TransformComponent>(eID);
-    registry->addComponent<MaterialComponent>(eID);
-    registry->addComponent<MeshComponent>(eID);
-    registry->addComponent<LightComponent>(eID);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Light>(eID);
 
     initializeOpenGLFunctions();
 
@@ -397,12 +397,12 @@ GLuint ResourceManager::makeLightObject() {
                                3, 0, 2,
                                0, 3, 1});
 
-    auto &lightMat = registry->getComponent<MaterialComponent>(eID);
+    auto &lightMat = registry->getComponent<Material>(eID);
     lightMat.setTextureUnit(Textures["white.bmp"]->id() - 1);
     lightMat.setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
     lightMat.setShader(Tex);
 
-    auto &lightMesh = registry->getComponent<MeshComponent>(eID);
+    auto &lightMesh = registry->getComponent<Mesh>(eID);
     lightMesh.mVerticeCount = mMeshData.mVertices.size();
     lightMesh.mIndiceCount = mMeshData.mIndices.size();
     lightMesh.mDrawType = GL_TRIANGLES;
@@ -416,7 +416,7 @@ GLuint ResourceManager::makeLightObject() {
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */
-void ResourceManager::initVertexBuffers(MeshComponent *mesh) {
+void ResourceManager::initVertexBuffers(Mesh *mesh) {
     //Vertex Array Object - VAO
     glGenVertexArrays(1, &mesh->mVAO);
     glBindVertexArray(mesh->mVAO);
@@ -443,7 +443,7 @@ void ResourceManager::initVertexBuffers(MeshComponent *mesh) {
  * @brief opengl init for glDrawElements - initialize the given mesh's index buffer
  * @param mesh
  */
-void ResourceManager::initIndexBuffers(MeshComponent *mesh) {
+void ResourceManager::initIndexBuffers(Mesh *mesh) {
     glGenBuffers(1, &mesh->mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
@@ -638,7 +638,7 @@ bool ResourceManager::readFile(std::string fileName) {
     //being a nice boy and closing the file after use
     fileIn.close();
 
-    auto &mesh = registry->getLastComponent<MeshComponent>();
+    auto &mesh = registry->getLastComponent<Mesh>();
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mIndiceCount = mMeshData.mIndices.size();
     mesh.mDrawType = GL_TRIANGLES;
@@ -666,20 +666,20 @@ void ResourceManager::LoadMesh(std::string fileName) {
         return;
     }
     // the mesh at the back is the latest creation
-    mMeshMap[fileName] = registry->getLastComponent<MeshComponent>(); // Save the new unique mesh in the meshmap for other entities that might need it
+    mMeshMap[fileName] = registry->getLastComponent<Mesh>(); // Save the new unique mesh in the meshmap for other entities that might need it
 }
 
-MeshComponent *ResourceManager::LoadTriangleMesh(std::string fileName) {
+Mesh *ResourceManager::LoadTriangleMesh(std::string fileName) {
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {
         return &search->second; // Return a copy of the mesh it wants if already stored
     }
     if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
-        return new MeshComponent;
+        return new Mesh;
     }
-    mMeshMap[fileName] = registry->getLastComponent<MeshComponent>(); // Save the new unique mesh in the meshmap for other entities that might need it
-    return &registry->getLastComponent<MeshComponent>();              // the mesh at the back is the latest creation
+    mMeshMap[fileName] = registry->getLastComponent<Mesh>(); // Save the new unique mesh in the meshmap for other entities that might need it
+    return &registry->getLastComponent<Mesh>();              // the mesh at the back is the latest creation
 }
 
 bool ResourceManager::readTriangleFile(std::string fileName) {
@@ -701,7 +701,7 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        auto &mesh = registry->getLastComponent<MeshComponent>();
+        auto &mesh = registry->getLastComponent<Mesh>();
         mesh.mVerticeCount = mMeshData.mVertices.size();
         mesh.mDrawType = GL_TRIANGLES;
         initVertexBuffers(&mesh);

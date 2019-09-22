@@ -1,7 +1,7 @@
 #include "movementsystem.h"
 #include "registry.h"
 MovementSystem::MovementSystem() {
-    mTransforms = Registry::instance()->registerComponent<TransformComponent>();
+    mTransforms = Registry::instance()->registerComponent<Transform>();
 }
 
 void MovementSystem::update() {

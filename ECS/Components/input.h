@@ -5,12 +5,12 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-class InputComponent : public Component {
+class Input : public Component {
 public:
     virtual void update(float dt);
     virtual void init();
 
-    InputComponent();
+    Input();
 
     bool W{false};
     bool A{false};

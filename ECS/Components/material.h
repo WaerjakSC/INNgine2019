@@ -15,10 +15,10 @@ class Shader;
 /**
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
-class MaterialComponent : public Component {
+class Material : public Component {
 public:
     friend class RenderSystem;
-    MaterialComponent();
+    Material();
 
     void update(float dt = 0.0f);
 

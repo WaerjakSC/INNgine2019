@@ -66,6 +66,13 @@ win32 {
     }
 }
 HEADERS += \
+    ECS/Components/input.h \
+    ECS/Components/light.h \
+    ECS/Components/material.h \
+    ECS/Components/mesh.h \
+    ECS/Components/physics.h \
+    ECS/Components/sound.h \
+    ECS/Components/transform.h \
     ECS/registry.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
@@ -87,13 +94,6 @@ HEADERS += \
 #
     ECS/gameobject.h \
     ECS/Components/component.h \
-    ECS/Components/meshcomponent.h \
-    ECS/Components/inputcomponent.h \
-    ECS/Components/lightcomponent.h \
-    ECS/Components/materialcomponent.h \
-    ECS/Components/physicscomponent.h \
-    ECS/Components/soundcomponent.h \
-    ECS/Components/transformcomponent.h \
     ECS/Components/comppch.h \
     ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
@@ -118,6 +118,13 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
+    ECS/Components/input.cpp \
+    ECS/Components/light.cpp \
+    ECS/Components/material.cpp \
+    ECS/Components/mesh.cpp \
+    ECS/Components/physics.cpp \
+    ECS/Components/sound.cpp \
+    ECS/Components/transform.cpp \
     ECS/registry.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
@@ -138,13 +145,6 @@ SOURCES += main.cpp \
 #
     ECS/gameobject.cpp \
     ECS/Components/component.cpp \
-    ECS/Components/meshcomponent.cpp \
-    ECS/Components/inputcomponent.cpp \
-    ECS/Components/lightcomponent.cpp \
-    ECS/Components/materialcomponent.cpp \
-    ECS/Components/physicscomponent.cpp \
-    ECS/Components/soundcomponent.cpp \
-    ECS/Components/transformcomponent.cpp \
     ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
     ECS/Systems/movementsystem.cpp \

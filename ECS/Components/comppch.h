@@ -2,12 +2,12 @@
 #define COMPPCH_H
 
 // Component headers
-#include "inputcomponent.h"
-#include "lightcomponent.h"
-#include "materialcomponent.h"
-#include "meshcomponent.h"
-#include "physicscomponent.h"
-#include "soundcomponent.h"
-#include "transformcomponent.h"
+#include "input.h"
+#include "light.h"
+#include "material.h"
+#include "mesh.h"
+#include "physics.h"
+#include "sound.h"
+#include "transform.h"
 
 #endif // COMPPCH_H

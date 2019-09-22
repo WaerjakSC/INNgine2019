@@ -1,6 +1,6 @@
 #include "textureshader.h"
 #include "innpch.h"
-#include "materialcomponent.h"
+#include "material.h"
 
 TextureShader::TextureShader(const std::string shaderName, const GLchar *geometryPath)
     : Shader(shaderName, geometryPath) {

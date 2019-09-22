@@ -1,18 +1,18 @@
-#include "lightcomponent.h"
+#include "light.h"
 #include "shader.h"
-LightComponent::LightComponent() {
+Light::Light() {
     light.mObjectColor = gsl::Vector3D{1.f, 1.f, 1.f};
     mType = CType::Light;
 }
 
-void LightComponent::update(float dt) {
+void Light::update(float dt) {
 }
 
-LightData LightComponent::getLight() const {
+LightData Light::getLight() const {
     return light;
 }
 
-void LightComponent::setLightColor(const gsl::Vector3D &color) {
+void Light::setLightColor(const gsl::Vector3D &color) {
     light.mLightColor = color;
 }
 

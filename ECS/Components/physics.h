@@ -3,9 +3,9 @@
 
 #include "component.h"
 
-class PhysicsComponent : public Component {
+class Physics : public Component {
 public:
-    PhysicsComponent();
+    Physics();
     virtual void update(float dt);
 };
 

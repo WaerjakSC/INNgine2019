@@ -18,9 +18,9 @@ private:
     void updateEntities();
 
     std::map<ShaderType, Shader *> mShaders;
-    std::shared_ptr<Pool<MeshComponent>> mMeshPool;
-    std::shared_ptr<Pool<MaterialComponent>> mMaterialPool;
-    std::shared_ptr<Pool<TransformComponent>> mTransformPool;
+    std::shared_ptr<Pool<Mesh>> mMeshPool;
+    std::shared_ptr<Pool<Material>> mMaterialPool;
+    std::shared_ptr<Pool<Transform>> mTransformPool;
 };
 
 #endif // RENDERSYSTEM_H

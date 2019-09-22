@@ -47,7 +47,7 @@ signals:
     void rotationChanged(gsl::Vector3D newRot);
 
 private:
-    std::shared_ptr<Pool<TransformComponent>> mTransforms;
+    std::shared_ptr<Pool<Transform>> mTransforms;
 };
 
 #endif // MOVEMENTSYSTEM_H

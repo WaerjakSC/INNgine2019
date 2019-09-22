@@ -13,7 +13,7 @@ class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
 class QStandardItem;
-class TransformComponent;
+class Transform;
 namespace Ui {
 class MainWindow;
 }
@@ -87,7 +87,7 @@ private:
     void forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void setupComponentList();
-    void setupTransformSettings(TransformComponent *component);
+    void setupTransformSettings(Transform *component);
 };
 
 #endif // MAINWINDOW_H

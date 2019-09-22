@@ -2,7 +2,7 @@
 #define BILLBOARD_H
 
 #include "gameobject.h"
-class TransformComponent;
+class Transform;
 class Shader;
 class BillBoard : public GameObject {
 
@@ -13,7 +13,7 @@ public:
 
     void setConstantYUp(bool constantUp);
 
-    void update(TransformComponent *transform, Shader *shader);
+    void update(Transform *transform, Shader *shader);
 
 private:
     using GameObject::update;
