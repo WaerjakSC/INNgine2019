@@ -1,45 +1,46 @@
 #include "rendersystem.h"
 #include "billboard.h"
+#include "registry.h"
 #include "renderview.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     factory = ResourceManager::instance();
-    // To-do: Implement signal/slot behavior to update the list of entities needed to render
-    //    connectComponents();
+    mMaterialPool = Registry::instance()->registerComponent<MaterialComponent>();
+    mMeshPool = Registry::instance()->registerComponent<MeshComponent>();
+    mTransformPool = Registry::instance()->registerComponent<TransformComponent>();
 }
-// To-do: Render only entities that want to be rendered.
+/**
+ * @brief RenderSystem::iterateEntities
+ * @todo Render only entities that want to be rendered.
+ * addendum - sort mesh and material pool by whether they are visible or not - hold an iterator that denotes the end of the "watched" group
+ */
 void RenderSystem::iterateEntities() {
-    for (size_t i = 0; i < mViableEntities.size(); i++) {
+    GLuint curEntity{0}; // which index of entities() is being iterated
+    // Iterate through entities -- We know Mesh and Material types will always want to be rendered, so we can iterate through all of the entities that own those types.
+    for (auto entityID : mMeshPool->entities()) {
+        auto &mesh = mMeshPool->data()[curEntity]; // We can access the component directly without any indirections because RenderSystem owns mesh and material types
+        auto &material = mMaterialPool->data()[curEntity];
+        auto &transform = mTransformPool->get(entityID); // Transforms could be sorted some unknown way - therefore we need to find the index of the component first through get(int entityID)
+        ShaderType type = material.getShader();
+
         initializeOpenGLFunctions();
-        mTransforms.at(i)->update();
-        ShaderType type = mMaterials.at(i)->getShader();
+        transform.update();
         // If entity is a billboard, additionally run the update function for that
-        BillBoard *billboard = dynamic_cast<BillBoard *>(factory->getGameObject(i));
+        BillBoard *billboard = dynamic_cast<BillBoard *>(factory->getGameObject(entityID));
         if (billboard)
-            billboard->update(mTransforms.at(i), mShaders[type]); // This probably causes some performance problems but idk how else to do this atm
+            billboard->update(&transform, mShaders[type]); // This probably causes some performance problems but idk how else to do this atm
         glUseProgram(mShaders[type]->getProgram());
-        mShaders[type]->transmitUniformData(&mTransforms.at(i)->matrix(), &mMaterials.at(i)->material);
-        glBindVertexArray(mMeshes.at(i)->mVAO);
-        mMaterials.at(i)->update();
-        mMeshes.at(i)->update();
-        if (mMeshes.at(i)->mIndiceCount > 0)
-            glDrawElements(mMeshes.at(i)->mDrawType, mMeshes.at(i)->mIndiceCount, GL_UNSIGNED_INT, nullptr);
+        mShaders[type]->transmitUniformData(&transform.matrix(), &material.material);
+        glBindVertexArray(mesh.mVAO);
+        material.update();
+        mesh.update();
+        if (mesh.mIndiceCount > 0)
+            glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
         else
-            glDrawArrays(mMeshes.at(i)->mDrawType, 0, mMeshes.at(i)->mVerticeCount);
+            glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
+        curEntity++;
     }
 }
 
 void RenderSystem::render() {
-    if (mOutOfDate)
-        updateEntities();
     iterateEntities();
-}
-void RenderSystem::updateEntities() {
-    std::tie(mViableEntities, mTransforms, mMaterials, mMeshes) = (factory->getRenderView()->getComponents());
-    mOutOfDate = false;
-}
-void RenderSystem::newEntity(std::tuple<int, TransformComponent *, MaterialComponent *, MeshComponent *> entity) {
-    mViableEntities.emplace_back(std::get<0>(entity));
-    mTransforms.emplace_back(std::get<1>(entity));
-    mMaterials.emplace_back(std::get<2>(entity));
-    mMeshes.emplace_back(std::get<3>(entity));
 }

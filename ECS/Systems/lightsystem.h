@@ -5,15 +5,15 @@
 class PhongShader;
 class LightSystem {
 public:
-    LightSystem(std::shared_ptr<Pool<TransformComponent>> transforms, PhongShader *shader);
+    LightSystem(PhongShader *shader);
 
     void update();
 
     Pool<LightComponent> *lightPool() const;
 
 private:
-    std::unique_ptr<Pool<LightComponent>> mLightPool;
-    std::shared_ptr<Pool<TransformComponent>> mTransformPool;
+    std::shared_ptr<Pool<LightComponent>> mLightPool;
+    std::shared_ptr<Pool<TransformComponent>> mTransforms;
     PhongShader *mPhong;
 };
 

@@ -7,7 +7,7 @@
 class MovementSystem : public QObject {
     Q_OBJECT
 public:
-    MovementSystem(std::shared_ptr<Pool<TransformComponent>> trans);
+    MovementSystem();
     void update();
 
     void setPosition(int eID, gsl::Vector3D position);
@@ -23,15 +23,16 @@ public:
     void moveY(int eID, float yIn);
     void moveZ(int eID, float zIn);
 
+    bool hasParent(int eID);
+    void setParent(int eID, int parentID);
     gsl::Matrix4x4 multiplyByParent(int eID, int pID);
+
     void updateMatrix();
     void iterateChildren(int eID);
 
     gsl::Vector3D getPosition(int eID);
 
     gsl::Vector3D getRelativePosition(int eID);
-
-    bool hasParent(int eID);
 
     void setRotationX(int eID, float xIn);
     void setRotationY(int eID, float yIn);
@@ -46,7 +47,7 @@ signals:
     void rotationChanged(gsl::Vector3D newRot);
 
 private:
-    std::shared_ptr<Pool<TransformComponent>> mTransformPool;
+    std::shared_ptr<Pool<TransformComponent>> mTransforms;
 };
 
 #endif // MOVEMENTSYSTEM_H

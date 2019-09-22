@@ -11,6 +11,7 @@
 class RenderView;
 class LightSystem;
 class GameObject;
+class Registry;
 // Resource manager work in progress
 struct meshData {
     meshData() = default;
@@ -38,10 +39,6 @@ public:
     void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
     GLuint makeGameObject(std::string name = "");
-
-    void addComponent(CType type, int eID = -1);
-    void removeComponent(CType type, int eID);
-    Component *getComponent(CType type, int eID = -1);
     void addMeshComponent(std::string name, int eID = -1);
 
     // Basic Shapes and Prefabs
@@ -66,11 +63,7 @@ public:
 
     std::vector<int> getGameObjectIndex() const;
 
-    void setParent(int eID, int parentID);
-
-    RenderView *getRenderView() const;
-
-    std::shared_ptr<Pool<TransformComponent>> transformPool() const;
+    //    RenderView *getRenderView() const;
 
     void setLightSystem(const std::shared_ptr<LightSystem> &lightSystem);
 
@@ -81,7 +74,7 @@ private:
     ResourceManager();
 
     static ResourceManager *mInstance;
-
+    Registry *registry;
     GLuint mNumGameObjects{0};
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> Shaders;
@@ -97,27 +90,15 @@ private:
     // Systems
     std::shared_ptr<LightSystem> mLightSystem;
 
-    // Component pools
-    // Partially owned by MovementSystem
-    std::shared_ptr<Pool<TransformComponent>> mTransforms;
-
-    Pool<InputComponent> mInputs;
-    Pool<PhysicsComponent> mPhysics;
-    Pool<SoundComponent> mSounds;
-    // Access functions -- The pools below are fully owned by their respective view or system
-    Pool<MeshComponent> *meshPool();
-    Pool<MaterialComponent> *matPool();
-    Pool<LightComponent> *lightPool();
-
     // View class for collecting the components RenderSystem needs
-    std::unique_ptr<RenderView> mRenderView; // Should this belong to RenderSystem?
+    //    std::unique_ptr<RenderView> mRenderView; // Should this belong to RenderSystem?
 
     // OpenGL init functions
     void initVertexBuffers(MeshComponent *mesh);
     void initIndexBuffers(MeshComponent *mesh);
 
     // Reads and loads mesh
-    MeshComponent *LoadMesh(std::string fileName);
+    void LoadMesh(std::string fileName);
     void setMesh(MeshComponent *mesh, int eID);
     bool readFile(std::string fileName);
     bool readTriangleFile(std::string filename);

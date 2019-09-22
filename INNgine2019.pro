@@ -66,6 +66,7 @@ win32 {
     }
 }
 HEADERS += \
+    ECS/registry.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -117,6 +118,7 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
+    ECS/registry.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
     GSL/matrix4x4.cpp \

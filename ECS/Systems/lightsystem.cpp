@@ -1,15 +1,18 @@
 #include "lightsystem.h"
 #include "phongshader.h"
+#include "registry.h"
 
-LightSystem::LightSystem(std::shared_ptr<Pool<TransformComponent>> transforms, PhongShader *shader)
-    : mTransformPool(transforms), mPhong(shader) {
-    mLightPool = std::make_unique<Pool<LightComponent>>();
+LightSystem::LightSystem(PhongShader *shader)
+    : mPhong(shader) {
+    mTransforms = Registry::instance()->registerComponent<TransformComponent>();
+    mLightPool = Registry::instance()->registerComponent<LightComponent>();
 }
 void LightSystem::update() {
-    for (size_t i = 0; i < mLightPool->size(); i++) {
-        int curEntity = mLightPool->getEntityList().at(i); // Get the actual ID.
+    GLuint curEntity{0}; // Get the actual ID.
+    for (auto entityID : mLightPool->entities()) {
         // Send the entity's model matrix as well as the light data.
-        mPhong->updateLightUniforms(&mTransformPool->get(curEntity)->matrix(), mLightPool->getComponents().at(i)->getLight());
+        mPhong->updateLightUniforms(&mTransforms->get(entityID).matrix(), mLightPool->data()[curEntity].getLight());
+        curEntity++;
     }
 }
 

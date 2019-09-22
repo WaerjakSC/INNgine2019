@@ -21,6 +21,7 @@
 #include "meshcomponent.h"
 #include "movementsystem.h"
 #include "phongshader.h"
+#include "registry.h"
 #include "rendersystem.h"
 #include "renderview.h"
 #include "textureshader.h"
@@ -29,7 +30,7 @@ typedef gsl::Vector3D vec3;
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false),
-      mFactory(ResourceManager::instance()), mSoundManager(SoundManager::instance()),
+      mFactory(ResourceManager::instance()), mRegistry(Registry::instance()), mSoundManager(SoundManager::instance()),
       mMainWindow(mainWindow) {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
@@ -118,8 +119,8 @@ void RenderWindow::init() {
 
     // Set up the systems.
     mRenderer = std::make_unique<RenderSystem>(mFactory->getShaders());
-    mMoveSys = std::make_unique<MovementSystem>(mFactory->transformPool());
-    mLightSys = std::make_shared<LightSystem>(mFactory->transformPool(), static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong)));
+    mMoveSys = std::make_unique<MovementSystem>();
+    mLightSys = std::make_shared<LightSystem>(static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong)));
     mFactory->setLightSystem(mLightSys);
 
     //********************** Set up camera **********************
@@ -135,10 +136,10 @@ void RenderWindow::init() {
     mLight = mFactory->makeLightObject();
 
     GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
-    static_cast<MaterialComponent *>(mFactory->getComponent(Material, boxID))->setShader(Color);
+    mRegistry->getComponent<MaterialComponent>(boxID).setShader(Color);
     //one monkey
     GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
-    mFactory->setParent(monkey, boxID);
+    mMoveSys->setParent(monkey, boxID);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     mFactory->GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
@@ -147,7 +148,6 @@ void RenderWindow::init() {
 
     // Add game objects to the scene hierarchy GUI
     mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
-
     // Initial positional setup.
     mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
     mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
@@ -157,8 +157,8 @@ void RenderWindow::init() {
     mMoveSys->setScale(skybox, 15);
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
     // Set up connections between MainWindow options and related systems.
-    connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
-    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer.get(), &RenderSystem::newEntity);
+    //    connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
+    //    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer.get(), &RenderSystem::newEntity);
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),

@@ -3,6 +3,7 @@
 #include "hierarchymodel.h"
 #include "innpch.h"
 #include "movementsystem.h"
+#include "registry.h"
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
@@ -155,7 +156,7 @@ void MainWindow::createActions() {
  */
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();
-    std::vector<Component *> components = ResourceManager::instance()->getComponents(selectedEntity->eID);
+    std::vector<Component *> components = Registry::instance()->getComponents(selectedEntity->eID);
     for (auto component : components) {
         switch (component->type()) { // Will add other components eventually
         case Transform:
@@ -371,14 +372,14 @@ void MainWindow::onParentChanged(const QModelIndex &parent) {
         for (auto entity : ResourceManager::instance()->getGameObjects()) {
             if (QString::fromStdString(entity->mName) == data) { // Checking by name necessitates unique names
                 parentID = entity->eID;
-                ResourceManager::instance()->setParent(selectedEntity->eID, parentID);
+                mRenderWindow->movement()->setParent(selectedEntity->eID, parentID);
                 mRenderWindow->movement()->iterateChildren(parentID);
                 qDebug() << "New Parent Name: " + QString::fromStdString(entity->mName) + ". ID: " + QString::number(parentID);
                 break;
             }
         }
     } else // Implies the item was dropped to the top node, aka it no longer has a parent. (or rather the parent is the top node which is empty)
-        ResourceManager::instance()->setParent(selectedEntity->eID, -1);
+        mRenderWindow->movement()->setParent(selectedEntity->eID, -1);
 }
 void MainWindow::onGameObjectClicked(const QModelIndex &index) {
     QString data = hierarchy->data(index).toString();
@@ -422,7 +423,7 @@ void MainWindow::insertGameObjects(std::vector<int> entities) {
                 item = new QStandardItem(QString("GameObject")) /*.arg(idx)*/;
             else
                 item = new QStandardItem(QString(QString::fromStdString(object->mName))) /*.arg(idx)*/;
-            int parentID = dynamic_cast<TransformComponent *>(ResourceManager::instance()->getComponent(Transform, object->eID))->parentID;
+            int parentID = Registry::instance()->getComponent<TransformComponent>(object->eID).parentID;
             if (parentID != -1) {
                 QString parent = QString::fromStdString(ResourceManager::instance()->getGameObject(entities.at(parentID))->mName);
                 forEach(hierarchy, parent, item);

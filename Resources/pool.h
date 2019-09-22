@@ -1,18 +1,23 @@
 #ifndef POOL_H
 #define POOL_H
 #include "comppch.h"
+#include <QObject>
 #include <vector>
-template <typename Type>
-class Pool {
+class IPool {
 public:
-    Pool() {}
-    ~Pool() {
-        for (auto components : mComponentList)
-            delete components;
-    }
+    virtual ~IPool() = default;
+    virtual void remove(int removedEntity) = 0;
+};
+
+template <typename Type>
+class Pool : public IPool {
+public:
+    Pool() = default;
+    ~Pool() {}
     /**
      * @brief Adds an entity and its new component to this pool.
      * Entity is equivalent to Component in this case, since pool won't contain the entity if the entity doesn't have the component.
+     * Could maybe have template<...Args> here for component initialization?
      * @param entityID
      */
     void add(int entityID) {
@@ -24,47 +29,48 @@ public:
         }
         mEntityIndices.push_back(mEntityList.size()); // entity list size is location of new entityID
         mEntityList.push_back(entityID);
-        mComponentList.push_back(new Type());
+        mComponentList.push_back(Type());
     }
     /**
      * @brief Removes an entity by swapping swapping the entityID/component with the last element of the dense arrays and popping out the last element.
-     * mEntityIndices[removedEntityID] now holds an impossible value for the dense arrays.
+     * mEntityIndices[removedEntityID] now holds an invalid value for the dense arrays.
      * mEntityIndices[swappedEntity] now holds the swapped location of the entityID/component.
      * @param removedEntityID
      */
     void remove(int removedEntityID) {
-        assert(has(removedEntityID));                                                   // Make sure the entity you want to delete actually exists. For debugging purposes.
-        mEntityIndices.at(mEntityList.back()) = mEntityIndices.at(removedEntityID);     // Set the index to point to the location after swap
-        std::swap(mEntityList.at(mEntityIndices[removedEntityID]), mEntityList.back()); // Swap the removed with the last, then pop out the last.
-        mEntityList.pop_back();
-        std::swap(mComponentList.at(mEntityIndices[removedEntityID]), mComponentList.back());
-        mComponentList.pop_back();
-        mEntityIndices.at(removedEntityID) = -1; // Set entity location to an invalid value.
+        if (has(removedEntityID)) {
+            // Make sure the entity you want to delete actually exists. For debugging purposes.
+            mEntityIndices.at(mEntityList.back()) = mEntityIndices.at(removedEntityID);     // Set the index to point to the location after swap
+            std::swap(mEntityList.at(mEntityIndices[removedEntityID]), mEntityList.back()); // Swap the removed with the last, then pop out the last.
+            mEntityList.pop_back();
+            std::swap(mComponentList.at(mEntityIndices[removedEntityID]), mComponentList.back());
+            mComponentList.pop_back();
+            mEntityIndices.at(removedEntityID) = -1; // Set entity location to an invalid value.
+        }
     }
-    std::vector<Type *> getComponents() { return mComponentList; } // Direct access to the components
-    const std::vector<int> getEntityList() { return mEntityList; }
-    const std::vector<int> getEntityIndices() { return mEntityIndices; }
+    /**
+     * @brief Direct access to the component list
+     * @return
+     */
+    std::vector<Type> &data() { return mComponentList; }
+    const std::vector<int> &entities() { return mEntityList; }
+    const std::vector<int> &indices() { return mEntityIndices; }
     /**
      * @brief get the component belonging to entity with given ID.
      * Some minor additional overhead due to going through mEntityIndices first -
-     * if you know you want to use all the entities in the Pool you may want getComponents() instead
+     * if you know you want to use all the entities in the Pool you may want data() instead
      * @param eID
      * @return
      */
-    Type *get(int eID) {
+    Type &get(int eID) {
         assert(has(eID));
-        if (has(eID)) {
-            return mComponentList.at(mEntityIndices.at(eID));
-        } else {
-            qDebug() << "Entity not found!";
-            return nullptr;
-        }
+        return mComponentList.at(mEntityIndices.at(eID));
     }
     /**
      * @brief get the last component in the pool, aka the latest creation
      * @return
      */
-    Type *getLast() {
+    Type &getLast() {
         return mComponentList.back();
     }
 
@@ -121,7 +127,7 @@ private:
     // Dense Arrays --  n points to Entity in mEntityList[n] and component data in mComponentList[n]
     // Both should be the same length.
     std::vector<int> mEntityList; // Value is entityID.
-    std::vector<Type *> mComponentList;
+    std::vector<Type> mComponentList;
 };
 
 #endif // POOL_H

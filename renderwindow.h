@@ -21,6 +21,7 @@ class MovementSystem;
 class SoundSource;
 class SoundManager;
 class LightSystem;
+class Registry;
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
 /// We also inherit from QOpenGLFunctions, to get access to the OpenGL functions
@@ -69,6 +70,7 @@ private:
     std::shared_ptr<LightSystem> mLightSys;
 
     ResourceManager *mFactory;
+    Registry *mRegistry;
     SoundManager *mSoundManager;
     GameObject *mPlayer; //the controllable object
 
