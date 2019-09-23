@@ -72,7 +72,6 @@ HEADERS += \
     ECS/Components/mesh.h \
     ECS/Components/physics.h \
     ECS/Components/sound.h \
-    ECS/Components/transform.h \
     ECS/registry.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
@@ -124,7 +123,6 @@ SOURCES += main.cpp \
     ECS/Components/mesh.cpp \
     ECS/Components/physics.cpp \
     ECS/Components/sound.cpp \
-    ECS/Components/transform.cpp \
     ECS/registry.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
