@@ -1,7 +1,6 @@
 #include "light.h"
 #include "shader.h"
-Light::Light() {
-    light.mObjectColor = gsl::Vector3D{1.f, 1.f, 1.f};
+Light::Light(LightData data) : light(data) {
     mType = CType::Light;
 }
 

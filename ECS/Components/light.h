@@ -13,7 +13,7 @@ struct LightData {
 
     GLfloat mSpecularStrength{0.3f};
     GLint mSpecularExponent{4};
-    gsl::Vector3D mObjectColor;
+    gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
 };
 
 /**
@@ -21,7 +21,7 @@ struct LightData {
  */
 class Light : public Component {
 public:
-    Light();
+    Light(LightData data = LightData());
     virtual void update(float dt);
 
     //    void draw(gsl::Matrix4x4 &mMatrix);
