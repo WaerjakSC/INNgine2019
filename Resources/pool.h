@@ -20,7 +20,8 @@ public:
      * Could maybe have template<...Args> here for component initialization?
      * @param entityID
      */
-    void add(int entityID) {
+    template <class... Args>
+    void add(int entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
         if ((size_t)entityID > mEntityIndices.size()) {
             for (size_t i = mEntityIndices.size(); i < (size_t)entityID; i++) {
@@ -29,7 +30,7 @@ public:
         }
         mEntityIndices.push_back(mEntityList.size()); // entity list size is location of new entityID
         mEntityList.push_back(entityID);
-        mComponentList.push_back(Type());
+        mComponentList.push_back(Type(args...));
     }
     /**
      * @brief Removes an entity by swapping swapping the entityID/component with the last element of the dense arrays and popping out the last element.

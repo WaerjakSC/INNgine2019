@@ -130,8 +130,7 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
 GLuint ResourceManager::makePlane() {
     GLuint eID = makeGameObject("Plane");
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
-    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Material>(eID, Color);
 
     initializeOpenGLFunctions();
     mMeshData.Clear();
@@ -141,12 +140,10 @@ GLuint ResourceManager::makePlane() {
     mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 0.f, 1.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 0.f, 0.f, 1.f});
     mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, 0.5f, 0.f, 0.f, 1.f});
+    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
 
-    // Once VAO and VBO have been generated, mMesh data can be discarded.
-    registry->getComponent<Material>(eID).setShader(Color);
+    // Once VAO and VBO have been generated, mMeshData can be discarded.
     auto &mesh = registry->getComponent<Mesh>(eID);
-    mesh.mVerticeCount = mMeshData.mVertices.size();
-    mesh.mDrawType = GL_TRIANGLES;
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -160,12 +157,9 @@ GLuint ResourceManager::makePlane() {
 GLuint ResourceManager::makeCube() {
     GLuint eID = makeGameObject("Cube");
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
+    registry->addComponent<Material>(eID, Color);
     registry->addComponent<Mesh>(eID);
     setMesh("cube.obj", eID);
-
-    // Once VAO and VBO have been generated, mMesh data can be discarded.
-    registry->getComponent<Material>(eID).setShader(Color);
 
     return eID;
 }
@@ -175,8 +169,7 @@ GLuint ResourceManager::makeCube() {
 GLuint ResourceManager::makeXYZ() {
     GLuint eID = makeGameObject("XYZ");
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
-    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Material>(eID, Color);
 
     initializeOpenGLFunctions();
     mMeshData.Clear();
@@ -186,12 +179,10 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
+    registry->addComponent<Mesh>(eID, GL_LINES, mMeshData);
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    registry->getComponent<Material>(eID).setShader(Color);
     auto &mesh = registry->getComponent<Mesh>(eID);
-    mesh.mVerticeCount = mMeshData.mVertices.size();
-    mesh.mDrawType = GL_LINES;
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -204,9 +195,8 @@ GLuint ResourceManager::makeXYZ() {
  */
 GLuint ResourceManager::makeSkyBox() {
     GLuint eID = makeGameObject("Skybox");
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
-    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
+    registry->addComponent<Material>(eID, Tex, Textures["skybox.bmp"]->id() - 1);
 
     //    temp->mMatrix.scale(15.f);
     initializeOpenGLFunctions();
@@ -259,16 +249,10 @@ GLuint ResourceManager::makeSkyBox() {
                                   16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
+    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData); // If using meshData struct, remember to add the Mesh component AFTER clearing and inserting mMeshData
 
-    auto &skyMat = registry->getComponent<Material>(eID);
-    skyMat.setShader(Tex);
-
-    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
+    //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
     auto &skyMesh = registry->getComponent<Mesh>(eID);
-    skyMesh.mVerticeCount = mMeshData.mVertices.size();
-    skyMesh.mIndiceCount = mMeshData.mIndices.size();
-    skyMesh.mDrawType = GL_TRIANGLES;
-
     initVertexBuffers(&skyMesh);
     initIndexBuffers(&skyMesh);
 
@@ -306,9 +290,9 @@ GLuint ResourceManager::makeBillBoard() {
     ++mNumGameObjects;
     mGameObjectIndex.emplace_back(mGameObjects.size());
     mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
-    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
+
+    registry->addComponent<Material>(eID, Tex, Textures["gnome.bmp"]->id() - 1);
 
     initializeOpenGLFunctions();
 
@@ -321,15 +305,9 @@ GLuint ResourceManager::makeBillBoard() {
                                    Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                    Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                });
-    auto &billBoardMat = registry->getComponent<Material>(eID);
-    billBoardMat.setTextureUnit(Textures["gnome.bmp"]->id() - 1);
-    billBoardMat.setShader(Tex);
-    billBoardMat.setColor(gsl::Vector3D(1.0f, 1.0f, 1.0f));
+    registry->addComponent<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
 
     auto &billBoardMesh = registry->getComponent<Mesh>(eID);
-    billBoardMesh.mVerticeCount = mMeshData.mVertices.size();
-    billBoardMesh.mDrawType = GL_TRIANGLE_STRIP;
-
     initVertexBuffers(&billBoardMesh);
 
     glBindVertexArray(0);
@@ -345,22 +323,17 @@ GLuint ResourceManager::makeOctBall(int n) {
     mMeshData.Clear();
     initializeOpenGLFunctions();
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
-    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Material>(eID, Color);
 
     GLint mRecursions = n;
     GLint mIndex = 0;
 
     GLuint mNumberVertices = static_cast<GLuint>(3 * 8 * std::pow(4, mRecursions)); // Not sure what these are used for?
 
-    makeUnitOctahedron(mRecursions);
+    makeUnitOctahedron(mRecursions); // This fills mMeshData
 
-    //    mTransforms.get(eID)->matrix().scale(0.5f, 0.5f, 0.5f);
+    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
     auto &octMesh = registry->getComponent<Mesh>(eID);
-    octMesh.mVerticeCount = mMeshData.mVertices.size();
-    octMesh.mIndiceCount = mMeshData.mIndices.size();
-    octMesh.mDrawType = GL_TRIANGLES;
-    registry->getComponent<Material>(eID).setShader(Color);
 
     initVertexBuffers(&octMesh);
     initIndexBuffers(&octMesh);
@@ -374,9 +347,8 @@ GLuint ResourceManager::makeOctBall(int n) {
  */
 GLuint ResourceManager::makeLightObject() {
     GLuint eID = makeGameObject("Light");
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
-    registry->addComponent<Mesh>(eID);
+    registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
+    registry->addComponent<Material>(eID, Tex, Textures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->addComponent<Light>(eID);
 
     initializeOpenGLFunctions();
@@ -397,16 +369,9 @@ GLuint ResourceManager::makeLightObject() {
                                1, 3, 2,
                                3, 0, 2,
                                0, 3, 1});
-
-    auto &lightMat = registry->getComponent<Material>(eID);
-    lightMat.setTextureUnit(Textures["white.bmp"]->id() - 1);
-    lightMat.setColor(gsl::Vector3D(0.1f, 0.1f, 0.8f));
-    lightMat.setShader(Tex);
+    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
 
     auto &lightMesh = registry->getComponent<Mesh>(eID);
-    lightMesh.mVerticeCount = mMeshData.mVertices.size();
-    lightMesh.mIndiceCount = mMeshData.mIndices.size();
-    lightMesh.mDrawType = GL_TRIANGLES;
 
     initVertexBuffers(&lightMesh);
     initIndexBuffers(&lightMesh);

@@ -46,10 +46,10 @@ public:
      * @tparam type Component type enum
      * @param eID Entity ID
      */
-    template <typename Type>
-    void addComponent(int entityID) {
+    template <typename Type, class... Args>
+    void addComponent(int entityID, Args... args) {
         // Add a component to the array for an entity
-        getComponentArray<Type>()->add(entityID);
+        getComponentArray<Type>()->add(entityID, args...);
     }
 
     template <typename Type>

@@ -2,6 +2,7 @@
 #define RESOURCEMANAGER_H
 
 #include "comppch.h"
+#include "mesh.h"
 #include "pool.h"
 #include "shader.h"
 #include "texture.h"
@@ -13,15 +14,7 @@ class LightSystem;
 class GameObject;
 class Registry;
 // Resource manager work in progress
-struct meshData {
-    meshData() = default;
-    std::vector<Vertex> mVertices;
-    std::vector<GLuint> mIndices;
-    void Clear() {
-        mVertices.clear();
-        mIndices.clear();
-    }
-};
+
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
 public:
     static ResourceManager *instance();

@@ -3,10 +3,11 @@
 
 #include "component.h"
 #include "vector3d.h"
-
+typedef gsl::Vector3D vec3;
 class Transform : public Component {
 public:
     Transform();
+    Transform(vec3 position, vec3 rotation = vec3(0), vec3 scale = vec3(1));
     virtual void update(float dt = 0.0f);
     bool mMatrixOutdated{true};
 

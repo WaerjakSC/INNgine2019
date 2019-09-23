@@ -7,6 +7,11 @@
 #include <QOpenGLFunctions_4_1_Core>
 
 struct MaterialData {
+    MaterialData() {} // Default constructor
+    MaterialData(gsl::Vector3D color, GLuint texture) {
+        mObjectColor = color;
+        mTextureUnit = texture;
+    }
     gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
     GLuint mTextureUnit{0}; //the actual texture to put into the uniform
 };
@@ -19,6 +24,8 @@ class Material : public Component {
 public:
     friend class RenderSystem;
     Material();
+    Material(ShaderType type, GLuint texture = 0, gsl::Vector3D color = gsl::Vector3D(1));
+    Material(ShaderType type, MaterialData data);
 
     void update(float dt = 0.0f);
 

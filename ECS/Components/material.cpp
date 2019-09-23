@@ -4,6 +4,12 @@ Material::Material() {
     mType = CType::Material;
 }
 
+Material::Material(ShaderType type, GLuint texture, gsl::Vector3D color) : Material(type, MaterialData(color, texture)) {}
+
+Material::Material(ShaderType type, MaterialData data) : material(data), mShader(type) {
+    mType = CType::Material;
+}
+
 void Material::update(float dt) {
 }
 

@@ -151,10 +151,6 @@ void RenderWindow::init() {
     // Initial positional setup.
     mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
     mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
-    mMoveSys->setPosition(mLight, 2.5f, 3.f, 0.f);
-    mMoveSys->setRotation(mLight, vec3(0.0f, 180.f, 0.0f));
-    mMoveSys->setPosition(billboard, vec3(4.f, 0.f, -3.5f));
-    mMoveSys->setScale(skybox, 15);
     mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
     // Set up connections between MainWindow options and related systems.
     //    connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);

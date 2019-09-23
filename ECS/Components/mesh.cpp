@@ -5,6 +5,13 @@ Mesh::Mesh() {
     mType = CType::Mesh;
 }
 
+Mesh::Mesh(GLenum drawType, GLuint verticeCount, GLuint indiceCount) : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType) {
+    mType = CType::Mesh;
+}
+
+Mesh::Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mVertices.size(), data.mIndices.size()) {
+}
+
 Mesh::~Mesh() {
     //    if (mVAO != 0)
     //        glDeleteVertexArrays(1, &mVAO);

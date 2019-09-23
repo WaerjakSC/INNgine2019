@@ -6,9 +6,20 @@
 #include <QOpenGLFunctions_4_1_Core>
 class Material;
 class Shader;
+struct meshData {
+    meshData() = default;
+    std::vector<Vertex> mVertices;
+    std::vector<GLuint> mIndices;
+    void Clear() {
+        mVertices.clear();
+        mIndices.clear();
+    }
+};
 class Mesh : public Component {
 public:
     Mesh();
+    Mesh(GLenum drawType, GLuint vertices = 0, GLuint indices = 0);
+    Mesh(GLenum drawType, meshData data);
 
     virtual ~Mesh();
 

@@ -5,6 +5,12 @@ Transform::Transform() {
     mMatrix.setToIdentity();
 }
 
+Transform::Transform(vec3 position, vec3 rotation, vec3 scale) : Transform() {
+    mPosition = position;
+    mRotation = rotation;
+    mScale = scale;
+}
+
 void Transform::update(float dt) {
 }
 
