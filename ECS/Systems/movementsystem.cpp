@@ -9,7 +9,7 @@ void MovementSystem::update() {
     for (auto entityID : mTransforms->entities()) {
         auto &comp = mTransforms->data()[curEntity];
         if (comp.mMatrixOutdated) {
-            comp.updateMatrix();
+            updateMatrix(comp);
             if (comp.parentID != -1) {
                 comp.matrix() = multiplyByParent(entityID, comp.parentID);
                 if (comp.mPosition != getPosition(entityID)) { // This is probably dumb
@@ -30,22 +30,40 @@ void MovementSystem::update() {
  * @param eID
  * @param parentID
  */
-void MovementSystem::setParent(int eID, int newParentID) {
-    int oldParentID = mTransforms->get(eID).parentID;
+void MovementSystem::setParent(int childID, int newParentID) {
+    int oldParentID = mTransforms->get(childID).parentID;
     if (oldParentID != -1) // Make sure to remove the child from its old parent if it had one
-        mTransforms->get(oldParentID).removeChild(eID);
-    mTransforms->get(eID).parentID = newParentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
+        removeChild(oldParentID, childID);
+    mTransforms->get(childID).parentID = newParentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
     if (newParentID != -1)
-        mTransforms->get(newParentID).addChild(eID);
+        addChild(newParentID, childID);
 }
 /**
  * @brief Set child matrices to outdated if the parent moves so they also move.
  * @param eID
  */
 void MovementSystem::iterateChildren(int eID) {
-    for (auto entity : mTransforms->get(eID).children()) {
+    for (auto entity : children(eID)) {
         mTransforms->get(entity).mMatrixOutdated = true;
     }
+}
+std::vector<int> &MovementSystem::children(const int eID) const {
+    return mTransforms->get(eID).mChildren;
+}
+void MovementSystem::addChild(const int eID, const GLuint childID) {
+    children(eID).emplace_back(childID);
+    mTransforms->get(eID).hasChildren = true;
+}
+
+void MovementSystem::removeChild(const int eID, const GLuint childID) {
+    for (auto child : children(eID)) {
+        if (child == (int)childID) {
+            std::swap(child, children(eID).back());
+            children(eID).pop_back();
+        }
+    }
+    if (children(eID).empty())
+        mTransforms->get(eID).hasChildren = false;
 }
 /**
  * @brief Get global position of object
@@ -206,4 +224,18 @@ void MovementSystem::setScaleZ(int eID, float zIn) {
 }
 gsl::Matrix4x4 MovementSystem::multiplyByParent(int eID, int pID) {
     return mTransforms->get(pID).matrix() * mTransforms->get(eID).matrix();
+}
+
+void MovementSystem::updateMatrix(Transform &comp) {
+    gsl::Vector3D position = comp.mPosition;
+    gsl::Vector3D rotation = comp.mRotation;
+    gsl::Vector3D scale = comp.mScale;
+    //calculate matrix from position, scale, rotation
+    comp.matrix().setToIdentity();
+    comp.matrix().translate(position);
+    comp.matrix().rotateX(rotation.x);
+    comp.matrix().rotateY(rotation.y);
+    comp.matrix().rotateZ(rotation.z);
+    comp.matrix().scale(scale);
+    comp.mMatrixOutdated = false;
 }
