@@ -5,7 +5,8 @@
 LightSystem::LightSystem(PhongShader *shader)
     : mPhong(shader) {
     mTransforms = Registry::instance()->registerComponent<Transform>();
-    mLightPool = Registry::instance()->registerComponent<Light>();
+    mLightPool = std::make_shared<Pool<Light>>();
+    Registry::instance()->registerComponent<Light>(mLightPool);
 }
 void LightSystem::update() {
     GLuint curEntity{0}; // Get the actual ID.

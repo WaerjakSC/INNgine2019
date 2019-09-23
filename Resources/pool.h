@@ -76,7 +76,6 @@ public:
 
     /**
      * @brief For checking if the pool contains a given entity.
-     * Utility function for View.
      * @param eID
      * @return
      */

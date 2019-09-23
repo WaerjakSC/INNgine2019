@@ -14,10 +14,11 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
-    registry->registerComponent<Transform>();
-    registry->registerComponent<Material>();
-    registry->registerComponent<Mesh>();
-    registry->registerComponent<Light>();
+    //    registry->registerComponent<Transform>();
+    //    registry->registerComponent<Material>();
+    //    registry->registerComponent<Mesh>();
+    //    registry->registerComponent<Light>();
+    // Move these elsewhere once they have systems
     registry->registerComponent<Input>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
