@@ -5,10 +5,6 @@
 #include <memory>
 #include <typeinfo>
 
-using ComponentType = std::uint8_t;
-// Used to define the size of arrays later on
-const ComponentType MAX_COMPONENTS = 32;
-
 class Registry {
 public:
     Registry();
@@ -42,34 +38,54 @@ public:
         return pool;
     }
     /**
-     * @brief ResourceManager::addComponent - Generic component creator
-     * @tparam type Component type enum
-     * @param eID Entity ID
+     * @brief Adds an entity and its new component to a pool of that type.
+     * Entity is equivalent to Component in this case, since a pool won't contain the entity if the entity doesn't have the component.
+     * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
+     * @param entityID
+     * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      */
     template <typename Type, class... Args>
     void addComponent(int entityID, Args... args) {
         // Add a component to the array for an entity
         getComponentArray<Type>()->add(entityID, args...);
     }
-
+    /**
+     * @brief Remove a component of type Type from the entity/gameobject with entityID.
+     */
     template <typename Type>
     void removeComponent(int entityID) {
         // Remove a component from the array for an entity
         getComponentArray<Type>()->remove(entityID);
     }
-
+    /**
+     * @brief Get a reference to the Type component owned by entityID
+     */
     template <typename Type>
     Type &getComponent(int entityID) {
         // Get a reference to a component from the array for an entity
         return getComponentArray<Type>()->get(entityID);
     }
+    /**
+     * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
+     */
     template <typename Type>
     Type &getLastComponent() {
         // Get a reference to a component from the array for an entity
         return getComponentArray<Type>()->getLast();
     }
+    /**
+     * @brief entityDestroyed is called when an entity is removed from the game.
+     * Iterates through all the Pools, and if they contain a component owned by entityID, delete and re-arrange the Pool.
+     * @param entityID
+     */
     void entityDestroyed(int entityID);
 
+    /**
+     * @brief Temporary function for MainWindow to get all the components owned by an entity.
+     * Has to be a better way to do this.
+     * @param entityID
+     * @return
+     */
     std::vector<Component *> getComponents(int entityID);
 
 private:

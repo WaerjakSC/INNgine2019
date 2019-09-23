@@ -23,7 +23,17 @@ public:
     void moveY(int eID, float yIn);
     void moveZ(int eID, float zIn);
 
+    /**
+     * @brief Check if Transform component (or rather its entity) has a parent object
+     * @param eID
+     * @return
+     */
     bool hasParent(int eID);
+    /**
+     * @brief Remove the entity's old parent (if it had one) and set it to the given parentID. If parentID == -1, simply removes the parent.
+     * @param eID
+     * @param parentID
+     */
     void setParent(int eID, int parentID);
     gsl::Matrix4x4 multiplyByParent(int eID, int pID);
 

@@ -18,6 +18,8 @@ public:
      * @brief Adds an entity and its new component to this pool.
      * Entity is equivalent to Component in this case, since pool won't contain the entity if the entity doesn't have the component.
      * Could maybe have template<...Args> here for component initialization?
+     * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
+     * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      * @param entityID
      */
     template <class... Args>
@@ -51,10 +53,23 @@ public:
     }
     /**
      * @brief Direct access to the component list
-     * @return
+     * @return std::vector containing the component type. Use operator[] to access a component if you know the component exists (isn't out of range) --
+     * it's faster than .at() BUT doesn't give an out_of_range exception like .at() does, so it can be harder to debug
      */
     std::vector<Type> &data() { return mComponentList; }
+    /**
+     * @brief Returns a list of every entity that exists in the component array.
+     * The index is initially meaningless except as an accessor, the component pool can be sorted
+     * to keep entities relevant to a certain system first in the array.
+     * @return The entity list contains a list of every entityID.
+     */
     const std::vector<int> &entities() { return mEntityList; }
+    /**
+     * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
+     * The index location is equal to the entityID. @example The location of Entity 5 in the packed arrays can be found at mEntityIndices[5].
+     * Both IDs and arrays begin at 0.
+     * @return
+     */
     const std::vector<int> &indices() { return mEntityIndices; }
     /**
      * @brief get the component belonging to entity with given ID.
@@ -86,12 +101,13 @@ public:
         return false;
     }
     /**
-     * @brief Actual number of components in list.
+     * @brief Actual number of entities with owned components in the pool.
      * @return
      */
     size_t size() { return mEntityList.size(); }
     /**
      * @brief Size of the sparse array.
+     * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
     size_t extent() { return mEntityIndices.size(); }
