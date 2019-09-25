@@ -1,6 +1,5 @@
 #include "billboard.h"
 #include "camera.h"
-#include "transform.h"
 
 BillBoard::BillBoard(GLuint eID, std::string name) : GameObject(eID, name) {
 
@@ -14,19 +13,19 @@ void BillBoard::update(Transform *transform, Shader *shader) {
         gsl::Vector3D camPosition = shader->getCurrentCamera()->position();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
-            camPosition.setY(transform->matrix().getPosition().y);
-        direction = camPosition - gsl::Vector3D(transform->matrix().getPosition());
+            camPosition.setY(transform->mMatrix.getPosition().y);
+        direction = camPosition - gsl::Vector3D(transform->mMatrix.getPosition());
     } else {
         gsl::Vector3D camDirection = shader->getCurrentCamera()->forward();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
-            camDirection.setY(transform->matrix().getPosition().y);
+            camDirection.setY(transform->mMatrix.getPosition().y);
         direction = camDirection * -1;
     }
 
     direction.normalize();
     //set rotation to this direction
-    transform->matrix().setRotationToVector(direction);
+    transform->mMatrix.setRotationToVector(direction);
 }
 
 //gsl::Vector3D BillBoard::getNormal(gsl::Matrix4x4 mMatrix) {

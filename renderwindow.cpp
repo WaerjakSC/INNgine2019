@@ -1,5 +1,4 @@
 #include "renderwindow.h"
-#include "Components/input.h"
 #include "innpch.h"
 #include <QKeyEvent>
 #include <QOpenGLContext>
@@ -18,7 +17,6 @@
 
 #include "colorshader.h"
 #include "lightsystem.h"
-#include "mesh.h"
 #include "movementsystem.h"
 #include "phongshader.h"
 #include "registry.h"
@@ -131,12 +129,12 @@ void RenderWindow::init() {
 
     //********************** Making the objects to be drawn **********************
     mFactory->makeXYZ();
-    GLuint skybox = mFactory->makeSkyBox();
-    GLuint billboard = mFactory->makeBillBoard();
+    mFactory->makeSkyBox();
+    mFactory->makeBillBoard();
     mLight = mFactory->makeLightObject();
 
     GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
-    mRegistry->getComponent<Material>(boxID).setShader(Color);
+    mRegistry->getComponent<Material>(boxID).mShader = Color;
     //one monkey
     GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
     mMoveSys->setParent(monkey, boxID);

@@ -22,7 +22,7 @@ void RenderSystem::iterateEntities() {
         auto &mesh = mMeshPool->data()[curEntity]; // We can access the component directly without any indirections because RenderSystem owns mesh and material types
         auto &material = mMaterialPool->data()[curEntity];
         auto &transform = mTransformPool->get(entityID); // Transforms could be sorted some unknown way - therefore we need to find the index of the component first through get(int entityID)
-        ShaderType type = material.getShader();
+        ShaderType type = material.mShader;
 
         initializeOpenGLFunctions();
         transform.update();
@@ -31,7 +31,7 @@ void RenderSystem::iterateEntities() {
         if (billboard)
             billboard->update(&transform, mShaders[type]); // This probably causes some performance problems but idk how else to do this atm
         glUseProgram(mShaders[type]->getProgram());
-        mShaders[type]->transmitUniformData(&transform.matrix(), &material.material);
+        mShaders[type]->transmitUniformData(&transform.mMatrix, &material);
         glBindVertexArray(mesh.mVAO);
         material.update();
         mesh.update();

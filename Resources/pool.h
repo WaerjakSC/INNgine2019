@@ -1,6 +1,7 @@
 #ifndef POOL_H
 #define POOL_H
-#include "comppch.h"
+
+#include "components.h"
 #include <QObject>
 #include <vector>
 class IPool {

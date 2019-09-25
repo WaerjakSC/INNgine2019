@@ -13,8 +13,7 @@
 //must inherit from QOpenGLFunctions_4_1_Core, since we use that instead of glfw/glew/glad
 
 class Camera;
-struct LightData;
-struct MaterialData;
+struct Material;
 enum ShaderType {
     Color = 0,
     Tex = 1,
@@ -31,7 +30,7 @@ public:
 
     //Get program number for this shader
     GLuint getProgram() const;
-    virtual void transmitUniformData(gsl::Matrix4x4 *modelMatrix, MaterialData *material = nullptr);
+    virtual void transmitUniformData(gsl::Matrix4x4 *modelMatrix, Material *material = nullptr);
 
     void setCurrentCamera(Camera *currentCamera);
 

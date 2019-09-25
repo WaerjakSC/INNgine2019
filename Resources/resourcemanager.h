@@ -1,8 +1,7 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include "comppch.h"
-#include "mesh.h"
+#include "components.h"
 #include "pool.h"
 #include "shader.h"
 #include "texture.h"
@@ -13,7 +12,7 @@ class RenderView;
 class LightSystem;
 class GameObject;
 class Registry;
-// Resource manager work in progress
+class MainWindow;
 
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
 public:

@@ -4,7 +4,6 @@
 #include "camera.h"
 
 #include "gameobject.h"
-#include "input.h"
 #include "resourcemanager.h"
 #include "texture.h"
 #include <QElapsedTimer>

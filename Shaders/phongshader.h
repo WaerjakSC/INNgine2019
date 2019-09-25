@@ -2,7 +2,7 @@
 #define PHONGSHADER_H
 
 #include "shader.h"
-
+struct LightData;
 class PhongShader : public Shader {
 public:
     PhongShader(const std::string shaderName, const GLchar *geometryPath = nullptr);

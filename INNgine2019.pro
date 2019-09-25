@@ -66,12 +66,7 @@ win32 {
     }
 }
 HEADERS += \
-    ECS/Components/input.h \
-    ECS/Components/light.h \
-    ECS/Components/material.h \
-    ECS/Components/mesh.h \
-    ECS/Components/physics.h \
-    ECS/Components/sound.h \
+    ECS/Components/components.h \
     ECS/registry.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
@@ -92,8 +87,6 @@ HEADERS += \
     Shaders/shader.h \
 #
     ECS/gameobject.h \
-    ECS/Components/component.h \
-    ECS/Components/comppch.h \
     ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
     ECS/Systems/movementsystem.h \
@@ -117,12 +110,7 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
-    ECS/Components/input.cpp \
-    ECS/Components/light.cpp \
-    ECS/Components/material.cpp \
-    ECS/Components/mesh.cpp \
-    ECS/Components/physics.cpp \
-    ECS/Components/sound.cpp \
+    ECS/Components/components.cpp \
     ECS/registry.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
@@ -142,7 +130,6 @@ SOURCES += main.cpp \
     Shaders/shader.cpp \
 #
     ECS/gameobject.cpp \
-    ECS/Components/component.cpp \
     ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
     ECS/Systems/movementsystem.cpp \

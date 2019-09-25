@@ -11,7 +11,7 @@ void MovementSystem::update() {
         if (comp.mMatrixOutdated) {
             updateMatrix(comp);
             if (comp.parentID != -1) {
-                comp.matrix() = multiplyByParent(entityID, comp.parentID);
+                comp.mMatrix = multiplyByParent(entityID, comp.parentID);
                 if (comp.mPosition != getPosition(entityID)) { // This is probably dumb
                     comp.mPosition = getPosition(entityID);    // Position from the multiplied matrix should be the global position.
                     comp.mMatrixOutdated = true;
@@ -223,7 +223,7 @@ void MovementSystem::setScaleZ(int eID, float zIn) {
     setScale(eID, newScale);
 }
 gsl::Matrix4x4 MovementSystem::multiplyByParent(int eID, int pID) {
-    return mTransforms->get(pID).matrix() * mTransforms->get(eID).matrix();
+    return mTransforms->get(pID).mMatrix * mTransforms->get(eID).mMatrix;
 }
 
 void MovementSystem::updateMatrix(Transform &comp) {
@@ -231,11 +231,11 @@ void MovementSystem::updateMatrix(Transform &comp) {
     gsl::Vector3D rotation = comp.mRotation;
     gsl::Vector3D scale = comp.mScale;
     //calculate matrix from position, scale, rotation
-    comp.matrix().setToIdentity();
-    comp.matrix().translate(position);
-    comp.matrix().rotateX(rotation.x);
-    comp.matrix().rotateY(rotation.y);
-    comp.matrix().rotateZ(rotation.z);
-    comp.matrix().scale(scale);
+    comp.mMatrix.setToIdentity();
+    comp.mMatrix.translate(position);
+    comp.mMatrix.rotateX(rotation.x);
+    comp.mMatrix.rotateY(rotation.y);
+    comp.mMatrix.rotateZ(rotation.z);
+    comp.mMatrix.scale(scale);
     comp.mMatrixOutdated = false;
 }

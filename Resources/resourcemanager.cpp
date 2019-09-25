@@ -3,7 +3,6 @@
 #include "colorshader.h"
 #include "innpch.h"
 #include "lightsystem.h"
-#include "mesh.h"
 #include "phongshader.h"
 #include "registry.h"
 #include "renderview.h"
@@ -64,13 +63,13 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 void ResourceManager::setMesh(Mesh *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
     if ((size_t)eID < mGameObjects.size()) {
-        registry->getComponent<Mesh>(eID).copyOpenGLData(*mesh);
+        registry->getComponent<Mesh>(eID) = *mesh;
     }
 }
 void ResourceManager::setMesh(std::string name, int eID) {
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
-        registry->getComponent<Mesh>(eID).copyOpenGLData(search->second);
+        registry->getComponent<Mesh>(eID) = search->second;
     } else
         LoadMesh(name);
 }
@@ -118,9 +117,8 @@ GLuint ResourceManager::makeGameObject(std::string name) {
 GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
     GLuint eID = makeGameObject(name);
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
+    registry->addComponent<Material>(eID, type);
     addMeshComponent(name, eID);
-    registry->getComponent<Material>(eID).setShader(type);
     return eID;
 }
 /**

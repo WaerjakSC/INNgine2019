@@ -1,7 +1,7 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#include "component.h"
+#include "components.h"
 #include "matrix4x4.h"
 
 class GameObject {

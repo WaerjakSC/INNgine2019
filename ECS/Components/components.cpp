@@ -1,18 +1,7 @@
-#include "input.h"
-#include "renderwindow.h"
-#include <QKeyEvent>
+#include "components.h"
+#include "mainwindow.h"
 
-// InputComponent handling user inputs (moved from renderwindow and implemented here)
-Input::Input() {
-    mType = CType::Input;
-}
-
-// Updates each game loop/tick
-void Input::update(float dt) {
-}
-void Input::setMainWindow(MainWindow *mainWindow) { mMainWindow = mainWindow; }
-// Code initialization (Similar to Unity's void Start()), separating the constructor and code initialization
-void Input::init() {
+Component::~Component() {
 }
 
 void Input::keyPressEvent(QKeyEvent *event) {
@@ -144,7 +133,7 @@ void Input::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 /*
-void InputComponent::wheelEvent(QWheelEvent *event){
+void Input::wheelEvent(QWheelEvent *event){
     QPoint numDegrees = event->angleDelta() / 8;
     RenderWindow r;
     //if RMB, change the speed of the camera
