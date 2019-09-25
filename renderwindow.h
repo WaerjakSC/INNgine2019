@@ -2,7 +2,6 @@
 #define RENDERWINDOW_H
 
 #include "camera.h"
-
 #include "gameobject.h"
 #include "resourcemanager.h"
 #include "texture.h"
@@ -11,10 +10,10 @@
 #include <QWindow>
 #include <chrono>
 #include <memory>
+
 class QOpenGLContext;
 class Shader;
 class MainWindow;
-class LightObject;
 class RenderSystem;
 class MovementSystem;
 class SoundSource;

@@ -59,7 +59,7 @@ struct Transform : Component {
         mType = CType::Transform;
         mMatrix.setToIdentity();
     }
-    Transform(vec3 position, vec3 rotation = vec3(0), vec3 scale = vec3(1)) : Transform() {
+    Transform(vec3 position, vec3 rotation = 0, vec3 scale = 1) : Transform() {
         mPosition = position;
         mRotation = rotation;
         mScale = scale;
@@ -123,7 +123,7 @@ public:
     }
 };
 struct Light : public Component {
-    Light() {
+    Light(LightData light = LightData()) : mLight(light) {
         mType = CType::Light;
     }
     virtual void update() {}

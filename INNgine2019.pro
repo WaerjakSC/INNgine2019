@@ -10,7 +10,6 @@ PRECOMPILED_HEADER = innpch.h
 INCLUDEPATH += \
     ./GSL \
     ./ECS \
-    ./ECS/Components \
     ./ECS/Systems \
     ./ECS/Views \
     ./Shaders \
@@ -66,8 +65,6 @@ win32 {
     }
 }
 HEADERS += \
-    ECS/Components/components.h \
-    ECS/registry.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -87,6 +84,8 @@ HEADERS += \
     Shaders/shader.h \
 #
     ECS/gameobject.h \
+    ECS/components.h \
+    ECS/registry.h \
     ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
     ECS/Systems/movementsystem.h \
@@ -110,8 +109,6 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
-    ECS/Components/components.cpp \
-    ECS/registry.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
     GSL/matrix4x4.cpp \
@@ -130,6 +127,8 @@ SOURCES += main.cpp \
     Shaders/shader.cpp \
 #
     ECS/gameobject.cpp \
+    ECS/components.cpp \
+    ECS/registry.cpp \
     ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
     ECS/Systems/movementsystem.cpp \
