@@ -165,6 +165,35 @@ void MainWindow::setupComponentList() {
         }
     }
 }
+void MainWindow::setupMaterialSettings(Material *component) {
+    QStyle *fusion = QStyleFactory::create("fusion");
+    QGroupBox *box = new QGroupBox(tr("Material"));
+    box->setAlignment(Qt::AlignCenter);
+    box->setStyle(fusion);
+
+    QVBoxLayout *shader = new QVBoxLayout;
+    shader->setMargin(1);
+    QComboBox *shaderType = new QComboBox;
+    for (auto type : ResourceManager::instance()->getShaders()) {
+        QString curText;
+        switch (type.first) {
+        case Color:
+            curText = "Color";
+            shaderType->addItem(curText);
+            break;
+        case Tex:
+            curText = "Texture";
+            shaderType->addItem("Texture");
+            break;
+        case Phong:
+            curText = "Phong";
+            shaderType->addItem("Phong");
+            break;
+        }
+        if (type.first == component->mShader)
+            shaderType->setCurrentIndex(shaderType->findText(curText));
+    }
+}
 void MainWindow::setupTransformSettings(Transform *component) {
     QStyle *fusion = QStyleFactory::create("fusion");
     QGroupBox *box = new QGroupBox(tr("Transform"));

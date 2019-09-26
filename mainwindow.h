@@ -14,6 +14,7 @@ class HierarchyView;
 class VerticalScrollArea;
 class QStandardItem;
 class Transform;
+class Material;
 namespace Ui {
 class MainWindow;
 }
@@ -88,6 +89,7 @@ private:
     void createActions();
     void setupComponentList();
     void setupTransformSettings(Transform *component);
+    void setupMaterialSettings(Material *component);
 };
 
 #endif // MAINWINDOW_H

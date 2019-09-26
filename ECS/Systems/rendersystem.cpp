@@ -25,7 +25,6 @@ void RenderSystem::iterateEntities() {
         ShaderType type = material.mShader;
 
         initializeOpenGLFunctions();
-        transform.update();
         // If entity is a billboard, additionally run the update function for that
         BillBoard *billboard = dynamic_cast<BillBoard *>(factory->getGameObject(entityID));
         if (billboard)
@@ -33,8 +32,6 @@ void RenderSystem::iterateEntities() {
         glUseProgram(mShaders[type]->getProgram());
         mShaders[type]->transmitUniformData(&transform.mMatrix, &material);
         glBindVertexArray(mesh.mVAO);
-        material.update();
-        mesh.update();
         if (mesh.mIndiceCount > 0)
             glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
         else
