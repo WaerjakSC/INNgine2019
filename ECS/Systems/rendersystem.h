@@ -11,6 +11,9 @@ public:
 
     void render();
 
+public slots:
+    void changeShader(int entityID, ShaderType nShader);
+
 private:
     ResourceManager *factory{nullptr};
 

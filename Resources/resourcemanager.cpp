@@ -446,9 +446,9 @@ void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
  * @param fileName
  * @param textureUnit
  */
-void ResourceManager::LoadTexture(std::string fileName, GLuint textureUnit) {
+void ResourceManager::LoadTexture(std::string fileName) {
     if (Textures.find(fileName) == Textures.end()) {
-        Textures[fileName] = new Texture(fileName, textureUnit);
+        Textures[fileName] = new Texture(fileName, Textures.size());
 
         qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
     }
@@ -460,6 +460,15 @@ Shader *ResourceManager::GetShader(ShaderType type) {
 
 Texture *ResourceManager::GetTexture(std::string fileName) {
     return Textures[fileName];
+}
+QString ResourceManager::GetTextureName(GLuint id) {
+    for (auto it = Textures.begin(); it != Textures.end(); ++it) {
+        if (it->second->id() == id + 1) {
+            qDebug() << QString::fromStdString(it->first);
+            return QString::fromStdString(it->first);
+        }
+    }
+    return QString();
 }
 /**
  * @brief Read .obj file.

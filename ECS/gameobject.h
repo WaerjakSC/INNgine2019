@@ -13,6 +13,8 @@ public:
 
     GLuint eID;
 
+    CType types;
+
     virtual void update();
 
     void init();

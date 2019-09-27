@@ -28,14 +28,59 @@ struct LightData {
     gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
 };
 enum class CType {
-    Transform = 0,
-    Material = 1,
-    Mesh = 2,
-    Light = 3,
-    Input = 4,
-    Physics = 5,
-    Sound = 6
-}; // Consider using bitwise masks to let systems know what to ignore
+    None = 0,
+    Transform = 1 << 0,
+    Material = 1 << 1,
+    Mesh = 1 << 2,
+    Light = 1 << 3,
+    Input = 1 << 4,
+    Physics = 1 << 5,
+    Sound = 1 << 6
+};
+
+template <typename E>
+struct enableBitmaskOperators {
+    static constexpr bool enable = false;
+};
+template <>
+struct enableBitmaskOperators<CType> {
+    static constexpr bool enable = true;
+};
+template <typename E>
+typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
+operator|(E lhs, E rhs) {
+    typedef typename std::underlying_type<E>::type underlying;
+    return static_cast<E>(static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+}
+template <typename E>
+typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
+operator~(E type) {
+    typedef typename std::underlying_type<E>::type underlying;
+    return static_cast<E>(static_cast<underlying>(type));
+}
+template <typename E>
+typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
+operator|=(E &lhs, E rhs) {
+    typedef typename std::underlying_type<E>::type underlying;
+    lhs = static_cast<E>(
+        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+    return lhs;
+}
+template <typename E>
+typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
+operator&=(E &lhs, E rhs) {
+    typedef typename std::underlying_type<E>::type underlying;
+    lhs = static_cast<E>(
+        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+    return lhs;
+}
+template <typename E>
+typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
+operator&(E lhs, E rhs) {
+    typedef typename std::underlying_type<E>::type underlying;
+    return static_cast<E>(
+        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+}
 /**
  * @brief The Component class is the base class for all components.
  */

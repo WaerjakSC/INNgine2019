@@ -43,3 +43,7 @@ void RenderSystem::iterateEntities() {
 void RenderSystem::render() {
     iterateEntities();
 }
+
+void RenderSystem::changeShader(int entityID, ShaderType nShader) {
+    mMaterialPool->get(entityID).mShader = nShader;
+}

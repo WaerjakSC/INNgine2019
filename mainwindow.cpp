@@ -10,8 +10,9 @@
 #include <QComboBox>
 #include <QDesktopWidget>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
 #include <QLabel>
-#include <QRadioButton>
+#include <QPushButton>
 #include <QStandardItem>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
@@ -113,6 +114,14 @@ void MainWindow::updateScaleVals(gsl::Vector3D newScale) {
     emit scaleY(newScale.y);
     emit scaleZ(newScale.z);
 }
+void MainWindow::setNewShader(const QString &text) {
+    if (text == "Texture")
+        emit newShader(selectedEntity->eID, Tex);
+    else if (text == "Color")
+        emit newShader(selectedEntity->eID, Color);
+    else if (text == "Phong")
+        emit newShader(selectedEntity->eID, Phong);
+}
 void MainWindow::snapToObject() {
     if (selectedEntity)
         mRenderWindow->snapToObject(selectedEntity->eID);
@@ -157,15 +166,15 @@ void MainWindow::createActions() {
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();
     // Probably err, just scrap this and re-do it some other way...
-    std::vector<Component *> components = Registry::instance()->getComponents(selectedEntity->eID);
-    for (auto component : components) {
-        switch (component->type()) { // Will add other components eventually
-        case CType::Transform:
-            setupTransformSettings(dynamic_cast<Transform *>(component));
-        }
+    CType typeMask = ResourceManager::instance()->getGameObject(selectedEntity->eID)->types;
+    if ((typeMask & CType::Transform) != CType::None) {
+        setupTransformSettings(Registry::instance()->getComponent<Transform>(selectedEntity->eID));
+    }
+    if ((typeMask & CType::Material) != CType::None) {
+        setupMaterialSettings(Registry::instance()->getComponent<Material>(selectedEntity->eID));
     }
 }
-void MainWindow::setupMaterialSettings(Material *component) {
+void MainWindow::setupMaterialSettings(const Material &component) {
     QStyle *fusion = QStyleFactory::create("fusion");
     QGroupBox *box = new QGroupBox(tr("Material"));
     box->setAlignment(Qt::AlignCenter);
@@ -190,11 +199,43 @@ void MainWindow::setupMaterialSettings(Material *component) {
             shaderType->addItem("Phong");
             break;
         }
-        if (type.first == component->mShader)
+        if (type.first == component.mShader)
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
+    connect(this, &MainWindow::newShader, mRenderWindow->renderer(), &RenderSystem::changeShader);
+    connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setNewShader(const QString &)));
+    // To-do: If Texture shader selected, enable a box to select the texture image.
+
+    fileLabel = new QLabel(box);
+    QString curTexture = ResourceManager::instance()->GetTextureName(Registry::instance()->getComponent<Material>(selectedEntity->eID).mTextureUnit);
+    fileLabel->setText(curTexture);
+    QPushButton *browseImages = new QPushButton("&Browse", this);
+    browseImages->setStyle(fusion);
+
+    connect(browseImages, &QPushButton::clicked, this, &MainWindow::setNewTextureFile);
+
+    QHBoxLayout *texture = new QHBoxLayout;
+    texture->addWidget(fileLabel);
+    texture->addWidget(browseImages);
+    shader->addWidget(shaderType);
+    shader->addLayout(texture);
+    box->setLayout(shader);
+    scrollArea->addGroupBox(box);
 }
-void MainWindow::setupTransformSettings(Transform *component) {
+void MainWindow::setNewTextureFile() {
+    QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Image"), directory, tr("Image Files (*.bmp)")); // Could add other image files, idk what Texture class supports
+    if (!fileName.isEmpty()) {
+        QFileInfo file(fileName);
+        fileName = file.fileName();
+        ResourceManager *factory = ResourceManager::instance();
+        factory->LoadTexture(fileName.toStdString());
+        Registry::instance()->getComponent<Material>(selectedEntity->eID).mTextureUnit = factory->GetTexture(fileName.toStdString())->id() - 1;
+        fileLabel->setText(fileName);
+    }
+}
+void MainWindow::setupTransformSettings(const Transform &component) {
     QStyle *fusion = QStyleFactory::create("fusion");
     QGroupBox *box = new QGroupBox(tr("Transform"));
     box->setAlignment(Qt::AlignCenter);
@@ -236,26 +277,26 @@ void MainWindow::setupTransformSettings(Transform *component) {
             val->setStyle(fusion);
             switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
             case 1:
-                if (component->parentID != -1)
-                    val->setValue(component->mRelativePosition.x);
+                if (component.parentID != -1)
+                    val->setValue(component.mRelativePosition.x);
                 else
-                    val->setValue(component->mPosition.x);
+                    val->setValue(component.mPosition.x);
                 connect(this, &MainWindow::posX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
                 break;
             case 3:
-                if (component->parentID != -1)
-                    val->setValue(component->mRelativePosition.y);
+                if (component.parentID != -1)
+                    val->setValue(component.mRelativePosition.y);
                 else
-                    val->setValue(component->mPosition.y);
+                    val->setValue(component.mPosition.y);
                 connect(this, &MainWindow::posY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
                 break;
             case 5:
-                if (component->parentID != -1)
-                    val->setValue(component->mRelativePosition.z);
+                if (component.parentID != -1)
+                    val->setValue(component.mRelativePosition.z);
                 else
-                    val->setValue(component->mPosition.z);
+                    val->setValue(component.mPosition.z);
                 connect(this, &MainWindow::posZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
                 break;
@@ -298,17 +339,17 @@ void MainWindow::setupTransformSettings(Transform *component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component->mRotation.x);
+                val->setValue(component.mRotation.x);
                 connect(this, &MainWindow::rotX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
                 break;
             case 3:
-                val->setValue(component->mRotation.y);
+                val->setValue(component.mRotation.y);
                 connect(this, &MainWindow::rotY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationY(double)));
                 break;
             case 5:
-                val->setValue(component->mRotation.z);
+                val->setValue(component.mRotation.z);
                 connect(this, &MainWindow::rotZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationZ(double)));
                 break;
@@ -351,17 +392,17 @@ void MainWindow::setupTransformSettings(Transform *component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component->mScale.x);
+                val->setValue(component.mScale.x);
                 connect(this, &MainWindow::scaleX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
                 break;
             case 3:
-                val->setValue(component->mScale.y);
+                val->setValue(component.mScale.y);
                 connect(this, &MainWindow::scaleY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleY(double)));
                 break;
             case 5:
-                val->setValue(component->mScale.z);
+                val->setValue(component.mScale.z);
                 connect(this, &MainWindow::scaleZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleZ(double)));
                 break;

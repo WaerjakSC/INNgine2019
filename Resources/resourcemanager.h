@@ -24,13 +24,12 @@ public:
     // Gets stored shader
     Shader *GetShader(ShaderType type);
     // Loads and generates texture from file
-    void LoadTexture(std::string name, GLuint textureUnit = 0);
+    void LoadTexture(std::string name);
     // Gets stored texture
     Texture *GetTexture(std::string name);
 
     void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
-    GLuint makeGameObject(std::string name = "");
     void addMeshComponent(std::string name, int eID = -1);
 
     // Basic Shapes and Prefabs
@@ -48,11 +47,10 @@ public:
 
     void setMesh(std::string name, int eID);
 
+    GLuint makeGameObject(std::string name = "");
     std::vector<GameObject *> getGameObjects() const;
-
     GameObject *getGameObject(int eID);
     void removeGameObject(int eID);
-
     std::vector<int> getGameObjectIndex() const;
 
     //    RenderView *getRenderView() const;
@@ -60,6 +58,8 @@ public:
     void setLightSystem(const std::shared_ptr<LightSystem> &lightSystem);
 
     std::vector<Component *> getComponents(int eID);
+
+    QString GetTextureName(GLuint id);
 
 private:
     // Private constructor

@@ -1,7 +1,9 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
+#include "gameobject.h"
 #include "pool.h"
+#include "resourcemanager.h"
 #include <memory>
 #include <typeinfo>
 
@@ -28,6 +30,7 @@ public:
     std::shared_ptr<Pool<Type>> registerComponent() {
         std::string typeName = typeid(Type).name();
         std::shared_ptr<Pool<Type>> pool;
+
         if (mPools.find(typeName) != mPools.end()) {
             pool = getComponentArray<Type>();
         } else {
@@ -48,12 +51,14 @@ public:
     void addComponent(int entityID, Args... args) {
         // Add a component to the array for an entity
         getComponentArray<Type>()->add(entityID, args...);
+        ResourceManager::instance()->getGameObject(entityID)->types |= getComponentArray<Type>()->get(entityID).type();
     }
     /**
      * @brief Remove a component of type Type from the entity/gameobject with entityID.
      */
     template <typename Type>
     void removeComponent(int entityID) {
+        ResourceManager::instance()->getGameObject(entityID)->types &= ~getComponentArray<Type>()->get(entityID).type();
         // Remove a component from the array for an entity
         getComponentArray<Type>()->remove(entityID);
     }
@@ -79,14 +84,6 @@ public:
      * @param entityID
      */
     void entityDestroyed(int entityID);
-
-    /**
-     * @brief Temporary function for MainWindow to get all the components owned by an entity.
-     * Has to be a better way to do this.
-     * @param entityID
-     * @return
-     */
-    std::vector<Component *> getComponents(int entityID);
 
 private:
     static Registry *mInstance;
