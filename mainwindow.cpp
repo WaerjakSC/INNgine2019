@@ -7,6 +7,7 @@
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
+#include <QColorDialog>
 #include <QComboBox>
 #include <QDesktopWidget>
 #include <QDoubleSpinBox>
@@ -99,20 +100,26 @@ void MainWindow::init() {
     connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
     connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
 }
-void MainWindow::updatePositionVals(gsl::Vector3D newPos) {
-    emit posX(newPos.x);
-    emit posY(newPos.y);
-    emit posZ(newPos.z);
+void MainWindow::updatePositionVals(GLuint eID, gsl::Vector3D newPos) {
+    if (eID == selectedEntity->eID) {
+        emit posX(newPos.x);
+        emit posY(newPos.y);
+        emit posZ(newPos.z);
+    }
 }
-void MainWindow::updateRotationVals(gsl::Vector3D newRot) {
-    emit rotX(newRot.x);
-    emit rotY(newRot.y);
-    emit rotZ(newRot.z);
+void MainWindow::updateRotationVals(GLuint eID, gsl::Vector3D newRot) {
+    if (eID == selectedEntity->eID) {
+        emit rotX(newRot.x);
+        emit rotY(newRot.y);
+        emit rotZ(newRot.z);
+    }
 }
-void MainWindow::updateScaleVals(gsl::Vector3D newScale) {
-    emit scaleX(newScale.x);
-    emit scaleY(newScale.y);
-    emit scaleZ(newScale.z);
+void MainWindow::updateScaleVals(GLuint eID, gsl::Vector3D newScale) {
+    if (eID == selectedEntity->eID) {
+        emit scaleX(newScale.x);
+        emit scaleY(newScale.y);
+        emit scaleZ(newScale.z);
+    }
 }
 void MainWindow::setNewShader(const QString &text) {
     if (text == "Texture")
@@ -165,14 +172,35 @@ void MainWindow::createActions() {
  */
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();
-    // Probably err, just scrap this and re-do it some other way...
+    Registry *registry = Registry::instance();
     CType typeMask = ResourceManager::instance()->getGameObject(selectedEntity->eID)->types;
     if ((typeMask & CType::Transform) != CType::None) {
-        setupTransformSettings(Registry::instance()->getComponent<Transform>(selectedEntity->eID));
+        setupTransformSettings(registry->getComponent<Transform>(selectedEntity->eID));
     }
     if ((typeMask & CType::Material) != CType::None) {
-        setupMaterialSettings(Registry::instance()->getComponent<Material>(selectedEntity->eID));
+        setupMaterialSettings(registry->getComponent<Material>(selectedEntity->eID));
     }
+    if ((typeMask & CType::Mesh) != CType::None) {
+        setupMeshSettings(registry->getComponent<Mesh>(selectedEntity->eID));
+    }
+}
+void MainWindow::setupMeshSettings(const Mesh &mesh) {
+    QStyle *fusion = QStyleFactory::create("fusion");
+    QGroupBox *box = new QGroupBox(tr("Mesh"));
+    box->setAlignment(Qt::AlignCenter);
+    box->setStyle(fusion);
+
+    objFileLabel = new QLabel(box);
+    objFileLabel->setText(ResourceManager::instance()->getMeshName(mesh));
+    QPushButton *button = new QPushButton("Change Mesh");
+    connect(button, &QPushButton::clicked, this, &MainWindow::setNewMesh);
+
+    QHBoxLayout *meshLayout = new QHBoxLayout;
+    meshLayout->setMargin(1);
+    meshLayout->addWidget(objFileLabel);
+    meshLayout->addWidget(button);
+    box->setLayout(meshLayout);
+    scrollArea->addGroupBox(box);
 }
 void MainWindow::setupMaterialSettings(const Material &component) {
     QStyle *fusion = QStyleFactory::create("fusion");
@@ -204,21 +232,38 @@ void MainWindow::setupMaterialSettings(const Material &component) {
     }
     connect(this, &MainWindow::newShader, mRenderWindow->renderer(), &RenderSystem::changeShader);
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setNewShader(const QString &)));
-    // To-do: If Texture shader selected, enable a box to select the texture image.
 
-    fileLabel = new QLabel(box);
-    QString curTexture = ResourceManager::instance()->GetTextureName(Registry::instance()->getComponent<Material>(selectedEntity->eID).mTextureUnit);
-    fileLabel->setText(curTexture);
-    QPushButton *browseImages = new QPushButton("&Browse", this);
+    QString curTexture = ResourceManager::instance()->getTextureName(component.mTextureUnit);
+    QLabel *textureThumb = new QLabel(box);
+    QPixmap thumbNail;
+    thumbNail.load(QString::fromStdString(gsl::assetFilePath) + "Textures/" + curTexture); // Load the texture image into the pixmap
+    textureThumb->setPixmap(thumbNail.scaled(18, 18));                                     // Get a scaled version of the image loaded above
+    texFileLabel = new QLabel(box);
+    texFileLabel->setText(curTexture); // Saves the file name of the texture image
+    QPushButton *browseImages = new QPushButton("Browse", this);
     browseImages->setStyle(fusion);
-
     connect(browseImages, &QPushButton::clicked, this, &MainWindow::setNewTextureFile);
-
     QHBoxLayout *texture = new QHBoxLayout;
-    texture->addWidget(fileLabel);
+    texture->addWidget(textureThumb);
+    texture->addWidget(texFileLabel);
     texture->addWidget(browseImages);
+
+    colorLabel = new QLabel;
+    QPixmap curColor(18, 18);
+    gsl::Vector3D oColor = component.mObjectColor;
+    rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
+    curColor.fill(rgb);
+    colorLabel->setPixmap(curColor);
+    QPushButton *colorButton = new QPushButton(tr("Change Color"));
+    connect(colorButton, &QPushButton::clicked, this, &MainWindow::setColor);
+
+    QHBoxLayout *color = new QHBoxLayout;
+    color->addWidget(colorLabel);
+    color->addWidget(colorButton);
+
     shader->addWidget(shaderType);
     shader->addLayout(texture);
+    shader->addLayout(color);
     box->setLayout(shader);
     scrollArea->addGroupBox(box);
 }
@@ -230,10 +275,34 @@ void MainWindow::setNewTextureFile() {
         QFileInfo file(fileName);
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
-        factory->LoadTexture(fileName.toStdString());
-        Registry::instance()->getComponent<Material>(selectedEntity->eID).mTextureUnit = factory->GetTexture(fileName.toStdString())->id() - 1;
-        fileLabel->setText(fileName);
+        factory->loadTexture(fileName.toStdString());
+        Registry::instance()->getComponent<Material>(selectedEntity->eID).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
+        texFileLabel->setText(fileName);
     }
+}
+void MainWindow::setNewMesh() {
+    QString directory = QString::fromStdString(gsl::assetFilePath) + "Meshes";
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Mesh File"), directory, tr("OBJ Files (*.obj)"));
+    if (!fileName.isEmpty()) {
+        QFileInfo file(fileName);
+        fileName = file.fileName();
+        ResourceManager *factory = ResourceManager::instance();
+        factory->setMesh(fileName.toStdString(), selectedEntity->eID);
+        objFileLabel->setText(fileName);
+    }
+}
+/**
+ * @brief Not sure why this gives a geometry warning, ask Ole?
+ */
+void MainWindow::setColor() {
+    const QColor color = QColorDialog::getColor(rgb, this, "Select Color");
+    if (color.isValid()) {
+        QPixmap newRgb(18, 18);
+        newRgb.fill(color);
+        colorLabel->setPixmap(newRgb);
+    }
+    Registry::instance()->getComponent<Material>(selectedEntity->eID).mObjectColor = gsl::Vector3D(color.redF(), color.greenF(), color.blueF());
 }
 void MainWindow::setupTransformSettings(const Transform &component) {
     QStyle *fusion = QStyleFactory::create("fusion");

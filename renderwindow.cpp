@@ -97,28 +97,28 @@ void RenderWindow::init() {
     //it is a Singleton!
     mSoundManager->init();
     //Compile shaders:
-    mFactory->LoadShader(Color);
-    mFactory->LoadShader(Tex);
-    mFactory->LoadShader(Phong);
+    mFactory->loadShader(Color);
+    mFactory->loadShader(Tex);
+    mFactory->loadShader(Phong);
 
     //**********************  Texture stuff: **********************
 
-    mFactory->LoadTexture("white.bmp");
-    mFactory->LoadTexture("gnome.bmp");
-    mFactory->LoadTexture("skybox.bmp");
+    mFactory->loadTexture("white.bmp");
+    mFactory->loadTexture("gnome.bmp");
+    mFactory->loadTexture("skybox.bmp");
 
     //Set the textures loaded to a texture unit
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("white.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("white.bmp")->id());
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("gnome.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("gnome.bmp")->id());
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mFactory->GetTexture("skybox.bmp")->id());
+    glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("skybox.bmp")->id());
 
     // Set up the systems.
     mRenderer = std::make_unique<RenderSystem>(mFactory->getShaders());
     mMoveSys = std::make_unique<MovementSystem>();
-    mLightSys = std::make_shared<LightSystem>(static_cast<PhongShader *>(mFactory->GetShader(ShaderType::Phong)));
+    mLightSys = std::make_shared<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
     mFactory->setLightSystem(mLightSys);
 
     //********************** Set up camera **********************
@@ -140,9 +140,9 @@ void RenderWindow::init() {
     mMoveSys->setParent(monkey, boxID);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    mFactory->GetShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
-    mFactory->GetShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    mFactory->GetShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
 
     // Add game objects to the scene hierarchy GUI
     mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());

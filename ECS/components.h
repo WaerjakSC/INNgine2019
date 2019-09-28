@@ -166,6 +166,11 @@ public:
         mDrawType = other.mDrawType;
         return *this;
     }
+    bool operator==(const Mesh &other) {
+        bool buffers = mVAO == other.mVAO && mVBO == other.mVBO && mEAB == other.mEAB;
+        bool data = mVerticeCount == other.mVerticeCount && mIndiceCount == other.mIndiceCount && mDrawType == other.mDrawType;
+        return buffers && data;
+    }
 };
 struct Light : public Component {
     Light(LightData light = LightData()) : mLight(light) {

@@ -74,12 +74,14 @@ private slots:
     void setScaleX(double xIn);
     void setScaleY(double yIn);
     void setScaleZ(double zIn);
-    void updatePositionVals(gsl::Vector3D newPos);
-    void updateRotationVals(gsl::Vector3D newRot);
-    void updateScaleVals(gsl::Vector3D newScale);
+    void updatePositionVals(GLuint eID, gsl::Vector3D newPos);
+    void updateRotationVals(GLuint eID, gsl::Vector3D newRot);
+    void updateScaleVals(GLuint eID, gsl::Vector3D newScale);
 
     void setNewShader(const QString &text);
     void setNewTextureFile();
+    void setColor();
+    void setNewMesh();
 
 private:
     void init();
@@ -91,12 +93,17 @@ private:
     GameObject *selectedEntity{nullptr};
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
-    QLabel *fileLabel;
+    QColor rgb;
+    QLabel *colorLabel;
+    QLabel *texFileLabel;
+    QLabel *objFileLabel;
+
     void forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void setupComponentList();
     void setupTransformSettings(const Transform &component);
     void setupMaterialSettings(const Material &component);
+    void setupMeshSettings(const Mesh &mesh);
 };
 
 #endif // MAINWINDOW_H

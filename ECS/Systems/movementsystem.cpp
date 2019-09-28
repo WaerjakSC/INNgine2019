@@ -98,7 +98,7 @@ void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
         mTransforms->get(eID).mPosition = position;
     }
     iterateChildren(eID);
-    emit positionChanged(position);
+    emit positionChanged(eID, position);
 }
 /**
  * @brief Sets relative position if parented to an object -- otherwise sets global position.
@@ -184,7 +184,7 @@ void MovementSystem::setRotation(int eID, gsl::Vector3D rotation) {
     mTransforms->get(eID).mMatrixOutdated = true;
     mTransforms->get(eID).mRotation = rotation;
     iterateChildren(eID);
-    emit rotationChanged(rotation);
+    emit rotationChanged(eID, rotation);
 }
 void MovementSystem::setRotationX(int eID, float xIn) {
     gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
@@ -205,7 +205,7 @@ void MovementSystem::setScale(int eID, gsl::Vector3D scale) {
     mTransforms->get(eID).mMatrixOutdated = true;
     mTransforms->get(eID).mScale = scale;
     iterateChildren(eID);
-    emit scaleChanged(scale);
+    emit scaleChanged(eID, scale);
 }
 void MovementSystem::setScaleX(int eID, float xIn) {
     gsl::Vector3D newScale = mTransforms->get(eID).mScale;

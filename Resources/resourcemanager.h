@@ -20,13 +20,13 @@ public:
     virtual ~ResourceManager();
 
     // Loads and generates shader (takes name and the shader)
-    void LoadShader(ShaderType type, const GLchar *geometryPath = nullptr);
+    void loadShader(ShaderType type, const GLchar *geometryPath = nullptr);
     // Gets stored shader
-    Shader *GetShader(ShaderType type);
+    Shader *getShader(ShaderType type);
     // Loads and generates texture from file
-    void LoadTexture(std::string name);
+    void loadTexture(std::string name);
     // Gets stored texture
-    Texture *GetTexture(std::string name);
+    Texture *getTexture(std::string name);
 
     void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
@@ -59,7 +59,9 @@ public:
 
     std::vector<Component *> getComponents(int eID);
 
-    QString GetTextureName(GLuint id);
+    QString getTextureName(GLuint id);
+
+    QString getMeshName(const Mesh &mesh);
 
 private:
     // Private constructor
@@ -69,8 +71,8 @@ private:
     Registry *registry;
     GLuint mNumGameObjects{0};
     // std::map(key, object) for easy resource storage
-    std::map<ShaderType, Shader *> Shaders;
-    std::map<std::string, Texture *> Textures;
+    std::map<ShaderType, Shader *> mShaders;
+    std::map<std::string, Texture *> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
 
     // Temp mVertices/mIndices container. Cleared before each use.
@@ -90,11 +92,11 @@ private:
     void initIndexBuffers(Mesh *mesh);
 
     // Reads and loads mesh
-    void LoadMesh(std::string fileName);
+    void loadMesh(std::string fileName);
     void setMesh(Mesh *mesh, int eID);
     bool readFile(std::string fileName);
     bool readTriangleFile(std::string filename);
-    Mesh *LoadTriangleMesh(std::string fileName);
+    Mesh *loadTriangleMesh(std::string fileName);
 
     // OctahedronBall functions
     void makeUnitOctahedron(GLint recursions);

@@ -33,10 +33,10 @@ ResourceManager::ResourceManager() {
 
 // Do resource manager stuff -- Aka actually delete the pointers after application end
 ResourceManager::~ResourceManager() {
-    for (auto &shader : Shaders) {
+    for (auto &shader : mShaders) {
         delete shader.second;
     }
-    for (auto &texture : Textures) {
+    for (auto &texture : mTextures) {
         delete texture.second;
     }
     for (auto &entity : mGameObjects)
@@ -71,7 +71,7 @@ void ResourceManager::setMesh(std::string name, int eID) {
     if (search != mMeshMap.end()) {
         registry->getComponent<Mesh>(eID) = search->second;
     } else
-        LoadMesh(name);
+        loadMesh(name);
 }
 
 /**
@@ -194,7 +194,7 @@ GLuint ResourceManager::makeXYZ() {
 GLuint ResourceManager::makeSkyBox() {
     GLuint eID = makeGameObject("Skybox");
     registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
-    registry->addComponent<Material>(eID, Tex, Textures["skybox.bmp"]->id() - 1);
+    registry->addComponent<Material>(eID, Tex, mTextures["skybox.bmp"]->id() - 1);
 
     //    temp->mMatrix.scale(15.f);
     initializeOpenGLFunctions();
@@ -274,7 +274,7 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID);
     registry->addComponent<Mesh>(eID);
-    setMesh(LoadTriangleMesh(fileName), eID);
+    setMesh(loadTriangleMesh(fileName), eID);
     glBindVertexArray(0);
 
     return eID;
@@ -290,7 +290,7 @@ GLuint ResourceManager::makeBillBoard() {
     mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
     registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
 
-    registry->addComponent<Material>(eID, Tex, Textures["gnome.bmp"]->id() - 1);
+    registry->addComponent<Material>(eID, Tex, mTextures["gnome.bmp"]->id() - 1);
 
     initializeOpenGLFunctions();
 
@@ -346,7 +346,7 @@ GLuint ResourceManager::makeOctBall(int n) {
 GLuint ResourceManager::makeLightObject() {
     GLuint eID = makeGameObject("Light");
     registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
-    registry->addComponent<Material>(eID, Tex, Textures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
+    registry->addComponent<Material>(eID, Tex, mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->addComponent<Light>(eID);
 
     initializeOpenGLFunctions();
@@ -417,21 +417,21 @@ void ResourceManager::initIndexBuffers(Mesh *mesh) {
  * @param type
  * @param geometryPath
  */
-void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
-    if (Shaders.find(type) == Shaders.end()) {
+void ResourceManager::loadShader(ShaderType type, const GLchar *geometryPath) {
+    if (mShaders.find(type) == mShaders.end()) {
         std::string shaderName;
         switch (type) {
         case ShaderType::Color:
             shaderName = "plainshader";
-            Shaders[type] = new ColorShader(shaderName, geometryPath);
+            mShaders[type] = new ColorShader(shaderName, geometryPath);
             break;
         case ShaderType::Tex:
             shaderName = "textureshader";
-            Shaders[type] = new TextureShader(shaderName, geometryPath);
+            mShaders[type] = new TextureShader(shaderName, geometryPath);
             break;
         case ShaderType::Phong:
             shaderName = "phongshader";
-            Shaders[type] = new PhongShader(shaderName, geometryPath);
+            mShaders[type] = new PhongShader(shaderName, geometryPath);
             break;
         default:
             qDebug() << "Failed to find shader in switch statement";
@@ -446,25 +446,32 @@ void ResourceManager::LoadShader(ShaderType type, const GLchar *geometryPath) {
  * @param fileName
  * @param textureUnit
  */
-void ResourceManager::LoadTexture(std::string fileName) {
-    if (Textures.find(fileName) == Textures.end()) {
-        Textures[fileName] = new Texture(fileName, Textures.size());
+void ResourceManager::loadTexture(std::string fileName) {
+    if (mTextures.find(fileName) == mTextures.end()) {
+        mTextures[fileName] = new Texture(fileName, mTextures.size());
 
         qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
     }
 }
 
-Shader *ResourceManager::GetShader(ShaderType type) {
-    return Shaders[type];
+Shader *ResourceManager::getShader(ShaderType type) {
+    return mShaders[type];
 }
 
-Texture *ResourceManager::GetTexture(std::string fileName) {
-    return Textures[fileName];
+Texture *ResourceManager::getTexture(std::string fileName) {
+    return mTextures[fileName];
 }
-QString ResourceManager::GetTextureName(GLuint id) {
-    for (auto it = Textures.begin(); it != Textures.end(); ++it) {
+QString ResourceManager::getTextureName(GLuint id) {
+    for (auto it = mTextures.begin(); it != mTextures.end(); ++it) {
         if (it->second->id() == id + 1) {
-            qDebug() << QString::fromStdString(it->first);
+            return QString::fromStdString(it->first);
+        }
+    }
+    return QString();
+}
+QString ResourceManager::getMeshName(const Mesh &mesh) {
+    for (auto it = mMeshMap.begin(); it != mMeshMap.end(); ++it) {
+        if (it->second == mesh) {
             return QString::fromStdString(it->first);
         }
     }
@@ -628,7 +635,7 @@ bool ResourceManager::readFile(std::string fileName) {
  * @param fileName
  * @return
  */
-void ResourceManager::LoadMesh(std::string fileName) {
+void ResourceManager::loadMesh(std::string fileName) {
 
     //    auto search = mMeshMap.find(fileName);
     //    if (search != mMeshMap.end()) {
@@ -642,7 +649,7 @@ void ResourceManager::LoadMesh(std::string fileName) {
     mMeshMap[fileName] = registry->getLastComponent<Mesh>(); // Save the new unique mesh in the meshmap for other entities that might need it
 }
 
-Mesh *ResourceManager::LoadTriangleMesh(std::string fileName) {
+Mesh *ResourceManager::loadTriangleMesh(std::string fileName) {
     auto search = mMeshMap.find(fileName);
     if (search != mMeshMap.end()) {
         return &search->second; // Return a copy of the mesh it wants if already stored
@@ -705,7 +712,7 @@ std::vector<GameObject *> ResourceManager::getGameObjects() const {
 }
 
 std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
-    return Shaders;
+    return mShaders;
 }
 
 //=========================== Octahedron Functions =========================== //

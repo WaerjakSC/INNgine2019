@@ -60,9 +60,9 @@ public:
     void setScaleZ(int eID, float zIn);
 
 signals:
-    void positionChanged(gsl::Vector3D newPos);
-    void scaleChanged(gsl::Vector3D newScale);
-    void rotationChanged(gsl::Vector3D newRot);
+    void positionChanged(GLuint eID, gsl::Vector3D newPos);
+    void scaleChanged(GLuint eID, gsl::Vector3D newScale);
+    void rotationChanged(GLuint eID, gsl::Vector3D newRot);
 
 private:
     std::shared_ptr<Pool<Transform>> mTransforms;
