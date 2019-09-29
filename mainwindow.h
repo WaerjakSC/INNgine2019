@@ -13,7 +13,7 @@ class GameObject;
 class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
-class QStandardItem;
+class EntityItem;
 class QLabel;
 class Transform;
 class Material;
@@ -53,7 +53,7 @@ private slots:
 
     void onParentChanged(const QModelIndex &index);
 
-    void onGameObjectDragged(const QString &text);
+    void onGameObjectDragged(GLuint id);
 
     void makeCube();
 
@@ -83,6 +83,17 @@ private slots:
     void setColor();
     void setNewMesh();
 
+    void addTransformComponent();
+    void addMaterialComponent();
+    void addMeshComponent();
+    void addLightComponent();
+    void addInputComponent();
+    void addPhysicsComponent();
+    void addSoundComponent();
+    void makeGameObject();
+
+    void removeGameObject(const QModelIndex &index);
+
 private:
     void init();
     Ui::MainWindow *ui;
@@ -98,7 +109,7 @@ private:
     QLabel *texFileLabel;
     QLabel *objFileLabel;
 
-    void forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent = QModelIndex());
+    void forEach(QAbstractItemModel *model, QString parentName, EntityItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void setupComponentList();
     void setupTransformSettings(const Transform &component);

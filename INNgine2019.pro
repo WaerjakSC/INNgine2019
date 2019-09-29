@@ -74,6 +74,7 @@ HEADERS += \
     GSL/gsl_math.h \
     GSL/math_constants.h \
 #
+    GUI/entityitem.h \
     GUI/hierarchymodel.h \
     GUI/hierarchyview.h \
 #
@@ -117,6 +118,7 @@ SOURCES += main.cpp \
     GSL/vector4d.cpp \
     GSL/gsl_math.cpp \
 #
+    GUI/entityitem.cpp \
     GUI/hierarchymodel.cpp \
     GUI/hierarchyview.cpp \
 #

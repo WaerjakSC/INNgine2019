@@ -1,5 +1,6 @@
 #ifndef HIERARCHYVIEW_H
 #define HIERARCHYVIEW_H
+#include "gsl_math.h"
 #include <QTreeView>
 class MainWindow;
 class HierarchyView : public QTreeView {
@@ -11,7 +12,7 @@ public:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void setMainWindow(MainWindow *window);
 signals:
-    void dragSelection(const QString &text);
+    void dragSelection(GLuint id);
 
 private:
     MainWindow *mMainWindow{nullptr};

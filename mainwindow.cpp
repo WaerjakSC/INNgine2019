@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "Systems/rendersystem.h"
+#include "entityitem.h"
 #include "hierarchymodel.h"
 #include "innpch.h"
 #include "movementsystem.h"
@@ -14,7 +15,6 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QPushButton>
-#include <QStandardItem>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -97,7 +97,7 @@ void MainWindow::init() {
     connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
-    connect(hView, &QTreeView::clicked, this, &MainWindow::onGameObjectClicked);
+    connect(hView, &HierarchyView::clicked, this, &MainWindow::onGameObjectClicked);
     connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
 }
 void MainWindow::updatePositionVals(GLuint eID, gsl::Vector3D newPos) {
@@ -134,7 +134,9 @@ void MainWindow::snapToObject() {
         mRenderWindow->snapToObject(selectedEntity->eID);
 }
 void MainWindow::createActions() {
-    QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
+    QMenu *gameObject = ui->menuBar->addMenu(tr("GameObject"));
+    QAction *empty = new QAction(tr("Empty GameObject"), this);
+    gameObject->addAction(empty);
     QMenu *make3D = gameObject->addMenu(tr("3D Object"));
     QAction *cube = new QAction(tr("Cube"), this);
     make3D->addAction(cube);
@@ -143,7 +145,7 @@ void MainWindow::createActions() {
     QAction *plane = new QAction(tr("Plane"), this);
     make3D->addAction(plane);
     // Component menu actions don't do anything *yet* //
-    QMenu *components = ui->menuBar->addMenu(tr("&Components")); // Maybe disable specific component if selected entity has that component already
+    QMenu *components = ui->menuBar->addMenu(tr("Add Components")); // Maybe disable specific component if selected entity has that component already
     QAction *transform = new QAction(tr("Transform"), this);
     components->addAction(transform);
     QAction *material = new QAction(tr("Material"), this);
@@ -161,19 +163,79 @@ void MainWindow::createActions() {
 
     ui->mainToolBar->setMovable(false);
 
+    // Setup the component actions
+    connect(transform, &QAction::triggered, this, &MainWindow::addTransformComponent);
+    connect(material, &QAction::triggered, this, &MainWindow::addMaterialComponent);
+    connect(mesh, &QAction::triggered, this, &MainWindow::addMeshComponent);
+    connect(light, &QAction::triggered, this, &MainWindow::addLightComponent);
+    connect(input, &QAction::triggered, this, &MainWindow::addInputComponent);
+    connect(physics, &QAction::triggered, this, &MainWindow::addPhysicsComponent);
+    connect(sound, &QAction::triggered, this, &MainWindow::addSoundComponent);
+
     connect(cube, &QAction::triggered, this, &MainWindow::makeCube);
     connect(sphere, &QAction::triggered, this, &MainWindow::makeSphere);
     connect(plane, &QAction::triggered, this, &MainWindow::makePlane);
+    connect(empty, &QAction::triggered, this, &MainWindow::makeGameObject);
+
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
+}
+void MainWindow::addTransformComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Transform) == CType::None)
+        registry->addComponent<Transform>(selectedEntity->eID);
+    setupComponentList();
+}
+void MainWindow::addMaterialComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Material) == CType::None)
+        registry->addComponent<Material>(selectedEntity->eID);
+    setupComponentList();
+}
+void MainWindow::addMeshComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Mesh) == CType::None)
+        registry->addComponent<Mesh>(selectedEntity->eID);
+    setupComponentList();
+}
+void MainWindow::addLightComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Light) == CType::None)
+        registry->addComponent<Light>(selectedEntity->eID);
+    setupComponentList();
+}
+void MainWindow::addInputComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Input) == CType::None)
+        registry->addComponent<Input>(selectedEntity->eID);
+    setupComponentList();
+}
+void MainWindow::addPhysicsComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Physics) == CType::None)
+        registry->addComponent<Physics>(selectedEntity->eID);
+    setupComponentList();
+}
+void MainWindow::addSoundComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Sound) == CType::None)
+        registry->addComponent<Sound>(selectedEntity->eID);
+    setupComponentList();
 }
 /**
  * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
- * @todo Dynamically update selected entity transforms etc when they change outside of the component panel
+ * @todo Right click a QGroupBox to get options like remove component (look at Unity for inspiration)
  */
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();
     Registry *registry = Registry::instance();
-    CType typeMask = ResourceManager::instance()->getGameObject(selectedEntity->eID)->types;
+    CType typeMask = selectedEntity->types;
     if ((typeMask & CType::Transform) != CType::None) {
         setupTransformSettings(registry->getComponent<Transform>(selectedEntity->eID));
     }
@@ -495,6 +557,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_F)
         mRenderWindow->keyReleaseEvent(event);
 }
+void MainWindow::makeGameObject() {
+    emit made3DObject(ResourceManager::instance()->makeGameObject("GameObject"));
+}
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());
 }
@@ -522,31 +587,30 @@ void MainWindow::onParentChanged(const QModelIndex &parent) {
         mRenderWindow->movement()->setParent(selectedEntity->eID, -1);
 }
 void MainWindow::onGameObjectClicked(const QModelIndex &index) {
-    QString data = hierarchy->data(index).toString();
-    onGameObjectDragged(data);
+    GLuint id = static_cast<EntityItem *>(hierarchy->itemFromIndex(index))->id();
+    onGameObjectDragged(id);
     setupComponentList();
-
-    // Implement properties(components) list update here
 }
-void MainWindow::onGameObjectDragged(const QString &text) {
-    for (auto entity : ResourceManager::instance()->getGameObjects()) {
-        if (QString::fromStdString(entity->mName) == text) {
-            selectedEntity = entity;
-            break;
-        }
-    }
+/**
+ * @brief Get the game object the user is interacting with.
+ * @param id of the entity
+ */
+void MainWindow::onGameObjectDragged(GLuint id) {
+    selectedEntity = ResourceManager::instance()->getGameObject(id);
     qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
-    gsl::Vector3D location = mRenderWindow->movement()->getRelativePosition(selectedEntity->eID);
-    qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
+    if ((selectedEntity->types & CType::Transform) != CType::None) {
+        gsl::Vector3D location = mRenderWindow->movement()->getRelativePosition(selectedEntity->eID);
+        qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
+    }
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     if (selectedEntity)
         selectedEntity->mName = hierarchy->data(index).toString().toStdString();
 }
 void MainWindow::onGameObjectsChanged(GLuint entity) {
-    QStandardItem *parentItem = hierarchy->invisibleRootItem();
+    EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->invisibleRootItem());
     GameObject *object = ResourceManager::instance()->getGameObject(entity);
-    QStandardItem *item = new QStandardItem(QString(QString::fromStdString(object->mName)));
+    EntityItem *item = new EntityItem(QString::fromStdString(object->mName), object->eID);
     parentItem->appendRow(item);
 }
 /**
@@ -554,15 +618,15 @@ void MainWindow::onGameObjectsChanged(GLuint entity) {
  * @param entities
  */
 void MainWindow::insertGameObjects(std::vector<int> entities) {
-    QStandardItem *parentItem = hierarchy->invisibleRootItem();
+    EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->invisibleRootItem());
     for (auto entity : entities) {
         if (entity != -1) {
             GameObject *object = ResourceManager::instance()->getGameObject(entity);
-            QStandardItem *item;
+            EntityItem *item;
             if (object->mName == "")
-                item = new QStandardItem(QString("GameObject")) /*.arg(idx)*/;
+                item = new EntityItem(QString("GameObject"), object->eID) /*.arg(idx)*/;
             else
-                item = new QStandardItem(QString(QString::fromStdString(object->mName))) /*.arg(idx)*/;
+                item = new EntityItem(QString::fromStdString(object->mName), object->eID) /*.arg(idx)*/;
             int parentID = Registry::instance()->getComponent<Transform>(object->eID).parentID;
             if (parentID != -1) {
                 QString parent = QString::fromStdString(ResourceManager::instance()->getGameObject(entities.at(parentID))->mName);
@@ -572,6 +636,8 @@ void MainWindow::insertGameObjects(std::vector<int> entities) {
         }
     }
 }
+void MainWindow::removeGameObject(const QModelIndex &index) {
+}
 /**
  * @brief Iterate through a model to find a specific item
  * @param model
@@ -579,12 +645,12 @@ void MainWindow::insertGameObjects(std::vector<int> entities) {
  * @param child
  * @param parent
  */
-void MainWindow::forEach(QAbstractItemModel *model, QString parentName, QStandardItem *child, QModelIndex parent) {
+void MainWindow::forEach(QAbstractItemModel *model, QString parentName, EntityItem *child, QModelIndex parent) {
     for (int r = 0; r < model->rowCount(parent); ++r) {
         QModelIndex index = model->index(r, 0, parent);
         QVariant name = model->data(index);
         if (parentName == name) { // If in-value parentName matches the name of the current item, append the new child to that item. In theory.
-            QStandardItem *parentItem = hierarchy->itemFromIndex(index);
+            EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->itemFromIndex(index));
             parentItem->appendRow(child);
             break;
         }
