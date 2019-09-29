@@ -18,6 +18,7 @@ private:
     MainWindow *mMainWindow{nullptr};
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 };
 
 #endif // HIERARCHYVIEW_H
