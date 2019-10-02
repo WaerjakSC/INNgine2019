@@ -103,6 +103,24 @@ public:
             return mEntityIndices.at(eID) != -1;
         return false;
     }
+    void swap(GLuint eID, GLuint other) {
+        assert(has(eID));
+        assert(has(other));
+        std::swap(mEntityList[mEntityIndices[eID]], mEntityList[mEntityIndices[other]]);       // Swap the two entities in the pool
+        std::swap(mComponentList[mEntityIndices[eID]], mComponentList[mEntityIndices[other]]); // Swap the components to keep the dense set up to date
+        std::swap(mEntityIndices[eID], mEntityIndices[other]);                                 // Set the value for mEntityIndices to the new value.
+    }
+    /**
+     * @brief sort the pool according to a different index
+     * @param otherIndex
+     */
+    void sort(std::vector<int> otherIndex) {
+        for (size_t i = 0; i < mEntityList.size(); i++) {
+            if (has(i)) {
+                swap(mEntityList[mEntityIndices[i]], mEntityList[otherIndex[i]]);
+            }
+        }
+    }
     /**
      * @brief Actual number of entities with owned components in the pool.
      * @return

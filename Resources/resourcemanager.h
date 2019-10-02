@@ -2,7 +2,6 @@
 #define RESOURCEMANAGER_H
 
 #include "components.h"
-#include "pool.h"
 #include "shader.h"
 #include "texture.h"
 #include <QOpenGLFunctions_4_1_Core>

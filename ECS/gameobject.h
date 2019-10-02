@@ -13,7 +13,7 @@ public:
 
     GLuint eID;
 
-    CType types;
+    CType types{CType::None};
 
     virtual void update();
 

@@ -8,22 +8,12 @@ class RenderView : public QObject {
 public:
     RenderView();
 
-    //    std::vector<int> getViableEntities();
-    //    std::tuple<std::vector<int>, std::vector<TransformComponent *>, std::vector<MaterialComponent *>, std::vector<MeshComponent *>> getComponents();
-
-    //    Pool<MeshComponent> *getMeshPool() const;
-    //    Pool<MaterialComponent> *getMaterialPool() const;
-public slots:
-    //    void addEntity(int entityID);
-signals:
-    void updateSystem(std::tuple<int, Transform *, Material *, Mesh *>);
-
 private:
-    //    std::unique_ptr<Pool<MeshComponent>> mMeshPool;
-    //    std::unique_ptr<Pool<MaterialComponent>> mMaterialPool;
-    //    std::shared_ptr<Pool<TransformComponent>> mTransformPool;
-    std::vector<int> mViableEntities;
-    //    CType getSmallestPool();
+    size_t lastRenderItem{0};
+    std::shared_ptr<Pool<Mesh>> mMeshPool;
+    std::shared_ptr<Pool<Material>> mMaterialPool;
+    std::shared_ptr<Pool<Transform>> mTransformPool;
+    void sortGroup();
 };
 
 #endif // RENDERVIEW_H

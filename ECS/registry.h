@@ -76,14 +76,41 @@ public:
     template <typename Type>
     Type &getLastComponent() {
         // Get a reference to a component from the array for an entity
-        return getComponentArray<Type>()->getLast();
+        return getComponentArray<Type>()->back();
     }
     /**
      * @brief entityDestroyed is called when an entity is removed from the game.
      * Iterates through all the Pools, and if they contain a component owned by entityID, delete and re-arrange the Pool.
      * @param entityID
      */
-    void entityDestroyed(int entityID);
+    void entityDestroyed(int entityID) {
+        // Notify each component array that an entity has been destroyed.
+        // If it has a component for that entity, it will remove it.
+        if (contains(entityID, CType::Transform))
+            getComponentArray<Transform>()->remove(entityID);
+        if (contains(entityID, CType::Material))
+            getComponentArray<Material>()->remove(entityID);
+        if (contains(entityID, CType::Mesh))
+            getComponentArray<Mesh>()->remove(entityID);
+        if (contains(entityID, CType::Light))
+            getComponentArray<Light>()->remove(entityID);
+        if (contains(entityID, CType::Input))
+            getComponentArray<Input>()->remove(entityID);
+        if (contains(entityID, CType::Physics))
+            getComponentArray<Physics>()->remove(entityID);
+        if (contains(entityID, CType::Sound))
+            getComponentArray<Sound>()->remove(entityID);
+        //        for (auto const &pair : mPools) {
+
+        //            auto const &pool = pair.second;
+
+        //            pool->remove(entityID);
+        //        }
+    }
+    bool contains(GLuint eID, CType type) {
+        CType typeMask = ResourceManager::instance()->getGameObject(eID)->types;
+        return (typeMask & type) != CType::None;
+    }
 
 private:
     static Registry *mInstance;
