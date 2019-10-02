@@ -52,9 +52,7 @@ std::vector<int> &MovementSystem::children(const int eID) const {
 }
 void MovementSystem::addChild(const int eID, const GLuint childID) {
     children(eID).emplace_back(childID);
-    mTransforms->get(eID).hasChildren = true;
 }
-
 void MovementSystem::removeChild(const int eID, const GLuint childID) {
     for (auto child : children(eID)) {
         if (child == (int)childID) {
@@ -62,8 +60,6 @@ void MovementSystem::removeChild(const int eID, const GLuint childID) {
             children(eID).pop_back();
         }
     }
-    if (children(eID).empty())
-        mTransforms->get(eID).hasChildren = false;
 }
 /**
  * @brief Get global position of object

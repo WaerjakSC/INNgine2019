@@ -15,8 +15,8 @@ INCLUDEPATH += \
     ./Shaders \
     ./Systems \
     ./Views \
-    .\GUI \
-    .\Resources \
+    ./GUI \
+    ./Resources \
 
 win32 {
     INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
@@ -79,6 +79,7 @@ HEADERS += \
     GUI/hierarchyview.h \
 #
     GUI/verticalscrollarea.h \
+    Resources/scene.h \
     Shaders/colorshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
@@ -123,6 +124,7 @@ SOURCES += main.cpp \
     GUI/hierarchyview.cpp \
 #
     GUI/verticalscrollarea.cpp \
+    Resources/scene.cpp \
     Shaders/colorshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \

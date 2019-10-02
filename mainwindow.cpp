@@ -35,8 +35,6 @@ void MainWindow::init() {
     scrollArea = new VerticalScrollArea();
     ui->horizontalTopLayout->addWidget(scrollArea);
 
-    createActions();
-
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
 
@@ -69,6 +67,7 @@ void MainWindow::init() {
 
     //We have a format for the OpenGL window, so let's make it:
     mRenderWindow = new RenderWindow(format, this);
+    createActions();
 
     //Check if renderwindow did initialize, else prints error and quit
     if (!mRenderWindow->context()) {
@@ -133,7 +132,13 @@ void MainWindow::snapToObject() {
     if (selectedEntity)
         mRenderWindow->snapToObject(selectedEntity->eID);
 }
+// To-do: Save As button, folder pop-up that lets you choose or make a new scene file.
 void MainWindow::createActions() {
+    QMenu *projectActions = ui->menuBar->addMenu(tr("Project"));
+    QAction *saveScene = new QAction(tr("Save Scene"));
+    QAction *loadScene = new QAction(tr("Load Scene"));
+    projectActions->addAction(saveScene);
+    projectActions->addAction(loadScene);
     QMenu *gameObject = ui->menuBar->addMenu(tr("GameObject"));
     QAction *empty = new QAction(tr("Empty GameObject"), this);
     gameObject->addAction(empty);
@@ -162,6 +167,9 @@ void MainWindow::createActions() {
     components->addAction(sound);
 
     ui->mainToolBar->setMovable(false);
+
+    connect(saveScene, &QAction::triggered, mRenderWindow, &RenderWindow::save);
+    connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
 
     // Setup the component actions
     connect(transform, &QAction::triggered, this, &MainWindow::addTransformComponent);
@@ -599,7 +607,11 @@ void MainWindow::onGameObjectDragged(GLuint id) {
     selectedEntity = ResourceManager::instance()->getGameObject(id);
     qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
     if ((selectedEntity->types & CType::Transform) != CType::None) {
-        gsl::Vector3D location = mRenderWindow->movement()->getRelativePosition(selectedEntity->eID);
+        gsl::Vector3D location;
+        if (mRenderWindow->movement()->hasParent(selectedEntity->eID)) {
+            location = mRenderWindow->movement()->getRelativePosition(selectedEntity->eID);
+        } else
+            location = mRenderWindow->movement()->getPosition(selectedEntity->eID);
         qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
     }
 }
@@ -617,23 +629,20 @@ void MainWindow::onGameObjectsChanged(GLuint entity) {
  * @brief Initial insertion of gameobjects, such as those made in an init function or read from a level file.
  * @param entities
  */
-void MainWindow::insertGameObjects(std::vector<int> entities) {
+void MainWindow::insertGameObjects() {
     EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->invisibleRootItem());
-    for (auto entity : entities) {
-        if (entity != -1) {
-            GameObject *object = ResourceManager::instance()->getGameObject(entity);
-            EntityItem *item;
-            if (object->mName == "")
-                item = new EntityItem(QString("GameObject"), object->eID) /*.arg(idx)*/;
-            else
-                item = new EntityItem(QString::fromStdString(object->mName), object->eID) /*.arg(idx)*/;
-            int parentID = Registry::instance()->getComponent<Transform>(object->eID).parentID;
-            if (parentID != -1) {
-                QString parent = QString::fromStdString(ResourceManager::instance()->getGameObject(entities.at(parentID))->mName);
-                forEach(hierarchy, parent, item);
-            } else
-                parentItem->appendRow(item);
-        }
+    for (auto entity : ResourceManager::instance()->getGameObjects()) {
+        EntityItem *item;
+        if (entity->mName == "")
+            item = new EntityItem(QString("GameObject"), entity->eID) /*.arg(idx)*/;
+        else
+            item = new EntityItem(QString::fromStdString(entity->mName), entity->eID) /*.arg(idx)*/;
+        int parentID = Registry::instance()->getComponent<Transform>(entity->eID).parentID;
+        if (parentID != -1) {
+            QString parent = QString::fromStdString(ResourceManager::instance()->getGameObject(parentID)->mName);
+            forEach(hierarchy, parent, item);
+        } else
+            parentItem->appendRow(item);
     }
 }
 void MainWindow::removeGameObject(const QModelIndex &index) {

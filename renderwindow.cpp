@@ -1,5 +1,6 @@
 #include "renderwindow.h"
 #include "innpch.h"
+#include "scene.h"
 #include <QKeyEvent>
 #include <QOpenGLContext>
 #include <QOpenGLDebugLogger>
@@ -47,6 +48,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     mInput->setMainWindow(mMainWindow);
     //Make the gameloop timer:
     mRenderTimer = new QTimer(this);
+    scene = std::make_unique<Scene>();
 }
 
 RenderWindow::~RenderWindow() {
@@ -128,16 +130,17 @@ void RenderWindow::init() {
     //    mCurrentCamera->pitch(5.f);
 
     //********************** Making the objects to be drawn **********************
-    mFactory->makeXYZ();
-    mFactory->makeSkyBox();
-    mFactory->makeBillBoard();
-    mLight = mFactory->makeLightObject();
+    scene->loadScene(currentScene); // loadScene should be placed somewhere in init() rather than saveScene
+                                    //    mFactory->makeXYZ();
+                                    //    mFactory->makeSkyBox();
+                                    //    mFactory->makeBillBoard();
+                                    //    mLight = mFactory->makeLightObject();
+    mLight = scene->controllerID;
 
-    GLuint boxID = mFactory->makeTriangleSurface("box2.txt");
-    mRegistry->getComponent<Material>(boxID).mShader = Color;
-    //one monkey
-    GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
-    mMoveSys->setParent(monkey, boxID);
+    //    GLuint boxID = mFactory->make3DObject("box2.txt", Color);
+    //    //one monkey
+    //    GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
+    //    mMoveSys->setParent(monkey, boxID);
 
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     mFactory->getShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
@@ -145,11 +148,11 @@ void RenderWindow::init() {
     mFactory->getShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
 
     // Add game objects to the scene hierarchy GUI
-    mMainWindow->insertGameObjects(mFactory->getGameObjectIndex());
-    // Initial positional setup.
-    mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
-    mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
-    mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
+    mMainWindow->insertGameObjects();
+    //    // Initial positional setup.
+    //    mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
+    //    mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
+    //    mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
     // Set up connections between MainWindow options and related systems.
     //    connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
     //    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer.get(), &RenderSystem::newEntity);
@@ -265,10 +268,12 @@ void RenderWindow::calculateFramerate() {
         ++frameCount;
         if (frameCount > 30) //once pr 30 frames = update the message twice pr second (on a 60Hz monitor)
         {
-            //showing some statistics in status bar
-            mMainWindow->statusBar()->showMessage(" Time pr FrameDraw: " +
-                                                  QString::number(nsecElapsed / 1000000., 'g', 4) + " ms  |  " +
-                                                  "FPS (approximated): " + QString::number(1E9 / nsecElapsed, 'g', 7));
+            if (!showingMsg) {
+                //showing some statistics in status bar
+                mMainWindow->statusBar()->showMessage(" Time pr FrameDraw: " +
+                                                      QString::number(nsecElapsed / 1000000., 'g', 4) + " ms  |  " +
+                                                      "FPS (approximated): " + QString::number(1E9 / nsecElapsed, 'g', 7));
+            }
             frameCount = 0; //reset to show a new message in 60 frames
         }
     }
@@ -316,6 +321,20 @@ void RenderWindow::keyPressEvent(QKeyEvent *event) {
 void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
     mInput->keyReleaseEvent(event);
 }
+
+void RenderWindow::save() {
+    scene->saveScene(currentScene);
+    mMainWindow->statusBar()->showMessage("Saved Scene!", 1000);
+    showingMsg = true;
+    connect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
+}
+
+void RenderWindow::load() {
+    scene->loadScene(currentScene);
+    mMainWindow->statusBar()->showMessage("Loaded Scene!", 1000);
+    showingMsg = true;
+    connect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
+}
 void RenderWindow::setCameraSpeed(float value) {
     mCameraSpeed += value;
     //Keep within min and max values
@@ -324,14 +343,21 @@ void RenderWindow::setCameraSpeed(float value) {
     if (mCameraSpeed > 0.3f)
         mCameraSpeed = 0.3f;
 }
-
+void RenderWindow::changeMsg() {
+    showingMsg = !showingMsg;
+    disconnect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
+}
 void RenderWindow::handleInput() {
     //Camera
     mCurrentCamera->setSpeed(0.f); //cancel last frame movement
     if (mInput->F) {
         emit snapSignal();
     }
-    if (mInput->RMB) {
+    if (mInput->CTRL) {
+        if (mInput->S) {
+            save();
+        }
+    } else if (mInput->RMB) {
         if (mInput->W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
         if (mInput->S)

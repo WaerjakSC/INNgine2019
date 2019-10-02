@@ -58,7 +58,10 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
         eID = mGameObjects.size() - 1;
     }
     registry->addComponent<Mesh>(eID);
-    setMesh(name, eID);
+    if (name.find(".txt") != std::string::npos)
+        setMesh(loadTriangleMesh(name), eID);
+    else
+        setMesh(name, eID);
 }
 void ResourceManager::setMesh(Mesh *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
@@ -73,27 +76,49 @@ void ResourceManager::setMesh(std::string name, int eID) {
     } else
         loadMesh(name);
 }
-
+/**
+ * @brief Updates the child parent hierarchy in case it's out of date
+ */
+void ResourceManager::updateChildParent() {
+    for (auto entity : getGameObjects()) // For every gameobject
+    {
+        if ((entity->types & CType::Transform) != CType::None) {
+            Transform comp = registry->getComponent<Transform>(entity->eID);
+            if (comp.parentID != -1) {                                                                // If this entity has a parent then,
+                registry->getComponent<Transform>(comp.parentID).mChildren.emplace_back(entity->eID); // add this entity's ID to the parent's list of children.
+            }
+        }
+    }
+}
 /**
  * @brief Get a pointer to the entity with the specified ID.
  * @param eID
  * @return
  */
 GameObject *ResourceManager::getGameObject(int eID) {
-    assert((size_t)eID < mGameObjectIndex.size());
-    return mGameObjects.at(mGameObjectIndex.at(eID));
+    for (auto *object : mGameObjects) {
+        if ((int)object->eID == eID) {
+            return object;
+        }
+    }
+    return nullptr;
 }
 /**
  * @brief Destroy gameobject
  * @param eID - entityID
  */
 void ResourceManager::removeGameObject(int eID) {
-    assert((size_t)eID < mGameObjectIndex.size());
-    mGameObjectIndex.at(mGameObjects.back()->eID) = mGameObjectIndex.at(eID); // Set the index to point to the location after swap
-    std::swap(mGameObjects.at(mGameObjectIndex[eID]), mGameObjects.back());   // Swap the removed with the last, then pop out the last.
+    std::swap(mGameObjects[eID], mGameObjects.back()); // Swap the removed with the last, then pop out the last.
     mGameObjects.pop_back();
-    mGameObjectIndex.at(eID) = -1;  // Set entity location to an invalid value.
     registry->entityDestroyed(eID); // Pass the message on to the registry
+    mNumGameObjects--;
+}
+
+void ResourceManager::clearScene() {
+    for (auto entity : mGameObjects)
+        registry->entityDestroyed(entity->eID); // Pass the message on to the registry
+    mGameObjects.clear();
+    mNumGameObjects = 0;
 }
 /**
  * @brief Make a generic game object with no components attached.
@@ -103,8 +128,10 @@ void ResourceManager::removeGameObject(int eID) {
 GLuint ResourceManager::makeGameObject(std::string name) {
     GLuint eID = mNumGameObjects;
     mNumGameObjects++;
-    mGameObjectIndex.emplace_back(mGameObjects.size());
-    mGameObjects.emplace_back(new GameObject(eID, name));
+    if (name == "BillBoard")
+        mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
+    else
+        mGameObjects.emplace_back(new GameObject(eID, name));
 
     return eID;
 }
@@ -115,11 +142,15 @@ GLuint ResourceManager::makeGameObject(std::string name) {
  * @return The entity ID of the gameobject.
  */
 GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
-    GLuint eID = makeGameObject(name);
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, type);
-    addMeshComponent(name, eID);
-    return eID;
+    if (name.find(".txt") != std::string::npos)
+        return makeTriangleSurface(name, type);
+    else {
+        GLuint eID = makeGameObject(name);
+        registry->addComponent<Transform>(eID);
+        registry->addComponent<Material>(eID, type);
+        addMeshComponent(name, eID);
+        return eID;
+    }
 }
 /**
  * @brief Plane prefab -- should fix coloring at some point
@@ -129,9 +160,14 @@ GLuint ResourceManager::makePlane() {
     GLuint eID = makeGameObject("Plane");
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
+    makePlaneMesh(eID);
 
+    return eID;
+}
+void ResourceManager::makePlaneMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
+    mMeshData.mName = "Plane";
     mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 1.f, 0.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 1.f, 0.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, -0.5f, 0.f, 1.f, 0.f});
@@ -146,7 +182,6 @@ GLuint ResourceManager::makePlane() {
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
     glBindVertexArray(0);
-    return eID;
 }
 /**
  * @brief Cube prefab
@@ -171,6 +206,7 @@ GLuint ResourceManager::makeXYZ() {
 
     initializeOpenGLFunctions();
     mMeshData.Clear();
+    mMeshData.mName = "XYZ";
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
@@ -196,9 +232,13 @@ GLuint ResourceManager::makeSkyBox() {
     registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
     registry->addComponent<Material>(eID, Tex, mTextures["skybox.bmp"]->id() - 1);
 
-    //    temp->mMatrix.scale(15.f);
+    makeSkyBoxMesh(eID);
+    return eID;
+}
+void ResourceManager::makeSkyBoxMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
+    mMeshData.mName = "Skybox";
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
                                {
                                    //Vertex data for front
@@ -255,8 +295,6 @@ GLuint ResourceManager::makeSkyBox() {
     initIndexBuffers(&skyMesh);
 
     glBindVertexArray(0);
-
-    return eID;
 }
 
 /**
@@ -264,15 +302,13 @@ GLuint ResourceManager::makeSkyBox() {
  * @param fileName
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
+GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType type) {
     GLuint eID = makeGameObject(fileName);
-
-    mMeshData.Clear();
 
     initializeOpenGLFunctions();
 
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID);
+    registry->addComponent<Material>(eID, type);
     registry->addComponent<Mesh>(eID);
     setMesh(loadTriangleMesh(fileName), eID);
     glBindVertexArray(0);
@@ -284,32 +320,31 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName) {
  * @return
  */
 GLuint ResourceManager::makeBillBoard() {
-    GLuint eID = mNumGameObjects;
-    ++mNumGameObjects;
-    mGameObjectIndex.emplace_back(mGameObjects.size());
-    mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
+    GLuint eID = makeGameObject("BillBoard");
     registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
-
     registry->addComponent<Material>(eID, Tex, mTextures["gnome.bmp"]->id() - 1);
+    makeBillBoardMesh(eID);
 
+    return eID;
+}
+void ResourceManager::makeBillBoardMesh(int eID) {
     initializeOpenGLFunctions();
 
     mMeshData.Clear();
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {
-                                   // Positions            // Normals          //UVs
-                                   Vertex{gsl::Vector3D(-2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
-                                   Vertex{gsl::Vector3D(2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
-                                   Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
-                                   Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
-                               });
+    mMeshData.mName = "BillBoard";
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(), {
+                                                              // Positions            // Normals          //UVs
+                                                              Vertex{gsl::Vector3D(-2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
+                                                              Vertex{gsl::Vector3D(2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
+                                                              Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
+                                                              Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
+                                                          });
     registry->addComponent<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
 
     auto &billBoardMesh = registry->getComponent<Mesh>(eID);
     initVertexBuffers(&billBoardMesh);
 
     glBindVertexArray(0);
-    return eID;
 }
 /**
  * @brief Sphere prefab
@@ -318,11 +353,17 @@ GLuint ResourceManager::makeBillBoard() {
  */
 GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = makeGameObject("Ball");
-    mMeshData.Clear();
-    initializeOpenGLFunctions();
+
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
+    makeBallMesh(eID, n);
 
+    return eID;
+}
+void ResourceManager::makeBallMesh(GLuint eID, int n) {
+    initializeOpenGLFunctions();
+    mMeshData.Clear();
+    mMeshData.mName = "Ball";
     GLint mRecursions = n;
     GLint mIndex = 0;
 
@@ -337,7 +378,6 @@ GLuint ResourceManager::makeOctBall(int n) {
     initIndexBuffers(&octMesh);
 
     glBindVertexArray(0);
-    return eID;
 }
 /**
  * @brief Light object prefab -- not fully implemented yet
@@ -348,10 +388,14 @@ GLuint ResourceManager::makeLightObject() {
     registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
     registry->addComponent<Material>(eID, Tex, mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->addComponent<Light>(eID);
-
+    makeLightMesh(eID);
+    return eID;
+}
+void ResourceManager::makeLightMesh(int eID) {
     initializeOpenGLFunctions();
 
     mMeshData.Clear();
+    mMeshData.mName = "Light";
 
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
                                {
@@ -375,7 +419,6 @@ GLuint ResourceManager::makeLightObject() {
     initIndexBuffers(&lightMesh);
 
     glBindVertexArray(0);
-    return eID;
 }
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
@@ -619,6 +662,7 @@ bool ResourceManager::readFile(std::string fileName) {
     fileIn.close();
 
     auto &mesh = registry->getLastComponent<Mesh>();
+    mesh.mName = fileName;
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mIndiceCount = mMeshData.mIndices.size();
     mesh.mDrawType = GL_TRIANGLES;
@@ -683,6 +727,7 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
 
         auto &mesh = registry->getLastComponent<Mesh>();
         mesh.mVerticeCount = mMeshData.mVertices.size();
+        mesh.mName = fileName;
         mesh.mDrawType = GL_TRIANGLES;
         initVertexBuffers(&mesh);
         return true;
@@ -702,10 +747,6 @@ void ResourceManager::setLightSystem(const std::shared_ptr<LightSystem> &lightSy
 //RenderView *ResourceManager::getRenderView() const {
 //    return mRenderView.get();
 //}
-
-std::vector<int> ResourceManager::getGameObjectIndex() const {
-    return mGameObjectIndex;
-}
 
 std::vector<GameObject *> ResourceManager::getGameObjects() const {
     return mGameObjects;

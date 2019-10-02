@@ -44,13 +44,15 @@ public:
     void remove(int removedEntityID) {
         if (has(removedEntityID)) {
             // Make sure the entity you want to delete actually exists. For debugging purposes.
-            mEntityIndices.at(mEntityList.back()) = mEntityIndices.at(removedEntityID);     // Set the index to point to the location after swap
-            std::swap(mEntityList.at(mEntityIndices[removedEntityID]), mEntityList.back()); // Swap the removed with the last, then pop out the last.
+            mEntityIndices[mEntityList.back()] = mEntityIndices[removedEntityID];        // Set the index to point to the location after swap
+            std::swap(mEntityList[mEntityIndices[removedEntityID]], mEntityList.back()); // Swap the removed with the last, then pop out the last.
             mEntityList.pop_back();
             std::swap(mComponentList.at(mEntityIndices[removedEntityID]), mComponentList.back());
             mComponentList.pop_back();
-            mEntityIndices.at(removedEntityID) = -1; // Set entity location to an invalid value.
+            mEntityIndices[removedEntityID] = -1; // Set entity location to an invalid value.
         }
+        if (mEntityList.empty())
+            mEntityIndices.clear();
     }
     /**
      * @brief Direct access to the component list

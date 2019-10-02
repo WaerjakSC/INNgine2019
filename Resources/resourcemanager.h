@@ -15,6 +15,8 @@ class Registry;
 class MainWindow;
 
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
+    friend class Scene;
+
 public:
     static ResourceManager *instance();
     virtual ~ResourceManager();
@@ -35,7 +37,7 @@ public:
     // Basic Shapes and Prefabs
     GLuint makeXYZ();
     GLuint makeSkyBox();
-    GLuint makeTriangleSurface(std::string fileName);
+    GLuint makeTriangleSurface(std::string fileName, ShaderType type);
     GLuint makeBillBoard();
     GLuint makeOctBall(int n = 3);
     GLuint makePlane();
@@ -51,7 +53,7 @@ public:
     std::vector<GameObject *> getGameObjects() const;
     GameObject *getGameObject(int eID);
     void removeGameObject(int eID);
-    std::vector<int> getGameObjectIndex() const;
+    void clearScene();
 
     //    RenderView *getRenderView() const;
 
@@ -62,6 +64,8 @@ public:
     QString getTextureName(GLuint id);
 
     QString getMeshName(const Mesh &mesh);
+
+    void updateChildParent();
 
 private:
     // Private constructor
@@ -79,7 +83,7 @@ private:
     meshData mMeshData;
 
     MainWindow *mMainWindow;
-    std::vector<int> mGameObjectIndex;      // Holds the sparse array for gameobjects.
+    //    std::vector<int> mGameObjectIndices;    // Holds the sparse array for gameobjects.
     std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
     // Systems
     std::shared_ptr<LightSystem> mLightSystem;
@@ -90,6 +94,7 @@ private:
     // OpenGL init functions
     void initVertexBuffers(Mesh *mesh);
     void initIndexBuffers(Mesh *mesh);
+    void makeBillBoardMesh(int eID);
 
     // Reads and loads mesh
     void loadMesh(std::string fileName);
@@ -102,6 +107,10 @@ private:
     void makeUnitOctahedron(GLint recursions);
     void subDivide(const gsl::Vector3D &a, const gsl::Vector3D &b, const gsl::Vector3D &c, GLint n);
     void makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3);
+    void makeLightMesh(int eID);
+    void makeSkyBoxMesh(GLuint eID);
+    void makePlaneMesh(GLuint eID);
+    void makeBallMesh(GLuint eID, int n = 3);
 };
 
 #endif // RESOURCEMANAGER_H

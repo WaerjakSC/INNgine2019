@@ -18,6 +18,7 @@ class RenderSystem;
 class MovementSystem;
 class SoundSource;
 class SoundManager;
+class Scene;
 class LightSystem;
 class Registry;
 /// This inherits from QWindow to get access to the Qt functionality and
@@ -49,11 +50,15 @@ public:
     SoundManager *soundManager() const;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+
 public slots:
     void snapToObject(int eID);
+    void save();
+    void load();
 private slots:
     void render();
     void updateScene();
+    void changeMsg();
 signals:
     void snapSignal();
 
@@ -70,6 +75,9 @@ private:
     ResourceManager *mFactory;
     Registry *mRegistry;
     SoundManager *mSoundManager;
+    std::unique_ptr<Scene> scene;
+    std::string currentScene{"mainSceneCJK.json"};
+
     GameObject *mPlayer; //the controllable object
 
     GLuint mLight;
@@ -79,6 +87,7 @@ private:
     Camera *mCurrentCamera{nullptr};
 
     bool mWireframe{false};
+    bool showingMsg{false};
 
     //Input mInput;
 

@@ -28,7 +28,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void insertGameObjects(std::vector<int> entities);
+    void insertGameObjects();
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 signals:

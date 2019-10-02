@@ -11,12 +11,22 @@ struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
+    std::string mName;
     void Clear() {
         mVertices.clear();
         mIndices.clear();
+        mName.clear();
     }
 };
 struct LightData {
+    LightData() {}
+    LightData(GLfloat ambientStrength, vec3 ambientColor, GLfloat lightStrength, vec3 lightColor,
+              GLfloat specularStrength, GLint specularExponent,
+              vec3 objectColor)
+        : mAmbientStrength(ambientStrength), mAmbientColor(ambientColor),
+          mLightStrength(lightStrength), mLightColor(lightColor),
+          mSpecularStrength(specularStrength), mSpecularExponent(specularExponent),
+          mObjectColor(objectColor) {}
     GLfloat mAmbientStrength{0.3f};
     gsl::Vector3D mAmbientColor{0.3f, 0.3f, 0.3f};
 
@@ -120,7 +130,6 @@ struct Transform : Component {
     gsl::Matrix4x4 mMatrix;
 
     std::vector<int> mChildren;
-    bool hasChildren{false};
 
     int parentID = -1;
 };
@@ -130,6 +139,15 @@ struct Transform : Component {
 struct Material : public Component {
     Material(ShaderType type = Color, GLuint texture = 0, gsl::Vector3D color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
+    }
+    Material(std::string type, GLuint texture = 0, gsl::Vector3D color = 1) : mObjectColor(color), mTextureUnit(texture) {
+        mType = CType::Material;
+        if (type == "color")
+            mShader = Color;
+        else if (type == "texture")
+            mShader = Tex;
+        else if (type == "phong")
+            mShader = Phong;
     }
     virtual void update() {}
 
@@ -141,10 +159,11 @@ struct Material : public Component {
 struct Mesh : public Component {
 public:
     Mesh() {}
-    Mesh(GLenum drawType, GLuint verticeCount = 0, GLuint indiceCount = 0) : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType) {
+    Mesh(GLenum drawType, std::string name, GLuint verticeCount = 0, GLuint indiceCount = 0)
+        : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name) {
         mType = CType::Mesh;
     }
-    Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mVertices.size(), data.mIndices.size()) {
+    Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
     }
 
     virtual void update() {}
@@ -156,6 +175,8 @@ public:
     GLuint mVerticeCount{0};
     GLuint mIndiceCount{0};
     GLenum mDrawType{0};
+
+    std::string mName;
     Mesh &operator=(const Mesh &other) {
         mVAO = other.mVAO;
         mVBO = other.mVBO;
@@ -200,6 +221,7 @@ struct Input : public Component {
     bool F{false};
     bool C{false};
     bool LSHIFT{false};
+    bool CTRL{false};
     bool SPACE{false};
     bool LMB{false};
     bool RMB{false};
