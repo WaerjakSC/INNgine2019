@@ -65,6 +65,11 @@ public:
     QString getMeshName(const Mesh &mesh);
 
     void updateChildParent();
+    void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
+    std::vector<int> billBoards() { return mBillBoards; }
+    void setLoading(bool load) { mLoading = load; }
+
+    bool isLoading() const;
 
 private:
     // Private constructor
@@ -73,10 +78,12 @@ private:
     static ResourceManager *mInstance;
     Registry *registry;
     GLuint mNumGameObjects{0};
+    bool mLoading{false};
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> mShaders;
     std::map<std::string, Texture *> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
+    std::vector<int> mBillBoards;
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;

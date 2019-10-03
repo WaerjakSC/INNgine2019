@@ -31,6 +31,10 @@ ResourceManager::ResourceManager() {
     //    mRenderView = std::make_unique<RenderView>(mTransforms);
 }
 
+bool ResourceManager::isLoading() const {
+    return mLoading;
+}
+
 // Do resource manager stuff -- Aka actually delete the pointers after application end
 ResourceManager::~ResourceManager() {
     for (auto &shader : mShaders) {
@@ -115,9 +119,11 @@ void ResourceManager::removeGameObject(int eID) {
 }
 
 void ResourceManager::clearScene() {
+    mBillBoards.clear();
     for (auto entity : mGameObjects)
         registry->entityDestroyed(entity->eID); // Pass the message on to the registry
     mGameObjects.clear();
+
     mNumGameObjects = 0;
 }
 /**

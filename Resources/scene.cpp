@@ -161,6 +161,7 @@ void Scene::saveScene(std::string fileName) {
 void Scene::loadScene(std::string fileName) {
     ResourceManager *factory = ResourceManager::instance();
     Registry *registry = Registry::instance();
+    factory->setLoading(true);
     factory->clearScene();
     std::ifstream file(gsl::sceneFilePath + fileName);
     if (!file.good())
@@ -198,9 +199,10 @@ void Scene::loadScene(std::string fileName) {
                     gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                     registry->addComponent<Material>(id, comp->value["shader"].GetString(), comp->value["textureid"].GetInt(), color);
                 } else if (comp->name == "mesh") {
-                    if (comp->value["name"] == "BillBoard")
+                    if (comp->value["name"] == "BillBoard") {
                         factory->makeBillBoardMesh(id);
-                    else if (comp->value["name"] == "Skybox")
+                        factory->addBillBoard(id);
+                    } else if (comp->value["name"] == "Skybox")
                         factory->makeSkyBoxMesh(id);
                     else if (comp->value["name"] == "Light")
                         factory->makeLightMesh(id);
@@ -227,4 +229,5 @@ void Scene::loadScene(std::string fileName) {
         registry->getComponent<Transform>(pair.first).parentID = idPairs[pair.second];
     }
     factory->updateChildParent();
+    factory->setLoading(false);
 }

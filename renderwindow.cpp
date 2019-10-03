@@ -136,6 +136,7 @@ void RenderWindow::init() {
                                     //    mFactory->makeBillBoard();
                                     //    mLight = mFactory->makeLightObject();
     mLight = scene->controllerID;
+    mRenderer->init();
 
     //    GLuint boxID = mFactory->make3DObject("box2.txt", Color);
     //    //one monkey
@@ -175,10 +176,11 @@ void RenderWindow::render() {
 
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    mMoveSys->update();
-    mRenderer->render();
-    mLightSys->update();
+    if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
+        mMoveSys->update();
+        mRenderer->render();
+        mLightSys->update();
+    }
     mSoundManager->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
 
     //Calculate framerate before

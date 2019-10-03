@@ -1,9 +1,12 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
-#include "resourcemanager.h"
+#include "pool.h"
+#include "renderview.h"
 #include <QOpenGLFunctions_4_1_Core>
-
+#include <memory>
+class ResourceManager;
+class RenderView;
 class RenderSystem : public QObject, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
@@ -11,6 +14,7 @@ public:
 
     void render();
 
+    void init();
 public slots:
     void changeShader(int entityID, ShaderType nShader);
 
@@ -21,9 +25,7 @@ private:
     void updateEntities();
 
     std::map<ShaderType, Shader *> mShaders;
-    std::shared_ptr<Pool<Mesh>> mMeshPool;
-    std::shared_ptr<Pool<Material>> mMaterialPool;
-    std::shared_ptr<Pool<Transform>> mTransformPool;
+    std::unique_ptr<RenderView> mView;
 };
 
 #endif // RENDERSYSTEM_H

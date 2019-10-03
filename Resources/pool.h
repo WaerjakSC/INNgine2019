@@ -34,25 +34,54 @@ public:
         mEntityIndices.push_back(mEntityList.size()); // entity list size is location of new entityID
         mEntityList.push_back(entityID);
         mComponentList.push_back(Type(args...));
+        if (isSorted) { // Swap the latest entity with the entity pointed at by the group marker, then increment the marker so it points one step right of the newest entity
+            swap(mEntityList[mEntityIndices.back()], mEntityList[mEntityIndices[mGroupEnd++]]);
+        }
     }
     /**
-     * @brief Removes an entity by swapping swapping the entityID/component with the last element of the dense arrays and popping out the last element.
+     * @brief Removes an entity by swapping the entityID/component with the last element of the dense arrays and popping out the last element.
      * mEntityIndices[removedEntityID] now holds an invalid value for the dense arrays.
      * mEntityIndices[swappedEntity] now holds the swapped location of the entityID/component.
      * @param removedEntityID
      */
     void remove(int removedEntityID) {
         if (has(removedEntityID)) {
-            // Make sure the entity you want to delete actually exists. For debugging purposes.
-            mEntityIndices[mEntityList.back()] = mEntityIndices[removedEntityID];        // Set the index to point to the location after swap
-            std::swap(mEntityList[mEntityIndices[removedEntityID]], mEntityList.back()); // Swap the removed with the last, then pop out the last.
+            GLuint swappedEntity = mEntityList.back();
+            swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
+            if (isSorted) {
+                if (mGroupEnd != mEntityList.size()) {
+                    swap(swappedEntity, mEntityList.back()); // Do a final swap to re-position the group marker
+                }
+                mGroupEnd--;
+            }
             mEntityList.pop_back();
-            std::swap(mComponentList.at(mEntityIndices[removedEntityID]), mComponentList.back());
             mComponentList.pop_back();
             mEntityIndices[removedEntityID] = -1; // Set entity location to an invalid value.
         }
         if (mEntityList.empty())
             mEntityIndices.clear();
+    }
+    void swap(GLuint eID, GLuint other) {
+        assert(has(eID));
+        assert(has(other));
+        std::swap(mEntityList[mEntityIndices[eID]], mEntityList[mEntityIndices[other]]);       // Swap the two entities in the pool
+        std::swap(mComponentList[mEntityIndices[eID]], mComponentList[mEntityIndices[other]]); // Swap the components to keep the dense set up to date
+        std::swap(mEntityIndices[eID], mEntityIndices[other]);                                 // Set the index to point to the location after swap
+    }
+    /**
+     * @brief sort the pool according to a different index
+     * @param otherIndex
+     */
+    void sort(std::vector<int> otherIndex) {
+        mGroupEnd = mEntityList.size();
+        isSorted = true;
+        for (size_t i = 0; i < mEntityList.size(); i++) {
+            if (has(i)) {
+                swap(mEntityList[mEntityIndices[i]], mEntityList[otherIndex[i]]);
+
+            } /*else
+                mGroupEnd--;*/
+        }
     }
     /**
      * @brief Direct access to the component list
@@ -83,13 +112,13 @@ public:
      */
     Type &get(int eID) {
         assert(has(eID));
-        return mComponentList.at(mEntityIndices.at(eID));
+        return mComponentList[mEntityIndices[eID]];
     }
     /**
      * @brief get the last component in the pool, aka the latest creation
      * @return
      */
-    Type &getLast() {
+    Type &back() {
         return mComponentList.back();
     }
 
@@ -100,27 +129,10 @@ public:
      */
     bool has(GLuint eID) {
         if (mEntityIndices.size() > eID)
-            return mEntityIndices.at(eID) != -1;
+            return mEntityIndices[eID] != -1;
         return false;
     }
-    void swap(GLuint eID, GLuint other) {
-        assert(has(eID));
-        assert(has(other));
-        std::swap(mEntityList[mEntityIndices[eID]], mEntityList[mEntityIndices[other]]);       // Swap the two entities in the pool
-        std::swap(mComponentList[mEntityIndices[eID]], mComponentList[mEntityIndices[other]]); // Swap the components to keep the dense set up to date
-        std::swap(mEntityIndices[eID], mEntityIndices[other]);                                 // Set the value for mEntityIndices to the new value.
-    }
-    /**
-     * @brief sort the pool according to a different index
-     * @param otherIndex
-     */
-    void sort(std::vector<int> otherIndex) {
-        for (size_t i = 0; i < mEntityList.size(); i++) {
-            if (has(i)) {
-                swap(mEntityList[mEntityIndices[i]], mEntityList[otherIndex[i]]);
-            }
-        }
-    }
+
     /**
      * @brief Actual number of entities with owned components in the pool.
      * @return
@@ -158,6 +170,14 @@ public:
         return size() <= other.size();
     }
 
+    void incMarker() { mGroupEnd++; }
+    GLuint groupEnd() const { return mGroupEnd; }
+    void setSorted() {
+        isSorted = true;
+        if (mGroupEnd == 0)
+            mGroupEnd = mEntityList.size();
+    }
+
 private:
     std::vector<int> mEntityIndices; // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
 
@@ -165,6 +185,8 @@ private:
     // Both should be the same length.
     std::vector<int> mEntityList; // Value is entityID.
     std::vector<Type> mComponentList;
+    GLuint mGroupEnd{0};
+    bool isSorted{false};
 };
 
 #endif // POOL_H
