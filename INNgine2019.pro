@@ -107,7 +107,8 @@ HEADERS += \
     triangle.h \
     vertex.h \
     camera.h \
-    gltypes.h
+    gltypes.h \
+    ECS/Systems/collisionsystem.h
 
 
 SOURCES += main.cpp \
@@ -149,7 +150,8 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     triangle.cpp \
     vertex.cpp \
-    camera.cpp
+    camera.cpp \
+    ECS/Systems/collisionsystem.cpp
 
 
 FORMS += \

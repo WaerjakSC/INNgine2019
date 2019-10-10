@@ -45,7 +45,8 @@ enum class CType {
     Light = 1 << 3,
     Input = 1 << 4,
     Physics = 1 << 5,
-    Sound = 1 << 6
+    Sound = 1 << 6,
+    Collision = 1 << 7
 };
 
 template <typename E>
@@ -250,4 +251,11 @@ public:
     Sound() {}
     virtual void update() {}
 };
+
+struct Collision : public Component {
+public:
+    Collision() {}
+    virtual void update(){}
+};
+
 #endif // COMPONENT_H
