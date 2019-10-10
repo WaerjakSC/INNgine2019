@@ -5,3 +5,7 @@ CollisionSystem::CollisionSystem()
 {
 
 }
+
+bool CollisionSystem::IntersectAABB(){
+
+}
