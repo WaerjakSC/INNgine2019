@@ -3,13 +3,15 @@
 
 #include "registry.h"
 
+
 class CollisionSystem
 {
 public:
     CollisionSystem();
 
-    bool IntersectAABB();
-
+    bool IntersectAABB(int eID, int otherEID);
+    bool IntersectOBB();
+    Registry *reg = Registry::instance();
 
 
 };
