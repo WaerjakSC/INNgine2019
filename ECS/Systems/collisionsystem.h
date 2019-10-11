@@ -3,8 +3,6 @@
 
 #include "registry.h"
 
-
-
 class CollisionSystem
 {
 public:

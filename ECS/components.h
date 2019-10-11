@@ -252,7 +252,18 @@ public:
     virtual void update() {}
 };
 
+/**
+ * @brief The Collision component class holds the collider types and bounds
+ */
 struct Collision : public Component {
+
+    enum ColType{
+        AABB,
+        OBB,
+        Sphere,
+        Capsule
+    };
+
 public:
     Collision() {}
     virtual void update(){}
