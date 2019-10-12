@@ -270,9 +270,24 @@ public:
     Collision(ColType type, vec3 size) : colType(type) {}
     virtual void update(){}
     ColType colType;
-
     bool mTrigger{false};
 
+
+   typedef struct AABB{
+        vec3 origin;
+        vec3 size;  // Half size
+
+        inline AABB() : size(2,2,2){}
+        inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
+    } AABB;
+
+    vec3 getMin(const AABB& aabb);
+    vec3 getMax(const AABB& aabb);
+
+
+
 };
+
+
 
 #endif // COMPONENT_H

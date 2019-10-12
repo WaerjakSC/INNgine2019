@@ -1,3 +1,4 @@
+#include <cmath>
 #include "components.h"
 #include "mainwindow.h"
 
@@ -149,3 +150,23 @@ void Input::wheelEvent(QWheelEvent *event){
     event->accept();
 }
 */
+
+vec3 Collision::getMin(const Collision::AABB &aabb)
+{
+    vec3 p1 = aabb.origin + aabb.size;
+    vec3 p2 = aabb.origin - aabb.size;
+
+    return vec3(fminf(p1.x, p2.x),
+                fminf(p1.y, p2.y),
+                fminf(p1.z, p2.z));
+}
+
+vec3 Collision::getMax(const Collision::AABB &aabb)
+{
+    vec3 p1 = aabb.origin + aabb.size;
+    vec3 p2 = aabb.origin - aabb.size;
+
+    return vec3(fmaxf(p1.x, p2.x),
+                fmaxf(p1.y, p2.y),
+                fmaxf(p1.z, p2.z));
+}
