@@ -284,6 +284,20 @@ public:
     vec3 getMin(const AABB& aabb);
     vec3 getMax(const AABB& aabb);
 
+    typedef struct OBB{
+        vec3 position;
+        vec3 size;
+
+        //<------ Trenger rotasjon her
+
+        // default constructor: lager en OBB ved origo
+        inline OBB() : size(2,2,2) {}
+        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
+        inline OBB(const vec3& p, const vec3& s) {}
+         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
+        //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
+    } OBB;
+
 
 
 };
