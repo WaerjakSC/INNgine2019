@@ -250,6 +250,10 @@ struct Sound : public Component {
 public:
     Sound() {}
     virtual void update() {}
+
+    bool mLooping{false};
+    bool mPlay{false};
+    bool mPlaying{false};
 };
 
 enum ColType{
@@ -265,8 +269,9 @@ struct Collision : public Component {
 public:
     Collision(ColType type, vec3 size) : colType(type) {}
     virtual void update(){}
-private:
     ColType colType;
+
+    bool mTrigger{false};
 
 };
 
