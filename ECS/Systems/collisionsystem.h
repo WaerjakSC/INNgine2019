@@ -18,7 +18,11 @@ public:
     vec3 getMax(const Collision::AABB& aabb);
 
 
-    bool AABBAABB(const Collision::AABB& AABB1, const Collision::AABB& AABB2);
+    bool AABBAABB(const Collision::AABB& aabb1, const Collision::AABB& aabb2);
+    bool SphereAABB(const Collision::Sphere& sphere, const Collision::AABB& aabb1);
+
+    bool PointInAABB(const vec3& point, const Collision::AABB& aabb);
+    vec3 ClosestPoint(const Collision::AABB& aabb, const vec3& point);
 
     Collision::AABB *aa;
 

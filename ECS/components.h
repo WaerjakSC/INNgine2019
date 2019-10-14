@@ -251,5 +251,61 @@ struct Sound : public Component {
 public:
     Sound() {}
     virtual void update() {}
+
+
+    bool mLooping{false};
+    bool mPlay{false};
+    bool mPlaying{false};
+};
+
+enum ColType{
+    AABB,
+    OBB,
+    Sphere,
+    Capsule
+};
+/**
+ * @brief The Collision component class holds the collider types and bounds
+ */
+struct Collision : public Component {
+public:
+    Collision(ColType type, vec3 size) : colType(type) {}
+    virtual void update(){}
+    ColType colType;
+    bool mTrigger{false};
+
+
+   typedef struct AABB{
+        vec3 origin;
+        vec3 size;  // Half size
+
+        inline AABB() : size(2,2,2){}
+        inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
+    } AABB;
+
+
+    typedef struct OBB{
+        vec3 position;
+        vec3 size;
+
+        //<------ Trenger rotasjon her
+
+        // default constructor: lager en OBB ved origo
+        inline OBB() : size(2,2,2) {}
+        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
+        inline OBB(const vec3& p, const vec3& s) {}
+         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
+        //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
+    } OBB;
+
+    typedef struct Sphere{
+        vec3 position;
+        float radius;
+
+        // default constructor
+        inline Sphere(): radius(3.0f) {};
+        // constructor with radius and position params
+        inline Sphere(const vec3& pos, const float& r): position(pos), radius(r) {}
+    } Sphere;
 };
 #endif // COMPONENT_H
