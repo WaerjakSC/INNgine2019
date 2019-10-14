@@ -90,6 +90,8 @@ private slots:
     void addInputComponent();
     void addPhysicsComponent();
     void addSoundComponent();
+    void addCollisionComponent();
+
     void makeGameObject();
 
     void removeGameObject(const QModelIndex &index);

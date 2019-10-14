@@ -100,6 +100,9 @@ public:
             getComponentArray<Physics>()->remove(entityID);
         if (contains(entityID, CType::Sound))
             getComponentArray<Sound>()->remove(entityID);
+        if (contains(entityID, CType::Collision)) {
+            getComponentArray<Collision>()->remove(entityID);
+        }
         //        for (auto const &pair : mPools) {
 
         //            auto const &pool = pair.second;
