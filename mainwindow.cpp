@@ -236,6 +236,13 @@ void MainWindow::addSoundComponent() {
         registry->addComponent<Sound>(selectedEntity->eID);
     setupComponentList();
 }
+void MainWindow::addCollisionComponent() {
+    Registry *registry = Registry::instance();
+    CType typeMask = selectedEntity->types;
+    if ((typeMask & CType::Collision) == CType::None)
+        registry->addComponent<Collision>(selectedEntity->eID);
+    setupComponentList();
+}
 /**
  * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
  * @todo Right click a QGroupBox to get options like remove component (look at Unity for inspiration)
@@ -252,6 +259,9 @@ void MainWindow::setupComponentList() {
     }
     if ((typeMask & CType::Mesh) != CType::None) {
         setupMeshSettings(registry->getComponent<Mesh>(selectedEntity->eID));
+    }
+    if ((typeMask & CType::None) != CType::None) {
+        // setupCollisionSettings(registry->getComponent<Collision>(selectedEntity->eID));
     }
 }
 void MainWindow::setupMeshSettings(const Mesh &mesh) {
