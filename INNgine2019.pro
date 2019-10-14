@@ -22,8 +22,7 @@ win32 {
     INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
 
     #Visual Studio 64-bit
-    contains(QT_ARCH, x86_64)
-    {
+    contains(QT_ARCH, x86_64) {
         LIBS *= $(OPENAL_HOME)\\libs\\Win64\\OpenAL32.lib
         # Copy required DLLs to output directory
         CONFIG(debug, debug|release) {
@@ -41,10 +40,7 @@ win32 {
         } else {
             error(Unknown set of dependencies.)
         }
-    }
-    #minGW 32-bit
-    contains(QT_ARCH, i386)
-    {
+    } else {
         LIBS *= $(OPENAL_HOME)\\libs\\Win32\\OpenAL32.lib
         # Copy required DLLs to output directory
         CONFIG(debug, debug|release) {
