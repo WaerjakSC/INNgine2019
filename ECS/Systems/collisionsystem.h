@@ -9,10 +9,7 @@ class CollisionSystem
 public:
     CollisionSystem();
 
-  //  bool IntersectAABB(int eID, int otherEID);
-    bool IntersectOBB();
     Registry *reg = Registry::instance();
-    static bool IntersectAABBAABB(const std::pair<vec3, vec3>& a, const std::pair<vec3, vec3>b);
 
     vec3 getMin(const Collision::AABB& aabb);
     vec3 getMax(const Collision::AABB& aabb);
@@ -35,8 +32,6 @@ public:
     vec3 ClosestPoint(const Collision::OBB& obb, const vec3& point);
     vec3 ClosestPoint(const Collision::Sphere& sphere, const vec3& point);
 
-
-    Collision::AABB *aa;
 
 };
 

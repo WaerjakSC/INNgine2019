@@ -274,7 +274,6 @@ public:
     ColType colType;
     bool mTrigger{false};
 
-
     /**
       * @brief Axis Aligned Bounding Box
       */
@@ -304,6 +303,9 @@ public:
         //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
     } OBB;
 
+    /**
+      * @brief Sphere struct
+      */
     typedef struct Sphere{
         vec3 position;
         float radius;
