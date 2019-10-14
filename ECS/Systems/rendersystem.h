@@ -5,7 +5,7 @@
 #include "renderview.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <memory>
-class ResourceManager;
+class Registry;
 class RenderView;
 class RenderSystem : public QObject, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
@@ -19,7 +19,7 @@ public slots:
     void changeShader(int entityID, ShaderType nShader);
 
 private:
-    ResourceManager *factory{nullptr};
+    Registry *registry{nullptr};
 
     void iterateEntities();
     void updateEntities();

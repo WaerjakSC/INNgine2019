@@ -6,6 +6,7 @@
 #include "phongshader.h"
 #include "registry.h"
 #include "renderview.h"
+#include "scene.h"
 #include "textureshader.h"
 #include <QDebug>
 
@@ -13,15 +14,11 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
-    //    registry->registerComponent<Transform>();
-    //    registry->registerComponent<Material>();
-    //    registry->registerComponent<Mesh>();
-    //    registry->registerComponent<Light>();
     // Move these elsewhere once they have systems
     registry->registerComponent<Input>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
-
+    sceneLoader = std::make_unique<Scene>();
     // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
     // Initialize shared pointers
@@ -29,6 +26,10 @@ ResourceManager::ResourceManager() {
 
     // Set up Views
     //    mRenderView = std::make_unique<RenderView>(mTransforms);
+}
+
+Scene *ResourceManager::getSceneLoader() const {
+    return sceneLoader.get();
 }
 
 bool ResourceManager::isLoading() const {
@@ -43,8 +44,6 @@ ResourceManager::~ResourceManager() {
     for (auto &texture : mTextures) {
         delete texture.second;
     }
-    for (auto &entity : mGameObjects)
-        delete entity;
 }
 ResourceManager *ResourceManager::instance() {
     if (!mInstance)
@@ -58,8 +57,8 @@ ResourceManager *ResourceManager::instance() {
  * @param eID - entityID
  */
 void ResourceManager::addMeshComponent(std::string name, int eID) {
-    if (eID <= -1 || (size_t)eID > mGameObjects.size() - 1) {
-        eID = mGameObjects.size() - 1;
+    if (eID <= -1 || (size_t)eID > registry->numEntities() - 1) {
+        eID = registry->numEntities() - 1;
     }
     registry->addComponent<Mesh>(eID);
     if (name.find(".txt") != std::string::npos)
@@ -69,7 +68,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 }
 void ResourceManager::setMesh(Mesh *mesh, int eID) {
     // If gameobject exists in vector and the component actually exists
-    if ((size_t)eID < mGameObjects.size()) {
+    if ((size_t)eID < registry->numEntities()) {
         registry->getComponent<Mesh>(eID) = *mesh;
     }
 }
@@ -80,67 +79,7 @@ void ResourceManager::setMesh(std::string name, int eID) {
     } else
         loadMesh(name);
 }
-/**
- * @brief Updates the child parent hierarchy in case it's out of date
- */
-void ResourceManager::updateChildParent() {
-    for (auto entity : getGameObjects()) // For every gameobject
-    {
-        if ((entity->types & CType::Transform) != CType::None) {
-            Transform comp = registry->getComponent<Transform>(entity->eID);
-            if (comp.parentID != -1) {                                                                // If this entity has a parent then,
-                registry->getComponent<Transform>(comp.parentID).mChildren.emplace_back(entity->eID); // add this entity's ID to the parent's list of children.
-            }
-        }
-    }
-}
-/**
- * @brief Get a pointer to the entity with the specified ID.
- * @param eID
- * @return
- */
-GameObject *ResourceManager::getGameObject(int eID) {
-    for (auto *object : mGameObjects) {
-        if ((int)object->eID == eID) {
-            return object;
-        }
-    }
-    return nullptr;
-}
-/**
- * @brief Destroy gameobject
- * @param eID - entityID
- */
-void ResourceManager::removeGameObject(int eID) {
-    std::swap(mGameObjects[eID], mGameObjects.back()); // Swap the removed with the last, then pop out the last.
-    mGameObjects.pop_back();
-    registry->entityDestroyed(eID); // Pass the message on to the registry
-    mNumGameObjects--;
-}
 
-void ResourceManager::clearScene() {
-    mBillBoards.clear();
-    for (auto entity : mGameObjects)
-        registry->entityDestroyed(entity->eID); // Pass the message on to the registry
-    mGameObjects.clear();
-
-    mNumGameObjects = 0;
-}
-/**
- * @brief Make a generic game object with no components attached.
- * @param name Name of the gameobject. Leave blank if no name desired.
- * @return Returns the entity ID for use in adding components or other tasks.
- */
-GLuint ResourceManager::makeGameObject(std::string name) {
-    GLuint eID = mNumGameObjects;
-    mNumGameObjects++;
-    if (name == "BillBoard")
-        mGameObjects.emplace_back(new BillBoard(eID, "BillBoard"));
-    else
-        mGameObjects.emplace_back(new GameObject(eID, name));
-
-    return eID;
-}
 /**
  * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
  * @param name
@@ -151,7 +90,7 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
-        GLuint eID = makeGameObject(name);
+        GLuint eID = registry->makeEntity(name);
         registry->addComponent<Transform>(eID);
         registry->addComponent<Material>(eID, type);
         addMeshComponent(name, eID);
@@ -163,7 +102,7 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
  * @return
  */
 GLuint ResourceManager::makePlane() {
-    GLuint eID = makeGameObject("Plane");
+    GLuint eID = registry->makeEntity("Plane");
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
     makePlaneMesh(eID);
@@ -194,7 +133,7 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
  * @return
  */
 GLuint ResourceManager::makeCube() {
-    GLuint eID = makeGameObject("Cube");
+    GLuint eID = registry->makeEntity("Cube");
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
     registry->addComponent<Mesh>(eID);
@@ -206,7 +145,7 @@ GLuint ResourceManager::makeCube() {
  * @brief Creates basic XYZ lines
  */
 GLuint ResourceManager::makeXYZ() {
-    GLuint eID = makeGameObject("XYZ");
+    GLuint eID = registry->makeEntity("XYZ");
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
 
@@ -234,7 +173,7 @@ GLuint ResourceManager::makeXYZ() {
  * @return
  */
 GLuint ResourceManager::makeSkyBox() {
-    GLuint eID = makeGameObject("Skybox");
+    GLuint eID = registry->makeEntity("Skybox");
     registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
     registry->addComponent<Material>(eID, Tex, mTextures["skybox.bmp"]->id() - 1);
 
@@ -309,7 +248,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType type) {
-    GLuint eID = makeGameObject(fileName);
+    GLuint eID = registry->makeEntity(fileName);
 
     initializeOpenGLFunctions();
 
@@ -326,7 +265,7 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType typ
  * @return
  */
 GLuint ResourceManager::makeBillBoard() {
-    GLuint eID = makeGameObject("BillBoard");
+    GLuint eID = registry->makeEntity("BillBoard");
     registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
     registry->addComponent<Material>(eID, Tex, mTextures["gnome.bmp"]->id() - 1);
     makeBillBoardMesh(eID);
@@ -358,7 +297,7 @@ void ResourceManager::makeBillBoardMesh(int eID) {
  * @return
  */
 GLuint ResourceManager::makeOctBall(int n) {
-    GLuint eID = makeGameObject("Ball");
+    GLuint eID = registry->makeEntity("Ball");
 
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
@@ -390,7 +329,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
  * @return
  */
 GLuint ResourceManager::makeLightObject() {
-    GLuint eID = makeGameObject("Light");
+    GLuint eID = registry->makeEntity("Light");
     registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
     registry->addComponent<Material>(eID, Tex, mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->addComponent<Light>(eID);
@@ -744,18 +683,6 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
 }
 void ResourceManager::setLightSystem(const std::shared_ptr<LightSystem> &lightSystem) {
     mLightSystem = lightSystem;
-}
-
-/**
- * @brief Get a raw pointer to mRenderView -- ResourceManager owns this as a unique_ptr
- * @return
- */
-//RenderView *ResourceManager::getRenderView() const {
-//    return mRenderView.get();
-//}
-
-std::vector<GameObject *> ResourceManager::getGameObjects() const {
-    return mGameObjects;
 }
 
 std::map<ShaderType, Shader *> ResourceManager::getShaders() const {

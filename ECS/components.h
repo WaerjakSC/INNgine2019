@@ -130,7 +130,7 @@ struct Transform : Component {
     gsl::Vector3D mScale{1};
     gsl::Matrix4x4 mMatrix;
 
-    std::vector<int> mChildren;
+    std::vector<GLuint> mChildren;
 
     int parentID = -1;
 };
@@ -158,8 +158,9 @@ struct Material : public Component {
 };
 
 struct Mesh : public Component {
-public:
-    Mesh() {}
+    Mesh() {
+        mType = CType::Mesh;
+    }
     Mesh(GLenum drawType, std::string name, GLuint verticeCount = 0, GLuint indiceCount = 0)
         : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name) {
         mType = CType::Mesh;
@@ -178,10 +179,12 @@ public:
     GLenum mDrawType{0};
 
     std::string mName;
+
     Mesh &operator=(const Mesh &other) {
         mVAO = other.mVAO;
         mVBO = other.mVBO;
         mEAB = other.mEAB; //holds the indices (Element Array Buffer - EAB)
+        mName = other.mName;
 
         mVerticeCount = other.mVerticeCount;
         mIndiceCount = other.mIndiceCount;
@@ -189,9 +192,7 @@ public:
         return *this;
     }
     bool operator==(const Mesh &other) {
-        bool buffers = mVAO == other.mVAO && mVBO == other.mVBO && mEAB == other.mEAB;
-        bool data = mVerticeCount == other.mVerticeCount && mIndiceCount == other.mIndiceCount && mDrawType == other.mDrawType;
-        return buffers && data;
+        return mName == other.mName; // name of the obj/txt file should be enough to verify if they're the same.
     }
 };
 struct Light : public Component {
@@ -250,56 +251,5 @@ struct Sound : public Component {
 public:
     Sound() {}
     virtual void update() {}
-
-    bool mLooping{false};
-    bool mPlay{false};
-    bool mPlaying{false};
 };
-
-enum ColType{
-    AABB,
-    OBB,
-    Sphere,
-    Capsule
-};
-/**
- * @brief The Collision component class holds the collider types and bounds
- */
-struct Collision : public Component {
-public:
-    Collision(ColType type, vec3 size) : colType(type) {}
-    virtual void update(){}
-    ColType colType;
-    bool mTrigger{false};
-
-
-   typedef struct AABB{
-        vec3 origin;
-        vec3 size;  // Half size
-
-        inline AABB() : size(2,2,2){}
-        inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
-    } AABB;
-
-
-    typedef struct OBB{
-        vec3 position;
-        vec3 size;
-
-        //<------ Trenger rotasjon her
-
-        // default constructor: lager en OBB ved origo
-        inline OBB() : size(2,2,2) {}
-        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
-        inline OBB(const vec3& p, const vec3& s) {}
-         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
-        //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
-    } OBB;
-
-
-
-};
-
-
-
 #endif // COMPONENT_H

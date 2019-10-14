@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "Systems/rendersystem.h"
-#include "entityitem.h"
 #include "hierarchymodel.h"
 #include "innpch.h"
 #include "movementsystem.h"
@@ -17,6 +16,7 @@
 #include <QPushButton>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
+#include <QToolButton>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     init();
@@ -85,6 +85,7 @@ void MainWindow::init() {
     mRenderWindowContainer->setMinimumSize(QSize(200, 200));
     //OpenGLLayout is made in the .ui-file!
     ui->OpenGLLayout->addWidget(mRenderWindowContainer);
+    playButtons();
 
     //sets the keyboard input focus to the RenderWindow when program starts
     // - can be deleted, but then you have to click inside the renderwindow to get the focus
@@ -95,26 +96,69 @@ void MainWindow::init() {
 
     connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
-    connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onGameObjectDragged);
-    connect(hView, &HierarchyView::clicked, this, &MainWindow::onGameObjectClicked);
+    connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onEntityDragged);
+    connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
     connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
+    connect(Registry::instance(), &Registry::entityCreated, this, &MainWindow::onEntityAdded);
+    connect(Registry::instance(), &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
+    connect(Registry::instance(), &Registry::parentChanged, this, &MainWindow::parentChanged);
 }
+void MainWindow::playButtons() {
+    QToolBar *toolbar = ui->mainToolBar;
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->setMargin(0);
+    play = new QToolButton;
+    play->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    play->setToolTip("Play");
+    connect(play, &QToolButton::clicked, mRenderWindow, &RenderWindow::play);
+    buttons->addWidget(play);
+
+    pause = new QToolButton;
+    pause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+    pause->setEnabled(false);
+    pause->setToolTip("Pause");
+    connect(pause, &QToolButton::clicked, mRenderWindow, &RenderWindow::pause);
+    buttons->addWidget(pause);
+
+    stop = new QToolButton;
+    stop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    stop->setEnabled(false);
+    stop->setToolTip("Stop");
+    connect(stop, &QToolButton::clicked, mRenderWindow, &RenderWindow::stop);
+    buttons->addWidget(stop);
+
+    QGroupBox *box = new QGroupBox;
+    box->setLayout(buttons);
+
+    QWidget *spacer1 = new QWidget(this);
+    spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacer1->setVisible(true);
+    toolbar->addWidget(spacer1); // Spacer #1
+
+    toolbar->addWidget(box);
+
+    QWidget *spacer2 = new QWidget(this);
+    spacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacer2->setVisible(true);
+    toolbar->addWidget(spacer2); // Spacer #2
+}
+
 void MainWindow::updatePositionVals(GLuint eID, gsl::Vector3D newPos) {
-    if (eID == selectedEntity->eID) {
+    if (eID == selectedEntity->id()) {
         emit posX(newPos.x);
         emit posY(newPos.y);
         emit posZ(newPos.z);
     }
 }
 void MainWindow::updateRotationVals(GLuint eID, gsl::Vector3D newRot) {
-    if (eID == selectedEntity->eID) {
+    if (eID == selectedEntity->id()) {
         emit rotX(newRot.x);
         emit rotY(newRot.y);
         emit rotZ(newRot.z);
     }
 }
 void MainWindow::updateScaleVals(GLuint eID, gsl::Vector3D newScale) {
-    if (eID == selectedEntity->eID) {
+    if (eID == selectedEntity->id()) {
         emit scaleX(newScale.x);
         emit scaleY(newScale.y);
         emit scaleZ(newScale.z);
@@ -122,23 +166,29 @@ void MainWindow::updateScaleVals(GLuint eID, gsl::Vector3D newScale) {
 }
 void MainWindow::setNewShader(const QString &text) {
     if (text == "Texture")
-        emit newShader(selectedEntity->eID, Tex);
+        emit newShader(selectedEntity->id(), Tex);
     else if (text == "Color")
-        emit newShader(selectedEntity->eID, Color);
+        emit newShader(selectedEntity->id(), Color);
     else if (text == "Phong")
-        emit newShader(selectedEntity->eID, Phong);
+        emit newShader(selectedEntity->id(), Phong);
 }
 void MainWindow::snapToObject() {
     if (selectedEntity)
-        mRenderWindow->snapToObject(selectedEntity->eID);
+        mRenderWindow->snapToObject(selectedEntity->id());
 }
 // To-do: Save As button, folder pop-up that lets you choose or make a new scene file.
 void MainWindow::createActions() {
     QMenu *projectActions = ui->menuBar->addMenu(tr("Project"));
     QAction *saveScene = new QAction(tr("Save Scene"));
-    QAction *loadScene = new QAction(tr("Load Scene"));
     projectActions->addAction(saveScene);
+    connect(saveScene, &QAction::triggered, mRenderWindow, &RenderWindow::save);
+    QAction *loadScene = new QAction(tr("Load Scene"));
     projectActions->addAction(loadScene);
+    connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
+    QAction *exit = new QAction(tr("Exit"));
+    projectActions->addAction(exit);
+    connect(exit, &QAction::triggered, this, &MainWindow::close);
+
     QMenu *gameObject = ui->menuBar->addMenu(tr("GameObject"));
     QAction *empty = new QAction(tr("Empty GameObject"), this);
     gameObject->addAction(empty);
@@ -149,98 +199,93 @@ void MainWindow::createActions() {
     make3D->addAction(sphere);
     QAction *plane = new QAction(tr("Plane"), this);
     make3D->addAction(plane);
-    // Component menu actions don't do anything *yet* //
+
     QMenu *components = ui->menuBar->addMenu(tr("Add Components")); // Maybe disable specific component if selected entity has that component already
     QAction *transform = new QAction(tr("Transform"), this);
     components->addAction(transform);
+    connect(transform, &QAction::triggered, this, &MainWindow::addTransformComponent);
+
     QAction *material = new QAction(tr("Material"), this);
     components->addAction(material);
+    connect(material, &QAction::triggered, this, &MainWindow::addMaterialComponent);
+
     QAction *mesh = new QAction(tr("Mesh"), this); // Somewhere along this action path should let you choose the mesh file to use/import
     components->addAction(mesh);
+    connect(mesh, &QAction::triggered, this, &MainWindow::addMeshComponent);
+
     QAction *light = new QAction(tr("Light"), this);
     components->addAction(light);
+    connect(light, &QAction::triggered, this, &MainWindow::addLightComponent);
+
     QAction *input = new QAction(tr("Input"), this);
     components->addAction(input);
+    connect(input, &QAction::triggered, this, &MainWindow::addInputComponent);
+
     QAction *physics = new QAction(tr("Physics"), this);
     components->addAction(physics);
+    connect(physics, &QAction::triggered, this, &MainWindow::addPhysicsComponent);
+
     QAction *sound = new QAction(tr("Sound"), this);
     components->addAction(sound);
+    connect(sound, &QAction::triggered, this, &MainWindow::addSoundComponent);
 
     ui->mainToolBar->setMovable(false);
 
-    connect(saveScene, &QAction::triggered, mRenderWindow, &RenderWindow::save);
-    connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
-
-    // Setup the component actions
-    connect(transform, &QAction::triggered, this, &MainWindow::addTransformComponent);
-    connect(material, &QAction::triggered, this, &MainWindow::addMaterialComponent);
-    connect(mesh, &QAction::triggered, this, &MainWindow::addMeshComponent);
-    connect(light, &QAction::triggered, this, &MainWindow::addLightComponent);
-    connect(input, &QAction::triggered, this, &MainWindow::addInputComponent);
-    connect(physics, &QAction::triggered, this, &MainWindow::addPhysicsComponent);
-    connect(sound, &QAction::triggered, this, &MainWindow::addSoundComponent);
-
+    // Set up the prefab actions
     connect(cube, &QAction::triggered, this, &MainWindow::makeCube);
     connect(sphere, &QAction::triggered, this, &MainWindow::makeSphere);
     connect(plane, &QAction::triggered, this, &MainWindow::makePlane);
-    connect(empty, &QAction::triggered, this, &MainWindow::makeGameObject);
+    connect(empty, &QAction::triggered, this, &MainWindow::makeEntity);
 
-    connect(this, &MainWindow::made3DObject, this, &MainWindow::onGameObjectsChanged);
+    connect(this, &MainWindow::made3DObject, this, &MainWindow::onEntityAdded);
 }
 void MainWindow::addTransformComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Transform) == CType::None)
-        registry->addComponent<Transform>(selectedEntity->eID);
+        registry->addComponent<Transform>(selectedEntity->id());
     setupComponentList();
 }
 void MainWindow::addMaterialComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Material) == CType::None)
-        registry->addComponent<Material>(selectedEntity->eID);
+        registry->addComponent<Material>(selectedEntity->id());
     setupComponentList();
 }
 void MainWindow::addMeshComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Mesh) == CType::None)
-        registry->addComponent<Mesh>(selectedEntity->eID);
+        registry->addComponent<Mesh>(selectedEntity->id());
     setupComponentList();
 }
 void MainWindow::addLightComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Light) == CType::None)
-        registry->addComponent<Light>(selectedEntity->eID);
+        registry->addComponent<Light>(selectedEntity->id());
     setupComponentList();
 }
 void MainWindow::addInputComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Input) == CType::None)
-        registry->addComponent<Input>(selectedEntity->eID);
+        registry->addComponent<Input>(selectedEntity->id());
     setupComponentList();
 }
 void MainWindow::addPhysicsComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Physics) == CType::None)
-        registry->addComponent<Physics>(selectedEntity->eID);
+        registry->addComponent<Physics>(selectedEntity->id());
     setupComponentList();
 }
 void MainWindow::addSoundComponent() {
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Sound) == CType::None)
-        registry->addComponent<Sound>(selectedEntity->eID);
-    setupComponentList();
-}
-void MainWindow::addCollisionComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
-    if ((typeMask & CType::Collision) == CType::None)
-        registry->addComponent<Collision>(selectedEntity->eID);
+        registry->addComponent<Sound>(selectedEntity->id());
     setupComponentList();
 }
 /**
@@ -250,18 +295,15 @@ void MainWindow::addCollisionComponent() {
 void MainWindow::setupComponentList() {
     scrollArea->clearLayout();
     Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types;
+    CType typeMask = selectedEntity->types();
     if ((typeMask & CType::Transform) != CType::None) {
-        setupTransformSettings(registry->getComponent<Transform>(selectedEntity->eID));
+        setupTransformSettings(registry->getComponent<Transform>(selectedEntity->id()));
     }
     if ((typeMask & CType::Material) != CType::None) {
-        setupMaterialSettings(registry->getComponent<Material>(selectedEntity->eID));
+        setupMaterialSettings(registry->getComponent<Material>(selectedEntity->id()));
     }
     if ((typeMask & CType::Mesh) != CType::None) {
-        setupMeshSettings(registry->getComponent<Mesh>(selectedEntity->eID));
-    }
-    if ((typeMask & CType::None) != CType::None) {
-        // setupCollisionSettings(registry->getComponent<Collision>(selectedEntity->eID));
+        setupMeshSettings(registry->getComponent<Mesh>(selectedEntity->id()));
     }
 }
 void MainWindow::setupMeshSettings(const Mesh &mesh) {
@@ -356,7 +398,7 @@ void MainWindow::setNewTextureFile() {
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
         factory->loadTexture(fileName.toStdString());
-        Registry::instance()->getComponent<Material>(selectedEntity->eID).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
+        Registry::instance()->getComponent<Material>(selectedEntity->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
         texFileLabel->setText(fileName);
     }
 }
@@ -368,7 +410,7 @@ void MainWindow::setNewMesh() {
         QFileInfo file(fileName);
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
-        factory->setMesh(fileName.toStdString(), selectedEntity->eID);
+        factory->setMesh(fileName.toStdString(), selectedEntity->id());
         objFileLabel->setText(fileName);
     }
 }
@@ -382,7 +424,7 @@ void MainWindow::setColor() {
         newRgb.fill(color);
         colorLabel->setPixmap(newRgb);
     }
-    Registry::instance()->getComponent<Material>(selectedEntity->eID).mObjectColor = gsl::Vector3D(color.redF(), color.greenF(), color.blueF());
+    Registry::instance()->getComponent<Material>(selectedEntity->id()).mObjectColor = gsl::Vector3D(color.redF(), color.greenF(), color.blueF());
 }
 void MainWindow::setupTransformSettings(const Transform &component) {
     QStyle *fusion = QStyleFactory::create("fusion");
@@ -575,8 +617,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_F)
         mRenderWindow->keyReleaseEvent(event);
 }
-void MainWindow::makeGameObject() {
-    emit made3DObject(ResourceManager::instance()->makeGameObject("GameObject"));
+void MainWindow::makeEntity() {
+    emit made3DObject(Registry::instance()->makeEntity("GameObject"));
 }
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());
@@ -587,76 +629,94 @@ void MainWindow::makeSphere() {
 void MainWindow::makeCube() {
     emit made3DObject(ResourceManager::instance()->makeCube());
 }
-void MainWindow::onParentChanged(const QModelIndex &parent) {
-    QString data = hierarchy->data(parent).toString();
+void MainWindow::onParentChanged(const QModelIndex &newParent) {
+    QString data = hierarchy->data(newParent).toString();
+    Entity *item = static_cast<Entity *>(hierarchy->itemFromIndex(newParent));
+    Registry *registry = Registry::instance();
     if (data != "") {
-        int parentID;
-        // Find gameobject in resourcemanager and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-        for (auto entity : ResourceManager::instance()->getGameObjects()) {
-            if (QString::fromStdString(entity->mName) == data) { // Checking by name necessitates unique names
-                parentID = entity->eID;
-                mRenderWindow->movement()->setParent(selectedEntity->eID, parentID);
-                mRenderWindow->movement()->iterateChildren(parentID);
-                qDebug() << "New Parent Name: " + QString::fromStdString(entity->mName) + ". ID: " + QString::number(parentID);
-                break;
-            }
+        Entity *entity = static_cast<Entity *>(item);
+        // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
+        // Really not sure about this whole "Transform component governs parent/child relationship thing"
+        if (registry->contains(entity->id(), CType::Transform)) {
+            int parentID = entity->id();
+            // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
+            registry->setParent(selectedEntity->id(), parentID);
+            mRenderWindow->movement()->iterateChildren(parentID);
+            qDebug() << "New Parent Name: " + registry->getEntity(entity->id())->name() + ". ID: " + QString::number(parentID);
         }
-    } else // Implies the item was dropped to the top node, aka it no longer has a parent. (or rather the parent is the top node which is empty)
-        mRenderWindow->movement()->setParent(selectedEntity->eID, -1);
+    }
 }
-void MainWindow::onGameObjectClicked(const QModelIndex &index) {
-    GLuint id = static_cast<EntityItem *>(hierarchy->itemFromIndex(index))->id();
-    onGameObjectDragged(id);
+void MainWindow::parentChanged(GLuint eID) {
+    disconnect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
+    QStandardItem *rootItem = hierarchy->invisibleRootItem();
+    Entity *item = hierarchy->itemFromEntityID(eID);
+    if (item) {
+        hierarchy->removeRow(item->row());
+        item = Registry::instance()->getEntity(eID)->cloneEntity();
+
+        int parentID = Registry::instance()->getComponent<Transform>(item->id()).parentID;
+        if (Registry::instance()->hasParent(eID)) {
+            Entity *parent = hierarchy->itemFromEntityID(parentID);
+            parent->insertRow(parent->rowCount(), item);
+        } else
+            rootItem->appendRow(item);
+    }
+    connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
+}
+void MainWindow::onEntityClicked(const QModelIndex &index) {
+    Entity *entt = static_cast<Entity *>(hierarchy->itemFromIndex(index));
+    GLuint id = entt->id();
+    onEntityDragged(id);
     setupComponentList();
 }
 /**
  * @brief Get the game object the user is interacting with.
  * @param id of the entity
  */
-void MainWindow::onGameObjectDragged(GLuint id) {
-    selectedEntity = ResourceManager::instance()->getGameObject(id);
-    qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
-    if ((selectedEntity->types & CType::Transform) != CType::None) {
+void MainWindow::onEntityDragged(GLuint id) {
+    selectedEntity = Registry::instance()->getEntity(id);
+    //    qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
+    if ((selectedEntity->types() & CType::Transform) != CType::None) {
         gsl::Vector3D location;
-        if (mRenderWindow->movement()->hasParent(selectedEntity->eID)) {
-            location = mRenderWindow->movement()->getRelativePosition(selectedEntity->eID);
+        GLuint id = selectedEntity->id();
+        if (Registry::instance()->hasParent(id)) {
+            location = mRenderWindow->movement()->getRelativePosition(id);
         } else
-            location = mRenderWindow->movement()->getPosition(selectedEntity->eID);
-        qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
+            location = mRenderWindow->movement()->getPosition(id);
+        //        qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
     }
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     if (selectedEntity)
-        selectedEntity->mName = hierarchy->data(index).toString().toStdString();
+        selectedEntity->setName(hierarchy->data(index).toString());
 }
-void MainWindow::onGameObjectsChanged(GLuint entity) {
-    EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->invisibleRootItem());
-    GameObject *object = ResourceManager::instance()->getGameObject(entity);
-    EntityItem *item = new EntityItem(QString::fromStdString(object->mName), object->eID);
+void MainWindow::onEntityAdded(GLuint eID) {
+    QStandardItem *parentItem = hierarchy->invisibleRootItem();
+    QStandardItem *item = Registry::instance()->getEntity(eID)->cloneEntity();
     parentItem->appendRow(item);
 }
+
 /**
  * @brief Initial insertion of gameobjects, such as those made in an init function or read from a level file.
  * @param entities
  */
-void MainWindow::insertGameObjects() {
-    EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->invisibleRootItem());
-    for (auto entity : ResourceManager::instance()->getGameObjects()) {
-        EntityItem *item;
-        if (entity->mName == "")
-            item = new EntityItem(QString("GameObject"), entity->eID) /*.arg(idx)*/;
+void MainWindow::insertEntities() {
+    hierarchy->clear();
+    QStandardItem *parentItem = hierarchy->invisibleRootItem();
+    for (auto entity : Registry::instance()->getEntities()) {
+        Entity *item{nullptr};
+        if (entity.second->name() == "")
+            item = new Entity(entity.second->id(), QString("GameObject"));
         else
-            item = new EntityItem(QString::fromStdString(entity->mName), entity->eID) /*.arg(idx)*/;
-        int parentID = Registry::instance()->getComponent<Transform>(entity->eID).parentID;
+            item = new Entity(entity.second->id(), entity.second->name());
+        int parentID = Registry::instance()->getComponent<Transform>(entity.second->id()).parentID;
         if (parentID != -1) {
-            QString parent = QString::fromStdString(ResourceManager::instance()->getGameObject(parentID)->mName);
-            forEach(hierarchy, parent, item);
+            forEach(parentID, item);
         } else
             parentItem->appendRow(item);
     }
 }
-void MainWindow::removeGameObject(const QModelIndex &index) {
-}
+
 /**
  * @brief Iterate through a model to find a specific item
  * @param model
@@ -664,44 +724,61 @@ void MainWindow::removeGameObject(const QModelIndex &index) {
  * @param child
  * @param parent
  */
-void MainWindow::forEach(QAbstractItemModel *model, QString parentName, EntityItem *child, QModelIndex parent) {
-    for (int r = 0; r < model->rowCount(parent); ++r) {
-        QModelIndex index = model->index(r, 0, parent);
-        QVariant name = model->data(index);
-        if (parentName == name) { // If in-value parentName matches the name of the current item, append the new child to that item. In theory.
-            EntityItem *parentItem = static_cast<EntityItem *>(hierarchy->itemFromIndex(index));
-            parentItem->appendRow(child);
+void MainWindow::forEach(GLuint parentID, Entity *child, QModelIndex parent) {
+    for (int r = 0; r < hierarchy->rowCount(parent); ++r) {
+        QModelIndex index = hierarchy->index(r, 0, parent);
+        Entity *item = static_cast<Entity *>(hierarchy->itemFromIndex(index));
+        if (parentID == item->id()) { // If in-value parentID matches the ID of the current item, append the new child to that item.
+            item->appendRow(child);
             break;
         }
-        if (model->hasChildren(index)) {
-            forEach(model, parentName, child, index);
+        if (hierarchy->hasChildren(index)) {
+            forEach(parentID, child, index);
         }
     }
 }
 void MainWindow::setPositionX(double xIn) {
-    mRenderWindow->movement()->setPositionX(selectedEntity->eID, xIn);
+    mRenderWindow->movement()->setPositionX(selectedEntity->id(), xIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setPositionY(double yIn) {
-    mRenderWindow->movement()->setPositionY(selectedEntity->eID, yIn);
+    mRenderWindow->movement()->setPositionY(selectedEntity->id(), yIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setPositionZ(double zIn) {
-    mRenderWindow->movement()->setPositionZ(selectedEntity->eID, zIn);
+    mRenderWindow->movement()->setPositionZ(selectedEntity->id(), zIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setRotationX(double xIn) {
-    mRenderWindow->movement()->setRotationX(selectedEntity->eID, xIn);
+    mRenderWindow->movement()->setRotationX(selectedEntity->id(), xIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setRotationY(double yIn) {
-    mRenderWindow->movement()->setRotationY(selectedEntity->eID, yIn);
+    mRenderWindow->movement()->setRotationY(selectedEntity->id(), yIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setRotationZ(double zIn) {
-    mRenderWindow->movement()->setRotationZ(selectedEntity->eID, zIn);
+    mRenderWindow->movement()->setRotationZ(selectedEntity->id(), zIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setScaleX(double xIn) {
-    mRenderWindow->movement()->setScaleX(selectedEntity->eID, xIn);
+    mRenderWindow->movement()->setScaleX(selectedEntity->id(), xIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setScaleY(double yIn) {
-    mRenderWindow->movement()->setScaleY(selectedEntity->eID, yIn);
+    mRenderWindow->movement()->setScaleY(selectedEntity->id(), yIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setScaleZ(double zIn) {
-    mRenderWindow->movement()->setScaleZ(selectedEntity->eID, zIn);
+    mRenderWindow->movement()->setScaleZ(selectedEntity->id(), zIn, false);
+    if (!mRenderWindow->mIsPlaying)
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }

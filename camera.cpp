@@ -105,3 +105,27 @@ gsl::Vector3D Camera::up() const {
 gsl::Vector3D Camera::forward() const {
     return mForward;
 }
+vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width) {
+    vec3 rayNDC = getNormalizedDeviceCoords(viewportPoint, height, width);
+
+    vec4 rayClip = vec4(rayNDC.x, rayNDC.y, -1.0, 1.0);
+
+    gsl::Matrix4x4 projMatrix = mProjectionMatrix;
+    projMatrix.inverse();
+
+    vec4 rayEye = projMatrix * rayClip; // Invert the perspective matrix to get to view/eye space (camera)
+    rayEye = vec4(rayEye.x, rayEye.y, -1.0, 0.0);
+
+    gsl::Matrix4x4 viewMatrix = mViewMatrix;
+    viewMatrix.inverse();
+    vec3 rayWorld = (viewMatrix * rayEye).getXYZ();
+    rayWorld.normalize();
+
+    return rayWorld;
+}
+vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width) {
+    float x = (2.0f * mouse.x) / width - 1.0f;
+    float y = 1.0f - (2.0f * mouse.y) / height;
+    float z = mouse.z;
+    return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
+}

@@ -1,9 +1,8 @@
 #include "rendersystem.h"
 #include "billboard.h"
 #include "registry.h"
-#include "resourcemanager.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
-    factory = ResourceManager::instance();
+    registry = Registry::instance();
     mView = std::make_unique<RenderView>();
 }
 /**
@@ -27,11 +26,6 @@ void RenderSystem::iterateEntities() {
             glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
         else
             glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
-    }
-    for (auto billBoard : factory->billBoards()) {
-        auto &transform = mView->mTransformPool->get(billBoard);
-        ShaderType type = mView->mMaterialPool->get(billBoard).mShader;
-        dynamic_cast<BillBoard *>(factory->getGameObject(billBoard))->update(&transform, mShaders[type]);
     }
 }
 void RenderSystem::init() {

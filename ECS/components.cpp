@@ -1,4 +1,3 @@
-#include <cmath>
 #include "components.h"
 #include "mainwindow.h"
 
@@ -150,5 +149,3 @@ void Input::wheelEvent(QWheelEvent *event){
     event->accept();
 }
 */
-
-

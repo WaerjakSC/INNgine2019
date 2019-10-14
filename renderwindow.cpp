@@ -7,6 +7,7 @@
 #include <QOpenGLFunctions>
 #include <QStatusBar>
 #include <QTimer>
+#include <QToolButton>
 #include <chrono>
 
 #include "soundmanager.h"
@@ -20,6 +21,7 @@
 #include "lightsystem.h"
 #include "movementsystem.h"
 #include "phongshader.h"
+#include "raycast.h"
 #include "registry.h"
 #include "rendersystem.h"
 #include "renderview.h"
@@ -48,7 +50,6 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     mInput->setMainWindow(mMainWindow);
     //Make the gameloop timer:
     mRenderTimer = new QTimer(this);
-    scene = std::make_unique<Scene>();
 }
 
 RenderWindow::~RenderWindow() {
@@ -102,7 +103,15 @@ void RenderWindow::init() {
     mFactory->loadShader(Color);
     mFactory->loadShader(Tex);
     mFactory->loadShader(Phong);
-
+    //********************** Set up camera **********************
+    mCurrentCamera = new Camera();
+    mCurrentCamera->setPosition(vec3(1.f, 1.f, 4.4f));
+    //    mCurrentCamera->yaw(45.f);
+    //    mCurrentCamera->pitch(5.f);
+    //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
+    mFactory->getShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
@@ -122,46 +131,19 @@ void RenderWindow::init() {
     mMoveSys = std::make_unique<MovementSystem>();
     mLightSys = std::make_shared<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
     mFactory->setLightSystem(mLightSys);
-
-    //********************** Set up camera **********************
-    mCurrentCamera = new Camera();
-    mCurrentCamera->setPosition(vec3(1.f, 1.f, 4.4f));
-    //    mCurrentCamera->yaw(45.f);
-    //    mCurrentCamera->pitch(5.f);
+    ray = new Raycast(this, mCurrentCamera);
 
     //********************** Making the objects to be drawn **********************
-    scene->loadScene(currentScene); // loadScene should be placed somewhere in init() rather than saveScene
-                                    //    mFactory->makeXYZ();
-                                    //    mFactory->makeSkyBox();
-                                    //    mFactory->makeBillBoard();
-                                    //    mLight = mFactory->makeLightObject();
-    mLight = scene->controllerID;
+    mFactory->getSceneLoader()->loadScene(currentScene); // loadScene should be placed somewhere in init() rather than saveScene
+
+    mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
+    mLight = mFactory->getSceneLoader()->controllerID;
     mRenderer->init();
-
-    //    GLuint boxID = mFactory->make3DObject("box2.txt", Color);
-    //    //one monkey
-    //    GLuint monkey = mFactory->make3DObject("monkey.obj", Phong); // Simple creation of item by using factory
-    //    mMoveSys->setParent(monkey, boxID);
-
-    //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    mFactory->getShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
-    mFactory->getShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    mFactory->getShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
-
-    // Add game objects to the scene hierarchy GUI
-    mMainWindow->insertGameObjects();
-    //    // Initial positional setup.
-    //    mMoveSys->setPosition(monkey, vec3(1.3f, 1.3f, -3.5f));
-    //    mMoveSys->setScale(monkey, vec3(0.5f, 0.5f, 0.5f));
-    //    mMoveSys->setPosition(boxID, vec3(-3.3f, .3f, -3.5f));
-    // Set up connections between MainWindow options and related systems.
-    //    connect(mMainWindow, &MainWindow::made3DObject, mFactory->getRenderView(), &RenderView::addEntity);
-    //    connect(mFactory->getRenderView(), &RenderView::updateSystem, mRenderer.get(), &RenderSystem::newEntity);
+    mMoveSys->init();
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
         "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
-    soundTest();
 }
 
 ///Called each frame - doing the rendering
@@ -177,11 +159,13 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
-        mMoveSys->update();
+        if (mIsPlaying) {
+            mMoveSys->update();
+        }
         mRenderer->render();
         mLightSys->update();
+        mSoundManager->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
     }
-    mSoundManager->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
 
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -200,9 +184,7 @@ void RenderWindow::render() {
 void RenderWindow::snapToObject(int eID) {
     mCurrentCamera->goTo(mMoveSys->getPosition(eID));
 }
-void RenderWindow::updateScene() {
-    mFactory->getGameObjects();
-}
+
 RenderSystem *RenderWindow::renderer() const {
     return mRenderer.get();
 }
@@ -213,7 +195,7 @@ MovementSystem *RenderWindow::movement() const {
 SoundManager *RenderWindow::soundManager() const {
     return mSoundManager;
 }
-void RenderWindow::soundTest() {
+void RenderWindow::playSound() {
     //plays the sounds
     mStereoSound->play();
     mStereoSound->setPosition(Vector3(4.f, 2.f, -3.5f));
@@ -270,7 +252,7 @@ void RenderWindow::calculateFramerate() {
         ++frameCount;
         if (frameCount > 30) //once pr 30 frames = update the message twice pr second (on a 60Hz monitor)
         {
-            if (!showingMsg) {
+            if (!mShowingMsg) {
                 //showing some statistics in status bar
                 mMainWindow->statusBar()->showMessage(" Time pr FrameDraw: " +
                                                       QString::number(nsecElapsed / 1000000., 'g', 4) + " ms  |  " +
@@ -325,17 +307,53 @@ void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void RenderWindow::save() {
-    scene->saveScene(currentScene);
+    mFactory->getSceneLoader()->saveScene(currentScene);
     mMainWindow->statusBar()->showMessage("Saved Scene!", 1000);
-    showingMsg = true;
+    mShowingMsg = true;
     connect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
 }
 
 void RenderWindow::load() {
-    scene->loadScene(currentScene);
+    stop(); // Stop the editor if it's in play
+    mFactory->getSceneLoader()->loadScene(currentScene);
+    mMoveSys->init();
+    mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
     mMainWindow->statusBar()->showMessage("Loaded Scene!", 1000);
-    showingMsg = true;
+    mShowingMsg = true;
     connect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
+}
+void RenderWindow::play() {
+    if (!mIsPlaying) {
+        if (mPaused) { // Only make snapshot if not resuming from pause
+            mPaused = false;
+        } else
+            mRegistry->makeSnapshot();
+        mIsPlaying = true;
+        mMainWindow->play->setEnabled(false);
+        mMainWindow->pause->setEnabled(true);
+        mMainWindow->stop->setEnabled(true);
+        playSound();
+    }
+}
+void RenderWindow::pause() {
+    if (mIsPlaying) {
+        mIsPlaying = false;
+        mPaused = true;
+        mMainWindow->play->setEnabled(true);
+        mMainWindow->pause->setEnabled(false);
+        mStereoSound->pause();
+    }
+}
+void RenderWindow::stop() {
+    if (mIsPlaying) {
+        mRegistry->loadSnapshot();
+        mMoveSys->init();
+        mIsPlaying = false;
+        mMainWindow->play->setEnabled(true);
+        mMainWindow->pause->setEnabled(false);
+        mMainWindow->stop->setEnabled(false);
+        mStereoSound->stop();
+    }
 }
 void RenderWindow::setCameraSpeed(float value) {
     mCameraSpeed += value;
@@ -346,7 +364,7 @@ void RenderWindow::setCameraSpeed(float value) {
         mCameraSpeed = 0.3f;
 }
 void RenderWindow::changeMsg() {
-    showingMsg = !showingMsg;
+    mShowingMsg = !mShowingMsg;
     disconnect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
 }
 void RenderWindow::handleInput() {
@@ -359,6 +377,8 @@ void RenderWindow::handleInput() {
         if (mInput->S) {
             save();
         }
+    } else if (mInput->LMB) {
+        ray->rayCast(mapFromGlobal(QCursor::pos()));
     } else if (mInput->RMB) {
         if (mInput->W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
@@ -373,7 +393,7 @@ void RenderWindow::handleInput() {
         if (mInput->E) {
             mCurrentCamera->updateHeight(mCameraSpeed);
         }
-    } else {
+    } else if (mIsPlaying) {
         if (mInput->W)
             mMoveSys->moveZ(mLight, -mCameraSpeed);
         if (mInput->S)
