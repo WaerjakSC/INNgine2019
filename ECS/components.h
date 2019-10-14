@@ -296,6 +296,15 @@ public:
         //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
     } OBB;
 
+    typedef struct Sphere{
+        vec3 position;
+        float radius;
+
+        // default constructor
+        inline Sphere(): radius(3.0f) {};
+        // constructor with radius and position params
+        inline Sphere(const vec3& pos, const float& r): position(pos), radius(r) {}
+    } Sphere;
 
 
 };

@@ -19,6 +19,7 @@ public:
 
 
     bool AABBAABB(const Collision::AABB& AABB1, const Collision::AABB& AABB2);
+    bool SphereAABB(const Collision::Sphere& Sphere, const Collision::AABB& AABB1);
 
     Collision::AABB *aa;
 
