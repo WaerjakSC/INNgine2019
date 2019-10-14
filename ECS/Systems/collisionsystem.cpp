@@ -51,11 +51,42 @@ bool CollisionSystem::SphereOBB(const Collision::Sphere &sphere, const Collision
     // Trenger å finne punkt i OBB nærmest gitt punkt i Sphere
     // lignende funksjon som closest point for AABB
 }
+
+/**
+ * @brief CollisionSystem::SphereSphere
+ * @param sphere1
+ * @param sphere2
+ * @return true if distance is less than radius^2 (intersection)
+ */
+bool CollisionSystem::SphereSphere(const Collision::Sphere &sphere1, const Collision::Sphere &sphere2)
+{
+    // sum of radius
+    float rs = sphere1.radius + sphere2.radius;
+    // dist squared
+    float dist = (sphere1.position + sphere2.position).length();
+    // compare
+    return dist < (rs * rs);
+}
+
+/**
+ * @brief CollisionSystem::SphereAABB collision between a Sphere and AABB
+ * @param sphere
+ * @param aabb
+ * @return true if distance is less than radius (we have an intersection)
+ */
+bool CollisionSystem::SphereAABB(const Collision::Sphere &sphere, const Collision::AABB &aabb){
+    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
+    // not 100% sure about this one
+    float dist = (sphere.position - closestPoint).length();
+    float radiusSq = sphere.radius * sphere.radius;
+
+    return dist < radiusSq;
+}
 /**
  * @brief bool CollisionSystem::AABBAABB returns true if an intersection between given AABB's occur
  * @param AABB1
  * @param AABB2
- * @return
+ * @return true if all axis overlap (we have an intersection)
  */
 bool CollisionSystem::AABBAABB(const Collision::AABB &AABB1, const Collision::AABB &AABB2) {
 
@@ -66,8 +97,8 @@ bool CollisionSystem::AABBAABB(const Collision::AABB &AABB1, const Collision::AA
     vec3 bMax = getMax(AABB2);
 
     return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-           (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-           (aMin.z <= bMax.z && aMax.z >= bMin.z);
+            (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
+            (aMin.z <= bMax.z && aMax.z >= bMin.z);
 }
 
 /**
@@ -95,18 +126,29 @@ vec3 CollisionSystem::ClosestPoint(const Collision::AABB &aabb, const vec3 &poin
     return result;
 
 }
+/**
+ * @brief CollisionSystem::ClosestPoint finds the point in an OBB closest to a given point
+ * @param obb
+ * @param point
+ * @return
+ */
+vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point)
+{
+
+}
 
 /**
- * @brief CollisionSystem::SphereAABB collision between a Sphere and AABB
+ * @brief CollisionSystem::ClosestPoint finds the point in a Sphere closest to a given point
  * @param sphere
- * @param aabb
- * @return true if distance is less than radius (we have an intersection)
+ * @param point
+ * @return resized vector, offset by sphere.position
  */
-bool CollisionSystem::SphereAABB(const Collision::Sphere &sphere, const Collision::AABB &aabb){
-    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
-    // not 100% sure about this one
-    float dist = (sphere.position - closestPoint).length();
-    float radiusSq = sphere.radius * sphere.radius;
+vec3 CollisionSystem::ClosestPoint(const Collision::Sphere &sphere, const vec3 &point)
+{
+    vec3 sphereCenterToPoint = point - sphere.position;
+    sphereCenterToPoint.normalize();
+    sphereCenterToPoint = sphereCenterToPoint * sphere.radius;
 
-    return dist < radiusSq;
+    return sphereCenterToPoint + sphere.position;
 }
+
