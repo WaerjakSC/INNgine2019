@@ -74,7 +74,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator|=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -82,7 +82,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator&=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -90,7 +90,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
 operator&(E lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     return static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
 }
 /**
  * @brief The Component class is the base class for all components.
@@ -273,7 +273,10 @@ public:
     bool mTrigger{false};
 
 
-   typedef struct AABB{
+    /**
+      * @brief Axis Aligned Bounding Box
+      */
+    typedef struct AABB{
         vec3 origin;
         vec3 size;  // Half size
 
@@ -284,6 +287,9 @@ public:
     vec3 getMin(const AABB& aabb);
     vec3 getMax(const AABB& aabb);
 
+    /**
+      * @brief Oriented Bounding Box
+      */
     typedef struct OBB{
         vec3 position;
         vec3 size;
@@ -294,7 +300,7 @@ public:
         inline OBB() : size(2,2,2) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
         inline OBB(const vec3& p, const vec3& s) {}
-         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
+        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
         //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
     } OBB;
 
