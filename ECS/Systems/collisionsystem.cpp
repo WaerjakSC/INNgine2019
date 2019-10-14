@@ -1,6 +1,7 @@
 #include "collisionsystem.h"
 #include "components.h"
 #include "registry.h"
+#include <cmath>
 
 CollisionSystem::CollisionSystem() {
     Registry::instance()->registerComponent<Collision>();
@@ -87,4 +88,19 @@ vec3 CollisionSystem::ClosestPoint(const Collision::AABB &aabb, const vec3 &poin
 
     return result;
 
+}
+
+/**
+ * @brief CollisionSystem::SphereAABB collision between a Sphere and AABB
+ * @param sphere
+ * @param aabb
+ * @return true if distance is less than radius (we have an intersection)
+ */
+bool CollisionSystem::SphereAABB(const Collision::Sphere &sphere, const Collision::AABB &aabb){
+    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
+    // not 100% sure about this one
+    float dist = (sphere.position - closestPoint).length();
+    float radiusSq = sphere.radius * sphere.radius;
+
+    return dist < radiusSq;
 }
