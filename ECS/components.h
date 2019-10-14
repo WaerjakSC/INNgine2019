@@ -281,8 +281,6 @@ public:
         inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
     } AABB;
 
-    vec3 getMin(const AABB& aabb);
-    vec3 getMax(const AABB& aabb);
 
     typedef struct OBB{
         vec3 position;
