@@ -1,5 +1,5 @@
 #include "hierarchyview.h"
-#include "entityitem.h"
+#include "entity.h"
 #include "hierarchymodel.h"
 #include "mainwindow.h"
 #include <QDebug>
@@ -11,9 +11,10 @@ void HierarchyView::dragEnterEvent(QDragEnterEvent *event) {
     QTreeView::dragEnterEvent(event);
     // Get the item from index (must cast to HierarchyModel or QStandardItemModel to get itemFromIndex function
     QStandardItem *item = static_cast<HierarchyModel *>(model())->itemFromIndex(QTreeView::currentIndex());
-    EntityItem *entity = static_cast<EntityItem *>(item); // One further cast to get the EntityItem, an overloaded QStandardItem that also contains an entity ID.
-    emit dragSelection(entity->id());                     // When you start dragging an item, make sure you save that item in MainWindow's selectedEntity gameobject.
+    Entity *entity = static_cast<Entity *>(item); // One further cast to get the Entity, an overloaded QStandardItem that also contains an entity ID.
+    emit dragSelection(entity->id());             // When you start dragging an item, make sure you save that item in MainWindow's selectedEntity gameobject.
 }
+
 void HierarchyView::dropEvent(QDropEvent *event) {
     QTreeView::dropEvent(event);
 }

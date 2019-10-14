@@ -1,13 +1,14 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
-#include "gameobject.h"
+#include "entity.h"
 #include "pool.h"
 #include "resourcemanager.h"
 #include <memory>
 #include <typeinfo>
 
-class Registry {
+class Registry : public QObject {
+    Q_OBJECT
 public:
     Registry();
     static Registry *instance();
@@ -51,14 +52,14 @@ public:
     void addComponent(int entityID, Args... args) {
         // Add a component to the array for an entity
         getComponentArray<Type>()->add(entityID, args...);
-        ResourceManager::instance()->getGameObject(entityID)->types |= getComponentArray<Type>()->get(entityID).type();
+        getEntity(entityID)->types() |= getComponentArray<Type>()->get(entityID).type();
     }
     /**
      * @brief Remove a component of type Type from the entity/gameobject with entityID.
      */
     template <typename Type>
     void removeComponent(int entityID) {
-        ResourceManager::instance()->getGameObject(entityID)->types &= ~getComponentArray<Type>()->get(entityID).type();
+        getEntity(entityID)->types() &= ~getComponentArray<Type>()->get(entityID).type();
         // Remove a component from the array for an entity
         getComponentArray<Type>()->remove(entityID);
     }
@@ -67,8 +68,9 @@ public:
      */
     template <typename Type>
     Type &getComponent(int entityID) {
+        CType typeMask = getEntity(entityID)->types();
         // Get a reference to a component from the array for an entity
-        return getComponentArray<Type>()->get(entityID);
+        return getComponentArray<Type>()->get(entityID, typeMask);
     }
     /**
      * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
@@ -100,21 +102,57 @@ public:
             getComponentArray<Physics>()->remove(entityID);
         if (contains(entityID, CType::Sound))
             getComponentArray<Sound>()->remove(entityID);
-        //        for (auto const &pair : mPools) {
-
-        //            auto const &pool = pair.second;
-
-        //            pool->remove(entityID);
-        //        }
     }
     bool contains(GLuint eID, CType type) {
-        CType typeMask = ResourceManager::instance()->getGameObject(eID)->types;
+        CType typeMask = getEntity(eID)->types();
         return (typeMask & type) != CType::None;
     }
+    void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
+    void removeBillBoardID(GLuint entityID);
+    std::vector<GLuint> billBoards() { return mBillBoards; }
+
+    GLuint makeEntity(std::string name = "");
+    std::map<GLuint, Entity *> getEntities() const { return mEntities; }
+    Entity *getEntity(GLuint eID);
+    void removeEntity(GLuint eID);
+    GLuint numEntities() { return mEntities.size(); }
+
+    void clearScene();
+
+    void updateChildParent();
+
+    void makeSnapshot();
+    void loadSnapshot();
+    void removeChild(const GLuint eID, const GLuint childID);
+    void addChild(const GLuint eID, const GLuint childID);
+    /**
+     * @brief Check if Transform component (or rather its entity) has a parent object
+     * @param eID
+     * @return
+     */
+    bool hasParent(GLuint eID);
+    /**
+     * @brief Remove the entity's old parent (if it had one) and set it to the given parentID. If parentID == -1, simply removes the parent.
+     * @param eID
+     * @param parentID
+     */
+    void setParent(GLuint eID, int parentID);
+    std::vector<GLuint> getChildren(GLuint eID);
+
+signals:
+    void entityCreated(GLuint eID);
+    void entityRemoved(GLuint eID);
+    void parentChanged(GLuint childID);
+    void poolChanged(std::shared_ptr<IPool>);
 
 private:
     static Registry *mInstance;
     std::map<std::string, std::shared_ptr<IPool>> mPools{};
+    std::map<GLuint, Entity *> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
+    std::vector<GLuint> mBillBoards;
+    bool isBillBoard(GLuint entityID);
+
+    std::tuple<std::map<GLuint, Entity *>, std::vector<GLuint>, std::map<std::string, std::shared_ptr<IPool>>> mSnapshot;
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>

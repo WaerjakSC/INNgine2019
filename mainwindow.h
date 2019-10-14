@@ -9,14 +9,14 @@
 
 class QWidget;
 class RenderWindow;
-class GameObject;
+class Entity;
 class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
-class EntityItem;
 class QLabel;
 class Transform;
 class Material;
+class QToolButton;
 namespace Ui {
 class MainWindow;
 }
@@ -28,9 +28,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void insertGameObjects();
+    void insertEntities();
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    QString windowName = "OpenGL in Qt";
+    QToolButton *play, *pause, *stop;
+
 signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
@@ -45,15 +48,16 @@ signals:
     void scaleZ(GLfloat zIn);
     void newShader(int entityID, ShaderType shader);
 public slots:
+    void parentChanged(GLuint eID);
 private slots:
-    void onGameObjectClicked(const QModelIndex &index);
+    void onEntityClicked(const QModelIndex &index);
 
     void onNameChanged(const QModelIndex &index);
-    void onGameObjectsChanged(GLuint entity);
+    void onEntityAdded(GLuint entity);
 
     void onParentChanged(const QModelIndex &index);
 
-    void onGameObjectDragged(GLuint id);
+    void onEntityDragged(GLuint id);
 
     void makeCube();
 
@@ -90,9 +94,7 @@ private slots:
     void addInputComponent();
     void addPhysicsComponent();
     void addSoundComponent();
-    void makeGameObject();
-
-    void removeGameObject(const QModelIndex &index);
+    void makeEntity();
 
 private:
     void init();
@@ -101,20 +103,19 @@ private:
     HierarchyModel *hierarchy;
     HierarchyView *hView;
     VerticalScrollArea *scrollArea;
-    GameObject *selectedEntity{nullptr};
+    Entity *selectedEntity{nullptr};
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
     QColor rgb;
-    QLabel *colorLabel;
-    QLabel *texFileLabel;
-    QLabel *objFileLabel;
+    QLabel *colorLabel, *texFileLabel, *objFileLabel;
 
-    void forEach(QAbstractItemModel *model, QString parentName, EntityItem *child, QModelIndex parent = QModelIndex());
+    void forEach(GLuint parentID, Entity *child, QModelIndex parent = QModelIndex());
     void createActions();
     void setupComponentList();
     void setupTransformSettings(const Transform &component);
     void setupMaterialSettings(const Material &component);
     void setupMeshSettings(const Mesh &mesh);
+    void playButtons();
 };
 
 #endif // MAINWINDOW_H

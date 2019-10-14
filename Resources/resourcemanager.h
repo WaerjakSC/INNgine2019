@@ -9,9 +9,10 @@
 
 class RenderView;
 class LightSystem;
-class GameObject;
+class Entity;
 class Registry;
 class MainWindow;
+class Scene;
 
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
     friend class Scene;
@@ -33,28 +34,9 @@ public:
 
     void addMeshComponent(std::string name, int eID = -1);
 
-    // Basic Shapes and Prefabs
-    GLuint makeXYZ();
-    GLuint makeSkyBox();
-    GLuint makeTriangleSurface(std::string fileName, ShaderType type);
-    GLuint makeBillBoard();
-    GLuint makeOctBall(int n = 3);
-    GLuint makePlane();
-    GLuint makeCube();
-    GLuint makeLightObject();
-    GLuint make3DObject(std::string name, ShaderType type = Phong);
-
     std::map<ShaderType, Shader *> getShaders() const;
 
     void setMesh(std::string name, int eID);
-
-    GLuint makeGameObject(std::string name = "");
-    std::vector<GameObject *> getGameObjects() const;
-    GameObject *getGameObject(int eID);
-    void removeGameObject(int eID);
-    void clearScene();
-
-    //    RenderView *getRenderView() const;
 
     void setLightSystem(const std::shared_ptr<LightSystem> &lightSystem);
 
@@ -64,12 +46,22 @@ public:
 
     QString getMeshName(const Mesh &mesh);
 
-    void updateChildParent();
-    void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
-    std::vector<int> billBoards() { return mBillBoards; }
     void setLoading(bool load) { mLoading = load; }
 
     bool isLoading() const;
+
+    // Basic Shapes and Prefabs
+    GLuint makeXYZ();
+    GLuint makeSkyBox();
+    GLuint makeBillBoard();
+    GLuint makeOctBall(int n = 3);
+    GLuint makePlane();
+    GLuint makeCube();
+    GLuint makeLightObject();
+    GLuint make3DObject(std::string name, ShaderType type = Phong);
+    GLuint makeTriangleSurface(std::string fileName, ShaderType type);
+
+    Scene *getSceneLoader() const;
 
 private:
     // Private constructor
@@ -77,30 +69,27 @@ private:
 
     static ResourceManager *mInstance;
     Registry *registry;
-    GLuint mNumGameObjects{0};
+
+    std::unique_ptr<Scene> sceneLoader;
+
     bool mLoading{false};
     // std::map(key, object) for easy resource storage
     std::map<ShaderType, Shader *> mShaders;
     std::map<std::string, Texture *> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
-    std::vector<int> mBillBoards;
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;
 
     MainWindow *mMainWindow;
     //    std::vector<int> mGameObjectIndices;    // Holds the sparse array for gameobjects.
-    std::vector<GameObject *> mGameObjects; // Save GameObjects as pointers to avoid clipping of derived classes
+
     // Systems
     std::shared_ptr<LightSystem> mLightSystem;
-
-    // View class for collecting the components RenderSystem needs
-    //    std::unique_ptr<RenderView> mRenderView; // Should this belong to RenderSystem?
 
     // OpenGL init functions
     void initVertexBuffers(Mesh *mesh);
     void initIndexBuffers(Mesh *mesh);
-    void makeBillBoardMesh(int eID);
 
     // Reads and loads mesh
     void loadMesh(std::string fileName);
@@ -117,6 +106,7 @@ private:
     void makeSkyBoxMesh(GLuint eID);
     void makePlaneMesh(GLuint eID);
     void makeBallMesh(GLuint eID, int n = 3);
+    void makeBillBoardMesh(int eID);
 };
 
 #endif // RESOURCEMANAGER_H

@@ -22,8 +22,7 @@ win32 {
     INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
 
     #Visual Studio 64-bit
-    contains(QT_ARCH, x86_64)
-    {
+    contains(QT_ARCH, x86_64) {
         LIBS *= $(OPENAL_HOME)\\libs\\Win64\\OpenAL32.lib
         # Copy required DLLs to output directory
         CONFIG(debug, debug|release) {
@@ -41,10 +40,7 @@ win32 {
         } else {
             error(Unknown set of dependencies.)
         }
-    }
-    #minGW 32-bit
-    contains(QT_ARCH, i386)
-    {
+    } else {
         LIBS *= $(OPENAL_HOME)\\libs\\Win32\\OpenAL32.lib
         # Copy required DLLs to output directory
         CONFIG(debug, debug|release) {
@@ -65,6 +61,7 @@ win32 {
     }
 }
 HEADERS += \
+    ECS/entity.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -74,7 +71,6 @@ HEADERS += \
     GSL/gsl_math.h \
     GSL/math_constants.h \
 #
-    GUI/entityitem.h \
     GUI/hierarchymodel.h \
     GUI/hierarchyview.h \
 #
@@ -85,12 +81,12 @@ HEADERS += \
     Shaders/phongshader.h \
     Shaders/shader.h \
 #
-    ECS/gameobject.h \
     ECS/components.h \
     ECS/registry.h \
     ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
     ECS/Systems/movementsystem.h \
+    ECS/Systems/collisionsystem.h \
     ECS/Views/renderview.h \
 #
     Resources/soundmanager.h \
@@ -102,16 +98,17 @@ HEADERS += \
 #
     constants.h \
     billboard.h \
+    raycast.h \
     renderwindow.h \
     mainwindow.h \
     triangle.h \
     vertex.h \
     camera.h \
-    gltypes.h \
-    ECS/Systems/collisionsystem.h
+    gltypes.h
 
 
 SOURCES += main.cpp \
+    ECS/entity.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
     GSL/matrix4x4.cpp \
@@ -120,7 +117,6 @@ SOURCES += main.cpp \
     GSL/vector4d.cpp \
     GSL/gsl_math.cpp \
 #
-    GUI/entityitem.cpp \
     GUI/hierarchymodel.cpp \
     GUI/hierarchyview.cpp \
 #
@@ -131,12 +127,12 @@ SOURCES += main.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
 #
-    ECS/gameobject.cpp \
     ECS/components.cpp \
     ECS/registry.cpp \
     ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
     ECS/Systems/movementsystem.cpp \
+    ECS/Systems/collisionsystem.cpp \
     ECS/Views/renderview.cpp \
 #
     Resources/soundmanager.cpp \
@@ -146,12 +142,12 @@ SOURCES += main.cpp \
     Resources/texture.cpp \
 #
     billboard.cpp \
+    raycast.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     triangle.cpp \
     vertex.cpp \
-    camera.cpp \
-    ECS/Systems/collisionsystem.cpp
+    camera.cpp
 
 
 FORMS += \

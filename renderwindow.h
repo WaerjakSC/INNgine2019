@@ -2,7 +2,7 @@
 #define RENDERWINDOW_H
 
 #include "camera.h"
-#include "gameobject.h"
+#include "entity.h"
 #include "resourcemanager.h"
 #include "texture.h"
 #include <QElapsedTimer>
@@ -18,9 +18,9 @@ class RenderSystem;
 class MovementSystem;
 class SoundSource;
 class SoundManager;
-class Scene;
 class LightSystem;
 class Registry;
+class Raycast;
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
 /// We also inherit from QOpenGLFunctions, to get access to the OpenGL functions
@@ -39,7 +39,7 @@ public:
 
     void checkForGLerrors();
     void setCameraSpeed(float value);
-    void soundTest();
+    void playSound();
 
     RenderSystem *renderer() const;
 
@@ -55,9 +55,11 @@ public slots:
     void snapToObject(int eID);
     void save();
     void load();
+    void play();
+    void pause();
+    void stop();
 private slots:
     void render();
-    void updateScene();
     void changeMsg();
 signals:
     void snapSignal();
@@ -75,10 +77,11 @@ private:
     ResourceManager *mFactory;
     Registry *mRegistry;
     SoundManager *mSoundManager;
-    std::unique_ptr<Scene> scene;
-    std::string currentScene{"mainSceneCJK.json"};
+    Raycast *ray;
 
-    GameObject *mPlayer; //the controllable object
+    QString currentScene{"mainSceneCJK.json"};
+
+    Entity *mPlayer; //the controllable object
 
     GLuint mLight;
 
@@ -87,7 +90,9 @@ private:
     Camera *mCurrentCamera{nullptr};
 
     bool mWireframe{false};
-    bool showingMsg{false};
+    bool mShowingMsg{false};
+    bool mIsPlaying{false};
+    bool mPaused{false}; // Don't make a snapshot if it was just restarted from a pause
 
     //Input mInput;
 
@@ -112,6 +117,7 @@ private:
     void handleInput();
 
     std::chrono::high_resolution_clock::time_point mLastTime;
+    friend class MainWindow;
 
 protected:
     //The QWindow that we inherit from has these functions to capture

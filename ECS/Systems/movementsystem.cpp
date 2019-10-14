@@ -1,75 +1,66 @@
 #include "movementsystem.h"
+#include "billboard.h"
 #include "registry.h"
 MovementSystem::MovementSystem() {
-    mTransforms = Registry::instance()->registerComponent<Transform>();
+    registry = Registry::instance();
+    mTransforms = registry->registerComponent<Transform>();
 }
-
+void MovementSystem::init() {
+    update();
+}
 void MovementSystem::update() {
     GLuint curEntity{0}; // which index of entities() is being iterated
     for (auto entityID : mTransforms->entities()) {
         auto &comp = mTransforms->data()[curEntity];
         if (comp.mMatrixOutdated) {
-            updateMatrix(comp);
             if (comp.parentID != -1) {
                 comp.mMatrix = multiplyByParent(entityID, comp.parentID);
-                if (comp.mPosition != getPosition(entityID)) { // This is probably dumb
-                    comp.mPosition = getPosition(entityID);    // Position from the multiplied matrix should be the global position.
-                    comp.mMatrixOutdated = true;
-                }
+                comp.mPosition = getPosition(entityID); // Position from the multiplied matrix should be the global position.
             } else {
                 comp.mRelativePosition = gsl::Vector3D(0);
             }
+            updateMatrix(curEntity, comp);
         }
         curEntity++;
     }
+    for (auto billBoard : registry->billBoards()) {
+        if (BillBoard *board = dynamic_cast<BillBoard *>(registry->getEntity(billBoard)))
+            board->update();
+    }
 }
-/**
- * @brief Set the parent of a gameobject (or rather its transform component).
- * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
- * For now, make sure you create items in the order you want them to be parented, i.e. Parent first, then Children.
- * @param eID
- * @param parentID
- */
-void MovementSystem::setParent(int childID, int newParentID) {
-    int oldParentID = mTransforms->get(childID).parentID;
-    if (oldParentID != -1) // Make sure to remove the child from its old parent if it had one
-        removeChild(oldParentID, childID);
-    mTransforms->get(childID).parentID = newParentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
-    if (newParentID != -1)
-        addChild(newParentID, childID);
+void MovementSystem::updateEntity(GLuint eID) {
+    auto &comp = mTransforms->get(eID);
+    if (comp.mMatrixOutdated) {
+        if (comp.parentID != -1) {
+            comp.mMatrix = multiplyByParent(eID, comp.parentID);
+            comp.mPosition = getPosition(eID); // Position from the multiplied matrix should be the global position.
+        } else {
+            comp.mRelativePosition = gsl::Vector3D(0);
+        }
+        updateMatrix(eID, comp);
+    }
 }
+
 /**
  * @brief Set child matrices to outdated if the parent moves so they also move.
  * @param eID
  */
 void MovementSystem::iterateChildren(int eID) {
-    for (auto entity : children(eID)) {
-        mTransforms->get(entity).mMatrixOutdated = true;
-    }
-}
-std::vector<int> &MovementSystem::children(const int eID) const {
-    return mTransforms->get(eID).mChildren;
-}
-void MovementSystem::addChild(const int eID, const GLuint childID) {
-    children(eID).emplace_back(childID);
-}
-void MovementSystem::removeChild(const int eID, const GLuint childID) {
-    for (auto child : children(eID)) {
-        if (child == (int)childID) {
-            std::swap(child, children(eID).back());
-            children(eID).pop_back();
+    if (eID != -1)
+        for (auto entity : Registry::instance()->getComponent<Transform>(eID).mChildren) {
+            Registry::instance()->getComponent<Transform>(entity).mMatrixOutdated = true;
         }
-    }
 }
+
 /**
  * @brief Get global position of object
  * @param eID
  * @return
  */
 gsl::Vector3D MovementSystem::getPosition(int eID) {
-    if (hasParent(eID)) {
+    if (Registry::instance()->hasParent(eID)) {
         GLuint parentID = mTransforms->get(eID).parentID;
-        return mTransforms->get(parentID).mPosition + mTransforms->get(eID).mRelativePosition;
+        return getPosition(parentID) + mTransforms->get(eID).mRelativePosition;
     }
     return mTransforms->get(eID).mPosition;
 }
@@ -86,144 +77,147 @@ gsl::Vector3D MovementSystem::getRelativePosition(int eID) {
  * @param eID
  * @param position
  */
-void MovementSystem::setPosition(int eID, gsl::Vector3D position) {
+void MovementSystem::setPosition(GLuint eID, gsl::Vector3D position, bool signal) {
     mTransforms->get(eID).mMatrixOutdated = true;
-    if (hasParent(eID)) {
+    if (Registry::instance()->hasParent(eID)) {
         mTransforms->get(eID).mRelativePosition = position;
     } else {
         mTransforms->get(eID).mPosition = position;
     }
     iterateChildren(eID);
-    emit positionChanged(eID, position);
+    if (signal)
+        emit positionChanged(eID, position);
 }
 /**
  * @brief Sets relative position if parented to an object -- otherwise sets global position.
  * @param eID
  * @param position
  */
-void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn) {
-    setPosition(eID, gsl::Vector3D{xIn, yIn, zIn});
+void MovementSystem::setPosition(int eID, float xIn, float yIn, float zIn, bool signal) {
+    setPosition(eID, gsl::Vector3D{xIn, yIn, zIn}, signal);
 }
-void MovementSystem::setPositionX(int eID, float xIn) {
-    gsl::Vector3D newPos;
-    if (hasParent(eID)) {
-        newPos = mTransforms->get(eID).mRelativePosition;
-        newPos.x = xIn;
-    } else {
-        newPos = mTransforms->get(eID).mPosition;
-        newPos.x = xIn;
-    }
-    setPosition(eID, newPos);
+//void MovementSystem::setRelativePosition(const vec3 &position) {
+//}
+void MovementSystem::setPositionX(int eID, float xIn, bool signal) {
+    gsl::Vector3D newPos = getPosition(eID);
+    newPos.x = xIn;
+
+    setPosition(eID, newPos, signal);
 }
 
-void MovementSystem::setPositionY(int eID, float yIn) {
-    gsl::Vector3D newPos;
-    if (hasParent(eID)) {
-        newPos = mTransforms->get(eID).mRelativePosition;
-        newPos.y = yIn;
-    } else {
-        newPos = mTransforms->get(eID).mPosition;
-        newPos.y = yIn;
-    }
-    setPosition(eID, newPos);
+void MovementSystem::setPositionY(int eID, float yIn, bool signal) {
+    gsl::Vector3D newPos = getPosition(eID);
+    newPos.y = yIn;
+
+    setPosition(eID, newPos, signal);
 }
 
-void MovementSystem::setPositionZ(int eID, float zIn) {
-    gsl::Vector3D newPos;
-    if (hasParent(eID)) {
-        newPos = mTransforms->get(eID).mRelativePosition;
-        newPos.z = zIn;
-    } else {
-        newPos = mTransforms->get(eID).mPosition;
-        newPos.z = zIn;
-    }
-    setPosition(eID, newPos);
+void MovementSystem::setPositionZ(int eID, float zIn, bool signal) {
+    gsl::Vector3D newPos = getPosition(eID);
+    newPos.z = zIn;
+
+    setPosition(eID, newPos, signal);
 }
-bool MovementSystem::hasParent(int eID) {
-    return mTransforms->get(eID).parentID != -1;
-}
+
 void MovementSystem::moveX(int eID, float xIn) {
-    gsl::Vector3D newPos;
-    if (hasParent(eID)) {
-        newPos = mTransforms->get(eID).mRelativePosition;
-        newPos.x += xIn;
-    } else {
-        newPos = mTransforms->get(eID).mPosition;
-        newPos.x += xIn;
-    }
+    gsl::Vector3D newPos = getPosition(eID);
+    newPos.x += xIn;
+
     setPosition(eID, newPos);
 }
 void MovementSystem::moveY(int eID, float yIn) {
-    gsl::Vector3D newPos;
-    if (hasParent(eID)) {
-        newPos = mTransforms->get(eID).mRelativePosition;
-        newPos.y += yIn;
-    } else {
-        newPos = mTransforms->get(eID).mPosition;
-        newPos.y += yIn;
-    }
+    gsl::Vector3D newPos = getPosition(eID);
+    newPos.y += yIn;
+
     setPosition(eID, newPos);
 }
 void MovementSystem::moveZ(int eID, float zIn) {
-    gsl::Vector3D newPos;
-    if (hasParent(eID)) {
-        newPos = mTransforms->get(eID).mRelativePosition;
-        newPos.z += zIn;
-    } else {
-        newPos = mTransforms->get(eID).mPosition;
-        newPos.z += zIn;
-    }
+    gsl::Vector3D newPos = getPosition(eID);
+    newPos.z += zIn;
+
     setPosition(eID, newPos);
 }
 
-void MovementSystem::setRotation(int eID, gsl::Vector3D rotation) {
+void MovementSystem::setRotation(GLuint eID, gsl::Vector3D rotation, bool signal) {
     mTransforms->get(eID).mMatrixOutdated = true;
     mTransforms->get(eID).mRotation = rotation;
     iterateChildren(eID);
-    emit rotationChanged(eID, rotation);
+    if (signal)
+        emit rotationChanged(eID, rotation);
 }
-void MovementSystem::setRotationX(int eID, float xIn) {
+void MovementSystem::setRotationX(int eID, float xIn, bool signal) {
     gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
     newRot.x = xIn;
-    setRotation(eID, newRot);
+    setRotation(eID, newRot, signal);
 }
-void MovementSystem::setRotationY(int eID, float yIn) {
+void MovementSystem::setRotationY(int eID, float yIn, bool signal) {
     gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
     newRot.y = yIn;
-    setRotation(eID, newRot);
+    setRotation(eID, newRot, signal);
 }
-void MovementSystem::setRotationZ(int eID, float zIn) {
+void MovementSystem::setRotationZ(int eID, float zIn, bool signal) {
     gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
     newRot.z = zIn;
-    setRotation(eID, newRot);
+    setRotation(eID, newRot, signal);
 }
-void MovementSystem::setScale(int eID, gsl::Vector3D scale) {
+void MovementSystem::rotateX(GLuint eID, float xIn, bool signal) {
+    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
+    newRot.x += xIn;
+    setRotation(eID, newRot, signal);
+}
+void MovementSystem::rotateY(GLuint eID, float yIn, bool signal) {
+    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
+    newRot.y += yIn;
+    setRotation(eID, newRot, signal);
+}
+void MovementSystem::rotateZ(GLuint eID, float zIn, bool signal) {
+    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
+    newRot.z += zIn;
+    setRotation(eID, newRot, signal);
+}
+void MovementSystem::setScale(int eID, gsl::Vector3D scale, bool signal) {
     mTransforms->get(eID).mMatrixOutdated = true;
     mTransforms->get(eID).mScale = scale;
     iterateChildren(eID);
-    emit scaleChanged(eID, scale);
+    if (signal)
+        emit scaleChanged(eID, scale);
 }
-void MovementSystem::setScaleX(int eID, float xIn) {
+void MovementSystem::setScaleX(int eID, float xIn, bool signal) {
     gsl::Vector3D newScale = mTransforms->get(eID).mScale;
     newScale.x = xIn;
-    setScale(eID, newScale);
+    setScale(eID, newScale, signal);
 }
-void MovementSystem::setScaleY(int eID, float yIn) {
+void MovementSystem::setScaleY(int eID, float yIn, bool signal) {
     gsl::Vector3D newScale = mTransforms->get(eID).mScale;
     newScale.y = yIn;
-    setScale(eID, newScale);
+    setScale(eID, newScale, signal);
 }
-void MovementSystem::setScaleZ(int eID, float zIn) {
+void MovementSystem::setScaleZ(int eID, float zIn, bool signal) {
     gsl::Vector3D newScale = mTransforms->get(eID).mScale;
     newScale.z = zIn;
-    setScale(eID, newScale);
+    setScale(eID, newScale, signal);
 }
-gsl::Matrix4x4 MovementSystem::multiplyByParent(int eID, int pID) {
+void MovementSystem::scaleX(GLuint eID, float xIn, bool signal) {
+    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
+    newScale.x += xIn;
+    setScale(eID, newScale, signal);
+}
+void MovementSystem::scaleY(GLuint eID, float yIn, bool signal) {
+    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
+    newScale.y += yIn;
+    setScale(eID, newScale, signal);
+}
+void MovementSystem::scaleZ(GLuint eID, float zIn, bool signal) {
+    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
+    newScale.z += zIn;
+    setScale(eID, newScale, signal);
+}
+gsl::Matrix4x4 MovementSystem::multiplyByParent(GLuint eID, GLuint pID) {
     return mTransforms->get(pID).mMatrix * mTransforms->get(eID).mMatrix;
 }
 
-void MovementSystem::updateMatrix(Transform &comp) {
-    gsl::Vector3D position = comp.mPosition;
+void MovementSystem::updateMatrix(GLuint eID, Transform &comp) {
+    gsl::Vector3D position = getPosition(eID);
     gsl::Vector3D rotation = comp.mRotation;
     gsl::Vector3D scale = comp.mScale;
     //calculate matrix from position, scale, rotation

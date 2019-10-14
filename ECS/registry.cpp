@@ -1,5 +1,6 @@
 #include "registry.h"
-
+#include "billboard.h"
+#include <optional>
 Registry *Registry::mInstance = nullptr;
 
 Registry::Registry() {
@@ -8,4 +9,148 @@ Registry *Registry::instance() {
     if (!mInstance)
         mInstance = new Registry();
     return mInstance;
+}
+
+void Registry::removeBillBoardID(GLuint entityID) {
+    for (auto &billboard : mBillBoards) {
+        if (entityID == billboard) {
+            std::swap(billboard, mBillBoards.back());
+            mBillBoards.pop_back();
+            return;
+        }
+    }
+}
+
+bool Registry::isBillBoard(GLuint entityID) {
+    for (auto billboard : mBillBoards) {
+        if (entityID == billboard) {
+            return true;
+        }
+    }
+    return false;
+}
+/**
+ * @brief Get a pointer to the entity with the specified ID.
+ * @param eID
+ * @return
+ */
+Entity *Registry::getEntity(GLuint eID) {
+    auto search = mEntities.find(eID);
+    if (search != mEntities.end())
+        return search->second;
+    return nullptr;
+}
+/**
+ * @brief Destroy gameobject
+ * @param eID - entityID
+ */
+void Registry::removeEntity(GLuint eID) {
+    if (isBillBoard(eID)) {
+        removeBillBoardID(eID);
+    }
+    mEntities.erase(mEntities.find(eID));
+    entityDestroyed(eID); // Pass the message on to the registry
+    emit entityRemoved(eID);
+}
+
+void Registry::clearScene() {
+    mBillBoards.clear();
+    for (auto entity : mEntities) {
+        entityDestroyed(entity.second->id()); // Pass the message on to the registry
+        emit entityRemoved(entity.second->id());
+    }
+    mEntities.clear();
+}
+/**
+ * @brief Make a generic game object with no components attached.
+ * @param name Name of the gameobject. Leave blank if no name desired.
+ * @return Returns the entity ID for use in adding components or other tasks.
+ */
+GLuint Registry::makeEntity(std::string name) {
+    GLuint eID = numEntities();
+    if (name == "BillBoard")
+        mEntities[eID] = new BillBoard(eID, "BillBoard");
+    else
+        mEntities[eID] = new Entity(eID, QString::fromStdString(name));
+    emit entityCreated(eID);
+    return eID;
+}
+/**
+ * @brief Set the parent of a gameobject (or rather its transform component).
+ * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
+ * For now, make sure you create items in the order you want them to be parented, i.e. Parent first, then Children.
+ * @param eID
+ * @param parentID
+ */
+void Registry::setParent(GLuint childID, int newParentID) {
+    Transform &trans = getComponent<Transform>(childID);
+    if (hasParent(childID)) // Make sure to remove the child from its old parent if it had one
+        removeChild(trans.parentID, childID);
+    trans.parentID = newParentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
+    if (newParentID != -1)
+        addChild(newParentID, childID);
+    emit parentChanged(childID);
+}
+bool Registry::hasParent(GLuint eID) {
+    return getComponent<Transform>(eID).parentID != -1;
+}
+std::vector<GLuint> Registry::getChildren(GLuint eID) {
+    return getComponent<Transform>(eID).mChildren;
+}
+
+void Registry::addChild(const GLuint eID, const GLuint childID) {
+    getComponent<Transform>(eID).mChildren.emplace_back(childID);
+}
+void Registry::removeChild(const GLuint eID, const GLuint childID) {
+    std::vector<GLuint> &children = getComponent<Transform>(eID).mChildren;
+    for (auto &child : children) {
+        if (child == childID) {
+            std::swap(child, children.back());
+            children.pop_back();
+        }
+    }
+}
+/**
+ * @brief Updates the child parent hierarchy in case it's out of date
+ */
+void Registry::updateChildParent() {
+    for (auto entity : getEntities()) // For every gameobject
+    {
+        if ((entity.second->types() & CType::Transform) != CType::None) {
+            Transform comp = getComponent<Transform>(entity.second->id());
+            if (comp.parentID != -1) {                         // If this entity has a parent then,
+                setParent(entity.second->id(), comp.parentID); // add this entity's ID to the parent's list of children.
+            }
+        }
+    }
+}
+
+void Registry::makeSnapshot() {
+    std::map<GLuint, Entity *> newEntityMap;
+    for (auto entity : mEntities) {
+        if (BillBoard *board = dynamic_cast<BillBoard *>(entity.second)) {
+            newEntityMap[entity.first] = board;
+        } else {
+            Entity *entt = entity.second->cloneEntity();
+            newEntityMap[entity.first] = entt;
+        }
+    }
+    std::map<std::string, std::shared_ptr<IPool>> snapPools;
+    for (auto pool : mPools) {
+        auto newPool = pool.second->clone();
+        snapPools[pool.first] = newPool;
+    }
+
+    mSnapshot = std::make_tuple(newEntityMap, mBillBoards, snapPools);
+}
+
+void Registry::loadSnapshot() {
+    std::map<std::string, std::shared_ptr<IPool>> tempPools;
+    std::tie(mEntities, mBillBoards, tempPools) = mSnapshot;
+    for (auto pool : tempPools) {
+        mPools[pool.first]->swap(pool.second);
+    }
+    for (auto &transform : getComponentArray<Transform>()->data()) {
+        transform.mMatrixOutdated = true;
+    }
 }

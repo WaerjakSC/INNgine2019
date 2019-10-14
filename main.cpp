@@ -1,8 +1,10 @@
+#include "hierarchymodel.h"
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSplashScreen>
 
 int main(int argc, char *argv[]) {
+    qRegisterMetaType<EMimeData>();
     //Forces the usage of desktop OpenGL
     //Attribute must be set before Q(Gui)Application is constructed:
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);

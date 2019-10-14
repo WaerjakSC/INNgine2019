@@ -12,29 +12,29 @@
 Scene::Scene() {
 }
 
-void Scene::saveScene(std::string fileName) {
+void Scene::saveScene(const QString &fileName) {
     Registry *registry = Registry::instance();
-
-    std::vector<GameObject *> entities = ResourceManager::instance()->getGameObjects();
+    std::map<GLuint, Entity *> entities = registry->getEntities();
 
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer(buf);
     writer.StartObject();
-    writer.String(mName.c_str());
+    writer.String(mName.toStdString().c_str());
     writer.StartObject();
 
     for (auto entity : entities) {
+
         writer.String("GameObject");
         writer.StartObject();
         writer.Key("name");
-        writer.String(entity->mName.c_str());
+        writer.String(entity.second->name().toStdString().c_str());
         writer.Key("id");
-        writer.Uint(entity->eID);
+        writer.Uint(entity.second->id());
         writer.Key("components");
         writer.StartObject();
-        CType typeMask = entity->types;
+        CType typeMask = entity.second->types();
         if ((typeMask & CType::Transform) != CType::None) {
-            const Transform trans = registry->getComponent<Transform>(entity->eID);
+            const Transform trans = registry->getComponent<Transform>(entity.second->id());
             writer.Key("transform");
             writer.StartObject();
 
@@ -75,7 +75,7 @@ void Scene::saveScene(std::string fileName) {
         if ((typeMask & CType::Material) != CType::None) {
             writer.Key("material");
             writer.StartObject();
-            const Material mat = registry->getComponent<Material>(entity->eID);
+            const Material mat = registry->getComponent<Material>(entity.second->id());
 
             writer.Key("color");
             writer.StartArray();
@@ -104,7 +104,9 @@ void Scene::saveScene(std::string fileName) {
         if ((typeMask & CType::Mesh) != CType::None) {
             writer.Key("mesh");
             writer.StartObject();
-            const Mesh mesh = registry->getComponent<Mesh>(entity->eID);
+            const Mesh mesh = registry->getComponent<Mesh>(entity.second->id());
+            if (mesh.mName == "")
+                qDebug() << "what happens here?";
             writer.Key("name");
             writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
             writer.EndObject();
@@ -112,7 +114,7 @@ void Scene::saveScene(std::string fileName) {
         if ((typeMask & CType::Light) != CType::None) {
             writer.Key("light");
             writer.StartObject();
-            const Light lightcomp = registry->getComponent<Light>(entity->eID);
+            const Light lightcomp = registry->getComponent<Light>(entity.second->id());
             LightData light = lightcomp.mLight;
             writer.Key("ambstr");
             writer.Double(light.mAmbientStrength);
@@ -148,37 +150,51 @@ void Scene::saveScene(std::string fileName) {
 
             writer.EndObject();
         }
+        if ((typeMask & CType::Collision) != CType::None) {
+            // Write Collision data to json here.
+        }
         writer.EndObject();
         writer.EndObject();
     }
     writer.EndObject();
     writer.EndObject();
-    std::ofstream of(gsl::sceneFilePath + fileName);
+    std::ofstream of(gsl::sceneFilePath + fileName.toStdString());
     of << buf.GetString();
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
-void Scene::loadScene(std::string fileName) {
-    ResourceManager *factory = ResourceManager::instance();
+void Scene::loadScene(const QString &fileName) {
     Registry *registry = Registry::instance();
+    ResourceManager *factory = ResourceManager::instance();
     factory->setLoading(true);
-    factory->clearScene();
-    std::ifstream file(gsl::sceneFilePath + fileName);
-    if (!file.good())
-        throw std::runtime_error("Can't read the JSON file!");
-    std::stringstream stream;
-    stream << file.rdbuf();
-    IStreamWrapper isw(stream);
-    mScene.ParseStream(isw);
+    registry->clearScene();
+    auto search = mScenes.find(fileName);
+    if (search == mScenes.end())
+        loadSceneFromFile(fileName);
+    else {
+        Document sceneDoc;
+        sceneDoc.Parse(mScenes[fileName].c_str());
+        populateScene(sceneDoc);
+    }
+    registry->updateChildParent();
+    factory->setLoading(false);
+}
+void Scene::populateScene(const Document &scene) {
     std::map<int, int> parentID;
     std::map<int, int> idPairs;
+    Registry *registry = Registry::instance();
+    ResourceManager *factory = ResourceManager::instance();
+
+    mName = scene.MemberBegin()->name.GetString();
+
     // Iterate through each gameobject in the scene
-    for (Value::ConstMemberIterator itr = mScene[mName.c_str()].MemberBegin(); itr != mScene[mName.c_str()].MemberEnd(); ++itr) {
+    for (Value::ConstMemberIterator itr = scene[mName.toStdString().c_str()].MemberBegin(); itr != scene[mName.toStdString().c_str()].MemberEnd(); ++itr) {
+
         // Iterate through each of the members in the gameobject (name, id, components)
         if (itr->value["name"] == "XYZ") {
             factory->makeXYZ();
         } else {
-            GLuint id = factory->makeGameObject(itr->value["name"].GetString());
+            GLuint id = registry->makeEntity(itr->value["name"].GetString());
             idPairs[itr->value["id"].GetInt()] = id;
             if (itr->value["name"] == "Light")
                 controllerID = id;
@@ -201,7 +217,7 @@ void Scene::loadScene(std::string fileName) {
                 } else if (comp->name == "mesh") {
                     if (comp->value["name"] == "BillBoard") {
                         factory->makeBillBoardMesh(id);
-                        factory->addBillBoard(id);
+                        registry->addBillBoard(id);
                     } else if (comp->value["name"] == "Skybox")
                         factory->makeSkyBoxMesh(id);
                     else if (comp->value["name"] == "Light")
@@ -219,6 +235,8 @@ void Scene::loadScene(std::string fileName) {
 
                     LightData data(ambStr, ambColor, lightStr, lightColor, specStr, specExp, color);
                     registry->addComponent<Light>(id, data);
+                } else if (comp->name == "collision") {
+                    // Set collision variables here
                 }
             }
         }
@@ -228,6 +246,20 @@ void Scene::loadScene(std::string fileName) {
         //We can find the new id of that object by searching idPairs using Pair value as the key.
         registry->getComponent<Transform>(pair.first).parentID = idPairs[pair.second];
     }
-    factory->updateChildParent();
-    factory->setLoading(false);
+}
+void Scene::loadSceneFromFile(const QString &fileName) {
+    std::ifstream file(gsl::sceneFilePath + fileName.toStdString());
+    if (!file.good())
+        throw std::runtime_error("Can't read the JSON file!");
+    std::stringstream stream;
+    stream << file.rdbuf();
+    const std::string fileCopy = stream.str();
+    const char *scene = fileCopy.c_str();
+    Document sceneDoc;
+    sceneDoc.Parse(scene);
+    populateScene(sceneDoc);
+    mScenes[fileName] = fileCopy;
+}
+QString Scene::name() const {
+    return mName;
 }

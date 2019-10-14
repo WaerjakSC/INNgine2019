@@ -3,18 +3,39 @@
 
 #include "components.h"
 #include <QObject>
+#include <memory>
 #include <vector>
 class IPool {
 public:
     virtual ~IPool() = default;
     virtual void remove(int removedEntity) = 0;
+    virtual std::shared_ptr<IPool> clone() = 0;
+    virtual void swap(std::shared_ptr<IPool> other) = 0;
 };
 
 template <typename Type>
 class Pool : public IPool {
 public:
     Pool() = default;
+    Pool(Pool *other) {
+        mEntityList = other->mEntityList;
+        mEntityIndices = other->mEntityIndices;
+        mComponentList = other->mComponentList;
+        mGroupEnd = other->mGroupEnd;
+        isSorted = other->isSorted;
+    }
     ~Pool() {}
+    virtual std::shared_ptr<IPool> clone() override {
+        return std::make_shared<Pool>(*this);
+    }
+    virtual void swap(std::shared_ptr<IPool> other) override {
+        auto swapped = std::static_pointer_cast<Pool<Type>>(other);
+        mEntityList = swapped->mEntityList;
+        mEntityIndices = swapped->mEntityIndices;
+        mComponentList = swapped->mComponentList;
+        mGroupEnd = swapped->mGroupEnd;
+        isSorted = swapped->isSorted;
+    }
     /**
      * @brief Adds an entity and its new component to this pool.
      * Entity is equivalent to Component in this case, since pool won't contain the entity if the entity doesn't have the component.
@@ -46,9 +67,10 @@ public:
      */
     void remove(int removedEntityID) {
         if (has(removedEntityID)) {
+            bool groupMember = (mEntityIndices[removedEntityID] < (int)mGroupEnd);
             GLuint swappedEntity = mEntityList.back();
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
-            if (isSorted) {
+            if (isSorted && groupMember) {
                 if (mGroupEnd != mEntityList.size()) {
                     swap(swappedEntity, mEntityList.back()); // Do a final swap to re-position the group marker
                 }
@@ -110,6 +132,12 @@ public:
      * @param eID
      * @return
      */
+    Type &get(int eID, CType typeMask) {
+        assert(has(eID));
+        if ((typeMask & mComponentList[mEntityIndices[eID]].type()) == CType::None)
+            qDebug() << "something went wrong";
+        return mComponentList[mEntityIndices[eID]];
+    }
     Type &get(int eID) {
         assert(has(eID));
         return mComponentList[mEntityIndices[eID]];

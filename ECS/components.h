@@ -130,7 +130,7 @@ struct Transform : Component {
     gsl::Vector3D mScale{1};
     gsl::Matrix4x4 mMatrix;
 
-    std::vector<int> mChildren;
+    std::vector<GLuint> mChildren;
 
     int parentID = -1;
 };
@@ -158,8 +158,9 @@ struct Material : public Component {
 };
 
 struct Mesh : public Component {
-public:
-    Mesh() {}
+    Mesh() {
+        mType = CType::Mesh;
+    }
     Mesh(GLenum drawType, std::string name, GLuint verticeCount = 0, GLuint indiceCount = 0)
         : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name) {
         mType = CType::Mesh;
@@ -178,10 +179,12 @@ public:
     GLenum mDrawType{0};
 
     std::string mName;
+
     Mesh &operator=(const Mesh &other) {
         mVAO = other.mVAO;
         mVBO = other.mVBO;
         mEAB = other.mEAB; //holds the indices (Element Array Buffer - EAB)
+        mName = other.mName;
 
         mVerticeCount = other.mVerticeCount;
         mIndiceCount = other.mIndiceCount;
@@ -189,9 +192,7 @@ public:
         return *this;
     }
     bool operator==(const Mesh &other) {
-        bool buffers = mVAO == other.mVAO && mVBO == other.mVBO && mEAB == other.mEAB;
-        bool data = mVerticeCount == other.mVerticeCount && mIndiceCount == other.mIndiceCount && mDrawType == other.mDrawType;
-        return buffers && data;
+        return mName == other.mName; // name of the obj/txt file should be enough to verify if they're the same.
     }
 };
 struct Light : public Component {
@@ -251,6 +252,7 @@ public:
     Sound() {}
     virtual void update() {}
 
+
     bool mLooping{false};
     bool mPlay{false};
     bool mPlaying{false};
@@ -284,8 +286,6 @@ public:
         inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
     } AABB;
 
-    vec3 getMin(const AABB& aabb);
-    vec3 getMax(const AABB& aabb);
 
     /**
       * @brief Oriented Bounding Box
@@ -304,10 +304,14 @@ public:
         //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
     } OBB;
 
+    typedef struct Sphere{
+        vec3 position;
+        float radius;
 
-
+        // default constructor
+        inline Sphere(): radius(3.0f) {};
+        // constructor with radius and position params
+        inline Sphere(const vec3& pos, const float& r): position(pos), radius(r) {}
+    } Sphere;
 };
-
-
-
 #endif // COMPONENT_H
