@@ -45,6 +45,12 @@ vec3 CollisionSystem::getMax(const Collision::AABB &aabb) {
                 fmaxf(p1.y, p2.y),
                 fmaxf(p1.z, p2.z));
 }
+
+bool CollisionSystem::SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb)
+{
+    // Trenger å finne punkt i OBB nærmest gitt punkt i Sphere
+    // lignende funksjon som closest point for AABB
+}
 /**
  * @brief bool CollisionSystem::AABBAABB returns true if an intersection between given AABB's occur
  * @param AABB1
@@ -60,8 +66,8 @@ bool CollisionSystem::AABBAABB(const Collision::AABB &AABB1, const Collision::AA
     vec3 bMax = getMax(AABB2);
 
     return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-            (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-            (aMin.z <= bMax.z && aMax.z >= bMin.z);
+           (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
+           (aMin.z <= bMax.z && aMax.z >= bMin.z);
 }
 
 /**

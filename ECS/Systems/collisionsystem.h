@@ -17,6 +17,7 @@ public:
     vec3 getMin(const Collision::AABB& aabb);
     vec3 getMax(const Collision::AABB& aabb);
 
+    bool SphereOBB(const Collision::Sphere& sphere, const Collision::OBB& obb);
 
     bool AABBAABB(const Collision::AABB& aabb1, const Collision::AABB& aabb2);
     bool SphereAABB(const Collision::Sphere& sphere, const Collision::AABB& aabb1);
