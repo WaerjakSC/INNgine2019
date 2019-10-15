@@ -29,8 +29,8 @@ MainWindow::~MainWindow() {
 
 void MainWindow::init() {
     hierarchy = new HierarchyModel();
-    ui->SceneHierarchy->setModel(hierarchy);
     hView = ui->SceneHierarchy;
+    hView->setModel(hierarchy);
     hView->setMainWindow(this);
     scrollArea = new VerticalScrollArea();
     ui->horizontalTopLayout->addWidget(scrollArea);
@@ -99,6 +99,7 @@ void MainWindow::init() {
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onEntityDragged);
     connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
     connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
+    connect(mRenderWindow, &RenderWindow::rayHitEntity, this, &MainWindow::mouseRayHit);
     connect(Registry::instance(), &Registry::entityCreated, this, &MainWindow::onEntityAdded);
     connect(Registry::instance(), &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
     connect(Registry::instance(), &Registry::parentChanged, this, &MainWindow::parentChanged);
@@ -673,6 +674,13 @@ void MainWindow::onEntityClicked(const QModelIndex &index) {
     QStandardItem *item = hierarchy->itemFromIndex(index);
     Entity *entt = reg->getEntity(item->text());
     onEntityDragged(entt->id());
+    setupComponentList();
+}
+void MainWindow::mouseRayHit(GLuint eID) {
+    QStandardItem *entity = hierarchy->itemFromEntityID(eID);
+    QModelIndex entityIndex = hierarchy->indexFromItem(entity);
+    hView->setCurrentIndex(entityIndex);
+    onEntityDragged(eID);
     setupComponentList();
 }
 /**

@@ -13,7 +13,7 @@ class Entity;
 class Raycast {
 public:
     Raycast(RenderWindow *window, Camera *camera);
-    void rayCast(const QPoint &mousePos);
+    int rayCast(const QPoint &mousePos);
 
 private:
     RenderWindow *mOpenGLWindow;

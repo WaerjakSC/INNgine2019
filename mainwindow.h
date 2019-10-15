@@ -50,6 +50,7 @@ signals:
     void newShader(int entityID, ShaderType shader);
 public slots:
     void parentChanged(GLuint eID);
+    void mouseRayHit(GLuint eID);
 private slots:
     void onEntityClicked(const QModelIndex &index);
 
