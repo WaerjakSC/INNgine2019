@@ -58,6 +58,20 @@ bool CollisionSystem::SphereSphere(const Collision::Sphere &sphere1, const Colli
 }
 
 /**
+ * @brief CollisionSystem::AABBPlane returns true if an intersection between an AABB and a plane occurs
+ * @param aabb
+ * @param plane
+ * @return
+ */
+bool CollisionSystem::AABBPlane(const Collision::AABB &aabb, const Collision::Plane &plane)
+{   // WIP
+    // Distance from center of AABB to plane
+    float dotProduct = vec3::dot(plane.normal, aabb.origin);
+    float dist = dotProduct - plane.distance;
+
+}
+
+/**
  * @brief CollisionSystem::SphereAABB collision between a Sphere and AABB
  * @param sphere
  * @param aabb
