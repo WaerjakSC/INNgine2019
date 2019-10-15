@@ -73,6 +73,16 @@ void Camera::update() {
     mViewMatrix.translate(-mPosition);
 }
 
+gsl::Matrix4x4 Camera::getProjectionMatrix() const
+{
+    return mProjectionMatrix;
+}
+
+gsl::Matrix4x4 Camera::getViewMatrix() const
+{
+    return mViewMatrix;
+}
+
 void Camera::setPosition(const gsl::Vector3D &position) {
     mPosition = position;
 }
@@ -128,4 +138,8 @@ vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
     float y = 1.0f - (2.0f * mouse.y) / height;
     float z = mouse.z;
     return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
+}
+Frustum Camera::getFrustum() {
+    Frustum result;
+    gsl::Matrix4x4 vp = getViewMatrix() * getProjectionMatrix();
 }
