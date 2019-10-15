@@ -11,6 +11,7 @@ class MainWindow;
 #undef far
 
 typedef gsl::Vector3D vec3;
+typedef gsl::Matrix3x3 mat3;
 struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
@@ -348,7 +349,7 @@ typedef struct Frustum {
         plane planes[6];
     };
     inline Frustum() { }
-    Vertex Intersection(plane p1, plane p2, plane p3);
+    vec3 Intersection(plane p1, plane p2, plane p3);
     void GetCorners(const Frustum& f, vec3* outCorners);
 } Frustum;
 #endif // COMPONENT_H

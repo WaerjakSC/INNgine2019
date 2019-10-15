@@ -150,7 +150,32 @@ void Input::wheelEvent(QWheelEvent *event){
 }
 */
 
-Vertex Intersection(plane p1, plane p2, plane p3) {
+vec3 Intersection(plane p1, plane p2, plane p3) {
+    mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
+                p1.normal.y, p2.normal.y, p3.normal.y,
+                p1.normal.z, p2.normal.z, p3.normal.z};
 
+    vec3 A(-p1.distance, -p2.distance, -p3.distance);
 
+    mat3 Dx{A.x, A.y, A.z,
+                p1.normal.y, p2.normal.y, p3.normal.y,
+                p1.normal.z, p2.normal.z, p3.normal.z};
+    mat3 Dy{p1.normal.x, p2.normal.x, p3.normal.x,
+                A.x, A.y, A.z,
+                p1.normal.z, p2.normal.z, p3.normal.z};
+    mat3 Dz{p1.normal.x, p2.normal.x, p3.normal.x,
+                p1.normal.y, p2.normal.y, p3.normal.y,
+                A.x, A.y, A.z};
+
+    float detD = D.determinant();
+
+     if (detD == 0) {
+     return vec3();
+     }
+
+     float detDx = Dx.determinant();
+     float detDy = Dy.determinant();
+     float detDz = Dz.determinant();
+
+     return vec3(detDx / detD, detDy / detD, detDz / detD);
 }
