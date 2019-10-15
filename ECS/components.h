@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 class MainWindow;
 
+// must undefine for Frustum.
 #undef near
 #undef far
 
@@ -21,27 +22,6 @@ struct meshData {
         mName.clear();
     }
 };
-typedef struct Plane{
-    vec3 normal;
-    float distance;
-
-    inline Plane() : normal(1,0,0){}
-    inline Plane(const vec3& n, float d) : normal(n), distance(d){}
-} Plane;
-typedef struct Frustum {
-    union {
-        struct {
-            Plane top;
-            Plane bottom;
-            Plane left;
-            Plane right;
-            Plane near;
-            Plane far;
-        };
-        Plane planes[6];
-    };
-    inline Frustum() { }
-} Frustum;
 struct LightData {
     LightData() {}
     LightData(GLfloat ambientStrength, vec3 ambientColor, GLfloat lightStrength, vec3 lightColor,
@@ -339,5 +319,36 @@ public:
         // constructor with radius and position params
         inline Sphere(const vec3& pos, const float& r): position(pos), radius(r) {}
     } Sphere;
+
+    /**
+      * @brief Plane struct
+      */
+    typedef struct Plane{
+        vec3 normal;
+        float distance;
+
+        inline Plane() : normal(1,0,0){}
+        inline Plane(const vec3& n, float d) : normal(n), distance(d){}
+    } Plane;
 };
+/**
+  * @brief Frustum struct
+  */
+typedef const Collision::Plane &Plane;
+typedef struct Frustum {
+    union {
+        struct {
+            Plane top;
+            Plane bottom;
+            Plane left;
+            Plane right;
+            Plane near;
+            Plane far;
+        };
+        Plane planes[6];
+        Vertex Intersection(Plane p1, Plane p2, Plane p3);
+        void GetCorners(const Frustum& f, vec3* outCorners);
+    };
+    inline Frustum() { }
+} Frustum;
 #endif // COMPONENT_H
