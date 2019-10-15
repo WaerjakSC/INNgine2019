@@ -39,6 +39,8 @@ bool CollisionSystem::SphereOBB(const Collision::Sphere &sphere, const Collision
 {
     // Trenger å finne punkt i OBB nærmest gitt punkt i Sphere
     // lignende funksjon som closest point for AABB
+
+    // Gjør dette senere
 }
 
 /**
@@ -64,10 +66,16 @@ bool CollisionSystem::SphereSphere(const Collision::Sphere &sphere1, const Colli
  * @return
  */
 bool CollisionSystem::AABBPlane(const Collision::AABB &aabb, const Collision::Plane &plane)
-{   // WIP
+{   // WIP - not sure if this works
+    float mHalfExtent = aabb.size.x * fabsf(plane.normal.x) +
+            aabb.size.y * fabsf(plane.normal.y) +
+            aabb.size.z * fabsf(plane.normal.z);
+
     // Distance from center of AABB to plane
     float dotProduct = vec3::dot(plane.normal, aabb.origin);
     float dist = dotProduct - plane.distance;
+
+    return fabsf(dist) <= mHalfExtent;
 
 }
 
