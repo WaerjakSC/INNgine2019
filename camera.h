@@ -32,15 +32,45 @@ public:
 
     void setPitch(float newPitch);
     void setYaw(float newYaw);
-    void goTo(gsl::Vector3D target);    
+    void goTo(gsl::Vector3D target);
 
     vec3 getNormalizedDeviceCoords(const vec3 &viewportPoint, int height, int width);
     vec3 calculateMouseRay(const vec3 &viewportPoint, int height, int width);
 
-    Frustum getFrustum();
-
     gsl::Matrix4x4 getViewMatrix() const;
     gsl::Matrix4x4 getProjectionMatrix() const;
+
+    /**
+      * @brief Frustum struct
+      */
+    typedef Collision::Plane plane;
+    typedef Collision::Sphere sphere;
+    typedef Collision::AABB aABB;
+    typedef Collision::OBB oBB;
+    typedef struct Frustum {
+        union {
+            struct {
+                plane top;
+                plane bottom;
+                plane left;
+                plane right;
+                plane near;
+                plane far;
+            } planeType;
+            plane planes[6];
+        };
+        inline Frustum() { }
+        vec3 Intersection(plane p1, plane p2, plane p3);
+        void GetCorners(const Frustum& f, vec3* outCorners);
+        bool Intersects(const Frustum& f, const sphere& s);
+        float Classify(const aABB& aabb, const plane& plane);
+        float Classify(const oBB& obb, const plane& plane);
+        bool Intersects(const Frustum& f, const aABB& aabb);
+        bool Intersects(const Frustum& f, const oBB& obb);
+
+    } Frustum;
+
+    Frustum getFrustum();
 
 private:
     gsl::Vector3D mForward{0.f, 0.f, -1.f};
