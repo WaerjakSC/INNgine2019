@@ -26,6 +26,7 @@ private:
 
     std::map<ShaderType, Shader *> mShaders;
     std::unique_ptr<RenderView> mView;
+    std::shared_ptr<Pool<Collision>> mColliderPool;
 };
 
 #endif // RENDERSYSTEM_H
