@@ -150,6 +150,7 @@ void Input::wheelEvent(QWheelEvent *event){
 }
 */
 
+// Finds the corners where the planes p1, p2 and p3 intersect.
 vec3 Intersection(plane p1, plane p2, plane p3) {
     mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
                 p1.normal.y, p2.normal.y, p3.normal.y,
@@ -169,13 +170,25 @@ vec3 Intersection(plane p1, plane p2, plane p3) {
 
     float detD = D.determinant();
 
-     if (detD == 0) {
-     return vec3();
-     }
+    if (detD == 0) {
+        return vec3();
+    }
 
-     float detDx = Dx.determinant();
-     float detDy = Dy.determinant();
-     float detDz = Dz.determinant();
+    float detDx = Dx.determinant();
+    float detDy = Dy.determinant();
+    float detDz = Dz.determinant();
 
-     return vec3(detDx / detD, detDy / detD, detDz / detD);
+    return vec3(detDx / detD, detDy / detD, detDz / detD);
+}
+
+// Calls Intersection function 8 times to find all corners in near & far plane of frustum.
+void Frustum::GetCorners(const Frustum &f, vec3 *outCorners) {
+    outCorners[0] = Intersection(f.planeType.near, f.planeType.top, f.planeType.left);
+    outCorners[1] = Intersection(f.planeType.near, f.planeType.top, f.planeType.right);
+    outCorners[2] = Intersection(f.planeType.near, f.planeType.bottom, f.planeType.left);
+    outCorners[3] = Intersection(f.planeType.near, f.planeType.bottom, f.planeType.right);
+    outCorners[4] = Intersection(f.planeType.far, f.planeType.top, f.planeType.left);
+    outCorners[5] = Intersection(f.planeType.far, f.planeType.top, f.planeType.right);
+    outCorners[6] = Intersection(f.planeType.far, f.planeType.bottom, f.planeType.left);
+    outCorners[7] = Intersection(f.planeType.far, f.planeType.bottom, f.planeType.right);
 }
