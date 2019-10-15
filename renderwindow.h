@@ -63,6 +63,7 @@ private slots:
     void changeMsg();
 signals:
     void snapSignal();
+    void rayHitEntity(GLuint eID);
 
 private:
     void init();

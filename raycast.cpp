@@ -5,13 +5,17 @@
 #include <QWindow>
 Raycast::Raycast(RenderWindow *window, Camera *camera) : mOpenGLWindow(window), mCurrentCamera(camera) {
 }
-
-void Raycast::rayCast(const QPoint &mousePos) {
+/**
+ * @brief Raycast::rayCast
+ * @param mousePos
+ * @return For now this returns -1 if it doesn't hit any targets. Make sure to check if it's valid a valid entity before using it
+ */
+int Raycast::rayCast(const QPoint &mousePos) {
     Registry *registry = Registry::instance();
     Ray ray = getRay(mousePos);
     // actual point in world space
     //    vec3 rayPoint = getPointOnRay(ray, 5);
-    QString entityName;
+    int entityID{-1};
     double closestTarget{rayRange};
     for (auto entity : registry->getEntities()) {
         if (entity.second->name() != "Skybox" && entity.second->name() != "XYZ") {
@@ -20,13 +24,12 @@ void Raycast::rayCast(const QPoint &mousePos) {
             if (RayToSphere(ray, trans.mPosition, 1, intersectionPoint)) { // Setting radius to 1 just for testing
                 if (intersectionPoint < closestTarget) {
                     closestTarget = intersectionPoint;
-                    entityName = entity.second->name();
+                    entityID = entity.second->id();
                 }
             }
         }
     }
-    qDebug() << "Hit target: " << entityName;
-    qDebug() << closestTarget;
+    return entityID;
 }
 
 gsl::Vector3D Raycast::getPointOnRay(const Ray &ray, float distance) {

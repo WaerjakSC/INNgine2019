@@ -379,7 +379,10 @@ void RenderWindow::handleInput() {
             save();
         }
     } else if (mInput->LMB) {
-        ray->rayCast(mapFromGlobal(QCursor::pos()));
+        int entityID = ray->rayCast(mapFromGlobal(QCursor::pos()));
+        if (entityID != -1) {
+            emit rayHitEntity(entityID);
+        }
     } else if (mInput->RMB) {
         if (mInput->W)
             mCurrentCamera->setSpeed(-mCameraSpeed);
