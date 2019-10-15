@@ -79,7 +79,7 @@ void MovementSystem::updateTRS(Transform &comp) {
 gsl::Vector3D MovementSystem::getAbsolutePosition(int eID) {
     if (Registry::instance()->hasParent(eID)) {
         GLuint parentID = mTransforms->get(eID).parentID;
-        return getAbsolutePosition(parentID) - getRelativePosition(eID);
+        return getAbsolutePosition(parentID) + getRelativePosition(eID);
     }
     return mTransforms->get(eID).mPosition;
 }
