@@ -33,14 +33,14 @@ struct LightData {
           mSpecularStrength(specularStrength), mSpecularExponent(specularExponent),
           mObjectColor(objectColor) {}
     GLfloat mAmbientStrength{0.3f};
-    gsl::Vector3D mAmbientColor{0.3f, 0.3f, 0.3f};
+    vec3 mAmbientColor{0.3f, 0.3f, 0.3f};
 
     GLfloat mLightStrength{0.7f};
-    gsl::Vector3D mLightColor{0.3f, 0.3f, 0.3f};
+    vec3 mLightColor{0.3f, 0.3f, 0.3f};
 
     GLfloat mSpecularStrength{0.3f};
     GLint mSpecularExponent{4};
-    gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
+    vec3 mObjectColor{1.f, 1.f, 1.f};
 };
 enum class CType {
     None = 0,
@@ -132,9 +132,9 @@ struct Transform : Component {
 
     bool mMatrixOutdated{true};
 
-    gsl::Vector3D mPosition{0};
-    gsl::Vector3D mRotation{0};
-    gsl::Vector3D mScale{1};
+    vec3 mPosition{0};
+    vec3 mRotation{0};
+    vec3 mScale{1};
     gsl::Matrix4x4 modelMatrix, translationMatrix, rotationMatrix, scaleMatrix;
 
     std::vector<GLuint> mChildren;
@@ -145,10 +145,10 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(ShaderType type = Color, GLuint texture = 0, gsl::Vector3D color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
+    Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
-    Material(std::string type, GLuint texture = 0, gsl::Vector3D color = 1) : mObjectColor(color), mTextureUnit(texture) {
+    Material(std::string type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
         mType = CType::Material;
         if (type == "color")
             mShader = Color;
@@ -159,7 +159,7 @@ struct Material : public Component {
     }
     virtual void update() {}
 
-    gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
+    vec3 mObjectColor{1.f, 1.f, 1.f};
     GLuint mTextureUnit{0}; //the actual texture to put into the uniform
     ShaderType mShader;
 };
@@ -300,7 +300,7 @@ public:
         vec3 position;
         vec3 size;
 
-        //<------ Trenger rotasjon her
+        //mat3 orientation;
 
         // default constructor: lager en OBB ved origo
         inline OBB() : size(2,2,2) {}
