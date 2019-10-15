@@ -73,6 +73,16 @@ void Camera::update() {
     mViewMatrix.translate(-mPosition);
 }
 
+gsl::Matrix4x4 Camera::getProjectionMatrix() const
+{
+    return mProjectionMatrix;
+}
+
+gsl::Matrix4x4 Camera::getViewMatrix() const
+{
+    return mViewMatrix;
+}
+
 void Camera::setPosition(const gsl::Vector3D &position) {
     mPosition = position;
 }
@@ -128,4 +138,36 @@ vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
     float y = 1.0f - (2.0f * mouse.y) / height;
     float z = mouse.z;
     return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
+}
+Frustum Camera::getFrustum() {
+    Frustum result;
+    mat4 vp = getViewMatrix() * getProjectionMatrix();
+
+    vec3 col1{vp.getFloat(0), vp.getFloat(1), vp.getFloat(2)};
+    vec3 col2{vp.getFloat(4), vp.getFloat(5), vp.getFloat(6)};
+    vec3 col3{vp.getFloat(8), vp.getFloat(9), vp.getFloat(10)};
+    vec3 col4{vp.getFloat(12), vp.getFloat(13), vp.getFloat(14)};
+
+    result.planeType.left.normal = col4 + col1;
+    result.planeType.right.normal = col4 - col1;
+    result.planeType.bottom.normal = col4 + col2;
+    result.planeType.top.normal = col4 - col2;
+    result.planeType.near.normal = col3;
+    result.planeType.far.normal = col4 + col3;
+
+    result.planeType.left.distance = vp.getFloat(15) + vp.getFloat(3);
+    result.planeType.right.distance = vp.getFloat(15) - vp.getFloat(3);
+    result.planeType.bottom.distance = vp.getFloat(15) + vp.getFloat(7);
+    result.planeType.top.distance = vp.getFloat(15) - vp.getFloat(7);
+    result.planeType.near.distance = vp.getFloat(11);
+    result.planeType.far.distance = vp.getFloat(15) - vp.getFloat(11);
+
+    for (int i = 0; i < 6; i++) {
+     float mag = 1.0f /
+     result.planes[i].normal.length();
+     result.planes[i].normal =
+     result.planes[i].normal*mag;
+     result.planes[i].distance *= mag;
+     }
+     return result;
 }

@@ -17,6 +17,7 @@ class Matrix3x3
 public:
     Matrix3x3(bool isIdentity = false);
     Matrix3x3(std::initializer_list<GLfloat> values);
+    Matrix3x3(Vector3D v1, Vector3D v2, Vector3D v3);
 
     Matrix3x3 identity();
     void setToIdentity();

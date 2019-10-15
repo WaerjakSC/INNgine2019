@@ -6,7 +6,12 @@
 #include <QKeyEvent>
 class MainWindow;
 
+// must undefine for Frustum.
+#undef near
+#undef far
+
 typedef gsl::Vector3D vec3;
+typedef gsl::Matrix3x3 mat3;
 struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
@@ -253,5 +258,110 @@ struct Sound : public Component {
 public:
     Sound() {}
     virtual void update() {}
+
+
+    bool mLooping{false};
+    bool mPlay{false};
+    bool mPlaying{false};
 };
+
+enum ColType{
+    AABB,
+    OBB,
+    Sphere,
+    Capsule
+};
+/**
+ * @brief The Collision component class holds the collider types and bounds
+ */
+struct Collision : public Component {
+public:
+    Collision(ColType type, vec3 size) : colType(type) {}
+    virtual void update(){}
+    ColType colType;
+    bool mTrigger{false};
+
+    /**
+      * @brief Axis Aligned Bounding Box
+      */
+    typedef struct AABB{
+        vec3 origin;
+        vec3 size;  // Half size
+
+        inline AABB() : size(2,2,2){}
+        inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
+    } AABB;
+
+
+    /**
+      * @brief Oriented Bounding Box
+      */
+    typedef struct OBB{
+        vec3 position;
+        vec3 size;
+
+        //<------ Trenger rotasjon her
+
+        // default constructor: lager en OBB ved origo
+        inline OBB() : size(2,2,2) {}
+        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
+        inline OBB(const vec3& p, const vec3& s) {}
+        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
+        //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
+    } OBB;
+
+    /**
+      * @brief Sphere struct
+      */
+    typedef struct Sphere{
+        vec3 position;
+        float radius;
+
+        // default constructor
+        inline Sphere(): radius(3.0f) {};
+        // constructor with radius and position params
+        inline Sphere(const vec3& pos, const float& r): position(pos), radius(r) {}
+    } Sphere;
+
+    /**
+      * @brief Plane struct
+      */
+    typedef struct Plane{
+        vec3 normal;
+        float distance;
+
+        inline Plane() : normal(1,0,0){}
+        inline Plane(const vec3& n, float d) : normal(n), distance(d){}
+    } Plane;
+};
+/**
+  * @brief Frustum struct
+  */
+// have to define these outside Collision, so we can use them for frustum & frustum culling. (might be a better way to do this?)
+typedef Collision::Plane plane;
+typedef Collision::Sphere sphere;
+typedef Collision::AABB aABB;
+typedef Collision::OBB oBB;
+typedef struct Frustum {
+    union {
+        struct {
+            plane top;
+            plane bottom;
+            plane left;
+            plane right;
+            plane near;
+            plane far;
+        } planeType;
+        plane planes[6];
+    };
+    inline Frustum() { }
+    vec3 Intersection(plane p1, plane p2, plane p3);
+    void GetCorners(const Frustum& f, vec3* outCorners);
+    bool Intersects(const Frustum& f, const sphere& s);
+    float Classify(const aABB& aabb, const plane& plane);
+    float Classify(const oBB& obb, const plane& plane);
+    bool Intersects(const Frustum& f, const aABB& aabb);
+    bool Intersects(const Frustum& f, const oBB& obb);
+
+} Frustum;
 #endif // COMPONENT_H
