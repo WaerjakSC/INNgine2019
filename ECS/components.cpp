@@ -221,22 +221,43 @@ float Frustum::Classify(const aABB &aabb, const plane &plane) {
     return d - r;
 }
 
-float Frustum::Classify(const oBB &obb, const plane &plane) {
-    vec3 normal = MultiplyVector(plane.normal, obb.orientation);
+/**
+  * @brief Uncomment when Orientation is added to OBB struct.
+  */
+//float Frustum::Classify(const oBB &obb, const plane &plane) {
+//    vec3 normal = MultiplyVector(plane.normal, obb.orientation);
 
-    // maximum extent in direction of plane normal
-    float r = fabsf(obb.size.x * normal.x)
-            + fabsf(obb.size.y * normal.y)
-            + fabsf(obb.size.z * normal.z);
-    // signed distance between box center and plane
-    float d = plane.normal.dot(plane.normal, obb.position)
-            + plane.distance;
-    // return signed distance
-    if (fabsf(d) < r) {
-        return 0.0f;
+//    // maximum extent in direction of plane normal
+//    float r = fabsf(obb.size.x * normal.x)
+//            + fabsf(obb.size.y * normal.y)
+//            + fabsf(obb.size.z * normal.z);
+//    // signed distance between box center and plane
+//    float d = plane.normal.dot(plane.normal, obb.position)
+//            + plane.distance;
+//    // return signed distance
+//    if (fabsf(d) < r) {
+//        return 0.0f;
+//    }
+//    else if (d < 0.0f) {
+//        return d + r;
+//    }
+//    return d - r;
+//}
+
+bool Frustum::Intersects(const Frustum &f, const aABB &aabb) {
+    for (int i = 0; i < 6; ++i) {
+        if (Classify(aabb, f.planes[i]) < 0) {
+            return false;
+        }
     }
-    else if (d < 0.0f) {
-        return d + r;
-    }
-    return d - r;
+    return true;
 }
+
+//bool Frustum::Intersects(const Frustum &f, const oBB &obb) {
+//    for (int i = 0; i < 6; ++i) {
+//        if (Classify(obb, f.planes[i]) < 0) {
+//            return false;
+//        }
+//    }
+//    return true;
+//}
