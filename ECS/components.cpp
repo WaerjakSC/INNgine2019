@@ -149,3 +149,8 @@ void Input::wheelEvent(QWheelEvent *event){
     event->accept();
 }
 */
+
+Vertex Intersection(Plane p1, Plane p2, Plane p3) {
+
+
+}

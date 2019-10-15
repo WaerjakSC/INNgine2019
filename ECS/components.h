@@ -334,21 +334,21 @@ public:
 /**
   * @brief Frustum struct
   */
-typedef const Collision::Plane &Plane;
+typedef Collision::Plane plane;
 typedef struct Frustum {
     union {
         struct {
-            Plane top;
-            Plane bottom;
-            Plane left;
-            Plane right;
-            Plane near;
-            Plane far;
+            plane top;
+            plane bottom;
+            plane left;
+            plane right;
+            plane near;
+            plane far;
         };
-        Plane planes[6];
-        Vertex Intersection(Plane p1, Plane p2, Plane p3);
-        void GetCorners(const Frustum& f, vec3* outCorners);
+        plane planes[6];
     };
     inline Frustum() { }
+    Vertex Intersection(plane p1, plane p2, plane p3);
+    void GetCorners(const Frustum& f, vec3* outCorners);
 } Frustum;
 #endif // COMPONENT_H
