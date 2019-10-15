@@ -192,3 +192,15 @@ void Frustum::GetCorners(const Frustum &f, vec3 *outCorners) {
     outCorners[6] = Intersection(f.planeType.far, f.planeType.bottom, f.planeType.left);
     outCorners[7] = Intersection(f.planeType.far, f.planeType.bottom, f.planeType.right);
 }
+
+bool Frustum::Intersects(const Frustum &f, const sphere &s) {
+    for (int i = 0; i < 6; i++) {
+        vec3 normal = f.planes[i].normal;
+        float dist = f.planes[i].distance;
+        float side = s.position.dot(s.position, normal) + dist;
+        if (side < -s.radius) {
+            return false;
+        }
+    }
+    return true;
+}

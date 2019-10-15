@@ -336,6 +336,7 @@ public:
   * @brief Frustum struct
   */
 typedef Collision::Plane plane;
+typedef Collision::Sphere sphere;
 typedef struct Frustum {
     union {
         struct {
@@ -351,5 +352,7 @@ typedef struct Frustum {
     inline Frustum() { }
     vec3 Intersection(plane p1, plane p2, plane p3);
     void GetCorners(const Frustum& f, vec3* outCorners);
+    bool Intersects(const Frustum& f, const sphere& s);
+
 } Frustum;
 #endif // COMPONENT_H
