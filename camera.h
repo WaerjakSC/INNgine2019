@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "innpch.h"
+#include "components.h"
 typedef gsl::Vector3D vec3;
 typedef gsl::Vector4D vec4;
 class Camera {
@@ -30,10 +31,12 @@ public:
 
     void setPitch(float newPitch);
     void setYaw(float newYaw);
-    void goTo(gsl::Vector3D target);
+    void goTo(gsl::Vector3D target);    
 
     vec3 getNormalizedDeviceCoords(const vec3 &viewportPoint, int height, int width);
     vec3 calculateMouseRay(const vec3 &viewportPoint, int height, int width);
+
+    Frustum getFrustum();
 
 private:
     gsl::Vector3D mForward{0.f, 0.f, -1.f};

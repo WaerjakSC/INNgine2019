@@ -151,7 +151,7 @@ void Input::wheelEvent(QWheelEvent *event){
 */
 
 // Finds the corners where the planes p1, p2 and p3 intersect.
-vec3 Intersection(plane p1, plane p2, plane p3) {
+vec3 Frustum::Intersection(plane p1, plane p2, plane p3) {
     mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
                 p1.normal.y, p2.normal.y, p3.normal.y,
                 p1.normal.z, p2.normal.z, p3.normal.z};
