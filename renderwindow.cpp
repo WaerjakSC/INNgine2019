@@ -142,8 +142,8 @@ void RenderWindow::init() {
     mMoveSys->init();
 
     mStereoSound = mSoundManager->createSource(
-        "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-        "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
+                "Explosion", Vector3(0.0f, 0.0f, 0.0f),
+                "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
 }
 
 ///Called each frame - doing the rendering
@@ -412,6 +412,21 @@ void RenderWindow::handleInput() {
             mMoveSys->moveY(mLight, -mCameraSpeed);
     }
 }
+
+//std::vector<GLuint> RenderWindow::Cull(const Camera::Frustum &f) {
+//    std::vector<GLuint> result;
+
+//    for(auto entity : Registry::instance()->getEntities())
+//    GLuint entityID = entity.first;
+
+//    for (int i = 0; i < objects.size(); i++) {
+//        oBB bounds = GetOBB(*(objects[i]));
+//        if (Intersects(f, bounds)) {
+//            result.push_back(objects[i]);
+//        }
+//    }
+//    return result;
+//}
 
 void RenderWindow::mousePressEvent(QMouseEvent *event) {
     mInput->mousePressEvent(event);

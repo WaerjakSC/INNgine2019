@@ -244,9 +244,6 @@ float Camera::Frustum::Classify(const aABB &aabb, const plane &plane) {
     return d - r;
 }
 
-/**
-  * @brief Uncomment when Orientation is added to OBB struct.
-  */
 //float Camera::Frustum::Classify(const oBB &obb, const plane &plane) {
 //    vec3 normal = MultiplyVector(plane.normal, obb.orientation);
 
