@@ -114,6 +114,9 @@ public:
     GLuint makeEntity(std::string name = "");
     std::map<GLuint, Entity *> getEntities() const { return mEntities; }
     Entity *getEntity(GLuint eID);
+    Entity *getEntity(const QString &name);
+    bool isUniqueName(const QString &name);
+
     void removeEntity(GLuint eID);
     GLuint numEntities() { return mEntities.size(); }
 
@@ -136,7 +139,8 @@ public:
      * @param eID
      * @param parentID
      */
-    void setParent(GLuint eID, int parentID);
+    void setParent(GLuint eID, int parentID, bool fromEditor = false);
+    Transform &getParent(GLuint eID);
     std::vector<GLuint> getChildren(GLuint eID);
 
 signals:

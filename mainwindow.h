@@ -10,6 +10,7 @@
 class QWidget;
 class RenderWindow;
 class Entity;
+class QStandardItem;
 class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
@@ -108,8 +109,9 @@ private:
     RenderWindow *mRenderWindow;
     QColor rgb;
     QLabel *colorLabel, *texFileLabel, *objFileLabel;
+    quint32 unnamedEntityCount{0};
 
-    void forEach(GLuint parentID, Entity *child, QModelIndex parent = QModelIndex());
+    void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void setupComponentList();
     void setupTransformSettings(const Transform &component);

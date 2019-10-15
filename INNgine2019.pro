@@ -86,7 +86,6 @@ HEADERS += \
     ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
     ECS/Systems/movementsystem.h \
-    ECS/Systems/collisionsystem.h \
     ECS/Views/renderview.h \
 #
     Resources/soundmanager.h \
@@ -132,7 +131,6 @@ SOURCES += main.cpp \
     ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
     ECS/Systems/movementsystem.cpp \
-    ECS/Systems/collisionsystem.cpp \
     ECS/Views/renderview.cpp \
 #
     Resources/soundmanager.cpp \

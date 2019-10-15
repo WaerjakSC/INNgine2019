@@ -82,14 +82,20 @@ GLuint Registry::makeEntity(std::string name) {
  * @param eID
  * @param parentID
  */
-void Registry::setParent(GLuint childID, int newParentID) {
+void Registry::setParent(GLuint childID, int newParentID, bool fromEditor) {
     Transform &trans = getComponent<Transform>(childID);
     if (hasParent(childID)) // Make sure to remove the child from its old parent if it had one
         removeChild(trans.parentID, childID);
     trans.parentID = newParentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
     if (newParentID != -1)
         addChild(newParentID, childID);
-    emit parentChanged(childID);
+    if (!fromEditor)
+        emit parentChanged(childID);
+}
+
+Transform &Registry::getParent(GLuint eID) {
+    GLuint parentID = getComponent<Transform>(eID).parentID;
+    return getComponent<Transform>(parentID);
 }
 bool Registry::hasParent(GLuint eID) {
     return getComponent<Transform>(eID).parentID != -1;
@@ -98,13 +104,16 @@ std::vector<GLuint> Registry::getChildren(GLuint eID) {
     return getComponent<Transform>(eID).mChildren;
 }
 
-void Registry::addChild(const GLuint eID, const GLuint childID) {
-    getComponent<Transform>(eID).mChildren.emplace_back(childID);
+void Registry::addChild(const GLuint parentID, const GLuint childID) {
+    auto &parent = getComponent<Transform>(parentID);
+    parent.mChildren.emplace_back(childID);
+    getComponent<Transform>(childID).mMatrixOutdated = true;
 }
 void Registry::removeChild(const GLuint eID, const GLuint childID) {
     std::vector<GLuint> &children = getComponent<Transform>(eID).mChildren;
     for (auto &child : children) {
         if (child == childID) {
+            getComponent<Transform>(childID).mMatrixOutdated = true;
             std::swap(child, children.back());
             children.pop_back();
         }
@@ -117,21 +126,33 @@ void Registry::updateChildParent() {
     for (auto entity : getEntities()) // For every gameobject
     {
         if ((entity.second->types() & CType::Transform) != CType::None) {
-            Transform comp = getComponent<Transform>(entity.second->id());
+            Transform &comp = getComponent<Transform>(entity.second->id());
             if (comp.parentID != -1) {                         // If this entity has a parent then,
                 setParent(entity.second->id(), comp.parentID); // add this entity's ID to the parent's list of children.
             }
         }
     }
 }
-
+Entity *Registry::getEntity(const QString &name) {
+    for (auto entity : mEntities) {
+        if (entity.second->name() == name)
+            return entity.second;
+    }
+    return nullptr;
+}
+bool Registry::isUniqueName(const QString &name) {
+    for (auto entity : mEntities)
+        if (entity.second->name() == name)
+            return false;
+    return true;
+}
 void Registry::makeSnapshot() {
     std::map<GLuint, Entity *> newEntityMap;
     for (auto entity : mEntities) {
         if (BillBoard *board = dynamic_cast<BillBoard *>(entity.second)) {
             newEntityMap[entity.first] = board;
         } else {
-            Entity *entt = entity.second->cloneEntity();
+            Entity *entt = entity.second;
             newEntityMap[entity.first] = entt;
         }
     }
@@ -153,4 +174,5 @@ void Registry::loadSnapshot() {
     for (auto &transform : getComponentArray<Transform>()->data()) {
         transform.mMatrixOutdated = true;
     }
+    // To-do: Make scene view load back to its pre-parented state if something is parented during play
 }

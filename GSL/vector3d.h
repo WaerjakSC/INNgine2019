@@ -27,6 +27,7 @@ public:
     Vector3D operator^(const Vector3D &rhs) const;  // v x v  - cross product
     bool operator==(const Vector3D &compared) const;
     bool operator!=(const Vector3D &compared) const;
+    GLfloat &at(GLint index);
 
     //Functions
     GLfloat length() const;

@@ -182,7 +182,7 @@ void RenderWindow::render() {
     mContext->swapBuffers(this);
 }
 void RenderWindow::snapToObject(int eID) {
-    mCurrentCamera->goTo(mMoveSys->getPosition(eID));
+    mCurrentCamera->goTo(mMoveSys->getAbsolutePosition(eID));
 }
 
 RenderSystem *RenderWindow::renderer() const {
@@ -349,6 +349,7 @@ void RenderWindow::stop() {
         mRegistry->loadSnapshot();
         mMoveSys->init();
         mIsPlaying = false;
+        mMainWindow->insertEntities();
         mMainWindow->play->setEnabled(true);
         mMainWindow->pause->setEnabled(false);
         mMainWindow->stop->setEnabled(false);

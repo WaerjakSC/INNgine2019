@@ -175,6 +175,49 @@ bool Matrix4x4::inverse() {
     return true;
 }
 
+std::tuple<vec3, vec3, vec3> Matrix4x4::decomposed(const Matrix4x4 &matrix) {
+    Matrix4x4 transform = matrix;
+    vec3 position, scale, rotation;
+    position.x = transform.matrix[3];
+    position.y = transform.matrix[7];
+    position.z = transform.matrix[11];
+    // Zero out the fourth column in preparation for rotation matrix
+    transform.matrix[3] = 0.f;
+    transform.matrix[7] = 0.f;
+    transform.matrix[11] = 0.f;
+
+    // Scale
+    // Set up the first three columns of the transformation matrix into vectors
+    vec3 scaleX = vec3(transform.matrix[0], transform.matrix[4], transform.matrix[8]);  // 0 - 4 - 8
+    vec3 scaleY = vec3(transform.matrix[1], transform.matrix[5], transform.matrix[9]);  // 1 - 5 - 9
+    vec3 scaleZ = vec3(transform.matrix[2], transform.matrix[6], transform.matrix[10]); // 2 - 6 - 10
+
+    // The absolute scale of the object is calculated by the length of each column vector.
+    scale.x = scaleX.length();
+    scale.y = scaleY.length();
+    scale.z = scaleZ.length();
+
+    transform.matrix[0] = transform.matrix[0] / scale.x;
+    transform.matrix[4] = transform.matrix[4] / scale.x;
+    transform.matrix[8] = transform.matrix[8] / scale.x;
+
+    transform.matrix[1] = transform.matrix[1] / scale.y;
+    transform.matrix[5] = transform.matrix[5] / scale.y;
+    transform.matrix[9] = transform.matrix[9] / scale.y;
+
+    transform.matrix[2] = transform.matrix[2] / scale.z;
+    transform.matrix[6] = transform.matrix[6] / scale.z;
+    transform.matrix[10] = transform.matrix[10] / scale.z;
+
+    rotation.x = -gsl::rad2deg(std::atan2(transform.matrix[6], transform.matrix[10]));
+    rotation.y = -gsl::rad2deg(std::atan2(-transform.matrix[2],
+                                          std::sqrt(
+                                              std::pow(transform.matrix[6], 2) +
+                                              std::pow(transform.matrix[10], 2))));
+    rotation.z = -gsl::rad2deg(std::atan2(transform.matrix[1], transform.matrix[0]));
+    return std::tuple<vec3, vec3, vec3>(position, scale, rotation);
+}
+
 void Matrix4x4::translateX(GLfloat x) {
     translate(x, 0.f, 0.f);
 }

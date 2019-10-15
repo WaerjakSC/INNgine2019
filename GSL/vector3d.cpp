@@ -64,6 +64,22 @@ bool Vector3D::operator==(const Vector3D &compared) const {
 bool Vector3D::operator!=(const Vector3D &compared) const {
     return x != compared.x || y != compared.y || z != compared.z;
 }
+
+GLfloat &Vector3D::at(GLint index) {
+    switch (index) {
+    case 0:
+        return x;
+        break;
+    case 1:
+        return y;
+        break;
+    case 2:
+        return z;
+        break;
+    }
+    std::out_of_range("No value at given index");
+    return x;
+}
 GLfloat Vector3D::length() const {
     return std::sqrt(std::pow(x, 2.f) + std::pow(y, 2.f) + std::pow(z, 2.f));
 }

@@ -468,26 +468,26 @@ void MainWindow::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
             case 1:
-                if (component.parentID != -1)
-                    val->setValue(component.mRelativePosition.x);
-                else
-                    val->setValue(component.mPosition.x);
+                //                if (component.parentID != -1)
+                //                    val->setValue(component.mRelativePosition.x);
+                //                else
+                val->setValue(component.mPosition.x);
                 connect(this, &MainWindow::posX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
                 break;
             case 3:
-                if (component.parentID != -1)
-                    val->setValue(component.mRelativePosition.y);
-                else
-                    val->setValue(component.mPosition.y);
+                //                if (component.parentID != -1)
+                //                    val->setValue(component.mRelativePosition.y);
+                //                else
+                val->setValue(component.mPosition.y);
                 connect(this, &MainWindow::posY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
                 break;
             case 5:
-                if (component.parentID != -1)
-                    val->setValue(component.mRelativePosition.z);
-                else
-                    val->setValue(component.mPosition.z);
+                //                if (component.parentID != -1)
+                //                    val->setValue(component.mRelativePosition.z);
+                //                else
+                val->setValue(component.mPosition.z);
                 connect(this, &MainWindow::posZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
                 break;
@@ -631,42 +631,48 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     QString data = hierarchy->data(newParent).toString();
-    Entity *item = static_cast<Entity *>(hierarchy->itemFromIndex(newParent));
     Registry *registry = Registry::instance();
     if (data != "") {
-        Entity *entity = static_cast<Entity *>(item);
-        // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
-        // Really not sure about this whole "Transform component governs parent/child relationship thing"
-        if (registry->contains(entity->id(), CType::Transform)) {
-            int parentID = entity->id();
-            // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-            registry->setParent(selectedEntity->id(), parentID);
-            mRenderWindow->movement()->iterateChildren(parentID);
-            qDebug() << "New Parent Name: " + registry->getEntity(entity->id())->name() + ". ID: " + QString::number(parentID);
+        Entity *entt = registry->getEntity(data);
+        if (entt) {
+            // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
+            // Really not sure about this whole "Transform component governs parent/child relationship thing"
+            if (registry->contains(entt->id(), CType::Transform)) {
+                int parentID = entt->id();
+                // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
+                registry->setParent(selectedEntity->id(), parentID, true);
+                mRenderWindow->movement()->updateEntity(selectedEntity->id());
+            }
         }
+    } else if (registry->contains(selectedEntity->id(), CType::Transform)) {
+        registry->setParent(selectedEntity->id(), -1, true);
+        mRenderWindow->movement()->updateEntity(selectedEntity->id());
     }
 }
 void MainWindow::parentChanged(GLuint eID) {
     disconnect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     QStandardItem *rootItem = hierarchy->invisibleRootItem();
-    Entity *item = hierarchy->itemFromEntityID(eID);
+    QStandardItem *item = hierarchy->itemFromEntityID(eID);
     if (item) {
         hierarchy->removeRow(item->row());
-        item = Registry::instance()->getEntity(eID)->cloneEntity();
-
-        int parentID = Registry::instance()->getComponent<Transform>(item->id()).parentID;
+        Entity *entt = Registry::instance()->getEntity(eID);
+        item = new QStandardItem;
+        item->setText(entt->name());
+        int parentID = Registry::instance()->getComponent<Transform>(entt->id()).parentID;
         if (Registry::instance()->hasParent(eID)) {
-            Entity *parent = hierarchy->itemFromEntityID(parentID);
+            QStandardItem *parent = hierarchy->itemFromEntityID(parentID);
             parent->insertRow(parent->rowCount(), item);
         } else
             rootItem->appendRow(item);
+        mRenderWindow->movement()->updateEntity(eID);
     }
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
 }
 void MainWindow::onEntityClicked(const QModelIndex &index) {
-    Entity *entt = static_cast<Entity *>(hierarchy->itemFromIndex(index));
-    GLuint id = entt->id();
-    onEntityDragged(id);
+    Registry *reg = Registry::instance();
+    QStandardItem *item = hierarchy->itemFromIndex(index);
+    Entity *entt = reg->getEntity(item->text());
+    onEntityDragged(entt->id());
     setupComponentList();
 }
 /**
@@ -682,17 +688,19 @@ void MainWindow::onEntityDragged(GLuint id) {
         if (Registry::instance()->hasParent(id)) {
             location = mRenderWindow->movement()->getRelativePosition(id);
         } else
-            location = mRenderWindow->movement()->getPosition(id);
+            location = mRenderWindow->movement()->getAbsolutePosition(id);
         //        qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
     }
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
-    if (selectedEntity)
+    QString newName = hierarchy->data(index).toString();
+    if (selectedEntity && Registry::instance()->isUniqueName(newName))
         selectedEntity->setName(hierarchy->data(index).toString());
 }
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
-    QStandardItem *item = Registry::instance()->getEntity(eID)->cloneEntity();
+    QStandardItem *item = new QStandardItem;
+    item->setText(Registry::instance()->getEntity(eID)->name());
     parentItem->appendRow(item);
 }
 
@@ -704,11 +712,11 @@ void MainWindow::insertEntities() {
     hierarchy->clear();
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     for (auto entity : Registry::instance()->getEntities()) {
-        Entity *item{nullptr};
+        QStandardItem *item = new QStandardItem;
         if (entity.second->name() == "")
-            item = new Entity(entity.second->id(), QString("GameObject"));
+            item->setText(QString("GameObject" + QString::number(unnamedEntityCount)));
         else
-            item = new Entity(entity.second->id(), entity.second->name());
+            item->setText(entity.second->name());
         int parentID = Registry::instance()->getComponent<Transform>(entity.second->id()).parentID;
         if (parentID != -1) {
             forEach(parentID, item);
@@ -724,11 +732,13 @@ void MainWindow::insertEntities() {
  * @param child
  * @param parent
  */
-void MainWindow::forEach(GLuint parentID, Entity *child, QModelIndex parent) {
+void MainWindow::forEach(GLuint parentID, QStandardItem *child, QModelIndex parent) {
     for (int r = 0; r < hierarchy->rowCount(parent); ++r) {
         QModelIndex index = hierarchy->index(r, 0, parent);
-        Entity *item = static_cast<Entity *>(hierarchy->itemFromIndex(index));
-        if (parentID == item->id()) { // If in-value parentID matches the ID of the current item, append the new child to that item.
+        QStandardItem *item = hierarchy->itemFromIndex(index);
+        Entity *entt = Registry::instance()->getEntity(item->text());
+        item->setText(entt->name());
+        if (parentID == entt->id()) { // If in-value parentID matches the ID of the current item, append the new child to that item.
             item->appendRow(child);
             break;
         }

@@ -1,5 +1,6 @@
 #include "components.h"
 #include "mainwindow.h"
+#include "registry.h"
 
 Component::~Component() {
 }

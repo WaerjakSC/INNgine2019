@@ -5,26 +5,23 @@
 #include "matrix4x4.h"
 #include <QStandardItem>
 
-class Entity : public QStandardItem {
+class Entity {
 public:
     Entity(GLuint ID, const QString &text = "");
-    Entity();
     virtual ~Entity();
     GLuint id() const { return eID; }
-    QString name() { return text(); }
-    void setName(const QString &name) { setText(name); }
+    QString name() const { return mName; }
+    void setName(const QString &name) { mName = name; }
     CType &types() { return mTypes; }
     CType getTypes() const { return mTypes; }
-    void setEntityData(const Entity &value, int role = Qt::UserRole + 1);
-    Entity *cloneEntity() const;
+    void setEntityData(const Entity &value);
     bool operator==(const Entity &other) {
         return eID == other.eID;
     }
 
 private:
     GLuint eID;
-
+    QString mName;
     CType mTypes{CType::None};
 };
-
 #endif // ENTITY_H

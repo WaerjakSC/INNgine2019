@@ -5,6 +5,7 @@
 #include <QObject>
 #include <memory>
 class Registry;
+class Transform;
 class MovementSystem : public QObject {
     Q_OBJECT
 public:
@@ -12,28 +13,15 @@ public:
 
     void update();
     void init();
-    /**
-     * @brief Check if Transform component (or rather its entity) has a parent object
-     * @param eID
-     * @return
-     */
-    bool hasParent(int eID);
-    /**
-     * @brief Remove the entity's old parent (if it had one) and set it to the given parentID. If parentID == -1, simply removes the parent.
-     * @param eID
-     * @param parentID
-     */
-    void setParent(int eID, int parentID);
-    gsl::Matrix4x4 multiplyByParent(GLuint eID, GLuint pID);
 
-    void updateMatrix(GLuint eID, Transform &comp);
+    void updateTRS(Transform &comp);
     void updateEntity(GLuint eID);
 
-    void iterateChildren(int eID);
-
-    gsl::Vector3D getPosition(int eID);
+    gsl::Vector3D getAbsolutePosition(int eID);
     gsl::Vector3D getRelativePosition(int eID);
     // ******** Position Setters ******** //
+    void setAbsolutePosition(GLuint eID, gsl::Vector3D position, bool signal = true);
+
     void setPosition(GLuint eID, gsl::Vector3D position, bool signal = true);
     void setPosition(int eID, float xIn, float yIn, float zIn, bool signal = true);
 
@@ -45,7 +33,7 @@ public:
     void moveY(int eID, float yIn);
     void moveZ(int eID, float zIn);
     // ******** Rotation Setters ******** //
-    void setRotation(GLuint eID, gsl::Vector3D rotation, bool signal = false);
+    void setRotation(GLuint eID, gsl::Vector3D rotation, bool signal = true);
 
     void setRotationX(int eID, float xIn, bool signal = true);
     void setRotationY(int eID, float yIn, bool signal = true);
@@ -73,8 +61,10 @@ signals:
 private:
     std::shared_ptr<Pool<Transform>> mTransforms;
     Registry *registry;
-    void setPositionPrivate(GLuint eID, vec3 position);
+    void setPositionPrivate(GLuint eID, gsl::Vector3D position);
     void setRotationPrivate(GLuint eID, gsl::Vector3D rotation);
+    void updateModelMatrix(Transform &comp);
+    gsl::Matrix4x4 getTRMatrix(Transform &comp);
 };
 
 #endif // MOVEMENTSYSTEM_H

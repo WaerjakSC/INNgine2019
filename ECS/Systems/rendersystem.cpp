@@ -20,7 +20,7 @@ void RenderSystem::iterateEntities() {
 
         initializeOpenGLFunctions();
         glUseProgram(mShaders[type]->getProgram());
-        mShaders[type]->transmitUniformData(&transform.mMatrix, &material);
+        mShaders[type]->transmitUniformData(transform.modelMatrix, &material);
         glBindVertexArray(mesh.mVAO);
         if (mesh.mIndiceCount > 0)
             glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);

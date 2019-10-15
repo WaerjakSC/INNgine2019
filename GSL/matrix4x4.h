@@ -6,7 +6,7 @@
 #include "vector4d.h"
 #include <iomanip>
 #include <iostream>
-
+typedef gsl::Vector3D vec3;
 namespace gsl {
 class Matrix2x2;
 class Matrix3x3;
@@ -20,6 +20,7 @@ public:
     void setToIdentity();
 
     bool inverse();
+    static std::tuple<vec3, vec3, vec3> decomposed(const Matrix4x4 &matrix);
 
     void translateX(GLfloat x = 0.f);
     void translateY(GLfloat y = 0.f);

@@ -12,7 +12,7 @@ void LightSystem::update() {
     GLuint curEntity{0}; // Get the actual ID.
     for (auto entityID : mLightPool->entities()) {
         // Send the entity's model matrix as well as the light data.
-        mPhong->updateLightUniforms(&mTransforms->get(entityID).mMatrix, mLightPool->data()[curEntity].mLight);
+        mPhong->updateLightUniforms(mTransforms->get(entityID).modelMatrix, mLightPool->data()[curEntity].mLight);
         curEntity++;
     }
 }

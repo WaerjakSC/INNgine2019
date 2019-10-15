@@ -17,19 +17,21 @@ void BillBoard::update() {
         gsl::Vector3D camPosition = factory->getShader(mat.mShader)->getCurrentCamera()->position();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
-            camPosition.setY(transform.mMatrix.getPosition().y);
-        direction = camPosition - gsl::Vector3D(transform.mMatrix.getPosition());
+            camPosition.setY(transform.modelMatrix.getPosition().y);
+        direction = camPosition - gsl::Vector3D(transform.modelMatrix.getPosition());
     } else {
         gsl::Vector3D camDirection = factory->getShader(mat.mShader)->getCurrentCamera()->forward();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
-            camDirection.setY(transform.mMatrix.getPosition().y);
+            camDirection.setY(transform.modelMatrix.getPosition().y);
         direction = camDirection * -1;
     }
 
     direction.normalize();
     //set rotation to this direction
-    transform.mMatrix.setRotationToVector(direction);
+    transform.rotationMatrix.setRotationToVector(direction);
+    transform.mRotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
+    transform.mMatrixOutdated = true;
 }
 
 //gsl::Vector3D BillBoard::getNormal(gsl::Matrix4x4 mMatrix) {
