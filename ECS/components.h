@@ -18,6 +18,20 @@ struct meshData {
         mName.clear();
     }
 };
+typedef struct Frustum {
+ union {
+ struct {
+ Plane top;
+ Plane bottom;
+ Plane left;
+ Plane right;
+ Plane near;
+ Plane far;
+ };
+ Plane planes[6];
+ };
+ inline Frustum() { }
+} Frustum;
 struct LightData {
     LightData() {}
     LightData(GLfloat ambientStrength, vec3 ambientColor, GLfloat lightStrength, vec3 lightColor,
