@@ -150,7 +150,7 @@ void Input::wheelEvent(QWheelEvent *event){
 }
 */
 
-Vertex Intersection(Plane p1, Plane p2, Plane p3) {
+Vertex Intersection(plane p1, plane p2, plane p3) {
 
 
 }

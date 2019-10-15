@@ -344,7 +344,7 @@ typedef struct Frustum {
             plane right;
             plane near;
             plane far;
-        };
+        } planeType;
         plane planes[6];
     };
     inline Frustum() { }
