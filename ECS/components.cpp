@@ -204,3 +204,18 @@ bool Frustum::Intersects(const Frustum &f, const sphere &s) {
     }
     return true;
 }
+
+float Frustum::Classify(const aABB &aabb, const plane &plane) {
+    float r = fabsf(aabb.size.x * plane.normal.x)
+            + fabsf(aabb.size.y * plane.normal.y)
+            + fabsf(aabb.size.z * plane.normal.z);
+
+    float d = plane.normal.dot(plane.normal, aabb.position) + plane.distance;
+    if (fabsf(d) < r) {
+        return 0.0f;
+    }
+    else if (d < 0.0f) {
+        return d + r;
+    }
+    return d - r;
+}

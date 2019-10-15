@@ -284,6 +284,7 @@ public:
       */
     typedef struct AABB{
         vec3 origin;
+        vec3 position;
         vec3 size;  // Half size
 
         inline AABB() : size(2,2,2){}
@@ -335,8 +336,11 @@ public:
 /**
   * @brief Frustum struct
   */
+// have to define these outside Collision, so we can use them for frustum & frustum culling. (might be a better way to do this?)
 typedef Collision::Plane plane;
 typedef Collision::Sphere sphere;
+typedef Collision::AABB aABB;
+typedef Collision::OBB oBB;
 typedef struct Frustum {
     union {
         struct {
@@ -353,6 +357,10 @@ typedef struct Frustum {
     vec3 Intersection(plane p1, plane p2, plane p3);
     void GetCorners(const Frustum& f, vec3* outCorners);
     bool Intersects(const Frustum& f, const sphere& s);
+    float Classify(const aABB& aabb, const plane& plane);
+    float Classify(const oBB& obb, const plane& plane);
+    bool Intersects(const Frustum& f, const aABB& aabb);
+    bool Intersects(const Frustum& f, const oBB& obb);
 
 } Frustum;
 #endif // COMPONENT_H
