@@ -20,7 +20,6 @@ public:
     // todo
     bool SphereOBB(const Collision::Sphere& sphere, const Collision::OBB& obb);
     bool SphereSphere(const Collision::Sphere& sphere1, const Collision::Sphere& sphere2);
-
     bool AABBPlane(const Collision::AABB& aabb, const Collision::Plane& plane);
 
     // Could this be useful later?

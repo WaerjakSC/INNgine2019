@@ -1,6 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include "matrix4x4.h"
+#include "matrix3x3.h"
 #include "shader.h"
 #include "vertex.h"
 #include <QKeyEvent>
@@ -12,6 +13,7 @@ class MainWindow;
 
 typedef gsl::Vector3D vec3;
 typedef gsl::Matrix3x3 mat3;
+typedef gsl::Matrix4x4 mat4;
 struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
@@ -33,14 +35,14 @@ struct LightData {
           mSpecularStrength(specularStrength), mSpecularExponent(specularExponent),
           mObjectColor(objectColor) {}
     GLfloat mAmbientStrength{0.3f};
-    gsl::Vector3D mAmbientColor{0.3f, 0.3f, 0.3f};
+    vec3 mAmbientColor{0.3f, 0.3f, 0.3f};
 
     GLfloat mLightStrength{0.7f};
-    gsl::Vector3D mLightColor{0.3f, 0.3f, 0.3f};
+    vec3 mLightColor{0.3f, 0.3f, 0.3f};
 
     GLfloat mSpecularStrength{0.3f};
     GLint mSpecularExponent{4};
-    gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
+    vec3 mObjectColor{1.f, 1.f, 1.f};
 };
 enum class CType {
     None = 0,
@@ -79,7 +81,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator|=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -87,7 +89,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator&=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -95,7 +97,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
 operator&(E lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     return static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
 }
 /**
  * @brief The Component class is the base class for all components.
@@ -132,9 +134,9 @@ struct Transform : Component {
 
     bool mMatrixOutdated{true};
 
-    gsl::Vector3D mPosition{0};
-    gsl::Vector3D mRotation{0};
-    gsl::Vector3D mScale{1};
+    vec3 mPosition{0};
+    vec3 mRotation{0};
+    vec3 mScale{1};
     gsl::Matrix4x4 modelMatrix, translationMatrix, rotationMatrix, scaleMatrix;
 
     std::vector<GLuint> mChildren;
@@ -145,10 +147,10 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(ShaderType type = Color, GLuint texture = 0, gsl::Vector3D color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
+    Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
-    Material(std::string type, GLuint texture = 0, gsl::Vector3D color = 1) : mObjectColor(color), mTextureUnit(texture) {
+    Material(std::string type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
         mType = CType::Material;
         if (type == "color")
             mShader = Color;
@@ -159,7 +161,7 @@ struct Material : public Component {
     }
     virtual void update() {}
 
-    gsl::Vector3D mObjectColor{1.f, 1.f, 1.f};
+    vec3 mObjectColor{1.f, 1.f, 1.f};
     GLuint mTextureUnit{0}; //the actual texture to put into the uniform
     ShaderType mShader;
 };
@@ -299,15 +301,14 @@ public:
     typedef struct OBB{
         vec3 position;
         vec3 size;
-
-        //<------ Trenger rotasjon her
+        mat3 orientation;
 
         // default constructor: lager en OBB ved origo
         inline OBB() : size(2,2,2) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
         inline OBB(const vec3& p, const vec3& s) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
-        //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
+        inline OBB(const vec3& p, const vec3& s, const mat3& o ) : position(p), size(s), orientation(o) {}
     } OBB;
 
     /**
