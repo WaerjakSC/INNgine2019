@@ -6,6 +6,9 @@
 #include <QKeyEvent>
 class MainWindow;
 
+#undef near
+#undef far
+
 typedef gsl::Vector3D vec3;
 struct meshData {
     meshData() = default;
@@ -18,19 +21,26 @@ struct meshData {
         mName.clear();
     }
 };
+typedef struct Plane{
+    vec3 normal;
+    float distance;
+
+    inline Plane() : normal(1,0,0){}
+    inline Plane(const vec3& n, float d) : normal(n), distance(d){}
+} Plane;
 typedef struct Frustum {
- union {
- struct {
- Plane top;
- Plane bottom;
- Plane left;
- Plane right;
- Plane near;
- Plane far;
- };
- Plane planes[6];
- };
- inline Frustum() { }
+    union {
+        struct {
+            Plane top;
+            Plane bottom;
+            Plane left;
+            Plane right;
+            Plane near;
+            Plane far;
+        };
+        Plane planes[6];
+    };
+    inline Frustum() { }
 } Frustum;
 struct LightData {
     LightData() {}
