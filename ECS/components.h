@@ -1,6 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include "matrix4x4.h"
+#include "matrix3x3.h"
 #include "shader.h"
 #include "vertex.h"
 #include <QKeyEvent>
@@ -12,6 +13,7 @@ class MainWindow;
 
 typedef gsl::Vector3D vec3;
 typedef gsl::Matrix3x3 mat3;
+typedef gsl::Matrix4x4 mat4;
 struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
@@ -79,7 +81,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator|=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -87,7 +89,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator&=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -95,7 +97,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
 operator&(E lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     return static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
 }
 /**
  * @brief The Component class is the base class for all components.
@@ -299,15 +301,14 @@ public:
     typedef struct OBB{
         vec3 position;
         vec3 size;
-
-        //mat3 orientation;
+        mat3 orientation;
 
         // default constructor: lager en OBB ved origo
         inline OBB() : size(2,2,2) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
         inline OBB(const vec3& p, const vec3& s) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
-        //inline OBB(const vec3& p, const vec3& s, const ROTASJON!? ) : position(p), size(s), ROTASJON {}
+        inline OBB(const vec3& p, const vec3& s, const mat3& o ) : position(p), size(s), orientation(o) {}
     } OBB;
 
     /**
