@@ -284,7 +284,6 @@ public:
       */
     typedef struct AABB{
         vec3 origin;
-        vec3 position;
         vec3 size;  // Half size
 
         inline AABB() : size(2,2,2){}

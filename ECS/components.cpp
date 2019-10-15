@@ -211,7 +211,7 @@ float Frustum::Classify(const aABB &aabb, const plane &plane) {
             + fabsf(aabb.size.y * plane.normal.y)
             + fabsf(aabb.size.z * plane.normal.z);
     // signed distance between box center and plane
-    float d = plane.normal.dot(plane.normal, aabb.position) + plane.distance;
+    float d = plane.normal.dot(plane.normal, aabb.origin) + plane.distance;
     if (fabsf(d) < r) {
         return 0.0f;
     }
