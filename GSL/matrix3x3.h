@@ -35,6 +35,7 @@ public:
     Vector3D operator*(const Vector3D &v);
     GLfloat& operator()(int y, int x);
     GLfloat operator()(int y, int x) const;
+    inline float* operator[] (int i) {return &(matrix[i*3]);}
 
     friend std::ostream& operator<<(std::ostream &output, const Matrix3x3 &mIn)
     {
@@ -45,7 +46,6 @@ public:
         return output;
     }
 
-private:
     GLfloat matrix[9];
 };
 
