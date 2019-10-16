@@ -142,8 +142,8 @@ void RenderWindow::init() {
     mMoveSys->init();
 
     mStereoSound = mSoundManager->createSource(
-                "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-                "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
+        "Explosion", Vector3(0.0f, 0.0f, 0.0f),
+        "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
 }
 
 ///Called each frame - doing the rendering
@@ -315,6 +315,7 @@ void RenderWindow::save() {
 
 void RenderWindow::load() {
     stop(); // Stop the editor if it's in play
+    mMainWindow->clearHierarchy();
     mFactory->getSceneLoader()->loadScene(currentScene);
     mMoveSys->init();
     mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());

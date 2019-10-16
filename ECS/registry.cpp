@@ -57,7 +57,7 @@ void Registry::clearScene() {
     mBillBoards.clear();
     for (auto entity : mEntities) {
         entityDestroyed(entity.second->id()); // Pass the message on to the registry
-        emit entityRemoved(entity.second->id());
+                                              //        emit entityRemoved(entity.second->id());
     }
     mEntities.clear();
 }

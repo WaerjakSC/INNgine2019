@@ -618,6 +618,10 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_F)
         mRenderWindow->keyReleaseEvent(event);
 }
+
+void MainWindow::clearHierarchy() {
+    hierarchy->clear();
+}
 void MainWindow::makeEntity() {
     emit made3DObject(Registry::instance()->makeEntity("GameObject"));
 }
