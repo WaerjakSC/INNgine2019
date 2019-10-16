@@ -645,10 +645,11 @@ void MainWindow::onParentChanged(const QModelIndex &newParent) {
                 mRenderWindow->movement()->updateEntity(selectedEntity->id());
             }
         }
-    } else if (registry->contains(selectedEntity->id(), CType::Transform)) {
-        registry->setParent(selectedEntity->id(), -1, true);
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-    }
+    } else if (selectedEntity)
+        if (registry->contains(selectedEntity->id(), CType::Transform)) {
+            registry->setParent(selectedEntity->id(), -1, true);
+            mRenderWindow->movement()->updateEntity(selectedEntity->id());
+        }
 }
 void MainWindow::parentChanged(GLuint eID) {
     disconnect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
