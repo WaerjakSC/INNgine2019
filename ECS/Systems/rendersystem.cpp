@@ -32,6 +32,7 @@ void RenderSystem::iterateEntities() {
         if (registry->contains(entity, CType::Collision)) { // PS: At the moment only entities with all 4 component types have their collision boxes rendered (so pure collision boxes won't work)
             auto &collider = mColliderPool->get(entity);
             glBindVertexArray(0);
+            // Can move this to CollisionSystem and make sure to init every collider vertex array with the same shader and material to be able to make pure collision boxes independent from the mesh
             //            glBindVertexArray(collider.mVAO);
             //            glDrawArrays(GL_LINE_STRIP, 0, collider.mVertices.size()); // With GL_LINE_STRIP it should be enough to create the points of a cube (or whichever square collider)
         }
