@@ -54,6 +54,11 @@ public:
     GLfloat *yP();
     GLfloat *zP();
 
+    float vecArray[3];
+    float& operator[] (int i){
+        return vecArray[i];
+    }
+
     //Friend functions
     friend std::ostream &operator<<(std::ostream &output, const Vector3D &rhs) {
         output << "X = " << rhs.x << ", Y = " << rhs.y << ", Z = " << rhs.z;
