@@ -1,5 +1,4 @@
 {
-    "Basic Scene": {
         "GameObject": {
             "name": "XYZ",
             "id": 0,
@@ -240,5 +239,5 @@
                 }
             }
         }
-    }
+
 }

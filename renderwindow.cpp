@@ -1,6 +1,7 @@
 #include "renderwindow.h"
 #include "innpch.h"
 #include "scene.h"
+#include <QFileDialog>
 #include <QKeyEvent>
 #include <QOpenGLContext>
 #include <QOpenGLDebugLogger>
@@ -310,18 +311,26 @@ void RenderWindow::save() {
     mFactory->getSceneLoader()->saveScene(currentScene);
     mMainWindow->statusBar()->showMessage("Saved Scene!", 1000);
     mShowingMsg = true;
-    connect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
+    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
 }
-
+void RenderWindow::saveAs() {
+    QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("Json files (*.json)")));
+    mFactory->getSceneLoader()->saveScene(file.fileName());
+    mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
+    mMainWindow->statusBar()->showMessage("Saved Scene!", 1000);
+    mShowingMsg = true;
+    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
+}
 void RenderWindow::load() {
+    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("Json files (*json)")));
     stop(); // Stop the editor if it's in play
-    mMainWindow->clearHierarchy();
-    mFactory->getSceneLoader()->loadScene(currentScene);
+    mMainWindow->clearEditor();
+    mFactory->getSceneLoader()->loadScene(file.fileName());
     mMoveSys->init();
     mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
     mMainWindow->statusBar()->showMessage("Loaded Scene!", 1000);
     mShowingMsg = true;
-    connect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
+    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
 }
 void RenderWindow::play() {
     if (!mIsPlaying) {
@@ -367,7 +376,6 @@ void RenderWindow::setCameraSpeed(float value) {
 }
 void RenderWindow::changeMsg() {
     mShowingMsg = !mShowingMsg;
-    disconnect(mMainWindow->statusBar(), &QStatusBar::messageChanged, this, &RenderWindow::changeMsg);
 }
 void RenderWindow::handleInput() {
     //Camera

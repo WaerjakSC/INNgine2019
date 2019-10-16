@@ -180,10 +180,13 @@ void MainWindow::snapToObject() {
 // To-do: Save As button, folder pop-up that lets you choose or make a new scene file.
 void MainWindow::createActions() {
     QMenu *projectActions = ui->menuBar->addMenu(tr("Project"));
-    QAction *saveScene = new QAction(tr("Save Scene"));
+    QAction *saveScene = new QAction(tr("Save"));
     projectActions->addAction(saveScene);
     connect(saveScene, &QAction::triggered, mRenderWindow, &RenderWindow::save);
-    QAction *loadScene = new QAction(tr("Load Scene"));
+    QAction *saveAs = new QAction(tr("Save As"));
+    projectActions->addAction(saveAs);
+    connect(saveAs, &QAction::triggered, mRenderWindow, &RenderWindow::saveAs);
+    QAction *loadScene = new QAction(tr("Load"));
     projectActions->addAction(loadScene);
     connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
     QAction *exit = new QAction(tr("Exit"));
@@ -240,6 +243,7 @@ void MainWindow::createActions() {
 
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onEntityAdded);
 }
+
 void MainWindow::addTransformComponent() {
     Registry *registry = Registry::instance();
     CType typeMask = selectedEntity->types();
@@ -619,8 +623,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
         mRenderWindow->keyReleaseEvent(event);
 }
 
-void MainWindow::clearHierarchy() {
+void MainWindow::clearEditor() {
     hierarchy->clear();
+    scrollArea->clearLayout();
 }
 void MainWindow::makeEntity() {
     emit made3DObject(Registry::instance()->makeEntity("GameObject"));

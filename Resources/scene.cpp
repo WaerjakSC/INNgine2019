@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "registry.h"
 #include "resourcemanager.h"
+#include <QFileInfo>
 #include <fstream>
 #include <iostream>
 #include <rapidjson/document.h>
@@ -13,155 +14,158 @@ Scene::Scene() {
 }
 
 void Scene::saveScene(const QString &fileName) {
-    Registry *registry = Registry::instance();
-    std::map<GLuint, Entity *> entities = registry->getEntities();
+    if (fileName.isEmpty())
+        return;
+    else {
+        Registry *registry = Registry::instance();
+        std::map<GLuint, Entity *> entities = registry->getEntities();
 
-    StringBuffer buf;
-    PrettyWriter<StringBuffer> writer(buf);
-    writer.StartObject();
-    writer.String(mName.toStdString().c_str());
-    writer.StartObject();
+        StringBuffer buf;
+        PrettyWriter<StringBuffer> writer(buf);
 
-    for (auto entity : entities) {
-
-        writer.String("GameObject");
+        mName = fileName.chopped(5);
         writer.StartObject();
-        writer.Key("name");
-        writer.String(entity.second->name().toStdString().c_str());
-        writer.Key("id");
-        writer.Uint(entity.second->id());
-        writer.Key("components");
-        writer.StartObject();
-        CType typeMask = entity.second->types();
-        if ((typeMask & CType::Transform) != CType::None) {
-            const Transform trans = registry->getComponent<Transform>(entity.second->id());
-            writer.Key("transform");
+
+        for (auto entity : entities) {
+
+            writer.String("GameObject");
             writer.StartObject();
-
-            writer.Key("position");
-            writer.StartArray();
-            writer.Double(trans.mPosition.x);
-            writer.Double(trans.mPosition.y);
-            writer.Double(trans.mPosition.z);
-            writer.EndArray();
-
-            writer.Key("rotation");
-            writer.StartArray();
-            writer.Double(trans.mRotation.x);
-            writer.Double(trans.mRotation.y);
-            writer.Double(trans.mRotation.z);
-            writer.EndArray();
-
-            writer.Key("scale");
-            writer.StartArray();
-            writer.Double(trans.mScale.x);
-            writer.Double(trans.mScale.y);
-            writer.Double(trans.mScale.z);
-            writer.EndArray();
-
-            writer.Key("parent");
-            writer.Int(trans.parentID);
-
-            if (!trans.mChildren.empty()) {
-                writer.Key("children");
-                writer.StartArray();
-                for (auto child : trans.mChildren) {
-                    writer.Int(child);
-                }
-                writer.EndArray();
-            }
-            writer.EndObject();
-        }
-        if ((typeMask & CType::Material) != CType::None) {
-            writer.Key("material");
-            writer.StartObject();
-            const Material mat = registry->getComponent<Material>(entity.second->id());
-
-            writer.Key("color");
-            writer.StartArray();
-            writer.Double(mat.mObjectColor.x);
-            writer.Double(mat.mObjectColor.y);
-            writer.Double(mat.mObjectColor.z);
-            writer.EndArray();
-
-            writer.Key("textureid");
-            writer.Int(mat.mTextureUnit);
-
-            writer.Key("shader");
-            switch (mat.mShader) {
-            case Color:
-                writer.String("color");
-                break;
-            case Tex:
-                writer.String("texture");
-                break;
-            case Phong:
-                writer.String("phong");
-                break;
-            }
-            writer.EndObject();
-        }
-        if ((typeMask & CType::Mesh) != CType::None) {
-            writer.Key("mesh");
-            writer.StartObject();
-            const Mesh mesh = registry->getComponent<Mesh>(entity.second->id());
-            if (mesh.mName == "")
-                qDebug() << "what happens here?";
             writer.Key("name");
-            writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
-            writer.EndObject();
-        }
-        if ((typeMask & CType::Light) != CType::None) {
-            writer.Key("light");
+            writer.String(entity.second->name().toStdString().c_str());
+            writer.Key("id");
+            writer.Uint(entity.second->id());
+            writer.Key("components");
             writer.StartObject();
-            const Light lightcomp = registry->getComponent<Light>(entity.second->id());
-            LightData light = lightcomp.mLight;
-            writer.Key("ambstr");
-            writer.Double(light.mAmbientStrength);
+            CType typeMask = entity.second->types();
+            if ((typeMask & CType::Transform) != CType::None) {
+                const Transform trans = registry->getComponent<Transform>(entity.second->id());
+                writer.Key("transform");
+                writer.StartObject();
 
-            writer.Key("ambcolor");
-            writer.StartArray();
-            writer.Double(light.mAmbientColor.x);
-            writer.Double(light.mAmbientColor.y);
-            writer.Double(light.mAmbientColor.z);
-            writer.EndArray();
+                writer.Key("position");
+                writer.StartArray();
+                writer.Double(trans.mPosition.x);
+                writer.Double(trans.mPosition.y);
+                writer.Double(trans.mPosition.z);
+                writer.EndArray();
 
-            writer.Key("lightstr");
-            writer.Double(light.mLightStrength);
+                writer.Key("rotation");
+                writer.StartArray();
+                writer.Double(trans.mRotation.x);
+                writer.Double(trans.mRotation.y);
+                writer.Double(trans.mRotation.z);
+                writer.EndArray();
 
-            writer.Key("lightcolor");
-            writer.StartArray();
-            writer.Double(light.mLightColor.x);
-            writer.Double(light.mLightColor.y);
-            writer.Double(light.mLightColor.z);
-            writer.EndArray();
+                writer.Key("scale");
+                writer.StartArray();
+                writer.Double(trans.mScale.x);
+                writer.Double(trans.mScale.y);
+                writer.Double(trans.mScale.z);
+                writer.EndArray();
 
-            writer.Key("specstr");
-            writer.Double(light.mSpecularStrength);
-            writer.Key("specexp");
-            writer.Int(light.mSpecularExponent);
+                writer.Key("parent");
+                writer.Int(trans.parentID);
 
-            writer.Key("color");
-            writer.StartArray();
-            writer.Double(light.mObjectColor.x);
-            writer.Double(light.mObjectColor.y);
-            writer.Double(light.mObjectColor.z);
-            writer.EndArray();
+                if (!trans.mChildren.empty()) {
+                    writer.Key("children");
+                    writer.StartArray();
+                    for (auto child : trans.mChildren) {
+                        writer.Int(child);
+                    }
+                    writer.EndArray();
+                }
+                writer.EndObject();
+            }
+            if ((typeMask & CType::Material) != CType::None) {
+                writer.Key("material");
+                writer.StartObject();
+                const Material mat = registry->getComponent<Material>(entity.second->id());
 
+                writer.Key("color");
+                writer.StartArray();
+                writer.Double(mat.mObjectColor.x);
+                writer.Double(mat.mObjectColor.y);
+                writer.Double(mat.mObjectColor.z);
+                writer.EndArray();
+
+                writer.Key("textureid");
+                writer.Int(mat.mTextureUnit);
+
+                writer.Key("shader");
+                switch (mat.mShader) {
+                case Color:
+                    writer.String("color");
+                    break;
+                case Tex:
+                    writer.String("texture");
+                    break;
+                case Phong:
+                    writer.String("phong");
+                    break;
+                }
+                writer.EndObject();
+            }
+            if ((typeMask & CType::Mesh) != CType::None) {
+                writer.Key("mesh");
+                writer.StartObject();
+                const Mesh mesh = registry->getComponent<Mesh>(entity.second->id());
+                if (mesh.mName == "")
+                    qDebug() << "what happens here?";
+                writer.Key("name");
+                writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
+                writer.EndObject();
+            }
+            if ((typeMask & CType::Light) != CType::None) {
+                writer.Key("light");
+                writer.StartObject();
+                const Light lightcomp = registry->getComponent<Light>(entity.second->id());
+                LightData light = lightcomp.mLight;
+                writer.Key("ambstr");
+                writer.Double(light.mAmbientStrength);
+
+                writer.Key("ambcolor");
+                writer.StartArray();
+                writer.Double(light.mAmbientColor.x);
+                writer.Double(light.mAmbientColor.y);
+                writer.Double(light.mAmbientColor.z);
+                writer.EndArray();
+
+                writer.Key("lightstr");
+                writer.Double(light.mLightStrength);
+
+                writer.Key("lightcolor");
+                writer.StartArray();
+                writer.Double(light.mLightColor.x);
+                writer.Double(light.mLightColor.y);
+                writer.Double(light.mLightColor.z);
+                writer.EndArray();
+
+                writer.Key("specstr");
+                writer.Double(light.mSpecularStrength);
+                writer.Key("specexp");
+                writer.Int(light.mSpecularExponent);
+
+                writer.Key("color");
+                writer.StartArray();
+                writer.Double(light.mObjectColor.x);
+                writer.Double(light.mObjectColor.y);
+                writer.Double(light.mObjectColor.z);
+                writer.EndArray();
+
+                writer.EndObject();
+            }
+            if ((typeMask & CType::Collision) != CType::None) {
+                // Write Collision data to json here.
+            }
+            writer.EndObject();
             writer.EndObject();
         }
-        if ((typeMask & CType::Collision) != CType::None) {
-            // Write Collision data to json here.
-        }
         writer.EndObject();
-        writer.EndObject();
+        std::ofstream of(gsl::sceneFilePath + fileName.toStdString());
+        of << buf.GetString();
+        if (!of.good() || !of)
+            throw std::runtime_error("Can't write the JSON string to the file!");
     }
-    writer.EndObject();
-    writer.EndObject();
-    std::ofstream of(gsl::sceneFilePath + fileName.toStdString());
-    of << buf.GetString();
-    if (!of.good() || !of)
-        throw std::runtime_error("Can't write the JSON string to the file!");
 }
 void Scene::loadScene(const QString &fileName) {
     Registry *registry = Registry::instance();
@@ -176,6 +180,7 @@ void Scene::loadScene(const QString &fileName) {
         sceneDoc.Parse(mScenes[fileName].c_str());
         populateScene(sceneDoc);
     }
+    mName = fileName.chopped(5);
     registry->updateChildParent();
     factory->setLoading(false);
 }
@@ -185,10 +190,8 @@ void Scene::populateScene(const Document &scene) {
     Registry *registry = Registry::instance();
     ResourceManager *factory = ResourceManager::instance();
 
-    mName = scene.MemberBegin()->name.GetString();
-
     // Iterate through each gameobject in the scene
-    for (Value::ConstMemberIterator itr = scene[mName.toStdString().c_str()].MemberBegin(); itr != scene[mName.toStdString().c_str()].MemberEnd(); ++itr) {
+    for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
 
         // Iterate through each of the members in the gameobject (name, id, components)
         if (itr->value["name"] == "XYZ") {

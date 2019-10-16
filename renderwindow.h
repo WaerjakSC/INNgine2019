@@ -58,6 +58,7 @@ public slots:
     void play();
     void pause();
     void stop();
+    void saveAs();
 private slots:
     void render();
     void changeMsg();
@@ -120,7 +121,7 @@ private:
     std::chrono::high_resolution_clock::time_point mLastTime;
     friend class MainWindow;
 
-    std::vector<GLuint*>Cull(const Camera::Frustum& f);
+    std::vector<GLuint *> Cull(const Camera::Frustum &f);
 
 protected:
     //The QWindow that we inherit from has these functions to capture

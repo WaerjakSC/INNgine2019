@@ -34,7 +34,7 @@ public:
     void keyReleaseEvent(QKeyEvent *event) override;
     QString windowName = "OpenGL in Qt";
     QToolButton *play, *pause, *stop;
-    void clearHierarchy();
+    void clearEditor();
 signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
