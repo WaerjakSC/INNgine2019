@@ -35,12 +35,22 @@ vec3 CollisionSystem::getMax(const Collision::AABB &aabb) {
                 fmaxf(p1.z, p2.z));
 }
 
+/**
+ * @brief CollisionSystem::SphereOBB returns true if an intersection between a Sphere and an OBB occurs
+ * @param sphere
+ * @param obb
+ * @return true if distance less than radius squared ( We have an intersection )
+ */
 bool CollisionSystem::SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb)
 {
-    // Trenger å finne punkt i OBB nærmest gitt punkt i Sphere
-    // lignende funksjon som closest point for AABB
 
-    // Gjør dette senere
+    // Finner først nærmeste punktet i OBB til sphere center
+    vec3 p = ClosestPoint(obb, sphere.position);
+    // Finner avstanden mellom sphere center og punktet i OBB
+    float dist = (sphere.position - p).length();
+    float radiusSq = sphere.radius * sphere.radius;
+    // Hvis avstanden er mindre en radius^2, har vi en intersection mellom Sphere og OBB
+    return dist<radiusSq;
 }
 
 /**
