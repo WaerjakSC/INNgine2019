@@ -150,31 +150,31 @@ vec3 CollisionSystem::ClosestPoint(const Collision::AABB &aabb, const vec3 &poin
 vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point) {
     vec3 result = obb.position;
     // move the point relative to the OBB
-    vec3 dir = point - obb.position;
+    //    vec3 dir = point - obb.position;
 
-    // Loops three times, once for each axis: #0 for the X-axis, #1 for the Y-axis, #2 for the Z-axis
-    // projects the point onto each of the axes of the box,
-    // and compares the distance to the extent of the box
-    for (int i = 0; i < 3; ++i) {
-        const float *orientation = &obb.orientation.matrix[i * 3];
-        // vector that holds the different axis
-        vec3 axis(orientation[0],
-                  orientation[1],
-                  orientation[2]);
-        // projects the point onto that axis and stores the distance
-        float dist = vec3::dot(dir, axis);
+    //    // Loops three times, once for each axis: #0 for the X-axis, #1 for the Y-axis, #2 for the Z-axis
+    //    // projects the point onto each of the axes of the box,
+    //    // and compares the distance to the extent of the box
+    //    for (int i = 0; i < 3; ++i) {
+    //        const float *orientation = &obb.orientation.matrix[i * 3];
+    //        // vector that holds the different axis
+    //        vec3 axis(orientation[0],
+    //                  orientation[1],
+    //                  orientation[2]);
+    //        // projects the point onto that axis and stores the distance
+    //        float dist = vec3::dot(dir, axis);
 
-        // clamp
-        if (dist > obb.size.vecArray[i]) {
-            dist = obb.size.vecArray[i];
-        }
-        if (dist < -obb.size.vecArray[i]) {
-            dist = -obb.size.vecArray[i];
-        }
+    //        // clamp
+    //        if (dist > obb.size.vecArray[i]) {
+    //            dist = obb.size.vecArray[i];
+    //        }
+    //        if (dist < -obb.size.vecArray[i]) {
+    //            dist = -obb.size.vecArray[i];
+    //        }
 
-        // adjust the point by the axis and the distance
-        result = result + (axis * dist);
-    }
+    //        // adjust the point by the axis and the distance
+    //        result = result + (axis * dist);
+    //    }
 
     return result;
 }
