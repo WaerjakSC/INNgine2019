@@ -135,9 +135,9 @@ void RenderWindow::init() {
     ray = new Raycast(this, mCurrentCamera);
 
     //********************** Making the objects to be drawn **********************
-    mFactory->getSceneLoader()->loadScene(currentScene); // loadScene should be placed somewhere in init() rather than saveScene
+    mFactory->loadLastProject(); // loadScene should be placed somewhere in init() rather than saveScene
 
-    mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
+    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mLight = mFactory->getSceneLoader()->controllerID;
     mRenderer->init();
     mMoveSys->init();
@@ -306,31 +306,50 @@ void RenderWindow::keyPressEvent(QKeyEvent *event) {
 void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
     mInput->keyReleaseEvent(event);
 }
+void RenderWindow::showMessage(const QString &message) {
+    mMainWindow->statusBar()->showMessage(message, 1000);
+    mShowingMsg = true;
+    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
+}
 
 void RenderWindow::save() {
-    mFactory->getSceneLoader()->saveScene(currentScene);
-    mMainWindow->statusBar()->showMessage("Saved Scene!", 1000);
-    mShowingMsg = true;
-    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
+    mFactory->getSceneLoader()->saveScene(mFactory->getCurrentScene());
+    showMessage("Saved Scene!");
 }
 void RenderWindow::saveAs() {
-    QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("Json files (*.json)")));
+    QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
+    if (file.fileName().isEmpty())
+        return;
     mFactory->getSceneLoader()->saveScene(file.fileName());
-    mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
-    mMainWindow->statusBar()->showMessage("Saved Scene!", 1000);
-    mShowingMsg = true;
-    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
+    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
+    showMessage("Saved Scene!");
 }
 void RenderWindow::load() {
-    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("Json files (*json)")));
+    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
+    if (file.fileName().isEmpty())
+        return;
     stop(); // Stop the editor if it's in play
     mMainWindow->clearEditor();
     mFactory->getSceneLoader()->loadScene(file.fileName());
+    mFactory->setCurrentScene(file.fileName());
     mMoveSys->init();
-    mMainWindow->setWindowTitle("Current Scene: " + mFactory->getSceneLoader()->name());
-    mMainWindow->statusBar()->showMessage("Loaded Scene!", 1000);
-    mShowingMsg = true;
-    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
+    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
+    showMessage("Loaded Scene!");
+}
+void RenderWindow::loadProject() {
+    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"), QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)")));
+    if (file.fileName().isEmpty())
+        return;
+    stop(); // Stop the editor if it's in play
+    mMainWindow->clearEditor();
+    mFactory->loadProject(file.fileName());
+    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
+    mMoveSys->init();
+    showMessage("Loaded Project: " + mFactory->getProjectName());
+}
+void RenderWindow::saveProject() {
+    mFactory->saveProjectSettings(QString::fromStdString(gsl::settingsFilePath + mFactory->getProjectName().toStdString()));
+    showMessage("Saved Project!");
 }
 void RenderWindow::play() {
     if (!mIsPlaying) {

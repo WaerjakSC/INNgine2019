@@ -81,7 +81,7 @@ gsl::Vector3D MovementSystem::getAbsolutePosition(int eID) {
         GLuint parentID = mTransforms->get(eID).parentID;
         return getAbsolutePosition(parentID) + getRelativePosition(eID);
     }
-    return mTransforms->get(eID).mPosition;
+    return getRelativePosition(eID);
 }
 /**
  * @brief Get relative position of object (null-vector if no parent)

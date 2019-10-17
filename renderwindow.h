@@ -59,6 +59,8 @@ public slots:
     void pause();
     void stop();
     void saveAs();
+    void saveProject();
+    void loadProject();
 private slots:
     void render();
     void changeMsg();
@@ -80,8 +82,6 @@ private:
     Registry *mRegistry;
     SoundManager *mSoundManager;
     Raycast *ray;
-
-    QString currentScene{"mainSceneCJK.json"};
 
     Entity *mPlayer; //the controllable object
 
@@ -122,6 +122,8 @@ private:
     friend class MainWindow;
 
     std::vector<GLuint *> Cull(const Camera::Frustum &f);
+
+    void showMessage(const QString &message);
 
 protected:
     //The QWindow that we inherit from has these functions to capture

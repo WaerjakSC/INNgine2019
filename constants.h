@@ -8,6 +8,7 @@ namespace gsl //Game School Lib
 const std::string projectFolderName{"../INNgine2019/"};
 const std::string assetFilePath{projectFolderName + "Assets/"};
 const std::string sceneFilePath{assetFilePath + "Scenes/"};
+const std::string settingsFilePath{assetFilePath + "Settings/"};
 const std::string shaderFilePath{projectFolderName + "Shaders/"};
 } // namespace gsl
 

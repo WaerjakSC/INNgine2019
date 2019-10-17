@@ -4,11 +4,17 @@
 #include "innpch.h"
 #include "lightsystem.h"
 #include "phongshader.h"
+#include "rapidjson/prettywriter.h"
 #include "registry.h"
 #include "renderview.h"
 #include "scene.h"
 #include "textureshader.h"
 #include <QDebug>
+#include <QFileInfo>
+#include <fstream>
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/stringbuffer.h>
 
 ResourceManager *ResourceManager::mInstance = nullptr;
 
@@ -18,7 +24,7 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Input>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
-    sceneLoader = std::make_unique<Scene>();
+    mSceneLoader = std::make_unique<Scene>();
     // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
     // Initialize shared pointers
@@ -28,8 +34,20 @@ ResourceManager::ResourceManager() {
     //    mRenderView = std::make_unique<RenderView>(mTransforms);
 }
 
+void ResourceManager::setCurrentScene(const QString &currentScene) {
+    mCurrentScene = currentScene;
+}
+
+QString ResourceManager::getProjectName() const {
+    return mCurrentProject;
+}
+
+QString ResourceManager::getCurrentScene() const {
+    return mCurrentScene;
+}
+
 Scene *ResourceManager::getSceneLoader() const {
-    return sceneLoader.get();
+    return mSceneLoader.get();
 }
 
 bool ResourceManager::isLoading() const {
@@ -109,6 +127,78 @@ GLuint ResourceManager::makePlane() {
 
     return eID;
 }
+void ResourceManager::saveProjectSettings(const QString &fileName) {
+    if (fileName.isEmpty())
+        return;
+    QFileInfo file(fileName);
+    StringBuffer buf;
+    PrettyWriter<StringBuffer> writer(buf);
+
+    mCurrentProject = file.fileName();
+
+    writer.StartObject(); // Start the json file
+    writer.String(mCurrentProject.toStdString().c_str());
+    writer.StartObject();
+    writer.Key("default scene"); // Set the default startup scene.
+    writer.String(mDefaultScene.toStdString().c_str());
+    // add more options here as we think of them
+
+    writer.EndObject();
+    writer.EndObject(); // ready to write to rapidjson document
+
+    std::ofstream of(gsl::settingsFilePath + file.fileName().toStdString() + ".json");
+    of << buf.GetString();
+    if (!of.good() || !of)
+        throw std::runtime_error("Can't write the JSON string to the file!");
+}
+void ResourceManager::loadProject(const QString &fileName) {
+    QFileInfo file(fileName);
+    std::ifstream fileStream(gsl::settingsFilePath + file.fileName().toStdString());
+    if (!fileStream.good())
+        throw std::runtime_error("Can't read the JSON file!");
+    std::stringstream stream;
+    stream << fileStream.rdbuf();
+    fileStream.close();
+    const std::string fileCopy = stream.str();
+    const char *projSettings = fileCopy.c_str();
+    Document project;
+    project.Parse(projSettings);
+    mCurrentProject = QString::fromStdString(project.MemberBegin()->name.GetString());
+    if (project[mCurrentProject.toStdString().c_str()].HasMember("default scene")) {
+        mDefaultScene = project[mCurrentProject.toStdString().c_str()]["default scene"].GetString();
+    }
+    mCurrentScene = mDefaultScene;
+    mSceneLoader->loadScene(mDefaultScene + ".json");
+}
+void ResourceManager::loadLastProject() {
+    std::ifstream fileStream(gsl::settingsFilePath + "EngineSettings/settings.json");
+    if (!fileStream.good())
+        throw std::runtime_error("Can't read the JSON file!");
+    std::stringstream stream;
+    stream << fileStream.rdbuf();
+    fileStream.close();
+    const std::string fileCopy = stream.str();
+    const char *settings = fileCopy.c_str();
+    Document project;
+    project.Parse(settings);
+    mCurrentProject = project.MemberBegin()->value.GetString();
+    loadProject(QString::fromStdString(gsl::settingsFilePath) + mCurrentProject + ".json");
+}
+void ResourceManager::onExit() {
+    StringBuffer buf;
+    PrettyWriter<StringBuffer> writer(buf);
+
+    writer.StartObject(); // Start the json file
+    writer.Key("last project");
+    writer.String(mCurrentProject.toStdString().c_str());
+    writer.EndObject(); // ready to write to rapidjson document
+
+    std::ofstream of(gsl::settingsFilePath + "EngineSettings/settings.json");
+    of << buf.GetString();
+    if (!of.good() || !of)
+        throw std::runtime_error("Can't write the JSON string to the file!");
+}
+
 void ResourceManager::makePlaneMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();

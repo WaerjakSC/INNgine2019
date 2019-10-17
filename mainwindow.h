@@ -35,6 +35,7 @@ public:
     QString windowName = "OpenGL in Qt";
     QToolButton *play, *pause, *stop;
     void clearEditor();
+
 signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
@@ -51,6 +52,8 @@ signals:
 public slots:
     void parentChanged(GLuint eID);
     void mouseRayHit(GLuint eID);
+    void closeEngine();
+
 private slots:
     void onEntityClicked(const QModelIndex &index);
 

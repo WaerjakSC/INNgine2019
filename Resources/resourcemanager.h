@@ -63,6 +63,19 @@ public:
 
     Scene *getSceneLoader() const;
 
+    void saveProjectSettings(const QString &fileName);
+
+    QString getCurrentScene() const;
+
+    QString getProjectName() const;
+
+    void setCurrentScene(const QString &currentScene);
+
+    void loadProject(const QString &fileName);
+
+    void onExit();
+    void loadLastProject();
+
 private:
     // Private constructor
     ResourceManager();
@@ -70,7 +83,10 @@ private:
     static ResourceManager *mInstance;
     Registry *registry;
 
-    std::unique_ptr<Scene> sceneLoader;
+    std::unique_ptr<Scene> mSceneLoader;
+    QString mCurrentProject{"defaultProject"};
+    QString mCurrentScene{"mainSceneCJK"};
+    QString mDefaultScene{"mainSceneCJK"};
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage

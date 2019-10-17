@@ -10,7 +10,7 @@ void Input::keyPressEvent(QKeyEvent *event) {
 
     if (event->key() == Qt::Key_Escape) //Shuts down whole program
     {
-        mMainWindow->close();
+        mMainWindow->closeEngine();
     }
     if (event->key() == Qt::Key_Control)
         CTRL = true;

@@ -189,9 +189,17 @@ void MainWindow::createActions() {
     QAction *loadScene = new QAction(tr("Load"));
     projectActions->addAction(loadScene);
     connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
+
+    QAction *saveProject = new QAction(tr("Save Project"));
+    projectActions->addAction(saveProject);
+    connect(saveProject, &QAction::triggered, mRenderWindow, &RenderWindow::saveProject);
+    QAction *loadProject = new QAction(tr("Open Project"));
+    projectActions->addAction(loadProject);
+    connect(loadProject, &QAction::triggered, mRenderWindow, &RenderWindow::loadProject);
+
     QAction *exit = new QAction(tr("Exit"));
     projectActions->addAction(exit);
-    connect(exit, &QAction::triggered, this, &MainWindow::close);
+    connect(exit, &QAction::triggered, this, &MainWindow::closeEngine);
 
     QMenu *gameObject = ui->menuBar->addMenu(tr("GameObject"));
     QAction *empty = new QAction(tr("Empty GameObject"), this);
@@ -626,6 +634,11 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
 void MainWindow::clearEditor() {
     hierarchy->clear();
     scrollArea->clearLayout();
+}
+
+void MainWindow::closeEngine() {
+    ResourceManager::instance()->onExit();
+    close();
 }
 void MainWindow::makeEntity() {
     emit made3DObject(Registry::instance()->makeEntity("GameObject"));
