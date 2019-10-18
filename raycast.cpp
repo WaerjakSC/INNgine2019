@@ -32,7 +32,7 @@ int Raycast::rayCast(const QPoint &mousePos) {
     return entityID;
 }
 
-gsl::Vector3D Raycast::getPointOnRay(const Ray &ray, float distance) {
+vec3 Raycast::getPointOnRay(const Ray &ray, float distance) {
     return ray.origin + (ray.direction * distance);
 }
 Ray Raycast::getRay(const QPoint &mousePos) {
@@ -45,7 +45,7 @@ Ray Raycast::getRay(const QPoint &mousePos) {
     return Ray{origin, direction};
 }
 
-bool Raycast::RayToSphere(const Ray &ray, const gsl::Vector3D &center, double radius, double &intersectionDistance) {
+bool Raycast::RayToSphere(const Ray &ray, const vec3 &center, double radius, double &intersectionDistance) {
     vec3 originToCenter = ray.origin - center;
 
     float a = vec3::dot(ray.direction, ray.direction);
@@ -78,7 +78,8 @@ bool Raycast::RayToSphere(const Ray &ray, const gsl::Vector3D &center, double ra
     }
     return false;
 }
+// Remove this?
 //bool Raycast::RayToPlane(Entity *entt, float start, float finish, const Ray &ray) {
-//    gsl::Vector3D startPoint = getPointOnRay(ray, start);
-//    gsl::Vector3D endPoint = getPointOnRay(ray, finish);
+//    vec3 startPoint = getPointOnRay(ray, start);
+//    vec3 endPoint = getPointOnRay(ray, finish);
 //}

@@ -10,7 +10,7 @@
 #include <QWindow>
 #include <chrono>
 #include <memory>
-
+typedef gsl::Vector3D vec3;
 class QOpenGLContext;
 class Shader;
 class MainWindow;

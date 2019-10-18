@@ -28,7 +28,7 @@
 #include "renderview.h"
 #include "textureshader.h"
 
-typedef gsl::Vector3D vec3;
+
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false),
@@ -165,7 +165,7 @@ void RenderWindow::render() {
         }
         mRenderer->render();
         mLightSys->update();
-        mSoundManager->updateListener(mCurrentCamera->position(), gsl::Vector3D(1), mCurrentCamera->forward(), mCurrentCamera->up());
+        mSoundManager->updateListener(mCurrentCamera->position(), vec3(1), mCurrentCamera->forward(), mCurrentCamera->up());
     }
 
     //Calculate framerate before

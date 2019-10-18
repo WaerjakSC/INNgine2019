@@ -26,10 +26,10 @@ void Camera::setYaw(float newYaw) {
  * @brief go to location
  * @param target
  */
-void Camera::goTo(gsl::Vector3D target) {
-    gsl::Vector3D targetDistance{0, 0, 5};
-    const gsl::Vector3D position = target + targetDistance;
-    const gsl::Vector3D direction = (position - target).normalized();
+void Camera::goTo(vec3 target) {
+    vec3 targetDistance{0, 0, 5};
+    const vec3 position = target + targetDistance;
+    const vec3 direction = (position - target).normalized();
 
     mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
     mPitch = gsl::rad2degf(gsl::asin(-direction.y));
@@ -49,10 +49,10 @@ void Camera::updateRightVector() {
 }
 
 void Camera::updateForwardVector() {
-    mRight = gsl::Vector3D(1.f, 0.f, 0.f);
+    mRight = vec3(1.f, 0.f, 0.f);
     mRight.rotateY(mYaw);
     mRight.normalize();
-    mUp = gsl::Vector3D(0.f, 1.f, 0.f);
+    mUp = vec3(0.f, 1.f, 0.f);
     mUp.rotateX(mPitch);
     mUp.normalize();
     mForward = mUp ^ mRight;
@@ -83,7 +83,7 @@ gsl::Matrix4x4 Camera::getViewMatrix() const
     return mViewMatrix;
 }
 
-void Camera::setPosition(const gsl::Vector3D &position) {
+void Camera::setPosition(const vec3 &position) {
     mPosition = position;
 }
 
@@ -99,20 +99,20 @@ void Camera::moveRight(float delta) {
     //This fixes a bug in the up and right calculations
     //so camera always holds its height when straifing
     //should be fixed thru correct right calculations!
-    gsl::Vector3D right = mRight;
+    vec3 right = mRight;
     right.y = 0.f;
     mPosition += right * delta;
 }
 
-gsl::Vector3D Camera::position() const {
+vec3 Camera::position() const {
     return mPosition;
 }
 
-gsl::Vector3D Camera::up() const {
+vec3 Camera::up() const {
     return mUp;
 }
 
-gsl::Vector3D Camera::forward() const {
+vec3 Camera::forward() const {
     return mForward;
 }
 vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width) {

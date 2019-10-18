@@ -12,15 +12,15 @@ void BillBoard::update() {
     Transform &transform = registry->getComponent<Transform>(id());
     Material &mat = registry->getComponent<Material>(id());
     // find direction between this and camera
-    gsl::Vector3D direction{};
+    vec3 direction{};
     if (mNormalVersion) {
-        gsl::Vector3D camPosition = factory->getShader(mat.mShader)->getCurrentCamera()->position();
+        vec3 camPosition = factory->getShader(mat.mShader)->getCurrentCamera()->position();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
             camPosition.setY(transform.modelMatrix.getPosition().y);
-        direction = camPosition - gsl::Vector3D(transform.modelMatrix.getPosition());
+        direction = camPosition - vec3(transform.modelMatrix.getPosition());
     } else {
-        gsl::Vector3D camDirection = factory->getShader(mat.mShader)->getCurrentCamera()->forward();
+        vec3 camDirection = factory->getShader(mat.mShader)->getCurrentCamera()->forward();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
             camDirection.setY(transform.modelMatrix.getPosition().y);
@@ -34,10 +34,10 @@ void BillBoard::update() {
     transform.mMatrixOutdated = true;
 }
 
-//gsl::Vector3D BillBoard::getNormal(gsl::Matrix4x4 mMatrix) {
+//vec3 BillBoard::getNormal(gsl::Matrix4x4 mMatrix) {
 //    gsl::Matrix3x3 tempMat = mMatrix.toMatrix3();
 
-//    normal = tempMat * gsl::Vector3D{0.f, 0.f, -1.f};
+//    normal = tempMat * vec3{0.f, 0.f, -1.f};
 //    normal.normalize();
 
 //    return normal;

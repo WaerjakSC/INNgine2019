@@ -17,6 +17,8 @@
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 #include <QToolButton>
+
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     init();
@@ -144,21 +146,21 @@ void MainWindow::playButtons() {
     toolbar->addWidget(spacer2); // Spacer #2
 }
 
-void MainWindow::updatePositionVals(GLuint eID, gsl::Vector3D newPos) {
+void MainWindow::updatePositionVals(GLuint eID, vec3 newPos) {
     if (eID == selectedEntity->id()) {
         emit posX(newPos.x);
         emit posY(newPos.y);
         emit posZ(newPos.z);
     }
 }
-void MainWindow::updateRotationVals(GLuint eID, gsl::Vector3D newRot) {
+void MainWindow::updateRotationVals(GLuint eID, vec3 newRot) {
     if (eID == selectedEntity->id()) {
         emit rotX(newRot.x);
         emit rotY(newRot.y);
         emit rotZ(newRot.z);
     }
 }
-void MainWindow::updateScaleVals(GLuint eID, gsl::Vector3D newScale) {
+void MainWindow::updateScaleVals(GLuint eID, vec3 newScale) {
     if (eID == selectedEntity->id()) {
         emit scaleX(newScale.x);
         emit scaleY(newScale.y);
@@ -385,7 +387,7 @@ void MainWindow::setupMaterialSettings(const Material &component) {
 
     colorLabel = new QLabel;
     QPixmap curColor(18, 18);
-    gsl::Vector3D oColor = component.mObjectColor;
+    vec3 oColor = component.mObjectColor;
     rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
     curColor.fill(rgb);
     colorLabel->setPixmap(curColor);
@@ -437,7 +439,7 @@ void MainWindow::setColor() {
         newRgb.fill(color);
         colorLabel->setPixmap(newRgb);
     }
-    Registry::instance()->getComponent<Material>(selectedEntity->id()).mObjectColor = gsl::Vector3D(color.redF(), color.greenF(), color.blueF());
+    Registry::instance()->getComponent<Material>(selectedEntity->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
 }
 void MainWindow::setupTransformSettings(const Transform &component) {
     QStyle *fusion = QStyleFactory::create("fusion");
@@ -714,7 +716,7 @@ void MainWindow::onEntityDragged(GLuint id) {
     selectedEntity = Registry::instance()->getEntity(id);
     //    qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
     if ((selectedEntity->types() & CType::Transform) != CType::None) {
-        gsl::Vector3D location;
+        vec3 location;
         GLuint id = selectedEntity->id();
         if (Registry::instance()->hasParent(id)) {
             location = mRenderWindow->movement()->getRelativePosition(id);

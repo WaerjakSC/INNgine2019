@@ -7,6 +7,7 @@
 #include <QMainWindow>
 #include <QStringListModel>
 
+typedef gsl::Vector3D vec3;
 class QWidget;
 class RenderWindow;
 class Entity;
@@ -83,9 +84,9 @@ private slots:
     void setScaleX(double xIn);
     void setScaleY(double yIn);
     void setScaleZ(double zIn);
-    void updatePositionVals(GLuint eID, gsl::Vector3D newPos);
-    void updateRotationVals(GLuint eID, gsl::Vector3D newRot);
-    void updateScaleVals(GLuint eID, gsl::Vector3D newScale);
+    void updatePositionVals(GLuint eID, vec3 newPos);
+    void updateRotationVals(GLuint eID, vec3 newRot);
+    void updateScaleVals(GLuint eID, vec3 newScale);
 
     void setNewShader(const QString &text);
     void setNewTextureFile();

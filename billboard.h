@@ -2,6 +2,7 @@
 #define BILLBOARD_H
 
 #include "entity.h"
+typedef gsl::Vector3D vec3;
 class Transform;
 class ResourceManager;
 class Registry;

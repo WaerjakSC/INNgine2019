@@ -13,7 +13,7 @@ Vertex::Vertex(float x, float y, float z, float r, float g, float b) {
     mNormal.setZ(b);
 }
 
-Vertex::Vertex(gsl::Vector3D a, gsl::Vector3D b, gsl::Vector2D c) {
+Vertex::Vertex(vec3 a, vec3 b, gsl::Vector2D c) {
     mXYZ = a;
     mNormal = b;
     mST = c;
@@ -33,7 +33,7 @@ void Vertex::set_xyz(GLfloat x, GLfloat y, GLfloat z) {
     mXYZ.setZ(z);
 }
 
-void Vertex::set_xyz(gsl::Vector3D xyz_in) {
+void Vertex::set_xyz(vec3 xyz_in) {
     mXYZ = xyz_in;
 }
 
@@ -61,7 +61,7 @@ void Vertex::set_normal(GLfloat x, GLfloat y, GLfloat z) {
     mNormal.setZ(z);
 }
 
-void Vertex::set_normal(gsl::Vector3D normal_in) {
+void Vertex::set_normal(vec3 normal_in) {
     mNormal = normal_in;
 }
 

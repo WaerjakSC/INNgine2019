@@ -3,9 +3,10 @@
 #include "gsl_math.h"
 
 #include <QPoint>
+typedef gsl::Vector3D vec3;
 struct Ray {
-    gsl::Vector3D origin;
-    gsl::Vector3D direction;
+    vec3 origin;
+    vec3 direction;
 };
 class Camera;
 class RenderWindow;
@@ -19,9 +20,9 @@ private:
     RenderWindow *mOpenGLWindow;
     Camera *mCurrentCamera;
     Ray ray;
-    gsl::Vector3D getPointOnRay(const Ray &ray, float distance);
+    vec3 getPointOnRay(const Ray &ray, float distance);
     Ray getRay(const QPoint &mousePos);
-    bool RayToSphere(const Ray &ray, const gsl::Vector3D &center, double sphereRadius, double &intersectionDistance);
+    bool RayToSphere(const Ray &ray, const vec3 &center, double sphereRadius, double &intersectionDistance);
     //    bool RayToPlane(Entity *entt, float start, float finish, const Ray &ray);
     float rayRange{250};
 };

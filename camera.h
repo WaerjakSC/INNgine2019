@@ -19,20 +19,20 @@ public:
     gsl::Matrix4x4 mViewMatrix;
     gsl::Matrix4x4 mProjectionMatrix;
 
-    void setPosition(const gsl::Vector3D &position);
+    void setPosition(const vec3 &position);
 
     void setSpeed(float speed);
     void updateHeight(float deltaHeigth);
     void moveRight(float delta);
 
-    gsl::Vector3D position() const;
-    gsl::Vector3D up() const;
+    vec3 position() const;
+    vec3 up() const;
 
-    gsl::Vector3D forward() const;
+    vec3 forward() const;
 
     void setPitch(float newPitch);
     void setYaw(float newYaw);
-    void goTo(gsl::Vector3D target);
+    void goTo(vec3 target);
 
     vec3 getNormalizedDeviceCoords(const vec3 &viewportPoint, int height, int width);
     vec3 calculateMouseRay(const vec3 &viewportPoint, int height, int width);
@@ -73,11 +73,11 @@ public:
     Frustum getFrustum();
 
 private:
-    gsl::Vector3D mForward{0.f, 0.f, -1.f};
-    gsl::Vector3D mRight{1.f, 0.f, 0.f};
-    gsl::Vector3D mUp{0.f, 1.f, 0.f};
+    vec3 mForward{0.f, 0.f, -1.f};
+    vec3 mRight{1.f, 0.f, 0.f};
+    vec3 mUp{0.f, 1.f, 0.f};
 
-    gsl::Vector3D mPosition{0.f, 0.f, 0.f};
+    vec3 mPosition{0.f, 0.f, 0.f};
     float mPitch{0.f};
     float mYaw{0.f};
 
