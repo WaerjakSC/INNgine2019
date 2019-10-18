@@ -4,6 +4,8 @@
 #include "pool.h"
 #include <QObject>
 #include <memory>
+
+typedef gsl::Vector3D vec3;
 class Registry;
 class Transform;
 class MovementSystem : public QObject {
@@ -17,12 +19,12 @@ public:
     void updateTRS(Transform &comp);
     void updateEntity(GLuint eID);
 
-    gsl::Vector3D getAbsolutePosition(int eID);
-    gsl::Vector3D getRelativePosition(int eID);
+    vec3 getAbsolutePosition(int eID);
+    vec3 getRelativePosition(int eID);
     // ******** Position Setters ******** //
-    void setAbsolutePosition(GLuint eID, gsl::Vector3D position, bool signal = true);
+    void setAbsolutePosition(GLuint eID, vec3 position, bool signal = true);
 
-    void setPosition(GLuint eID, gsl::Vector3D position, bool signal = true);
+    void setPosition(GLuint eID, vec3 position, bool signal = true);
     void setPosition(int eID, float xIn, float yIn, float zIn, bool signal = true);
 
     void setPositionX(int eID, float xIn, bool signal = true);
@@ -33,7 +35,7 @@ public:
     void moveY(int eID, float yIn);
     void moveZ(int eID, float zIn);
     // ******** Rotation Setters ******** //
-    void setRotation(GLuint eID, gsl::Vector3D rotation, bool signal = true);
+    void setRotation(GLuint eID, vec3 rotation, bool signal = true);
 
     void setRotationX(int eID, float xIn, bool signal = true);
     void setRotationY(int eID, float yIn, bool signal = true);
@@ -44,7 +46,7 @@ public:
     void rotateZ(GLuint eID, float zIn, bool signal);
 
     // ******** Scale Setters ******** //
-    void setScale(int eID, gsl::Vector3D scale, bool signal = true);
+    void setScale(int eID, vec3 scale, bool signal = true);
 
     void setScaleX(int eID, float xIn, bool signal = true);
     void setScaleY(int eID, float yIn, bool signal = true);
@@ -54,15 +56,15 @@ public:
     void scaleY(GLuint eID, float yIn, bool signal);
     void scaleZ(GLuint eID, float zIn, bool signal);
 signals:
-    void positionChanged(GLuint eID, gsl::Vector3D newPos);
-    void scaleChanged(GLuint eID, gsl::Vector3D newScale);
-    void rotationChanged(GLuint eID, gsl::Vector3D newRot);
+    void positionChanged(GLuint eID, vec3 newPos);
+    void scaleChanged(GLuint eID, vec3 newScale);
+    void rotationChanged(GLuint eID, vec3 newRot);
 
 private:
     std::shared_ptr<Pool<Transform>> mTransforms;
     Registry *registry;
-    void setPositionPrivate(GLuint eID, gsl::Vector3D position);
-    void setRotationPrivate(GLuint eID, gsl::Vector3D rotation);
+    void setPositionPrivate(GLuint eID, vec3 position);
+    void setRotationPrivate(GLuint eID, vec3 rotation);
     void updateModelMatrix(Transform &comp);
     gsl::Matrix4x4 getTRMatrix(Transform &comp);
 };

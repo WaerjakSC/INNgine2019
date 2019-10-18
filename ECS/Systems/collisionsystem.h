@@ -16,10 +16,12 @@ public:
     // Need AABBSphere() and OBBSphere(), might use macro for swapping?
     bool AABBAABB(const Collision::AABB &aabb1, const Collision::AABB &aabb2);
     bool SphereAABB(const Collision::Sphere &sphere, const Collision::AABB &aabb1);
-    // todo
     bool SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb);
     bool SphereSphere(const Collision::Sphere &sphere1, const Collision::Sphere &sphere2);
     bool AABBPlane(const Collision::AABB &aabb, const Collision::Plane &plane);
+
+    // Work in progress this guy
+    bool CylinderCylinder(const Collision::Cylinder &cylinder1, const Collision::Cylinder &cylinder2);
 
     // Could this be useful later?
     // bool PointInAABB(const vec3& point, const Collision::AABB& aabb);

@@ -334,5 +334,12 @@ public:
         inline Plane() : normal(1,0,0){}
         inline Plane(const vec3& n, float d) : normal(n), distance(d){}
     } Plane;
+
+    typedef struct Cylinder{
+        vec3 position;
+        float radius;
+        float height;
+
+    } Cylinder;
 };
 #endif // COMPONENT_H

@@ -13,7 +13,7 @@ class Entity;
 class Registry;
 class MainWindow;
 class Scene;
-
+typedef gsl::Vector3D vec3;
 class ResourceManager : public QOpenGLFunctions_4_1_Core {
     friend class Scene;
 
@@ -116,8 +116,8 @@ private:
 
     // OctahedronBall functions
     void makeUnitOctahedron(GLint recursions);
-    void subDivide(const gsl::Vector3D &a, const gsl::Vector3D &b, const gsl::Vector3D &c, GLint n);
-    void makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3);
+    void subDivide(const vec3 &a, const vec3 &b, const vec3 &c, GLint n);
+    void makeTriangle(const vec3 &v1, const vec3 &v2, const vec3 &v3);
     void makeLightMesh(int eID);
     void makeSkyBoxMesh(GLuint eID);
     void makePlaneMesh(GLuint eID);
