@@ -147,8 +147,8 @@ vec3 CollisionSystem::ClosestPoint(const Collision::AABB &aabb, const vec3 &poin
  * @param point
  * @return
  */
-vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point) {
-    vec3 result = obb.position;
+//vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point) {
+    //vec3 result = obb.position;
     // move the point relative to the OBB
     //    vec3 dir = point - obb.position;
 
@@ -176,8 +176,8 @@ vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point)
     //        result = result + (axis * dist);
     //    }
 
-    return result;
-}
+  //  return result;
+//}
 
 /**
  * @brief CollisionSystem::ClosestPoint finds the point in a Sphere closest to a given point
