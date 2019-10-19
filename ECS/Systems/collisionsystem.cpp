@@ -7,6 +7,9 @@ CollisionSystem::CollisionSystem() {
     Registry::instance()->registerComponent<Collision>();
 }
 
+void CollisionSystem::update(float deltaTime) {
+}
+
 /**
  * @brief Helper function CollisionSystem::getMin finds minimum point in an AABB
  * @param aabb

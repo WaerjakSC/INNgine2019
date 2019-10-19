@@ -9,7 +9,8 @@ MovementSystem::MovementSystem() {
 void MovementSystem::init() {
     update();
 }
-void MovementSystem::update() {
+void MovementSystem::update(float deltaTime) {
+    Q_UNUSED(deltaTime) // remember to remove this once we implement deltaTime
     for (size_t curEntity{0}; curEntity < mTransforms->entities().size(); curEntity++) {
         auto &comp = mTransforms->data()[curEntity];
         updateModelMatrix(comp);

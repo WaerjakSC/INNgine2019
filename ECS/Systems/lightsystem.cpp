@@ -8,7 +8,8 @@ LightSystem::LightSystem(PhongShader *shader)
     mLightPool = std::make_shared<Pool<Light>>();
     Registry::instance()->registerComponent<Light>(mLightPool);
 }
-void LightSystem::update() {
+void LightSystem::update(float deltaTime) {
+    Q_UNUSED(deltaTime);
     GLuint curEntity{0}; // Get the actual ID.
     for (auto entityID : mLightPool->entities()) {
         // Send the entity's model matrix as well as the light data.

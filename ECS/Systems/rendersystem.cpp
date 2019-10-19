@@ -37,7 +37,8 @@ void RenderSystem::iterateEntities() {
 void RenderSystem::init() {
     mView->sortGroup();
 }
-void RenderSystem::render() {
+void RenderSystem::update(float deltaTime) {
+    Q_UNUSED(deltaTime);
     iterateEntities();
 }
 

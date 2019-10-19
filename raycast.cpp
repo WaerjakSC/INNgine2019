@@ -21,8 +21,7 @@ int Raycast::rayCast(const QPoint &mousePos) {
     for (auto entity : registry->getEntities()) {
         if (entity.second->name() != "Skybox" && entity.second->name() != "XYZ") {
             double intersectionPoint;
-            const Transform &trans = registry->getComponent<Transform>(entity.second->id());
-            if (RayToSphere(ray, mOpenGLWindow->movement()->getAbsolutePosition(entity.first), 1, intersectionPoint)) { // Setting radius to 1 just for testing
+            if (RayToSphere(ray, registry->getSystem<MovementSystem>()->getAbsolutePosition(entity.first), 1, intersectionPoint)) { // Setting radius to 1 just for testing
                 if (intersectionPoint < closestTarget) {
                     closestTarget = intersectionPoint;
                     entityID = entity.second->id();

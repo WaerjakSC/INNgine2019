@@ -2,18 +2,18 @@
 #define MOVEMENTSYSTEM_H
 
 #include "pool.h"
-#include <QObject>
+#include "system.h"
 #include <memory>
 
 typedef gsl::Vector3D vec3;
 class Registry;
 class Transform;
-class MovementSystem : public QObject {
+class MovementSystem : public QObject, public ISystem {
     Q_OBJECT
 public:
     MovementSystem();
 
-    void update();
+    void update(float deltaTime = 0.016) override;
     void init();
 
     void updateTRS(Transform &comp);

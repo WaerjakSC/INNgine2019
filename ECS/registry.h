@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "pool.h"
 #include "resourcemanager.h"
+#include "system.h"
 #include <memory>
 #include <typeinfo>
 
@@ -41,6 +42,20 @@ public:
         }
         return pool;
     }
+    template <typename Type, class... Args>
+    std::shared_ptr<Type> registerSystem(Args... args) {
+        std::string typeName = typeid(Type).name();
+        std::shared_ptr<Type> system;
+
+        if (mSystems.find(typeName) != mSystems.end()) {
+            system = getSystem<Type>();
+        } else {
+            system = std::make_shared<Type>(args...);
+            // Create a ComponentArray pointer and add it to the component arrays map
+            mSystems.insert({typeName, system});
+        }
+        return system;
+    }
     /**
      * @brief Adds an entity and its new component to a pool of that type.
      * Entity is equivalent to Component in this case, since a pool won't contain the entity if the entity doesn't have the component.
@@ -71,6 +86,11 @@ public:
         CType typeMask = getEntity(entityID)->types();
         // Get a reference to a component from the array for an entity
         return getComponentArray<Type>()->get(entityID, typeMask);
+    }
+    template <typename Type>
+    std::shared_ptr<Type> getSystem() {
+        std::string typeName = typeid(Type).name();
+        return std::static_pointer_cast<Type>(mSystems[typeName]);
     }
     /**
      * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
@@ -152,6 +172,8 @@ signals:
 private:
     static Registry *mInstance;
     std::map<std::string, std::shared_ptr<IPool>> mPools{};
+    std::map<std::string, std::shared_ptr<ISystem>> mSystems{};
+
     std::map<GLuint, Entity *> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);

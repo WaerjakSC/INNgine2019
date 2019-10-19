@@ -17,6 +17,7 @@ class HierarchyView;
 class VerticalScrollArea;
 class QToolButton;
 class ComponentList;
+class Registry;
 namespace Ui {
 class MainWindow;
 }
@@ -74,6 +75,7 @@ private:
     ComponentList *mComponentList;
     Entity *selectedEntity;
     quint32 unnamedEntityCount{0};
+    Registry *registry;
 
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();

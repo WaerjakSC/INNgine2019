@@ -65,6 +65,7 @@ void MainWindow::init() {
 
     //We have a format for the OpenGL window, so let's make it:
     mRenderWindow = new RenderWindow(format, this);
+    registry = Registry::instance();
     createActions();
 
     //Check if renderwindow did initialize, else prints error and quit
@@ -98,9 +99,9 @@ void MainWindow::init() {
     connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
     connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
     connect(mRenderWindow, &RenderWindow::rayHitEntity, this, &MainWindow::mouseRayHit);
-    connect(Registry::instance(), &Registry::entityCreated, this, &MainWindow::onEntityAdded);
-    connect(Registry::instance(), &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
-    connect(Registry::instance(), &Registry::parentChanged, this, &MainWindow::parentChanged);
+    connect(registry, &Registry::entityCreated, this, &MainWindow::onEntityAdded);
+    connect(registry, &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
+    connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
 }
 void MainWindow::playButtons() {
     QToolBar *toolbar = ui->mainToolBar;
@@ -189,7 +190,7 @@ void MainWindow::createActions() {
     components->addAction(material);
     connect(material, &QAction::triggered, mComponentList, &ComponentList::addMaterialComponent);
 
-    QAction *mesh = new QAction(tr("Mesh"), this); // Somewhere along this action path should let you choose the mesh file to use/import
+    QAction *mesh = new QAction(tr("Mesh"), this);
     components->addAction(mesh);
     connect(mesh, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
@@ -240,7 +241,7 @@ void MainWindow::closeEngine() {
     close();
 }
 void MainWindow::makeEntity() {
-    emit made3DObject(Registry::instance()->makeEntity("GameObject"));
+    emit made3DObject(registry->makeEntity("GameObject"));
 }
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());
@@ -253,7 +254,6 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     QString data = hierarchy->data(newParent).toString();
-    Registry *registry = Registry::instance();
     if (data != "") {
         Entity *entt = registry->getEntity(data);
         if (entt) {
@@ -263,13 +263,13 @@ void MainWindow::onParentChanged(const QModelIndex &newParent) {
                 int parentID = entt->id();
                 // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
                 registry->setParent(selectedEntity->id(), parentID, true);
-                mRenderWindow->movement()->updateEntity(selectedEntity->id());
+                registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
             }
         }
     } else if (selectedEntity)
         if (registry->contains(selectedEntity->id(), CType::Transform)) {
             registry->setParent(selectedEntity->id(), -1, true);
-            mRenderWindow->movement()->updateEntity(selectedEntity->id());
+            registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
         }
 }
 void MainWindow::parentChanged(GLuint eID) {
@@ -278,47 +278,46 @@ void MainWindow::parentChanged(GLuint eID) {
     QStandardItem *item = hierarchy->itemFromEntityID(eID);
     if (item) {
         hierarchy->removeRow(item->row());
-        Entity *entt = Registry::instance()->getEntity(eID);
+        Entity *entt = registry->getEntity(eID);
         item = new QStandardItem;
         item->setText(entt->name());
-        int parentID = Registry::instance()->getComponent<Transform>(entt->id()).parentID;
-        if (Registry::instance()->hasParent(eID)) {
+        int parentID = registry->getComponent<Transform>(entt->id()).parentID;
+        if (registry->hasParent(eID)) {
             QStandardItem *parent = hierarchy->itemFromEntityID(parentID);
             parent->insertRow(parent->rowCount(), item);
         } else
             rootItem->appendRow(item);
-        mRenderWindow->movement()->updateEntity(eID);
+        registry->getSystem<MovementSystem>()->updateEntity(eID);
     }
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
 }
 void MainWindow::onEntityClicked(const QModelIndex &index) {
-    Registry *reg = Registry::instance();
     QStandardItem *item = hierarchy->itemFromIndex(index);
-    Entity *entt = reg->getEntity(item->text());
+    Entity *entt = registry->getEntity(item->text());
     onEntityDragged(entt->id());
 
     mComponentList->setupComponentList();
 }
 
 void MainWindow::onEntityDragged(GLuint eID) {
-    selectedEntity = Registry::instance()->getEntity(eID);
+    selectedEntity = registry->getEntity(eID);
 }
 void MainWindow::mouseRayHit(GLuint eID) {
     QStandardItem *entity = hierarchy->itemFromEntityID(eID);
     QModelIndex entityIndex = hierarchy->indexFromItem(entity);
     hView->setCurrentIndex(entityIndex);
-    selectedEntity = Registry::instance()->getEntity(eID);
+    selectedEntity = registry->getEntity(eID);
     mComponentList->setupComponentList();
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
-    if (selectedEntity && Registry::instance()->isUniqueName(newName))
+    if (selectedEntity && registry->isUniqueName(newName))
         selectedEntity->setName(hierarchy->data(index).toString());
 }
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     QStandardItem *item = new QStandardItem;
-    item->setText(Registry::instance()->getEntity(eID)->name());
+    item->setText(registry->getEntity(eID)->name());
     parentItem->appendRow(item);
 }
 
@@ -329,13 +328,13 @@ void MainWindow::onEntityAdded(GLuint eID) {
 void MainWindow::insertEntities() {
     hierarchy->clear();
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
-    for (auto entity : Registry::instance()->getEntities()) {
+    for (auto entity : registry->getEntities()) {
         QStandardItem *item = new QStandardItem;
         if (entity.second->name() == "")
             item->setText(QString("GameObject" + QString::number(unnamedEntityCount)));
         else
             item->setText(entity.second->name());
-        int parentID = Registry::instance()->getComponent<Transform>(entity.second->id()).parentID;
+        int parentID = registry->getComponent<Transform>(entity.second->id()).parentID;
         if (parentID != -1) {
             forEach(parentID, item);
         } else
@@ -354,7 +353,7 @@ void MainWindow::forEach(GLuint parentID, QStandardItem *child, QModelIndex pare
     for (int r = 0; r < hierarchy->rowCount(parent); ++r) {
         QModelIndex index = hierarchy->index(r, 0, parent);
         QStandardItem *item = hierarchy->itemFromIndex(index);
-        Entity *entt = Registry::instance()->getEntity(item->text());
+        Entity *entt = registry->getEntity(item->text());
         item->setText(entt->name());
         if (parentID == entt->id()) { // If in-value parentID matches the ID of the current item, append the new child to that item.
             item->appendRow(child);

@@ -3,12 +3,13 @@
 
 #include "components.h"
 #include "registry.h"
-
-class CollisionSystem {
+#include "system.h"
+class CollisionSystem : public ISystem {
 public:
     CollisionSystem();
 
     Registry *reg = Registry::instance();
+    void update(float deltaTime = 0.016) override;
 
     vec3 getMin(const Collision::AABB &aabb);
     vec3 getMax(const Collision::AABB &aabb);

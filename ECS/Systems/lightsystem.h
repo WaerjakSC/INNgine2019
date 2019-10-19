@@ -1,13 +1,14 @@
 #ifndef LIGHTSYSTEM_H
 #define LIGHTSYSTEM_H
 #include "pool.h"
+#include "system.h"
 #include <memory>
 class PhongShader;
-class LightSystem {
+class LightSystem : public ISystem {
 public:
     LightSystem(PhongShader *shader);
 
-    void update();
+    void update(float deltaTime = 0.016) override;
 
     Pool<Light> *lightPool() const;
 

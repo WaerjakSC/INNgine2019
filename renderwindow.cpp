@@ -126,9 +126,9 @@ void RenderWindow::init() {
     glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("skybox.bmp")->id());
 
     // Set up the systems.
-    mRenderer = std::make_unique<RenderSystem>(mFactory->getShaders());
-    mMoveSys = std::make_unique<MovementSystem>();
-    mLightSys = std::make_shared<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
+    mRenderer = mRegistry->registerSystem<RenderSystem>(mFactory->getShaders());
+    mMoveSys = mRegistry->registerSystem<MovementSystem>();
+    mLightSys = mRegistry->registerSystem<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
     mFactory->setLightSystem(mLightSys);
     ray = new Raycast(this, mCurrentCamera);
 
@@ -165,7 +165,7 @@ void RenderWindow::render() {
         if (mIsPlaying) {
             mMoveSys->update();
         }
-        mRenderer->render();
+        mRenderer->update();
         mLightSys->update();
         mSoundManager->updateListener(mCurrentCamera->position(), vec3(1), mCurrentCamera->forward(), mCurrentCamera->up());
     }

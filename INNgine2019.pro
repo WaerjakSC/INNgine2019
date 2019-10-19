@@ -61,6 +61,7 @@ win32 {
     }
 }
 HEADERS += \
+    ECS/Systems/system.h \
     ECS/entity.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \

@@ -3,16 +3,17 @@
 
 #include "pool.h"
 #include "renderview.h"
+#include "system.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <memory>
 class Registry;
 class RenderView;
-class RenderSystem : public QObject, public QOpenGLFunctions_4_1_Core {
+class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
     RenderSystem(std::map<ShaderType, Shader *> shaders);
 
-    void render();
+    void update(float deltaTime = 0.016) override;
 
     void init();
 public slots:

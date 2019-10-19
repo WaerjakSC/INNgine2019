@@ -127,7 +127,7 @@ void ComponentList::setupMaterialSettings(const Material &component) {
         if (type.first == component.mShader)
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
-    connect(this, &ComponentList::newShader, mMainWindow->mRenderWindow->renderer(), &RenderSystem::changeShader);
+    connect(this, &ComponentList::newShader, registry->getSystem<RenderSystem>().get(), &RenderSystem::changeShader);
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setNewShader(const QString &)));
 
     QString curTexture = ResourceManager::instance()->getTextureName(component.mTextureUnit);
@@ -223,9 +223,10 @@ void ComponentList::setupTransformSettings(const Transform &component) {
 
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    connect(mMainWindow->mRenderWindow->movement(), &MovementSystem::positionChanged, this, &ComponentList::updatePositionVals);
-    connect(mMainWindow->mRenderWindow->movement(), &MovementSystem::rotationChanged, this, &ComponentList::updateRotationVals);
-    connect(mMainWindow->mRenderWindow->movement(), &MovementSystem::scaleChanged, this, &ComponentList::updateScaleVals);
+    MovementSystem *movement = registry->getSystem<MovementSystem>().get();
+    connect(movement, &MovementSystem::positionChanged, this, &ComponentList::updatePositionVals);
+    connect(movement, &MovementSystem::rotationChanged, this, &ComponentList::updateRotationVals);
+    connect(movement, &MovementSystem::scaleChanged, this, &ComponentList::updateScaleVals);
     // Set up the Position Display
     for (int i = 0; i < 6; i++) {
         if (i % 2 == 0) {
@@ -411,7 +412,7 @@ void ComponentList::updatePosSpinBoxes(int state) {
         zVal->setValue(trans.localPosition.z);
         break;
     case 2:
-        mMainWindow->mRenderWindow->movement()->getAbsolutePosition(mMainWindow->selectedEntity->id()); // have to call this function once to update the global pos variable if it hasn't been cached yet
+        registry->getSystem<MovementSystem>()->getAbsolutePosition(mMainWindow->selectedEntity->id()); // have to call this function once to update the global pos variable if it hasn't been cached yet
         xVal->setValue(trans.position.x);
         yVal->setValue(trans.position.y);
         zVal->setValue(trans.position.z);
@@ -447,57 +448,66 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
     }
 }
 void ComponentList::setPositionX(double xIn) {
+    auto movement = registry->getSystem<MovementSystem>();
     if (abs->isChecked())
-        mMainWindow->mRenderWindow->movement()->setAbsolutePositionX(mMainWindow->selectedEntity->id(), xIn, false);
+        movement->setAbsolutePositionX(mMainWindow->selectedEntity->id(), xIn, false);
     else
-        mMainWindow->mRenderWindow->movement()->setLocalPositionX(mMainWindow->selectedEntity->id(), xIn, false);
+        movement->setLocalPositionX(mMainWindow->selectedEntity->id(), xIn, false);
 
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setPositionY(double yIn) {
+    auto movement = registry->getSystem<MovementSystem>();
     if (abs->isChecked())
-        mMainWindow->mRenderWindow->movement()->setAbsolutePositionY(mMainWindow->selectedEntity->id(), yIn, false);
+        movement->setAbsolutePositionY(mMainWindow->selectedEntity->id(), yIn, false);
     else
-        mMainWindow->mRenderWindow->movement()->setLocalPositionY(mMainWindow->selectedEntity->id(), yIn, false);
+        movement->setLocalPositionY(mMainWindow->selectedEntity->id(), yIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setPositionZ(double zIn) {
+    auto movement = registry->getSystem<MovementSystem>();
     if (abs->isChecked())
-        mMainWindow->mRenderWindow->movement()->setAbsolutePositionZ(mMainWindow->selectedEntity->id(), zIn, false);
+        movement->setAbsolutePositionZ(mMainWindow->selectedEntity->id(), zIn, false);
     else
-        mMainWindow->mRenderWindow->movement()->setLocalPositionZ(mMainWindow->selectedEntity->id(), zIn, false);
+        movement->setLocalPositionZ(mMainWindow->selectedEntity->id(), zIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setRotationX(double xIn) {
-    mMainWindow->mRenderWindow->movement()->setRotationX(mMainWindow->selectedEntity->id(), xIn, false);
+    auto movement = registry->getSystem<MovementSystem>();
+    movement->setRotationX(mMainWindow->selectedEntity->id(), xIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setRotationY(double yIn) {
-    mMainWindow->mRenderWindow->movement()->setRotationY(mMainWindow->selectedEntity->id(), yIn, false);
+    auto movement = registry->getSystem<MovementSystem>();
+    movement->setRotationY(mMainWindow->selectedEntity->id(), yIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setRotationZ(double zIn) {
-    mMainWindow->mRenderWindow->movement()->setRotationZ(mMainWindow->selectedEntity->id(), zIn, false);
+    auto movement = registry->getSystem<MovementSystem>();
+    movement->setRotationZ(mMainWindow->selectedEntity->id(), zIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setScaleX(double xIn) {
-    mMainWindow->mRenderWindow->movement()->setScaleX(mMainWindow->selectedEntity->id(), xIn, false);
+    auto movement = registry->getSystem<MovementSystem>();
+    movement->setScaleX(mMainWindow->selectedEntity->id(), xIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setScaleY(double yIn) {
-    mMainWindow->mRenderWindow->movement()->setScaleY(mMainWindow->selectedEntity->id(), yIn, false);
+    auto movement = registry->getSystem<MovementSystem>();
+    movement->setScaleY(mMainWindow->selectedEntity->id(), yIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setScaleZ(double zIn) {
-    mMainWindow->mRenderWindow->movement()->setScaleZ(mMainWindow->selectedEntity->id(), zIn, false);
+    auto movement = registry->getSystem<MovementSystem>();
+    movement->setScaleZ(mMainWindow->selectedEntity->id(), zIn, false);
     if (!mMainWindow->mRenderWindow->isPlaying())
-        mMainWindow->mRenderWindow->movement()->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(mMainWindow->selectedEntity->id());
 }
