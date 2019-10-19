@@ -126,20 +126,20 @@ struct Transform : Component {
         scaleMatrix.setToIdentity();
     }
     Transform(vec3 pos, vec3 rot = 0, vec3 newScale = 1) : Transform() {
-        position = pos;
-        rotation = rot;
-        scale = newScale;
+        localPosition = pos;
+        localRotation = rot;
+        localScale = newScale;
     }
     virtual void update() {}
 
     bool matrixOutdated{true};
 
-    vec3 position{0};
     vec3 localPosition{0};
-    vec3 rotation{0};
+    vec3 position{0};
     vec3 localRotation{0};
-    vec3 scale{1};
+    vec3 rotation{0};
     vec3 localScale{1};
+    //    vec3 scale{1};
     gsl::Matrix4x4 modelMatrix, translationMatrix, rotationMatrix, scaleMatrix;
 
     std::vector<GLuint> children;

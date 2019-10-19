@@ -1,5 +1,6 @@
 #include "raycast.h"
 #include "camera.h"
+#include "movementsystem.h"
 #include "registry.h"
 #include "renderwindow.h"
 #include <QWindow>
@@ -21,7 +22,7 @@ int Raycast::rayCast(const QPoint &mousePos) {
         if (entity.second->name() != "Skybox" && entity.second->name() != "XYZ") {
             double intersectionPoint;
             const Transform &trans = registry->getComponent<Transform>(entity.second->id());
-            if (RayToSphere(ray, trans.position, 1, intersectionPoint)) { // Setting radius to 1 just for testing
+            if (RayToSphere(ray, mOpenGLWindow->movement()->getAbsolutePosition(entity.first), 1, intersectionPoint)) { // Setting radius to 1 just for testing
                 if (intersectionPoint < closestTarget) {
                     closestTarget = intersectionPoint;
                     entityID = entity.second->id();

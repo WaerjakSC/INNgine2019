@@ -38,6 +38,7 @@ public:
     static Vector3D cross(const Vector3D &v1, const Vector3D &v2);
     static GLfloat dot(const Vector3D &v1, const Vector3D &v2);
 
+    void rotate(const Vector3D &euler);
     void rotateX(GLfloat angle);
     void rotateY(GLfloat angle);
     void rotateZ(GLfloat angle);

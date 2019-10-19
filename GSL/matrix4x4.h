@@ -18,6 +18,7 @@ public:
 
     Matrix4x4 identity();
     void setToIdentity();
+    bool isIdentity();
 
     bool inverse();
     static std::tuple<vec3, vec3, vec3> decomposed(const Matrix4x4 &matrix);
@@ -39,6 +40,7 @@ public:
     void scale(Vector3D s);
     void scale(GLfloat uniformScale);
     void scale(GLfloat scaleX, GLfloat scaleY, GLfloat scaleZ);
+    Vector3D getScale();
 
     GLfloat *constData();
 
@@ -60,6 +62,7 @@ public:
 
     GLfloat &operator()(const int &y, const int &x);
     GLfloat operator()(const int &y, const int &x) const;
+    bool operator==(const Matrix4x4 &other);
 
     Matrix4x4 operator*(const Matrix4x4 &other);
 

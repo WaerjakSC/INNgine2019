@@ -19,6 +19,8 @@ class QLabel;
 class Transform;
 class Material;
 class QToolButton;
+class QCheckBox;
+class QDoubleSpinBox;
 namespace Ui {
 class MainWindow;
 }
@@ -57,13 +59,12 @@ public slots:
 
 private slots:
     void onEntityClicked(const QModelIndex &index);
+    void onEntityDragged(GLuint eID);
 
     void onNameChanged(const QModelIndex &index);
     void onEntityAdded(GLuint entity);
 
     void onParentChanged(const QModelIndex &index);
-
-    void onEntityDragged(GLuint id);
 
     void makeCube();
 
@@ -84,7 +85,7 @@ private slots:
     void setScaleX(double xIn);
     void setScaleY(double yIn);
     void setScaleZ(double zIn);
-    void updatePositionVals(GLuint eID, vec3 newPos);
+    void updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal);
     void updateRotationVals(GLuint eID, vec3 newRot);
     void updateScaleVals(GLuint eID, vec3 newScale);
 
@@ -102,6 +103,8 @@ private slots:
     void addSoundComponent();
     void makeEntity();
 
+    void updatePosSpinBoxes(int state);
+
 private:
     void init();
     Ui::MainWindow *ui;
@@ -115,6 +118,8 @@ private:
     QColor rgb;
     QLabel *colorLabel, *texFileLabel, *objFileLabel;
     quint32 unnamedEntityCount{0};
+    QCheckBox *abs;
+    QDoubleSpinBox *xVal, *yVal, *zVal;
 
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();

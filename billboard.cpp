@@ -30,7 +30,7 @@ void BillBoard::update() {
     direction.normalize();
     //set rotation to this direction
     transform.rotationMatrix.setRotationToVector(direction);
-    transform.rotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
+    transform.localRotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
     transform.matrixOutdated = true;
 }
 

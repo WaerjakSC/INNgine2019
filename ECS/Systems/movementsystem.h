@@ -19,17 +19,20 @@ public:
     void updateTRS(Transform &comp);
     void updateEntity(GLuint eID);
 
-    vec3 getAbsolutePosition(int eID);
-    vec3 getRelativePosition(int eID);
+    vec3 getAbsolutePosition(GLuint eID);
+    vec3 getLocalPosition(GLuint eID);
     // ******** Position Setters ******** //
     void setAbsolutePosition(GLuint eID, vec3 position, bool signal = true);
 
-    void setPosition(GLuint eID, vec3 position, bool signal = true);
-    void setPosition(int eID, float xIn, float yIn, float zIn, bool signal = true);
+    void setLocalPosition(GLuint eID, vec3 position, bool signal = true);
+    void setLocalPosition(int eID, float xIn, float yIn, float zIn, bool signal = true);
 
-    void setPositionX(int eID, float xIn, bool signal = true);
-    void setPositionY(int eID, float yIn, bool signal = true);
-    void setPositionZ(int eID, float zIn, bool signal = true);
+    void setAbsolutePositionX(int eID, float xIn, bool signal);
+    void setAbsolutePositionY(int eID, float yIn, bool signal);
+    void setAbsolutePositionZ(int eID, float zIn, bool signal);
+    void setLocalPositionX(int eID, float xIn, bool signal = true);
+    void setLocalPositionY(int eID, float yIn, bool signal = true);
+    void setLocalPositionZ(int eID, float zIn, bool signal = true);
 
     void moveX(GLuint eID, float xIn, bool signal = true);
     void moveY(GLuint eID, float yIn, bool signal = true);
@@ -55,13 +58,15 @@ public:
     void scaleX(GLuint eID, float xIn, bool signal = true);
     void scaleY(GLuint eID, float yIn, bool signal = true);
     void scaleZ(GLuint eID, float zIn, bool signal = true);
-    void setLocalPosition(GLuint eID, const vec3 &localPosition, bool signal = true);
-    void setLocalScale(GLuint eID, const vec3 &localScale, bool signal = true);
+
     void move(GLuint eID, const vec3 &moveDelta, bool signal = true);
     void scale(GLuint eID, const vec3 &scaleDelta, bool signal = true);
     void rotate(GLuint eID, const vec3 &rotDelta, bool signal = true);
+    gsl::Vector3D getAbsoluteRotation(GLuint eID);
+    gsl::Vector3D getRelativeRotation(GLuint eID);
+
 signals:
-    void positionChanged(GLuint eID, vec3 newPos);
+    void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);
     void rotationChanged(GLuint eID, vec3 newRot);
 

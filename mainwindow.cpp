@@ -7,6 +7,7 @@
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
+#include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QDesktopWidget>
@@ -145,7 +146,9 @@ void MainWindow::playButtons() {
     toolbar->addWidget(spacer2); // Spacer #2
 }
 
-void MainWindow::updatePositionVals(GLuint eID, vec3 newPos) {
+void MainWindow::updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal) {
+    if (abs->isChecked() != isGlobal) // if absolute position is checked but the signal is local, don't do anything, and vice versa
+        return;
     if (eID == selectedEntity->id()) {
         emit posX(newPos.x);
         emit posY(newPos.y);
@@ -178,7 +181,6 @@ void MainWindow::snapToObject() {
     if (selectedEntity)
         mRenderWindow->snapToObject(selectedEntity->id());
 }
-// To-do: Save As button, folder pop-up that lets you choose or make a new scene file.
 void MainWindow::createActions() {
     QMenu *projectActions = ui->menuBar->addMenu(tr("Project"));
     QAction *saveScene = new QAction(tr("Save"));
@@ -475,42 +477,51 @@ void MainWindow::setupTransformSettings(const Transform &component) {
             }
             position->addWidget(label);
         } else {
-            QDoubleSpinBox *val = new QDoubleSpinBox(box);
-            val->setDecimals(1);
-            val->setRange(-5000, 5000);
-            val->setMaximumWidth(58);
-            val->setStyle(fusion);
+
             switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
             case 1:
-                //                if (component.parentID != -1)
-                //                    val->setValue(component.mRelativePosition.x);
-                //                else
-                val->setValue(component.position.x);
-                connect(this, &MainWindow::posX, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
+                xVal = new QDoubleSpinBox(box);
+                xVal->setDecimals(1);
+                xVal->setRange(-5000, 5000);
+                xVal->setMaximumWidth(58);
+                xVal->setStyle(fusion);
+                xVal->setValue(component.localPosition.x);
+                connect(this, &MainWindow::posX, xVal, &QDoubleSpinBox::setValue);
+                connect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
+                position->addWidget(xVal);
                 break;
             case 3:
-                //                if (component.parentID != -1)
-                //                    val->setValue(component.mRelativePosition.y);
-                //                else
-                val->setValue(component.position.y);
-                connect(this, &MainWindow::posY, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
+                yVal = new QDoubleSpinBox(box);
+                yVal->setDecimals(1);
+                yVal->setRange(-5000, 5000);
+                yVal->setMaximumWidth(58);
+                yVal->setStyle(fusion);
+                yVal->setValue(component.localPosition.y);
+                connect(this, &MainWindow::posY, yVal, &QDoubleSpinBox::setValue);
+                connect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
+                position->addWidget(yVal);
                 break;
             case 5:
-                //                if (component.parentID != -1)
-                //                    val->setValue(component.mRelativePosition.z);
-                //                else
-                val->setValue(component.position.z);
-                connect(this, &MainWindow::posZ, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
+                zVal = new QDoubleSpinBox(box);
+                zVal->setDecimals(1);
+                zVal->setRange(-5000, 5000);
+                zVal->setMaximumWidth(58);
+                zVal->setStyle(fusion);
+                zVal->setValue(component.localPosition.z);
+                connect(this, &MainWindow::posZ, zVal, &QDoubleSpinBox::setValue);
+                connect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
+                position->addWidget(zVal);
                 break;
             }
-            position->addWidget(val);
         }
     }
     posBox->setLayout(position);
+    QHBoxLayout *check = new QHBoxLayout;
+    abs = new QCheckBox(tr("Absolute Position"));
+    connect(abs, &QCheckBox::stateChanged, this, &MainWindow::updatePosSpinBoxes);
+    check->addWidget(abs);
     grid->addWidget(posBox, 0, 0);
+    grid->addLayout(check, 1, 0);
 
     QGroupBox *rotBox = new QGroupBox(tr("Rotation"));
     rotBox->setStyle(fusion);
@@ -544,17 +555,17 @@ void MainWindow::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component.rotation.x);
+                val->setValue(component.localRotation.x);
                 connect(this, &MainWindow::rotX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
                 break;
             case 3:
-                val->setValue(component.rotation.y);
+                val->setValue(component.localRotation.y);
                 connect(this, &MainWindow::rotY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationY(double)));
                 break;
             case 5:
-                val->setValue(component.rotation.z);
+                val->setValue(component.localRotation.z);
                 connect(this, &MainWindow::rotZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationZ(double)));
                 break;
@@ -563,7 +574,7 @@ void MainWindow::setupTransformSettings(const Transform &component) {
         }
     }
     rotBox->setLayout(rotation);
-    grid->addWidget(rotBox, 1, 0);
+    grid->addWidget(rotBox, 2, 0);
 
     QGroupBox *scaleBox = new QGroupBox(tr("Scale"));
     scaleBox->setStyle(fusion);
@@ -597,17 +608,17 @@ void MainWindow::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component.scale.x);
+                val->setValue(component.localScale.x);
                 connect(this, &MainWindow::scaleX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
                 break;
             case 3:
-                val->setValue(component.scale.y);
+                val->setValue(component.localScale.y);
                 connect(this, &MainWindow::scaleY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleY(double)));
                 break;
             case 5:
-                val->setValue(component.scale.z);
+                val->setValue(component.localScale.z);
                 connect(this, &MainWindow::scaleZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleZ(double)));
                 break;
@@ -616,12 +627,35 @@ void MainWindow::setupTransformSettings(const Transform &component) {
         }
     }
     scaleBox->setLayout(scale);
-    grid->addWidget(scaleBox, 2, 0);
+    grid->addWidget(scaleBox, 3, 0);
 
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-
+void MainWindow::updatePosSpinBoxes(int state) {
+    disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
+    disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
+    disconnect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
+    auto &trans = Registry::instance()->getComponent<Transform>(selectedEntity->id());
+    switch (state) {
+    case 0:
+        xVal->setValue(trans.localPosition.x);
+        yVal->setValue(trans.localPosition.y);
+        zVal->setValue(trans.localPosition.z);
+        break;
+    case 2:
+        mRenderWindow->movement()->getAbsolutePosition(selectedEntity->id()); // have to call this function once to update the global pos variable if it hasn't been cached yet
+        xVal->setValue(trans.position.x);
+        yVal->setValue(trans.position.y);
+        zVal->setValue(trans.position.z);
+        break;
+    default:
+        break;
+    }
+    connect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
+    connect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
+    connect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
+}
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_F)
         mRenderWindow->keyPressEvent(event);
@@ -698,31 +732,19 @@ void MainWindow::onEntityClicked(const QModelIndex &index) {
     QStandardItem *item = hierarchy->itemFromIndex(index);
     Entity *entt = reg->getEntity(item->text());
     onEntityDragged(entt->id());
+
     setupComponentList();
+}
+
+void MainWindow::onEntityDragged(GLuint eID) {
+    selectedEntity = Registry::instance()->getEntity(eID);
 }
 void MainWindow::mouseRayHit(GLuint eID) {
     QStandardItem *entity = hierarchy->itemFromEntityID(eID);
     QModelIndex entityIndex = hierarchy->indexFromItem(entity);
     hView->setCurrentIndex(entityIndex);
-    onEntityDragged(eID);
+    selectedEntity = Registry::instance()->getEntity(eID);
     setupComponentList();
-}
-/**
- * @brief Get the game object the user is interacting with.
- * @param id of the entity
- */
-void MainWindow::onEntityDragged(GLuint id) {
-    selectedEntity = Registry::instance()->getEntity(id);
-    //    qDebug() << "Name: " + QString::fromStdString(selectedEntity->mName) + ". ID: " + QString::number(selectedEntity->eID);
-    if ((selectedEntity->types() & CType::Transform) != CType::None) {
-        vec3 location;
-        GLuint id = selectedEntity->id();
-        if (Registry::instance()->hasParent(id)) {
-            location = mRenderWindow->movement()->getRelativePosition(id);
-        } else
-            location = mRenderWindow->movement()->getAbsolutePosition(id);
-        //        qDebug() << "Location: " + QString::number(location.x) + ", " + QString::number(location.y) + ", " + QString::number(location.z);
-    }
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
@@ -780,17 +802,27 @@ void MainWindow::forEach(GLuint parentID, QStandardItem *child, QModelIndex pare
     }
 }
 void MainWindow::setPositionX(double xIn) {
-    mRenderWindow->movement()->setPositionX(selectedEntity->id(), xIn, false);
+    if (abs->isChecked())
+        mRenderWindow->movement()->setAbsolutePositionX(selectedEntity->id(), xIn, false);
+    else
+        mRenderWindow->movement()->setLocalPositionX(selectedEntity->id(), xIn, false);
+
     if (!mRenderWindow->mIsPlaying)
         mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setPositionY(double yIn) {
-    mRenderWindow->movement()->setPositionY(selectedEntity->id(), yIn, false);
+    if (abs->isChecked())
+        mRenderWindow->movement()->setAbsolutePositionY(selectedEntity->id(), yIn, false);
+    else
+        mRenderWindow->movement()->setLocalPositionY(selectedEntity->id(), yIn, false);
     if (!mRenderWindow->mIsPlaying)
         mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
 void MainWindow::setPositionZ(double zIn) {
-    mRenderWindow->movement()->setPositionZ(selectedEntity->id(), zIn, false);
+    if (abs->isChecked())
+        mRenderWindow->movement()->setAbsolutePositionZ(selectedEntity->id(), zIn, false);
+    else
+        mRenderWindow->movement()->setLocalPositionZ(selectedEntity->id(), zIn, false);
     if (!mRenderWindow->mIsPlaying)
         mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }

@@ -32,7 +32,9 @@ Matrix4x4 Matrix4x4::identity() {
 
     return *this;
 }
-
+bool Matrix4x4::isIdentity() {
+    return Matrix4x4(true) == *this;
+}
 void Matrix4x4::setToIdentity() {
     *this =
         {
@@ -239,7 +241,18 @@ void Matrix4x4::setPosition(GLfloat x, GLfloat y, GLfloat z) {
 Vector3D Matrix4x4::getPosition() {
     return gsl::Vector3D(matrix[3], matrix[7], matrix[11]);
 }
+Vector3D Matrix4x4::getScale() {
+    vec3 scaleX = vec3(matrix[0], matrix[4], matrix[8]);  // 0 - 4 - 8
+    vec3 scaleY = vec3(matrix[1], matrix[5], matrix[9]);  // 1 - 5 - 9
+    vec3 scaleZ = vec3(matrix[2], matrix[6], matrix[10]); // 2 - 6 - 10
 
+    vec3 scale;
+    // The absolute scale of the object is calculated by the length of each column vector.
+    scale.x = scaleX.length();
+    scale.y = scaleY.length();
+    scale.z = scaleZ.length();
+    return scale;
+}
 void Matrix4x4::rotateX(GLfloat degrees) {
     GLfloat rad = deg2radf(degrees);
 
@@ -473,6 +486,13 @@ GLfloat &Matrix4x4::operator()(const int &y, const int &x) {
 
 GLfloat Matrix4x4::operator()(const int &y, const int &x) const {
     return matrix[y * 4 + x];
+}
+
+bool Matrix4x4::operator==(const Matrix4x4 &other) {
+    for (size_t i = 0; i < 16; i++)
+        if (matrix[i] != other.matrix[i])
+            return false;
+    return true;
 }
 
 Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) {

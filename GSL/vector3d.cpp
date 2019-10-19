@@ -125,6 +125,12 @@ GLfloat Vector3D::dot(const Vector3D &v1, const Vector3D &v2) {
     return ((v1.getX() * v2.getX()) + (v1.getY() * v2.getY()) + (v1.getZ() * v2.getZ()));
 }
 
+void Vector3D::rotate(const Vector3D &euler) {
+    rotateX(euler.x);
+    rotateY(euler.y);
+    rotateZ(euler.z);
+}
+
 void Vector3D::rotateX(GLfloat angle) {
     Vector3D dir;
     angle = gsl::deg2rad(angle);
