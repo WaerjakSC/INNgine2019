@@ -51,6 +51,8 @@ public:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 
+    bool isPlaying() const;
+
 public slots:
     void snapToObject(int eID);
     void save();

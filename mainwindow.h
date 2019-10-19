@@ -15,12 +15,8 @@ class QStandardItem;
 class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
-class QLabel;
-class Transform;
-class Material;
 class QToolButton;
-class QCheckBox;
-class QDoubleSpinBox;
+class ComponentList;
 namespace Ui {
 class MainWindow;
 }
@@ -42,16 +38,6 @@ public:
 signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
-    void posX(GLfloat xIn);
-    void posY(GLfloat yIn);
-    void posZ(GLfloat zIn);
-    void rotX(GLfloat xIn);
-    void rotY(GLfloat yIn);
-    void rotZ(GLfloat zIn);
-    void scaleX(GLfloat xIn);
-    void scaleY(GLfloat yIn);
-    void scaleZ(GLfloat zIn);
-    void newShader(int entityID, ShaderType shader);
 public slots:
     void parentChanged(GLuint eID);
     void mouseRayHit(GLuint eID);
@@ -74,36 +60,7 @@ private slots:
 
     void snapToObject();
 
-    void setPositionX(double xIn);
-    void setPositionY(double yIn);
-    void setPositionZ(double zIn);
-
-    void setRotationX(double xIn);
-    void setRotationY(double yIn);
-    void setRotationZ(double zIn);
-
-    void setScaleX(double xIn);
-    void setScaleY(double yIn);
-    void setScaleZ(double zIn);
-    void updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal);
-    void updateRotationVals(GLuint eID, vec3 newRot);
-    void updateScaleVals(GLuint eID, vec3 newScale);
-
-    void setNewShader(const QString &text);
-    void setNewTextureFile();
-    void setColor();
-    void setNewMesh();
-
-    void addTransformComponent();
-    void addMaterialComponent();
-    void addMeshComponent();
-    void addLightComponent();
-    void addInputComponent();
-    void addPhysicsComponent();
-    void addSoundComponent();
     void makeEntity();
-
-    void updatePosSpinBoxes(int state);
 
 private:
     void init();
@@ -112,22 +69,16 @@ private:
     HierarchyModel *hierarchy;
     HierarchyView *hView;
     VerticalScrollArea *scrollArea;
-    Entity *selectedEntity{nullptr};
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
-    QColor rgb;
-    QLabel *colorLabel, *texFileLabel, *objFileLabel;
+    ComponentList *mComponentList;
+    Entity *selectedEntity;
     quint32 unnamedEntityCount{0};
-    QCheckBox *abs;
-    QDoubleSpinBox *xVal, *yVal, *zVal;
 
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
-    void setupComponentList();
-    void setupTransformSettings(const Transform &component);
-    void setupMaterialSettings(const Material &component);
-    void setupMeshSettings(const Mesh &mesh);
     void playButtons();
+    friend class ComponentList;
 };
 
 #endif // MAINWINDOW_H

@@ -145,6 +145,10 @@ void RenderWindow::init() {
         "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
 }
 
+bool RenderWindow::isPlaying() const {
+    return mIsPlaying;
+}
+
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
     //input

@@ -1,23 +1,18 @@
 #include "mainwindow.h"
-#include "Systems/rendersystem.h"
 #include "hierarchymodel.h"
 #include "innpch.h"
 #include "movementsystem.h"
 #include "registry.h"
+#include "rendersystem.h"
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QComboBox>
 #include <QDesktopWidget>
-#include <QDoubleSpinBox>
 #include <QFileDialog>
-#include <QLabel>
-#include <QPushButton>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 #include <QToolButton>
+#include <componentlist.h>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -36,6 +31,7 @@ void MainWindow::init() {
     hView->setMainWindow(this);
     scrollArea = new VerticalScrollArea();
     ui->horizontalTopLayout->addWidget(scrollArea);
+    mComponentList = new ComponentList(this, scrollArea);
 
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
@@ -146,37 +142,6 @@ void MainWindow::playButtons() {
     toolbar->addWidget(spacer2); // Spacer #2
 }
 
-void MainWindow::updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal) {
-    if (abs->isChecked() != isGlobal) // if absolute position is checked but the signal is local, don't do anything, and vice versa
-        return;
-    if (eID == selectedEntity->id()) {
-        emit posX(newPos.x);
-        emit posY(newPos.y);
-        emit posZ(newPos.z);
-    }
-}
-void MainWindow::updateRotationVals(GLuint eID, vec3 newRot) {
-    if (eID == selectedEntity->id()) {
-        emit rotX(newRot.x);
-        emit rotY(newRot.y);
-        emit rotZ(newRot.z);
-    }
-}
-void MainWindow::updateScaleVals(GLuint eID, vec3 newScale) {
-    if (eID == selectedEntity->id()) {
-        emit scaleX(newScale.x);
-        emit scaleY(newScale.y);
-        emit scaleZ(newScale.z);
-    }
-}
-void MainWindow::setNewShader(const QString &text) {
-    if (text == "Texture")
-        emit newShader(selectedEntity->id(), Tex);
-    else if (text == "Color")
-        emit newShader(selectedEntity->id(), Color);
-    else if (text == "Phong")
-        emit newShader(selectedEntity->id(), Phong);
-}
 void MainWindow::snapToObject() {
     if (selectedEntity)
         mRenderWindow->snapToObject(selectedEntity->id());
@@ -218,31 +183,31 @@ void MainWindow::createActions() {
     QMenu *components = ui->menuBar->addMenu(tr("Add Components")); // Maybe disable specific component if selected entity has that component already
     QAction *transform = new QAction(tr("Transform"), this);
     components->addAction(transform);
-    connect(transform, &QAction::triggered, this, &MainWindow::addTransformComponent);
+    connect(transform, &QAction::triggered, mComponentList, &ComponentList::addTransformComponent);
 
     QAction *material = new QAction(tr("Material"), this);
     components->addAction(material);
-    connect(material, &QAction::triggered, this, &MainWindow::addMaterialComponent);
+    connect(material, &QAction::triggered, mComponentList, &ComponentList::addMaterialComponent);
 
     QAction *mesh = new QAction(tr("Mesh"), this); // Somewhere along this action path should let you choose the mesh file to use/import
     components->addAction(mesh);
-    connect(mesh, &QAction::triggered, this, &MainWindow::addMeshComponent);
+    connect(mesh, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
     QAction *light = new QAction(tr("Light"), this);
     components->addAction(light);
-    connect(light, &QAction::triggered, this, &MainWindow::addLightComponent);
+    connect(light, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
 
     QAction *input = new QAction(tr("Input"), this);
     components->addAction(input);
-    connect(input, &QAction::triggered, this, &MainWindow::addInputComponent);
+    connect(input, &QAction::triggered, mComponentList, &ComponentList::addInputComponent);
 
     QAction *physics = new QAction(tr("Physics"), this);
     components->addAction(physics);
-    connect(physics, &QAction::triggered, this, &MainWindow::addPhysicsComponent);
+    connect(physics, &QAction::triggered, mComponentList, &ComponentList::addPhysicsComponent);
 
     QAction *sound = new QAction(tr("Sound"), this);
     components->addAction(sound);
-    connect(sound, &QAction::triggered, this, &MainWindow::addSoundComponent);
+    connect(sound, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
 
     ui->mainToolBar->setMovable(false);
 
@@ -255,407 +220,6 @@ void MainWindow::createActions() {
     connect(this, &MainWindow::made3DObject, this, &MainWindow::onEntityAdded);
 }
 
-void MainWindow::addTransformComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Transform) == CType::None)
-        registry->addComponent<Transform>(selectedEntity->id());
-    setupComponentList();
-}
-void MainWindow::addMaterialComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Material) == CType::None)
-        registry->addComponent<Material>(selectedEntity->id());
-    setupComponentList();
-}
-void MainWindow::addMeshComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Mesh) == CType::None)
-        registry->addComponent<Mesh>(selectedEntity->id());
-    setupComponentList();
-}
-void MainWindow::addLightComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Light) == CType::None)
-        registry->addComponent<Light>(selectedEntity->id());
-    setupComponentList();
-}
-void MainWindow::addInputComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Input) == CType::None)
-        registry->addComponent<Input>(selectedEntity->id());
-    setupComponentList();
-}
-void MainWindow::addPhysicsComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Physics) == CType::None)
-        registry->addComponent<Physics>(selectedEntity->id());
-    setupComponentList();
-}
-void MainWindow::addSoundComponent() {
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Sound) == CType::None)
-        registry->addComponent<Sound>(selectedEntity->id());
-    setupComponentList();
-}
-/**
- * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
- * @todo Right click a QGroupBox to get options like remove component (look at Unity for inspiration)
- */
-void MainWindow::setupComponentList() {
-    scrollArea->clearLayout();
-    Registry *registry = Registry::instance();
-    CType typeMask = selectedEntity->types();
-    if ((typeMask & CType::Transform) != CType::None) {
-        setupTransformSettings(registry->getComponent<Transform>(selectedEntity->id()));
-    }
-    if ((typeMask & CType::Material) != CType::None) {
-        setupMaterialSettings(registry->getComponent<Material>(selectedEntity->id()));
-    }
-    if ((typeMask & CType::Mesh) != CType::None) {
-        setupMeshSettings(registry->getComponent<Mesh>(selectedEntity->id()));
-    }
-}
-void MainWindow::setupMeshSettings(const Mesh &mesh) {
-    QStyle *fusion = QStyleFactory::create("fusion");
-    QGroupBox *box = new QGroupBox(tr("Mesh"));
-    box->setAlignment(Qt::AlignCenter);
-    box->setStyle(fusion);
-
-    objFileLabel = new QLabel(box);
-    objFileLabel->setText(ResourceManager::instance()->getMeshName(mesh));
-    QPushButton *button = new QPushButton("Change Mesh");
-    connect(button, &QPushButton::clicked, this, &MainWindow::setNewMesh);
-
-    QHBoxLayout *meshLayout = new QHBoxLayout;
-    meshLayout->setMargin(1);
-    meshLayout->addWidget(objFileLabel);
-    meshLayout->addWidget(button);
-    box->setLayout(meshLayout);
-    scrollArea->addGroupBox(box);
-}
-void MainWindow::setupMaterialSettings(const Material &component) {
-    QStyle *fusion = QStyleFactory::create("fusion");
-    QGroupBox *box = new QGroupBox(tr("Material"));
-    box->setAlignment(Qt::AlignCenter);
-    box->setStyle(fusion);
-
-    QVBoxLayout *shader = new QVBoxLayout;
-    shader->setMargin(1);
-    QComboBox *shaderType = new QComboBox;
-    for (auto type : ResourceManager::instance()->getShaders()) {
-        QString curText;
-        switch (type.first) {
-        case Color:
-            curText = "Color";
-            shaderType->addItem(curText);
-            break;
-        case Tex:
-            curText = "Texture";
-            shaderType->addItem("Texture");
-            break;
-        case Phong:
-            curText = "Phong";
-            shaderType->addItem("Phong");
-            break;
-        }
-        if (type.first == component.mShader)
-            shaderType->setCurrentIndex(shaderType->findText(curText));
-    }
-    connect(this, &MainWindow::newShader, mRenderWindow->renderer(), &RenderSystem::changeShader);
-    connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setNewShader(const QString &)));
-
-    QString curTexture = ResourceManager::instance()->getTextureName(component.mTextureUnit);
-    QLabel *textureThumb = new QLabel(box);
-    QPixmap thumbNail;
-    thumbNail.load(QString::fromStdString(gsl::assetFilePath) + "Textures/" + curTexture); // Load the texture image into the pixmap
-    textureThumb->setPixmap(thumbNail.scaled(18, 18));                                     // Get a scaled version of the image loaded above
-    texFileLabel = new QLabel(box);
-    texFileLabel->setText(curTexture); // Saves the file name of the texture image
-    QPushButton *browseImages = new QPushButton("Browse", this);
-    browseImages->setStyle(fusion);
-    connect(browseImages, &QPushButton::clicked, this, &MainWindow::setNewTextureFile);
-    QHBoxLayout *texture = new QHBoxLayout;
-    texture->addWidget(textureThumb);
-    texture->addWidget(texFileLabel);
-    texture->addWidget(browseImages);
-
-    colorLabel = new QLabel;
-    QPixmap curColor(18, 18);
-    vec3 oColor = component.mObjectColor;
-    rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
-    curColor.fill(rgb);
-    colorLabel->setPixmap(curColor);
-    QPushButton *colorButton = new QPushButton(tr("Change Color"));
-    connect(colorButton, &QPushButton::clicked, this, &MainWindow::setColor);
-
-    QHBoxLayout *color = new QHBoxLayout;
-    color->addWidget(colorLabel);
-    color->addWidget(colorButton);
-
-    shader->addWidget(shaderType);
-    shader->addLayout(texture);
-    shader->addLayout(color);
-    box->setLayout(shader);
-    scrollArea->addGroupBox(box);
-}
-void MainWindow::setNewTextureFile() {
-    QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Image"), directory, tr("Image Files (*.bmp)")); // Could add other image files, idk what Texture class supports
-    if (!fileName.isEmpty()) {
-        QFileInfo file(fileName);
-        fileName = file.fileName();
-        ResourceManager *factory = ResourceManager::instance();
-        factory->loadTexture(fileName.toStdString());
-        Registry::instance()->getComponent<Material>(selectedEntity->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
-        texFileLabel->setText(fileName);
-    }
-}
-void MainWindow::setNewMesh() {
-    QString directory = QString::fromStdString(gsl::assetFilePath) + "Meshes";
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Mesh File"), directory, tr("OBJ Files (*.obj)"));
-    if (!fileName.isEmpty()) {
-        QFileInfo file(fileName);
-        fileName = file.fileName();
-        ResourceManager *factory = ResourceManager::instance();
-        factory->setMesh(fileName.toStdString(), selectedEntity->id());
-        objFileLabel->setText(fileName);
-    }
-}
-/**
- * @brief Not sure why this gives a geometry warning, ask Ole?
- */
-void MainWindow::setColor() {
-    const QColor color = QColorDialog::getColor(rgb, this, "Select Color");
-    if (color.isValid()) {
-        QPixmap newRgb(18, 18);
-        newRgb.fill(color);
-        colorLabel->setPixmap(newRgb);
-    }
-    Registry::instance()->getComponent<Material>(selectedEntity->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
-}
-void MainWindow::setupTransformSettings(const Transform &component) {
-    QStyle *fusion = QStyleFactory::create("fusion");
-    QGroupBox *box = new QGroupBox(tr("Transform"));
-    box->setAlignment(Qt::AlignCenter);
-    box->setStyle(fusion);
-
-    QGridLayout *grid = new QGridLayout;
-    grid->setMargin(2);
-    QGroupBox *posBox = new QGroupBox(tr("Position"));
-    posBox->setStyle(fusion);
-    posBox->setFlat(true);
-
-    QHBoxLayout *position = new QHBoxLayout;
-    position->setMargin(1);
-    connect(mRenderWindow->movement(), &MovementSystem::positionChanged, this, &MainWindow::updatePositionVals);
-    connect(mRenderWindow->movement(), &MovementSystem::rotationChanged, this, &MainWindow::updateRotationVals);
-    connect(mRenderWindow->movement(), &MovementSystem::scaleChanged, this, &MainWindow::updateScaleVals);
-    // Set up the Position Display
-    for (int i = 0; i < 6; i++) {
-        if (i % 2 == 0) {
-            QLabel *label = new QLabel(box);
-            label->setStyle(fusion);
-            switch (i) {
-            case 0:
-                label->setText("X:");
-                break;
-            case 2:
-                label->setText("Y:");
-                break;
-            case 4:
-                label->setText("Z:");
-                break;
-            }
-            position->addWidget(label);
-        } else {
-
-            switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
-            case 1:
-                xVal = new QDoubleSpinBox(box);
-                xVal->setDecimals(1);
-                xVal->setRange(-5000, 5000);
-                xVal->setMaximumWidth(58);
-                xVal->setStyle(fusion);
-                xVal->setValue(component.localPosition.x);
-                connect(this, &MainWindow::posX, xVal, &QDoubleSpinBox::setValue);
-                connect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
-                position->addWidget(xVal);
-                break;
-            case 3:
-                yVal = new QDoubleSpinBox(box);
-                yVal->setDecimals(1);
-                yVal->setRange(-5000, 5000);
-                yVal->setMaximumWidth(58);
-                yVal->setStyle(fusion);
-                yVal->setValue(component.localPosition.y);
-                connect(this, &MainWindow::posY, yVal, &QDoubleSpinBox::setValue);
-                connect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
-                position->addWidget(yVal);
-                break;
-            case 5:
-                zVal = new QDoubleSpinBox(box);
-                zVal->setDecimals(1);
-                zVal->setRange(-5000, 5000);
-                zVal->setMaximumWidth(58);
-                zVal->setStyle(fusion);
-                zVal->setValue(component.localPosition.z);
-                connect(this, &MainWindow::posZ, zVal, &QDoubleSpinBox::setValue);
-                connect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
-                position->addWidget(zVal);
-                break;
-            }
-        }
-    }
-    posBox->setLayout(position);
-    QHBoxLayout *check = new QHBoxLayout;
-    abs = new QCheckBox(tr("Absolute Position"));
-    connect(abs, &QCheckBox::stateChanged, this, &MainWindow::updatePosSpinBoxes);
-    check->addWidget(abs);
-    grid->addWidget(posBox, 0, 0);
-    grid->addLayout(check, 1, 0);
-
-    QGroupBox *rotBox = new QGroupBox(tr("Rotation"));
-    rotBox->setStyle(fusion);
-    rotBox->setFlat(true);
-
-    QHBoxLayout *rotation = new QHBoxLayout;
-    rotation->setMargin(1);
-    // Set up the Rotation Display
-    for (int i = 0; i < 6; i++) {
-        if (i % 2 == 0) {
-            QLabel *label = new QLabel(box);
-            label->setStyle(fusion);
-            switch (i) {
-            case 0:
-                label->setText("X:");
-                break;
-            case 2:
-                label->setText("Y:");
-                break;
-            case 4:
-                label->setText("Z:");
-                break;
-            }
-            rotation->addWidget(label);
-        } else {
-            QDoubleSpinBox *val = new QDoubleSpinBox(box);
-            val->setDecimals(1);
-            val->setRange(-180, 180);
-            val->setWrapping(true);
-            val->setMaximumWidth(58);
-            val->setStyle(fusion);
-            switch (i) {
-            case 1:
-                val->setValue(component.localRotation.x);
-                connect(this, &MainWindow::rotX, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
-                break;
-            case 3:
-                val->setValue(component.localRotation.y);
-                connect(this, &MainWindow::rotY, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationY(double)));
-                break;
-            case 5:
-                val->setValue(component.localRotation.z);
-                connect(this, &MainWindow::rotZ, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationZ(double)));
-                break;
-            }
-            rotation->addWidget(val);
-        }
-    }
-    rotBox->setLayout(rotation);
-    grid->addWidget(rotBox, 2, 0);
-
-    QGroupBox *scaleBox = new QGroupBox(tr("Scale"));
-    scaleBox->setStyle(fusion);
-    scaleBox->setFlat(true);
-
-    QHBoxLayout *scale = new QHBoxLayout;
-    scale->setMargin(1);
-    // Set up the Rotation Display
-    for (int i = 0; i < 6; i++) {
-        if (i % 2 == 0) {
-            QLabel *label = new QLabel(box);
-            label->setStyle(fusion);
-            switch (i) {
-            case 0:
-                label->setText("X:");
-                break;
-            case 2:
-                label->setText("Y:");
-                break;
-            case 4:
-                label->setText("Z:");
-                break;
-            }
-            scale->addWidget(label);
-        } else { // TODO: Add lock to scale other parts proportionally
-            QDoubleSpinBox *val = new QDoubleSpinBox(box);
-            val->setDecimals(1);
-            val->setRange(0.1, 100);
-            val->setSingleStep(0.1f);
-            val->setMaximumWidth(58);
-            val->setStyle(fusion);
-            switch (i) {
-            case 1:
-                val->setValue(component.localScale.x);
-                connect(this, &MainWindow::scaleX, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
-                break;
-            case 3:
-                val->setValue(component.localScale.y);
-                connect(this, &MainWindow::scaleY, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleY(double)));
-                break;
-            case 5:
-                val->setValue(component.localScale.z);
-                connect(this, &MainWindow::scaleZ, val, &QDoubleSpinBox::setValue);
-                connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleZ(double)));
-                break;
-            }
-            scale->addWidget(val);
-        }
-    }
-    scaleBox->setLayout(scale);
-    grid->addWidget(scaleBox, 3, 0);
-
-    box->setLayout(grid);
-    scrollArea->addGroupBox(box);
-}
-void MainWindow::updatePosSpinBoxes(int state) {
-    disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
-    disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
-    disconnect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
-    auto &trans = Registry::instance()->getComponent<Transform>(selectedEntity->id());
-    switch (state) {
-    case 0:
-        xVal->setValue(trans.localPosition.x);
-        yVal->setValue(trans.localPosition.y);
-        zVal->setValue(trans.localPosition.z);
-        break;
-    case 2:
-        mRenderWindow->movement()->getAbsolutePosition(selectedEntity->id()); // have to call this function once to update the global pos variable if it hasn't been cached yet
-        xVal->setValue(trans.position.x);
-        yVal->setValue(trans.position.y);
-        zVal->setValue(trans.position.z);
-        break;
-    default:
-        break;
-    }
-    connect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
-    connect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
-    connect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
-}
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_F)
         mRenderWindow->keyPressEvent(event);
@@ -733,7 +297,7 @@ void MainWindow::onEntityClicked(const QModelIndex &index) {
     Entity *entt = reg->getEntity(item->text());
     onEntityDragged(entt->id());
 
-    setupComponentList();
+    mComponentList->setupComponentList();
 }
 
 void MainWindow::onEntityDragged(GLuint eID) {
@@ -744,7 +308,7 @@ void MainWindow::mouseRayHit(GLuint eID) {
     QModelIndex entityIndex = hierarchy->indexFromItem(entity);
     hView->setCurrentIndex(entityIndex);
     selectedEntity = Registry::instance()->getEntity(eID);
-    setupComponentList();
+    mComponentList->setupComponentList();
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
@@ -800,59 +364,4 @@ void MainWindow::forEach(GLuint parentID, QStandardItem *child, QModelIndex pare
             forEach(parentID, child, index);
         }
     }
-}
-void MainWindow::setPositionX(double xIn) {
-    if (abs->isChecked())
-        mRenderWindow->movement()->setAbsolutePositionX(selectedEntity->id(), xIn, false);
-    else
-        mRenderWindow->movement()->setLocalPositionX(selectedEntity->id(), xIn, false);
-
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setPositionY(double yIn) {
-    if (abs->isChecked())
-        mRenderWindow->movement()->setAbsolutePositionY(selectedEntity->id(), yIn, false);
-    else
-        mRenderWindow->movement()->setLocalPositionY(selectedEntity->id(), yIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setPositionZ(double zIn) {
-    if (abs->isChecked())
-        mRenderWindow->movement()->setAbsolutePositionZ(selectedEntity->id(), zIn, false);
-    else
-        mRenderWindow->movement()->setLocalPositionZ(selectedEntity->id(), zIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setRotationX(double xIn) {
-    mRenderWindow->movement()->setRotationX(selectedEntity->id(), xIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setRotationY(double yIn) {
-    mRenderWindow->movement()->setRotationY(selectedEntity->id(), yIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setRotationZ(double zIn) {
-    mRenderWindow->movement()->setRotationZ(selectedEntity->id(), zIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setScaleX(double xIn) {
-    mRenderWindow->movement()->setScaleX(selectedEntity->id(), xIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setScaleY(double yIn) {
-    mRenderWindow->movement()->setScaleY(selectedEntity->id(), yIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
-}
-void MainWindow::setScaleZ(double zIn) {
-    mRenderWindow->movement()->setScaleZ(selectedEntity->id(), zIn, false);
-    if (!mRenderWindow->mIsPlaying)
-        mRenderWindow->movement()->updateEntity(selectedEntity->id());
 }
