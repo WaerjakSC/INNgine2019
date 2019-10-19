@@ -20,11 +20,12 @@ public:
     const Vector3D &operator=(const Vector3D &rhs); // v = v
     Vector3D operator+(const Vector3D &rhs) const;  // v + v
     Vector3D operator-(const Vector3D &rhs) const;  // v - v
-    Vector3D &operator+=(const Vector3D &rhs);      // v += v
-    Vector3D &operator-=(const Vector3D &rhs);      // v -= v
-    Vector3D operator-() const;                     // -v
-    Vector3D operator*(GLfloat rhs) const;          // v * f
-    Vector3D operator^(const Vector3D &rhs) const;  // v x v  - cross product
+    Vector3D operator/(const Vector3D &rhs) const;
+    Vector3D &operator+=(const Vector3D &rhs);     // v += v
+    Vector3D &operator-=(const Vector3D &rhs);     // v -= v
+    Vector3D operator-() const;                    // -v
+    Vector3D operator*(GLfloat rhs) const;         // v * f
+    Vector3D operator^(const Vector3D &rhs) const; // v x v  - cross product
     bool operator==(const Vector3D &compared) const;
     bool operator!=(const Vector3D &compared) const;
     GLfloat &at(GLint index);
@@ -33,6 +34,7 @@ public:
     GLfloat length() const;
     void normalize();
     Vector3D normalized();
+    static Vector3D multiply(const Vector3D &lhs, const Vector3D &rhs);
     static Vector3D cross(const Vector3D &v1, const Vector3D &v2);
     static GLfloat dot(const Vector3D &v1, const Vector3D &v2);
 

@@ -18,7 +18,6 @@
 #include <QSurfaceFormat>
 #include <QToolButton>
 
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     init();
@@ -486,7 +485,7 @@ void MainWindow::setupTransformSettings(const Transform &component) {
                 //                if (component.parentID != -1)
                 //                    val->setValue(component.mRelativePosition.x);
                 //                else
-                val->setValue(component.mPosition.x);
+                val->setValue(component.position.x);
                 connect(this, &MainWindow::posX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
                 break;
@@ -494,7 +493,7 @@ void MainWindow::setupTransformSettings(const Transform &component) {
                 //                if (component.parentID != -1)
                 //                    val->setValue(component.mRelativePosition.y);
                 //                else
-                val->setValue(component.mPosition.y);
+                val->setValue(component.position.y);
                 connect(this, &MainWindow::posY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
                 break;
@@ -502,7 +501,7 @@ void MainWindow::setupTransformSettings(const Transform &component) {
                 //                if (component.parentID != -1)
                 //                    val->setValue(component.mRelativePosition.z);
                 //                else
-                val->setValue(component.mPosition.z);
+                val->setValue(component.position.z);
                 connect(this, &MainWindow::posZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
                 break;
@@ -545,17 +544,17 @@ void MainWindow::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component.mRotation.x);
+                val->setValue(component.rotation.x);
                 connect(this, &MainWindow::rotX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
                 break;
             case 3:
-                val->setValue(component.mRotation.y);
+                val->setValue(component.rotation.y);
                 connect(this, &MainWindow::rotY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationY(double)));
                 break;
             case 5:
-                val->setValue(component.mRotation.z);
+                val->setValue(component.rotation.z);
                 connect(this, &MainWindow::rotZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationZ(double)));
                 break;
@@ -598,17 +597,17 @@ void MainWindow::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component.mScale.x);
+                val->setValue(component.scale.x);
                 connect(this, &MainWindow::scaleX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
                 break;
             case 3:
-                val->setValue(component.mScale.y);
+                val->setValue(component.scale.y);
                 connect(this, &MainWindow::scaleY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleY(double)));
                 break;
             case 5:
-                val->setValue(component.mScale.z);
+                val->setValue(component.scale.z);
                 connect(this, &MainWindow::scaleZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleZ(double)));
                 break;

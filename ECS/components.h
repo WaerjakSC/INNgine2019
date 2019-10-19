@@ -1,7 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
-#include "matrix4x4.h"
 #include "matrix3x3.h"
+#include "matrix4x4.h"
 #include "shader.h"
 #include "vertex.h"
 #include <QKeyEvent>
@@ -81,7 +81,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator|=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-                static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -89,7 +89,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator&=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -97,7 +97,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
 operator&(E lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     return static_cast<E>(
-                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
 }
 /**
  * @brief The Component class is the base class for all components.
@@ -125,21 +125,24 @@ struct Transform : Component {
         rotationMatrix.setToIdentity();
         scaleMatrix.setToIdentity();
     }
-    Transform(vec3 position, vec3 rotation = 0, vec3 scale = 1) : Transform() {
-        mPosition = position;
-        mRotation = rotation;
-        mScale = scale;
+    Transform(vec3 pos, vec3 rot = 0, vec3 newScale = 1) : Transform() {
+        position = pos;
+        rotation = rot;
+        scale = newScale;
     }
     virtual void update() {}
 
-    bool mMatrixOutdated{true};
+    bool matrixOutdated{true};
 
-    vec3 mPosition{0};
-    vec3 mRotation{0};
-    vec3 mScale{1};
+    vec3 position{0};
+    vec3 localPosition{0};
+    vec3 rotation{0};
+    vec3 localRotation{0};
+    vec3 scale{1};
+    vec3 localScale{1};
     gsl::Matrix4x4 modelMatrix, translationMatrix, rotationMatrix, scaleMatrix;
 
-    std::vector<GLuint> mChildren;
+    std::vector<GLuint> children;
 
     int parentID = -1;
 };
@@ -261,13 +264,12 @@ public:
     Sound() {}
     virtual void update() {}
 
-
     bool mLooping{false};
     bool mPlay{false};
     bool mPlaying{false};
 };
 
-enum ColType{
+enum ColType {
     AABB,
     OBB,
     Sphere,
@@ -279,63 +281,62 @@ enum ColType{
 struct Collision : public Component {
 public:
     Collision(ColType type, vec3 size) : colType(type) {}
-    virtual void update(){}
+    virtual void update() {}
     ColType colType;
     bool mTrigger{false};
 
     /**
       * @brief Axis Aligned Bounding Box
       */
-    typedef struct AABB{
+    typedef struct AABB {
         vec3 origin;
-        vec3 size;  // Half size
+        vec3 size; // Half size
 
-        inline AABB() : size(2,2,2){}
-        inline AABB(const vec3& o, const vec3& s) : origin(o), size(s) {}
+        inline AABB() : size(2, 2, 2) {}
+        inline AABB(const vec3 &o, const vec3 &s) : origin(o), size(s) {}
     } AABB;
-
 
     /**
       * @brief Oriented Bounding Box
       */
-    typedef struct OBB{
+    typedef struct OBB {
         vec3 position;
         vec3 size;
         mat3 orientation;
 
         // default constructor: lager en OBB ved origo
-        inline OBB() : size(2,2,2) {}
+        inline OBB() : size(2, 2, 2) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
-        inline OBB(const vec3& p, const vec3& s) {}
+        inline OBB(const vec3 &p, const vec3 &s) {}
         // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
-        inline OBB(const vec3& p, const vec3& s, const mat3& o ) : position(p), size(s), orientation(o) {}
+        inline OBB(const vec3 &p, const vec3 &s, const mat3 &o) : position(p), size(s), orientation(o) {}
     } OBB;
 
     /**
       * @brief Sphere struct
       */
-    typedef struct Sphere{
+    typedef struct Sphere {
         vec3 position;
         float radius;
 
         // default constructor
-        inline Sphere(): radius(3.0f) {};
+        inline Sphere() : radius(3.0f){};
         // constructor with radius and position params
-        inline Sphere(const vec3& pos, const float& r): position(pos), radius(r) {}
+        inline Sphere(const vec3 &pos, const float &r) : position(pos), radius(r) {}
     } Sphere;
 
     /**
       * @brief Plane struct
       */
-    typedef struct Plane{
+    typedef struct Plane {
         vec3 normal;
         float distance;
 
-        inline Plane() : normal(1,0,0){}
-        inline Plane(const vec3& n, float d) : normal(n), distance(d){}
+        inline Plane() : normal(1, 0, 0) {}
+        inline Plane(const vec3 &n, float d) : normal(n), distance(d) {}
     } Plane;
 
-    typedef struct Cylinder{
+    typedef struct Cylinder {
         vec3 position;
         float radius;
         float height;

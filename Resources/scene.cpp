@@ -43,32 +43,32 @@ void Scene::saveScene(const QString &fileName) {
 
             writer.Key("position");
             writer.StartArray();
-            writer.Double(trans.mPosition.x);
-            writer.Double(trans.mPosition.y);
-            writer.Double(trans.mPosition.z);
+            writer.Double(trans.position.x);
+            writer.Double(trans.position.y);
+            writer.Double(trans.position.z);
             writer.EndArray();
 
             writer.Key("rotation");
             writer.StartArray();
-            writer.Double(trans.mRotation.x);
-            writer.Double(trans.mRotation.y);
-            writer.Double(trans.mRotation.z);
+            writer.Double(trans.rotation.x);
+            writer.Double(trans.rotation.y);
+            writer.Double(trans.rotation.z);
             writer.EndArray();
 
             writer.Key("scale");
             writer.StartArray();
-            writer.Double(trans.mScale.x);
-            writer.Double(trans.mScale.y);
-            writer.Double(trans.mScale.z);
+            writer.Double(trans.scale.x);
+            writer.Double(trans.scale.y);
+            writer.Double(trans.scale.z);
             writer.EndArray();
 
             writer.Key("parent");
             writer.Int(trans.parentID);
 
-            if (!trans.mChildren.empty()) {
+            if (!trans.children.empty()) {
                 writer.Key("children");
                 writer.StartArray();
-                for (auto child : trans.mChildren) {
+                for (auto child : trans.children) {
                     writer.Int(child);
                 }
                 writer.EndArray();

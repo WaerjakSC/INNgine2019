@@ -101,19 +101,19 @@ bool Registry::hasParent(GLuint eID) {
     return getComponent<Transform>(eID).parentID != -1;
 }
 std::vector<GLuint> Registry::getChildren(GLuint eID) {
-    return getComponent<Transform>(eID).mChildren;
+    return getComponent<Transform>(eID).children;
 }
 
 void Registry::addChild(const GLuint parentID, const GLuint childID) {
     auto &parent = getComponent<Transform>(parentID);
-    parent.mChildren.emplace_back(childID);
-    getComponent<Transform>(childID).mMatrixOutdated = true;
+    parent.children.emplace_back(childID);
+    getComponent<Transform>(childID).matrixOutdated = true;
 }
 void Registry::removeChild(const GLuint eID, const GLuint childID) {
-    std::vector<GLuint> &children = getComponent<Transform>(eID).mChildren;
+    std::vector<GLuint> &children = getComponent<Transform>(eID).children;
     for (auto &child : children) {
         if (child == childID) {
-            getComponent<Transform>(childID).mMatrixOutdated = true;
+            getComponent<Transform>(childID).matrixOutdated = true;
             std::swap(child, children.back());
             children.pop_back();
         }
@@ -172,7 +172,7 @@ void Registry::loadSnapshot() {
         mPools[pool.first]->swap(pool.second);
     }
     for (auto &transform : getComponentArray<Transform>()->data()) {
-        transform.mMatrixOutdated = true;
+        transform.matrixOutdated = true;
     }
     // To-do: Make scene view load back to its pre-parented state if something is parented during play
 }

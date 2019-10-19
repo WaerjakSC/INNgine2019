@@ -28,8 +28,6 @@
 #include "renderview.h"
 #include "textureshader.h"
 
-
-
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false),
       mFactory(ResourceManager::instance()), mRegistry(Registry::instance()), mSoundManager(SoundManager::instance()),
@@ -167,7 +165,6 @@ void RenderWindow::render() {
         mLightSys->update();
         mSoundManager->updateListener(mCurrentCamera->position(), vec3(1), mCurrentCamera->forward(), mCurrentCamera->up());
     }
-
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
     // and before swapBuffers(), else it will show the vsync time

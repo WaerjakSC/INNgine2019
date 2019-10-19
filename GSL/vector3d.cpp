@@ -30,6 +30,12 @@ Vector3D Vector3D::operator-(const Vector3D &rhs) const {
     return {x - rhs.getX(), y - rhs.getY(), z - rhs.getZ()};
 }
 
+Vector3D Vector3D::operator/(const Vector3D &rhs) const {
+    if (rhs.x != 0 && rhs.y != 0 && rhs.z != 0)
+        return {x / rhs.getX(), y / rhs.getY(), z / rhs.getZ()};
+    return *this;
+}
+
 Vector3D &Vector3D::operator+=(const Vector3D &rhs) {
     x += rhs.getX();
     y += rhs.getY();
@@ -92,6 +98,10 @@ void Vector3D::normalize() {
         y = y / l;
         z = z / l;
     }
+}
+
+Vector3D Vector3D::multiply(const Vector3D &lhs, const Vector3D &rhs) {
+    return {lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z};
 }
 
 Vector3D Vector3D::normalized() {

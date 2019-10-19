@@ -31,9 +31,9 @@ public:
     void setPositionY(int eID, float yIn, bool signal = true);
     void setPositionZ(int eID, float zIn, bool signal = true);
 
-    void moveX(int eID, float xIn);
-    void moveY(int eID, float yIn);
-    void moveZ(int eID, float zIn);
+    void moveX(GLuint eID, float xIn, bool signal = true);
+    void moveY(GLuint eID, float yIn, bool signal = true);
+    void moveZ(GLuint eID, float zIn, bool signal = true);
     // ******** Rotation Setters ******** //
     void setRotation(GLuint eID, vec3 rotation, bool signal = true);
 
@@ -41,9 +41,9 @@ public:
     void setRotationY(int eID, float yIn, bool signal = true);
     void setRotationZ(int eID, float zIn, bool signal = true);
 
-    void rotateX(GLuint eID, float xIn, bool signal);
-    void rotateY(GLuint eID, float yIn, bool signal);
-    void rotateZ(GLuint eID, float zIn, bool signal);
+    void rotateX(GLuint eID, float xIn, bool signal = true);
+    void rotateY(GLuint eID, float yIn, bool signal = true);
+    void rotateZ(GLuint eID, float zIn, bool signal = true);
 
     // ******** Scale Setters ******** //
     void setScale(int eID, vec3 scale, bool signal = true);
@@ -52,9 +52,14 @@ public:
     void setScaleY(int eID, float yIn, bool signal = true);
     void setScaleZ(int eID, float zIn, bool signal = true);
 
-    void scaleX(GLuint eID, float xIn, bool signal);
-    void scaleY(GLuint eID, float yIn, bool signal);
-    void scaleZ(GLuint eID, float zIn, bool signal);
+    void scaleX(GLuint eID, float xIn, bool signal = true);
+    void scaleY(GLuint eID, float yIn, bool signal = true);
+    void scaleZ(GLuint eID, float zIn, bool signal = true);
+    void setLocalPosition(GLuint eID, const vec3 &localPosition, bool signal = true);
+    void setLocalScale(GLuint eID, const vec3 &localScale, bool signal = true);
+    void move(GLuint eID, const vec3 &moveDelta, bool signal = true);
+    void scale(GLuint eID, const vec3 &scaleDelta, bool signal = true);
+    void rotate(GLuint eID, const vec3 &rotDelta, bool signal = true);
 signals:
     void positionChanged(GLuint eID, vec3 newPos);
     void scaleChanged(GLuint eID, vec3 newScale);

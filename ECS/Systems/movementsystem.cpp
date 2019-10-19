@@ -25,14 +25,14 @@ void MovementSystem::update() {
  */
 void MovementSystem::updateEntity(GLuint eID) {
     auto &comp = mTransforms->get(eID);
-    comp.mMatrixOutdated = true;
+    comp.matrixOutdated = true;
     updateModelMatrix(comp);
-    for (auto child : comp.mChildren)
+    for (auto child : comp.children)
         updateEntity(child);
 }
 
 void MovementSystem::updateModelMatrix(Transform &comp) {
-    if (comp.mMatrixOutdated) {
+    if (comp.matrixOutdated) {
         //calculate matrix from position, scale, rotation
         updateTRS(comp);
         gsl::Matrix4x4 parentMatrix;
@@ -41,12 +41,12 @@ void MovementSystem::updateModelMatrix(Transform &comp) {
             parentMatrix = getTRMatrix(parent);
         } else
             parentMatrix.setToIdentity();
-        for (auto child : comp.mChildren) {
-            Transform &childComp = mTransforms->get(child);
-            childComp.mMatrixOutdated = true;
-        }
         comp.modelMatrix = parentMatrix * comp.translationMatrix * comp.rotationMatrix * comp.scaleMatrix;
-        comp.mMatrixOutdated = false;
+        comp.matrixOutdated = false;
+        for (auto child : comp.children) {
+            Transform &childComp = mTransforms->get(child);
+            childComp.matrixOutdated = true;
+        }
     }
 }
 gsl::Matrix4x4 MovementSystem::getTRMatrix(Transform &comp) {
@@ -61,15 +61,15 @@ gsl::Matrix4x4 MovementSystem::getTRMatrix(Transform &comp) {
 void MovementSystem::updateTRS(Transform &comp) {
     //calculate matrix from position, scale, rotation
     comp.translationMatrix.setToIdentity();
-    comp.translationMatrix.translate(comp.mPosition);
+    comp.translationMatrix.translate(comp.position);
 
     comp.rotationMatrix.setToIdentity();
-    comp.rotationMatrix.rotateX(comp.mRotation.x);
-    comp.rotationMatrix.rotateY(comp.mRotation.y);
-    comp.rotationMatrix.rotateZ(comp.mRotation.z);
+    comp.rotationMatrix.rotateX(comp.rotation.x);
+    comp.rotationMatrix.rotateY(comp.rotation.y);
+    comp.rotationMatrix.rotateZ(comp.rotation.z);
 
     comp.scaleMatrix.setToIdentity();
-    comp.scaleMatrix.scale(comp.mScale);
+    comp.scaleMatrix.scale(comp.scale);
 }
 /**
  * @brief Get global position of object
@@ -89,7 +89,7 @@ gsl::Vector3D MovementSystem::getAbsolutePosition(int eID) {
  * @return
  */
 gsl::Vector3D MovementSystem::getRelativePosition(int eID) {
-    return mTransforms->get(eID).mPosition;
+    return mTransforms->get(eID).position;
 }
 /**
  * @brief MovementSystem::setAbsolutePosition
@@ -100,11 +100,11 @@ gsl::Vector3D MovementSystem::getRelativePosition(int eID) {
  */
 void MovementSystem::setAbsolutePosition(GLuint eID, gsl::Vector3D position, bool signal) {
     Transform &trans = mTransforms->get(eID);
-    trans.mMatrixOutdated = true;
+    trans.matrixOutdated = true;
     if (trans.parentID != -1) {
         vec3 desiredPos = -getAbsolutePosition(trans.parentID);
-        mTransforms->get(eID).mPosition = std::get<0>(gsl::Matrix4x4::decomposed((trans.modelMatrix)));
-        qDebug() << trans.mPosition;
+        mTransforms->get(eID).position = std::get<0>(gsl::Matrix4x4::decomposed((trans.modelMatrix)));
+        qDebug() << trans.position;
     }
     if (signal)
         emit positionChanged(eID, position);
@@ -115,8 +115,8 @@ void MovementSystem::setAbsolutePosition(GLuint eID, gsl::Vector3D position, boo
  * @param position
  */
 void MovementSystem::setPosition(GLuint eID, gsl::Vector3D position, bool signal) {
-    mTransforms->get(eID).mMatrixOutdated = true;
-    mTransforms->get(eID).mPosition = position;
+    mTransforms->get(eID).matrixOutdated = true;
+    mTransforms->get(eID).position = position;
     if (signal)
         emit positionChanged(eID, position);
 }
@@ -150,94 +150,85 @@ void MovementSystem::setPositionZ(int eID, float zIn, bool signal) {
     setPosition(eID, newPos, signal);
 }
 
-void MovementSystem::moveX(int eID, float xIn) {
-    gsl::Vector3D newPos = getRelativePosition(eID);
-    newPos.x += xIn;
-
-    setPosition(eID, newPos);
+void MovementSystem::moveX(GLuint eID, float xIn, bool signal) {
+    move(eID, vec3(xIn, 0, 0), signal);
 }
-void MovementSystem::moveY(int eID, float yIn) {
-    gsl::Vector3D newPos = getRelativePosition(eID);
-    newPos.y += yIn;
-
-    setPosition(eID, newPos);
+void MovementSystem::moveY(GLuint eID, float yIn, bool signal) {
+    move(eID, vec3(0, yIn, 0), signal);
 }
-void MovementSystem::moveZ(int eID, float zIn) {
-    gsl::Vector3D newPos = getRelativePosition(eID);
-    newPos.z += zIn;
-
-    setPosition(eID, newPos);
+void MovementSystem::moveZ(GLuint eID, float zIn, bool signal) {
+    move(eID, vec3(0, 0, zIn), signal);
 }
-
+void MovementSystem::move(GLuint eID, const vec3 &moveDelta, bool signal) {
+    vec3 position = getRelativePosition(eID);
+    position += moveDelta;
+    setPosition(eID, position, signal);
+}
 void MovementSystem::setRotation(GLuint eID, gsl::Vector3D rotation, bool signal) {
-    mTransforms->get(eID).mMatrixOutdated = true;
-    mTransforms->get(eID).mRotation = rotation;
+    mTransforms->get(eID).matrixOutdated = true;
+    mTransforms->get(eID).rotation = rotation;
     if (signal)
         emit rotationChanged(eID, rotation);
 }
 void MovementSystem::setRotationX(int eID, float xIn, bool signal) {
-    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
+    gsl::Vector3D newRot = mTransforms->get(eID).rotation;
     newRot.x = xIn;
     setRotation(eID, newRot, signal);
 }
 void MovementSystem::setRotationY(int eID, float yIn, bool signal) {
-    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
+    gsl::Vector3D newRot = mTransforms->get(eID).rotation;
     newRot.y = yIn;
     setRotation(eID, newRot, signal);
 }
 void MovementSystem::setRotationZ(int eID, float zIn, bool signal) {
-    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
+    gsl::Vector3D newRot = mTransforms->get(eID).rotation;
     newRot.z = zIn;
     setRotation(eID, newRot, signal);
 }
 void MovementSystem::rotateX(GLuint eID, float xIn, bool signal) {
-    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
-    newRot.x += xIn;
-    setRotation(eID, newRot, signal);
+    rotate(eID, vec3(xIn, 0, 0), signal);
 }
 void MovementSystem::rotateY(GLuint eID, float yIn, bool signal) {
-    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
-    newRot.y += yIn;
-    setRotation(eID, newRot, signal);
+    rotate(eID, vec3(0, yIn, 0), signal);
 }
 void MovementSystem::rotateZ(GLuint eID, float zIn, bool signal) {
-    gsl::Vector3D newRot = mTransforms->get(eID).mRotation;
-    newRot.z += zIn;
-    setRotation(eID, newRot, signal);
+    rotate(eID, vec3(0, 0, zIn), signal);
+}
+void MovementSystem::rotate(GLuint eID, const vec3 &rotDelta, bool signal) {
+    gsl::Vector3D rotation = mTransforms->get(eID).rotation + rotDelta;
+    setRotation(eID, rotation, signal);
 }
 void MovementSystem::setScale(int eID, gsl::Vector3D scale, bool signal) {
-    mTransforms->get(eID).mMatrixOutdated = true;
-    mTransforms->get(eID).mScale = scale;
+    mTransforms->get(eID).matrixOutdated = true;
+    mTransforms->get(eID).scale = scale;
     if (signal)
         emit scaleChanged(eID, scale);
 }
 void MovementSystem::setScaleX(int eID, float xIn, bool signal) {
-    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
+    gsl::Vector3D newScale = mTransforms->get(eID).scale;
     newScale.x = xIn;
     setScale(eID, newScale, signal);
 }
 void MovementSystem::setScaleY(int eID, float yIn, bool signal) {
-    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
+    gsl::Vector3D newScale = mTransforms->get(eID).scale;
     newScale.y = yIn;
     setScale(eID, newScale, signal);
 }
 void MovementSystem::setScaleZ(int eID, float zIn, bool signal) {
-    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
+    gsl::Vector3D newScale = mTransforms->get(eID).scale;
     newScale.z = zIn;
     setScale(eID, newScale, signal);
 }
+void MovementSystem::scale(GLuint eID, const vec3 &scaleDelta, bool signal) {
+    gsl::Vector3D scale = mTransforms->get(eID).scale + scaleDelta;
+    setScale(eID, scale, signal);
+}
 void MovementSystem::scaleX(GLuint eID, float xIn, bool signal) {
-    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
-    newScale.x += xIn;
-    setScale(eID, newScale, signal);
+    scale(eID, vec3(xIn, 0, 0), signal);
 }
 void MovementSystem::scaleY(GLuint eID, float yIn, bool signal) {
-    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
-    newScale.y += yIn;
-    setScale(eID, newScale, signal);
+    scale(eID, vec3(0, yIn, 0), signal);
 }
 void MovementSystem::scaleZ(GLuint eID, float zIn, bool signal) {
-    gsl::Vector3D newScale = mTransforms->get(eID).mScale;
-    newScale.z += zIn;
-    setScale(eID, newScale, signal);
+    scale(eID, vec3(0, 0, zIn), signal);
 }
