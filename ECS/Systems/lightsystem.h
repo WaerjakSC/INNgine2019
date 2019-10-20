@@ -1,7 +1,7 @@
 #ifndef LIGHTSYSTEM_H
 #define LIGHTSYSTEM_H
 #include "pool.h"
-#include "system.h"
+#include "isystem.h"
 #include <memory>
 class PhongShader;
 class LightSystem : public ISystem {

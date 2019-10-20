@@ -61,8 +61,10 @@ win32 {
     }
 }
 HEADERS += \
-    ECS/Systems/system.h \
+    ECS/Systems/inputsystem.h \
+    ECS/Systems/isystem.h \
     ECS/entity.h \
+    ECS/view.h \
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -110,6 +112,7 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
+    ECS/Systems/inputsystem.cpp \
     ECS/entity.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \

@@ -1,6 +1,10 @@
 #include "renderwindow.h"
 #include "innpch.h"
 #include "scene.h"
+#include "soundmanager.h"
+#include "soundsource.h"
+#include "view.h"
+
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QOpenGLContext>
@@ -10,9 +14,6 @@
 #include <QTimer>
 #include <QToolButton>
 #include <chrono>
-
-#include "soundmanager.h"
-#include "soundsource.h"
 #include <iostream>
 #include <thread> //for sleep_for
 
@@ -139,6 +140,9 @@ void RenderWindow::init() {
     mLight = mFactory->getSceneLoader()->controllerID;
     mRenderer->init();
     mMoveSys->init();
+    View<Transform> test(mMoveSys->mTransforms);
+    auto transform = test.get<Transform>(4);
+    qDebug() << transform.parentID;
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),

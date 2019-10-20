@@ -21,7 +21,6 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
     // Move these elsewhere once they have systems
-    registry->registerComponent<Input>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
     mSceneLoader = std::make_unique<Scene>();

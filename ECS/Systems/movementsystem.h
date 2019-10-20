@@ -1,8 +1,8 @@
 #ifndef MOVEMENTSYSTEM_H
 #define MOVEMENTSYSTEM_H
 
+#include "isystem.h"
 #include "pool.h"
-#include "system.h"
 #include <memory>
 
 typedef gsl::Vector3D vec3;
@@ -10,6 +10,15 @@ class Registry;
 class Transform;
 class MovementSystem : public QObject, public ISystem {
     Q_OBJECT
+    friend class RenderWindow;
+
+private:
+    std::shared_ptr<Pool<Transform>> mTransforms;
+    Registry *registry;
+
+    void updateModelMatrix(Transform &comp);
+    gsl::Matrix4x4 getTRMatrix(Transform &comp);
+
 public:
     MovementSystem();
 
@@ -69,14 +78,6 @@ signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);
     void rotationChanged(GLuint eID, vec3 newRot);
-
-private:
-    std::shared_ptr<Pool<Transform>> mTransforms;
-    Registry *registry;
-    void setPositionPrivate(GLuint eID, vec3 position);
-    void setRotationPrivate(GLuint eID, vec3 rotation);
-    void updateModelMatrix(Transform &comp);
-    gsl::Matrix4x4 getTRMatrix(Transform &comp);
 };
 
 #endif // MOVEMENTSYSTEM_H

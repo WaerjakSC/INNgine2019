@@ -3,7 +3,7 @@
 
 #include "components.h"
 #include "registry.h"
-#include "system.h"
+#include "isystem.h"
 class CollisionSystem : public ISystem {
 public:
     CollisionSystem();

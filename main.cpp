@@ -1,5 +1,3 @@
-#include "entity.h"
-#include "hierarchymodel.h"
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSplashScreen>

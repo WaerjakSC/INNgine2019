@@ -4,7 +4,7 @@
 #include "entity.h"
 #include "pool.h"
 #include "resourcemanager.h"
-#include "system.h"
+#include "isystem.h"
 #include <memory>
 #include <typeinfo>
 

@@ -4,6 +4,7 @@
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     registry = Registry::instance();
     mView = std::make_unique<RenderView>();
+
     //    mColliderPool = registry->registerComponent<Collision>();
 }
 /**
