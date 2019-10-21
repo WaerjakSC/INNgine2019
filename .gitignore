@@ -65,3 +65,8 @@ INNgine2019.pro.user
 *.txt
 *.wav
 *.jpg
+Assets/Icons
+Assets/Images
+Assets/Meshes
+Assets/Styles
+Assets/Textures

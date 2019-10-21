@@ -18,6 +18,10 @@ INCLUDEPATH += \
     ./GUI \
     ./Resources \
 
+mac {
+    LIBS += -framework OpenAL
+}
+
 win32 {
     INCLUDEPATH += $(OPENAL_HOME)\\include\\AL
 
@@ -60,6 +64,7 @@ win32 {
         }
     }
 }
+
 HEADERS += \
     ECS/Systems/inputsystem.h \
     ECS/Systems/isystem.h \

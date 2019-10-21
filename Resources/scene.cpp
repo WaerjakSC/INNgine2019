@@ -4,6 +4,7 @@
 #include "resourcemanager.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
