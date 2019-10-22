@@ -73,13 +73,11 @@ void Camera::update() {
     mViewMatrix.translate(-mPosition);
 }
 
-gsl::Matrix4x4 Camera::getProjectionMatrix() const
-{
+gsl::Matrix4x4 Camera::getProjectionMatrix() const {
     return mProjectionMatrix;
 }
 
-gsl::Matrix4x4 Camera::getViewMatrix() const
-{
+gsl::Matrix4x4 Camera::getViewMatrix() const {
     return mViewMatrix;
 }
 
@@ -164,32 +162,32 @@ Camera::Frustum Camera::getFrustum() {
     result.planeType.far.distance = vp.getFloat(15) - vp.getFloat(11);
 
     for (int i = 0; i < 6; i++) {
-     float mag = 1.0f /
-     result.planes[i].normal.length();
-     result.planes[i].normal =
-     result.planes[i].normal*mag;
-     result.planes[i].distance *= mag;
-     }
-     return result;
+        float mag = 1.0f /
+                    result.planes[i].normal.length();
+        result.planes[i].normal =
+            result.planes[i].normal * mag;
+        result.planes[i].distance *= mag;
+    }
+    return result;
 }
 
 // Finds the corners where the planes p1, p2 and p3 intersect.
 vec3 Camera::Frustum::Intersection(plane p1, plane p2, plane p3) {
     mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
-                p1.normal.y, p2.normal.y, p3.normal.y,
-                p1.normal.z, p2.normal.z, p3.normal.z};
+           p1.normal.y, p2.normal.y, p3.normal.y,
+           p1.normal.z, p2.normal.z, p3.normal.z};
 
     vec3 A(-p1.distance, -p2.distance, -p3.distance);
 
     mat3 Dx{A.x, A.y, A.z,
-                p1.normal.y, p2.normal.y, p3.normal.y,
-                p1.normal.z, p2.normal.z, p3.normal.z};
+            p1.normal.y, p2.normal.y, p3.normal.y,
+            p1.normal.z, p2.normal.z, p3.normal.z};
     mat3 Dy{p1.normal.x, p2.normal.x, p3.normal.x,
-                A.x, A.y, A.z,
-                p1.normal.z, p2.normal.z, p3.normal.z};
+            A.x, A.y, A.z,
+            p1.normal.z, p2.normal.z, p3.normal.z};
     mat3 Dz{p1.normal.x, p2.normal.x, p3.normal.x,
-                p1.normal.y, p2.normal.y, p3.normal.y,
-                A.x, A.y, A.z};
+            p1.normal.y, p2.normal.y, p3.normal.y,
+            A.x, A.y, A.z};
 
     float detD = D.determinant();
 
@@ -230,15 +228,12 @@ bool Camera::Frustum::Intersects(const Frustum &f, const sphere &s) {
 
 float Camera::Frustum::Classify(const aABB &aabb, const plane &plane) {
     // maximum extent in direction of plane normal
-    float r = fabsf(aabb.size.x * plane.normal.x)
-            + fabsf(aabb.size.y * plane.normal.y)
-            + fabsf(aabb.size.z * plane.normal.z);
+    float r = fabsf(aabb.size.x * plane.normal.x) + fabsf(aabb.size.y * plane.normal.y) + fabsf(aabb.size.z * plane.normal.z);
     // signed distance between box center and plane
     float d = plane.normal.dot(plane.normal, aabb.origin) + plane.distance;
     if (fabsf(d) < r) {
         return 0.0f;
-    }
-    else if (d < 0.0f) {
+    } else if (d < 0.0f) {
         return d + r;
     }
     return d - r;

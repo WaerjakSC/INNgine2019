@@ -63,6 +63,8 @@ private slots:
 
     void makeEntity();
 
+    void changeEntityName(const Entity &entt);
+
 private:
     void init();
     Ui::MainWindow *ui;

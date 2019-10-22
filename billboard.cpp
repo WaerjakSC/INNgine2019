@@ -5,7 +5,7 @@
 BillBoard::BillBoard(GLuint eID, const QString &name) : Entity(eID, name) {
     registry = Registry::instance();
     factory = ResourceManager::instance();
-    setConstantYUp(true);
+    setConstantYUp(false);
 }
 
 void BillBoard::update() {

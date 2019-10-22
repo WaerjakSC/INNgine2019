@@ -2,9 +2,9 @@
 #define REGISTRY_H
 
 #include "entity.h"
+#include "isystem.h"
 #include "pool.h"
 #include "resourcemanager.h"
-#include "isystem.h"
 #include <memory>
 #include <typeinfo>
 
@@ -131,11 +131,9 @@ public:
     void removeBillBoardID(GLuint entityID);
     std::vector<GLuint> billBoards() { return mBillBoards; }
 
-    GLuint makeEntity(std::string name = "");
+    GLuint makeEntity(const QString &name = "");
     std::map<GLuint, Entity *> getEntities() const { return mEntities; }
     Entity *getEntity(GLuint eID);
-    Entity *getEntity(const QString &name);
-    bool isUniqueName(const QString &name);
 
     void removeEntity(GLuint eID);
     GLuint numEntities() { return mEntities.size(); }

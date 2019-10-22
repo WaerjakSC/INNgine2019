@@ -68,64 +68,6 @@ ResourceManager *ResourceManager::instance() {
     return mInstance;
 }
 
-/**
- * @brief If you know the mesh you want at construction i.e. for prefabs and similar
- * @param name - name of the file you want to read
- * @param eID - entityID
- */
-void ResourceManager::addMeshComponent(std::string name, int eID) {
-    if (eID <= -1 || (size_t)eID > registry->numEntities() - 1) {
-        eID = registry->numEntities() - 1;
-    }
-    registry->addComponent<Mesh>(eID);
-    if (name.find(".txt") != std::string::npos)
-        setMesh(loadTriangleMesh(name), eID);
-    else
-        setMesh(name, eID);
-}
-void ResourceManager::setMesh(Mesh *mesh, int eID) {
-    // If gameobject exists in vector and the component actually exists
-    if ((size_t)eID < registry->numEntities()) {
-        registry->getComponent<Mesh>(eID) = *mesh;
-    }
-}
-void ResourceManager::setMesh(std::string name, int eID) {
-    auto search = mMeshMap.find(name);
-    if (search != mMeshMap.end()) {
-        registry->getComponent<Mesh>(eID) = search->second;
-    } else
-        loadMesh(name);
-}
-
-/**
- * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
- * @param name
- * @param type
- * @return The entity ID of the gameobject.
- */
-GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
-    if (name.find(".txt") != std::string::npos)
-        return makeTriangleSurface(name, type);
-    else {
-        GLuint eID = registry->makeEntity(name);
-        registry->addComponent<Transform>(eID);
-        registry->addComponent<Material>(eID, type);
-        addMeshComponent(name, eID);
-        return eID;
-    }
-}
-/**
- * @brief Plane prefab -- should fix coloring at some point
- * @return
- */
-GLuint ResourceManager::makePlane() {
-    GLuint eID = registry->makeEntity("Plane");
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, Color);
-    makePlaneMesh(eID);
-
-    return eID;
-}
 void ResourceManager::saveProjectSettings(const QString &fileName) {
     if (fileName.isEmpty())
         return;
@@ -197,21 +139,49 @@ void ResourceManager::onExit() {
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
+/**
+ * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
+ * @param name
+ * @param type
+ * @return The entity ID of the gameobject.
+ */
+GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
+    if (name.find(".txt") != std::string::npos)
+        return makeTriangleSurface(name, type);
+    else {
+        GLuint eID = registry->makeEntity(QString::fromStdString(name));
+        registry->addComponent<Transform>(eID);
+        registry->addComponent<Material>(eID, type);
+        addMeshComponent(name, eID);
+        return eID;
+    }
+}
+/**
+ * @brief Plane prefab -- should fix coloring at some point
+ * @return
+ */
+GLuint ResourceManager::makePlane(const QString &name) {
+    GLuint eID = registry->makeEntity(name);
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID, Color);
+    makePlaneMesh(eID);
 
+    return eID;
+}
 void ResourceManager::makePlaneMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Plane";
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, -0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.5f, 0.f, 0.5f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, -0.5f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{-0.5f, 0.f, 0.5f, 0.f, 0.f, 1.f});
-    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
+    mMeshData.mVertices.push_back(Vertex{0.8, 0, -0.8, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{-0.8, 0, -0.8, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{-0.8, 0, 0.8, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{-0.8, 0, 0.8, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{0.8, 0, 0.8, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{0.8, 0, -0.8, 0, 1, 0});
 
     // Once VAO and VBO have been generated, mMeshData can be discarded.
     auto &mesh = registry->getComponent<Mesh>(eID);
+    mesh = Mesh(GL_TRIANGLES, mMeshData);
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -221,8 +191,8 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
  * @brief Cube prefab
  * @return
  */
-GLuint ResourceManager::makeCube() {
-    GLuint eID = registry->makeEntity("Cube");
+GLuint ResourceManager::makeCube(const QString &name) {
+    GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
     registry->addComponent<Mesh>(eID);
@@ -233,11 +203,15 @@ GLuint ResourceManager::makeCube() {
 /**
  * @brief Creates basic XYZ lines
  */
-GLuint ResourceManager::makeXYZ() {
-    GLuint eID = registry->makeEntity("XYZ");
+GLuint ResourceManager::makeXYZ(const QString &name) {
+    GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, Color);
+    makeXYZMesh(eID);
 
+    return eID;
+}
+void ResourceManager::makeXYZMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "XYZ";
@@ -247,22 +221,21 @@ GLuint ResourceManager::makeXYZ() {
     mMeshData.mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
     mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
-    registry->addComponent<Mesh>(eID, GL_LINES, mMeshData);
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
-    auto &mesh = registry->getComponent<Mesh>(eID);
+    registry->addComponent<Mesh>(eID, GL_LINES, mMeshData);
+    auto &mesh = registry->getLastComponent<Mesh>();
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
     glBindVertexArray(0);
-    return eID;
 }
 /**
  * @brief Prefab skybox for editor
  * @return
  */
-GLuint ResourceManager::makeSkyBox() {
-    GLuint eID = registry->makeEntity("Skybox");
+GLuint ResourceManager::makeSkyBox(const QString &name) {
+    GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
     registry->addComponent<Material>(eID, Tex, mTextures["skybox.bmp"]->id() - 1);
 
@@ -321,10 +294,11 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
                                   16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
-    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData); // If using meshData struct, remember to add the Mesh component AFTER clearing and inserting mMeshData
 
     //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
     auto &skyMesh = registry->getComponent<Mesh>(eID);
+    skyMesh = Mesh(GL_TRIANGLES, mMeshData); // If using meshData struct, remember to add the Mesh component AFTER clearing and inserting mMeshData
+
     initVertexBuffers(&skyMesh);
     initIndexBuffers(&skyMesh);
 
@@ -337,14 +311,14 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType type) {
-    GLuint eID = registry->makeEntity(fileName);
+    GLuint eID = registry->makeEntity(QString::fromStdString(fileName));
 
     initializeOpenGLFunctions();
 
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, type);
     registry->addComponent<Mesh>(eID);
-    setMesh(loadTriangleMesh(fileName), eID);
+    setMesh(fileName, eID);
     glBindVertexArray(0);
 
     return eID;
@@ -353,8 +327,8 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType typ
  * @brief Billboard prefab
  * @return
  */
-GLuint ResourceManager::makeBillBoard() {
-    GLuint eID = registry->makeEntity("BillBoard");
+GLuint ResourceManager::makeBillBoard(const QString &name) {
+    GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
     registry->addComponent<Material>(eID, Tex, mTextures["gnome.bmp"]->id() - 1);
     makeBillBoardMesh(eID);
@@ -373,9 +347,9 @@ void ResourceManager::makeBillBoardMesh(int eID) {
                                                               Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
                                                               Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                                           });
-    registry->addComponent<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
 
     auto &billBoardMesh = registry->getComponent<Mesh>(eID);
+    billBoardMesh = Mesh(GL_TRIANGLE_STRIP, mMeshData);
     initVertexBuffers(&billBoardMesh);
 
     glBindVertexArray(0);
@@ -405,8 +379,8 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
 
     makeUnitOctahedron(mRecursions); // This fills mMeshData
 
-    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
     auto &octMesh = registry->getComponent<Mesh>(eID);
+    octMesh = Mesh(GL_TRIANGLES, mMeshData);
 
     initVertexBuffers(&octMesh);
     initIndexBuffers(&octMesh);
@@ -417,8 +391,8 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
  * @brief Light object prefab -- not fully implemented yet
  * @return
  */
-GLuint ResourceManager::makeLightObject() {
-    GLuint eID = registry->makeEntity("Light");
+GLuint ResourceManager::makeLightObject(const QString &name) {
+    GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
     registry->addComponent<Material>(eID, Tex, mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->addComponent<Light>(eID);
@@ -445,9 +419,9 @@ void ResourceManager::makeLightMesh(int eID) {
                                1, 3, 2,
                                3, 0, 2,
                                0, 3, 1});
-    registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
 
     auto &lightMesh = registry->getComponent<Mesh>(eID);
+    lightMesh = Mesh(GL_TRIANGLES, mMeshData);
 
     initVertexBuffers(&lightMesh);
     initIndexBuffers(&lightMesh);
@@ -488,6 +462,59 @@ void ResourceManager::initIndexBuffers(Mesh *mesh) {
     glGenBuffers(1, &mesh->mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
+}
+/**
+ * @brief If you know the mesh you want at construction i.e. for prefabs and similar
+ * @param name - name of the file you want to read
+ * @param eID - entityID
+ */
+void ResourceManager::addMeshComponent(std::string name, int eID) {
+    if (eID <= -1 || (size_t)eID > registry->numEntities() - 1) {
+        eID = registry->numEntities() - 1;
+    }
+    registry->addComponent<Mesh>(eID);
+    setMesh(name, eID);
+}
+void ResourceManager::setMesh(std::string name, int eID) {
+    auto search = mMeshMap.find(name);
+    if (search != mMeshMap.end()) {
+        registry->getComponent<Mesh>(eID) = search->second;
+        return;
+    } else if (name == "Skybox")
+        makeSkyBoxMesh(eID);
+    else if (name == "BillBoard") {
+        makeBillBoardMesh(eID);
+        registry->addBillBoard(eID);
+    } else if (name == "Light") // Light just refers to the pyramid mesh, probably not needed in the end
+        makeLightMesh(eID);
+    else if (name == "Plane")
+        makePlaneMesh(eID);
+    else {
+        if (name.find(".txt") != std::string::npos)
+            loadTriangleMesh(name);
+        else
+            loadMesh(name);
+    }
+    // the mesh at the back is the latest creation
+    mMeshMap[name] = registry->getLastComponent<Mesh>();
+}
+/**
+ * @brief ResourceManager::LoadMesh - Loads the mesh from file if it isn't already in the Meshes map.
+ * @param fileName
+ * @return
+ */
+void ResourceManager::loadMesh(std::string fileName) {
+    if (!readFile(fileName)) { // Should run readFile and add the mesh to the Meshes map if it can be found
+        qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
+        return;
+    }
+}
+
+void ResourceManager::loadTriangleMesh(std::string fileName) {
+    if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
+        qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
+        return;
+    }
 }
 /**
  * @brief Load shader for the first time if it's not already in storage.
@@ -706,38 +733,6 @@ bool ResourceManager::readFile(std::string fileName) {
 
     qDebug() << "Obj file read: " << QString::fromStdString(fileName);
     return true;
-}
-
-/**
- * @brief ResourceManager::LoadMesh - Loads the mesh from file if it isn't already in the Meshes map.
- * @param fileName
- * @return
- */
-void ResourceManager::loadMesh(std::string fileName) {
-
-    //    auto search = mMeshMap.find(fileName);
-    //    if (search != mMeshMap.end()) {
-    //        return &search->second; // Return a copy of the mesh it wants if already stored
-    //    }
-    if (!readFile(fileName)) { // Should run readFile and add the mesh to the Meshes map if it can be found
-        qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
-        return;
-    }
-    // the mesh at the back is the latest creation
-    mMeshMap[fileName] = registry->getLastComponent<Mesh>(); // Save the new unique mesh in the meshmap for other entities that might need it
-}
-
-Mesh *ResourceManager::loadTriangleMesh(std::string fileName) {
-    auto search = mMeshMap.find(fileName);
-    if (search != mMeshMap.end()) {
-        return &search->second; // Return a copy of the mesh it wants if already stored
-    }
-    if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
-        qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
-        return new Mesh;
-    }
-    mMeshMap[fileName] = registry->getLastComponent<Mesh>(); // Save the new unique mesh in the meshmap for other entities that might need it
-    return &registry->getLastComponent<Mesh>();              // the mesh at the back is the latest creation
 }
 
 bool ResourceManager::readTriangleFile(std::string fileName) {

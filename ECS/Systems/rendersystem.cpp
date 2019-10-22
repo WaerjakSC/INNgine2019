@@ -1,10 +1,13 @@
 #include "rendersystem.h"
 #include "billboard.h"
 #include "registry.h"
+#include "view.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     registry = Registry::instance();
     mView = std::make_unique<RenderView>();
-
+    //    View<Transform, Material, Mesh> test(mView->mTransformPool, mView->mMaterialPool, mView->mMeshPool);
+    //    auto [transform, material] = test.get<Transform, Material>(1);
+    //    qDebug() << transform.position;
     //    mColliderPool = registry->registerComponent<Collision>();
 }
 /**

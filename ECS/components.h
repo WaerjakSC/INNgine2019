@@ -153,7 +153,7 @@ struct Material : public Component {
     Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
-    Material(std::string type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
+    Material(const QString &type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
         mType = CType::Material;
         if (type == "color")
             mShader = Color;

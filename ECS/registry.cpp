@@ -40,6 +40,7 @@ Entity *Registry::getEntity(GLuint eID) {
         return search->second;
     return nullptr;
 }
+
 /**
  * @brief Destroy gameobject
  * @param eID - entityID
@@ -66,12 +67,12 @@ void Registry::clearScene() {
  * @param name Name of the gameobject. Leave blank if no name desired.
  * @return Returns the entity ID for use in adding components or other tasks.
  */
-GLuint Registry::makeEntity(std::string name) {
+GLuint Registry::makeEntity(const QString &name) {
     GLuint eID = numEntities();
     if (name == "BillBoard")
         mEntities[eID] = new BillBoard(eID, "BillBoard");
     else
-        mEntities[eID] = new Entity(eID, QString::fromStdString(name));
+        mEntities[eID] = new Entity(eID, name);
     emit entityCreated(eID);
     return eID;
 }
@@ -133,19 +134,7 @@ void Registry::updateChildParent() {
         }
     }
 }
-Entity *Registry::getEntity(const QString &name) {
-    for (auto entity : mEntities) {
-        if (entity.second->name() == name)
-            return entity.second;
-    }
-    return nullptr;
-}
-bool Registry::isUniqueName(const QString &name) {
-    for (auto entity : mEntities)
-        if (entity.second->name() == name)
-            return false;
-    return true;
-}
+
 void Registry::makeSnapshot() {
     std::map<GLuint, Entity *> newEntityMap;
     for (auto entity : mEntities) {

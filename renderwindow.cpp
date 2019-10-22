@@ -1,10 +1,6 @@
 #include "renderwindow.h"
 #include "innpch.h"
 #include "scene.h"
-#include "soundmanager.h"
-#include "soundsource.h"
-#include "view.h"
-
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QOpenGLContext>
@@ -14,6 +10,9 @@
 #include <QTimer>
 #include <QToolButton>
 #include <chrono>
+
+#include "soundmanager.h"
+#include "soundsource.h"
 #include <iostream>
 #include <thread> //for sleep_for
 
@@ -99,15 +98,17 @@ void RenderWindow::init() {
     //makes the soundmanager
     //it is a Singleton!
     mSoundManager->init();
+
+    //********************** Set up camera **********************
+    mCurrentCamera = new Camera();
+    mCurrentCamera->setPosition(vec3(0.f, 8.f, 15.0f));
+    //    mCurrentCamera->yaw(45.f);
+    mCurrentCamera->pitch(25.f);
+
     //Compile shaders:
     mFactory->loadShader(Color);
     mFactory->loadShader(Tex);
     mFactory->loadShader(Phong);
-    //********************** Set up camera **********************
-    mCurrentCamera = new Camera();
-    mCurrentCamera->setPosition(vec3(1.f, 1.f, 4.4f));
-    //    mCurrentCamera->yaw(45.f);
-    //    mCurrentCamera->pitch(5.f);
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
     mFactory->getShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
     mFactory->getShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
@@ -134,23 +135,16 @@ void RenderWindow::init() {
     ray = new Raycast(this, mCurrentCamera);
 
     //********************** Making the objects to be drawn **********************
-    mFactory->loadLastProject(); // loadScene should be placed somewhere in init() rather than saveScene
+    mFactory->loadLastProject();
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mLight = mFactory->getSceneLoader()->controllerID;
     mRenderer->init();
     mMoveSys->init();
-    View<Transform> test(mMoveSys->mTransforms);
-    auto transform = test.get<Transform>(4);
-    qDebug() << transform.parentID;
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
         "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
-}
-
-bool RenderWindow::isPlaying() const {
-    return mIsPlaying;
 }
 
 ///Called each frame - doing the rendering
@@ -200,6 +194,9 @@ MovementSystem *RenderWindow::movement() const {
 
 SoundManager *RenderWindow::soundManager() const {
     return mSoundManager;
+}
+bool RenderWindow::isPlaying() const {
+    return mIsPlaying;
 }
 void RenderWindow::playSound() {
     //plays the sounds

@@ -241,7 +241,7 @@ void MainWindow::closeEngine() {
     close();
 }
 void MainWindow::makeEntity() {
-    emit made3DObject(registry->makeEntity("GameObject"));
+    emit made3DObject(registry->makeEntity("GameObject" + QString::number(unnamedEntityCount)));
 }
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());
@@ -253,18 +253,16 @@ void MainWindow::makeCube() {
     emit made3DObject(ResourceManager::instance()->makeCube());
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
-    QString data = hierarchy->data(newParent).toString();
-    if (data != "") {
-        Entity *entt = registry->getEntity(data);
-        if (entt) {
-            // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
-            // Really not sure about this whole "Transform component governs parent/child relationship thing"
-            if (registry->contains(entt->id(), CType::Transform)) {
-                int parentID = entt->id();
-                // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-                registry->setParent(selectedEntity->id(), parentID, true);
-                registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
-            }
+    GLuint data = hierarchy->data(newParent, 257).toUInt();
+    Entity *entt = registry->getEntity(data);
+    if (entt) {
+        // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
+        // Really not sure about this whole "Transform component governs parent/child relationship thing"
+        if (registry->contains(entt->id(), CType::Transform) && selectedEntity) {
+            int parentID = entt->id();
+            // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
+            registry->setParent(selectedEntity->id(), parentID, true);
+            registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
         }
     } else if (selectedEntity)
         if (registry->contains(selectedEntity->id(), CType::Transform)) {
@@ -281,6 +279,7 @@ void MainWindow::parentChanged(GLuint eID) {
         Entity *entt = registry->getEntity(eID);
         item = new QStandardItem;
         item->setText(entt->name());
+        item->setData(entt->id());
         int parentID = registry->getComponent<Transform>(entt->id()).parentID;
         if (registry->hasParent(eID)) {
             QStandardItem *parent = hierarchy->itemFromEntityID(parentID);
@@ -292,10 +291,8 @@ void MainWindow::parentChanged(GLuint eID) {
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
 }
 void MainWindow::onEntityClicked(const QModelIndex &index) {
-    QStandardItem *item = hierarchy->itemFromIndex(index);
-    Entity *entt = registry->getEntity(item->text());
-    onEntityDragged(entt->id());
-
+    GLuint eID = hierarchy->itemFromIndex(index)->data().toUInt();
+    onEntityDragged(eID);
     mComponentList->setupComponentList();
 }
 
@@ -304,23 +301,29 @@ void MainWindow::onEntityDragged(GLuint eID) {
 }
 void MainWindow::mouseRayHit(GLuint eID) {
     QStandardItem *entity = hierarchy->itemFromEntityID(eID);
-    QModelIndex entityIndex = hierarchy->indexFromItem(entity);
-    hView->setCurrentIndex(entityIndex);
+    hView->setCurrentIndex(hierarchy->indexFromItem(entity));
     selectedEntity = registry->getEntity(eID);
     mComponentList->setupComponentList();
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
-    if (selectedEntity && registry->isUniqueName(newName))
+    if (selectedEntity)
         selectedEntity->setName(hierarchy->data(index).toString());
 }
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     QStandardItem *item = new QStandardItem;
-    item->setText(registry->getEntity(eID)->name());
+    Entity *entt = registry->getEntity(eID);
+    item->setText(entt->name());
+    item->setData(entt->id());
     parentItem->appendRow(item);
-}
 
+    connect(entt, &Entity::nameChanged, this, &MainWindow::changeEntityName);
+}
+void MainWindow::changeEntityName(const Entity &entt) {
+    QStandardItem *item = hierarchy->itemFromEntityID(entt.id());
+    item->setText(entt.name());
+}
 /**
  * @brief Initial insertion of gameobjects, such as those made in an init function or read from a level file.
  * @param entities
@@ -334,6 +337,7 @@ void MainWindow::insertEntities() {
             item->setText(QString("GameObject" + QString::number(unnamedEntityCount)));
         else
             item->setText(entity.second->name());
+        item->setData(entity.second->id());
         int parentID = registry->getComponent<Transform>(entity.second->id()).parentID;
         if (parentID != -1) {
             forEach(parentID, item);
@@ -353,9 +357,7 @@ void MainWindow::forEach(GLuint parentID, QStandardItem *child, QModelIndex pare
     for (int r = 0; r < hierarchy->rowCount(parent); ++r) {
         QModelIndex index = hierarchy->index(r, 0, parent);
         QStandardItem *item = hierarchy->itemFromIndex(index);
-        Entity *entt = registry->getEntity(item->text());
-        item->setText(entt->name());
-        if (parentID == entt->id()) { // If in-value parentID matches the ID of the current item, append the new child to that item.
+        if (parentID == item->data().toUInt()) { // If in-value parentID matches the ID of the current item, append the new child to that item.
             item->appendRow(child);
             break;
         }

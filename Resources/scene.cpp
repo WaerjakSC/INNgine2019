@@ -4,11 +4,11 @@
 #include "resourcemanager.h"
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
+#include <sstream>
 
 Scene::Scene() {
 }
@@ -110,7 +110,7 @@ void Scene::saveScene(const QString &fileName) {
             writer.StartObject();
             const Mesh mesh = registry->getComponent<Mesh>(entity.second->id());
             if (mesh.mName == "")
-                qDebug() << "what happens here?";
+                qDebug() << "No mesh name!";
             writer.Key("name");
             writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
             writer.EndObject();
@@ -161,7 +161,7 @@ void Scene::saveScene(const QString &fileName) {
         writer.EndObject();
     }
     writer.EndObject();
-    std::ofstream of(gsl::sceneFilePath + fileName.toStdString());
+    std::ofstream of(gsl::sceneFilePath + fileName.toStdString() + ".json");
     of << buf.GetString();
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
@@ -198,10 +198,9 @@ void Scene::populateScene(const Document &scene) {
         } else {
             GLuint id = registry->makeEntity(itr->value["name"].GetString());
             idPairs[itr->value["id"].GetInt()] = id;
-            if (itr->value["name"] == "Light")
+            if (itr->value["name"] == "Light") // Temporary
                 controllerID = id;
             for (Value::ConstMemberIterator comp = itr->value["components"].MemberBegin(); comp != itr->value["components"].MemberEnd(); ++comp) {
-                //                qDebug() << comp->name.GetString();
                 if (comp->name == "transform") {
                     gsl::Vector3D position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                     gsl::Vector3D rotation(comp->value["rotation"][0].GetDouble(), comp->value["rotation"][1].GetDouble(), comp->value["rotation"][2].GetDouble());
@@ -215,18 +214,11 @@ void Scene::populateScene(const Document &scene) {
                     }
                 } else if (comp->name == "material") {
                     gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
-                    registry->addComponent<Material>(id, comp->value["shader"].GetString(), comp->value["textureid"].GetInt(), color);
+                    QString shaderName = comp->value["shader"].GetString();
+                    registry->addComponent<Material>(id, shaderName, comp->value["textureid"].GetInt(), color);
                 } else if (comp->name == "mesh") {
-                    if (comp->value["name"] == "BillBoard") {
-                        factory->makeBillBoardMesh(id);
-                        registry->addBillBoard(id);
-                    } else if (comp->value["name"] == "Skybox")
-                        factory->makeSkyBoxMesh(id);
-                    else if (comp->value["name"] == "Light")
-                        factory->makeLightMesh(id);
-                    else
-                        factory->addMeshComponent(comp->value["name"].GetString(), id);
-                } else if (comp->name == "light") {
+                    factory->addMeshComponent(comp->value["name"].GetString(), id);
+                } else if (comp->name == "light") { // Again, temporary, very static functionality atm
                     GLfloat ambStr = comp->value["ambstr"].GetFloat();
                     gsl::Vector3D ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());
                     GLfloat lightStr = comp->value["lightstr"].GetFloat();
