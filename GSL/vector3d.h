@@ -95,5 +95,15 @@ public:
 };
 
 } // namespace gsl
-
+namespace std {
+template <>
+struct hash<gsl::Vector3D> {
+    size_t operator()(gsl::Vector3D const &v) const {
+        return ((hash<GLfloat>()(v.x) ^
+                 (hash<GLfloat>()(v.y) << 1)) >>
+                1) ^
+               (hash<GLfloat>()(v.z) << 1);
+    }
+};
+} // namespace std
 #endif // VECTOR3D_H

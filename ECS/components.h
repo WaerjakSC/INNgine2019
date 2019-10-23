@@ -349,15 +349,18 @@ public:
  * @brief The BSplineCurve struct
  */
 struct BSplineCurve : Component {
-    vec3 b[4];              // control points
-    int n;                  // n number of knots
-    int d;                  // d degrees
-    std::vector<float> t;   // knots
+    std::vector<vec3> b;  // control points
+    int n;                // n number of knots
+    int d;                // d degrees
+    std::vector<float> t; // knots
+
+    virtual void update() {}
 
     // default constructor
-    BSplineCurve();
-    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree=2);
-
+    BSplineCurve() {}
+    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree = 2) : b(controlpoints), d(degree), t(knots) {
+        n = knots.size();
+    }
 };
 
 #endif // COMPONENT_H

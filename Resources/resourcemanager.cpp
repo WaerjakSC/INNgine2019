@@ -591,200 +591,49 @@ QString ResourceManager::getMeshName(const Mesh &mesh) {
 bool ResourceManager::readFile(std::string fileName) {
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
-    std::ifstream fileIn;
-    fileIn.open(fileWithPath, std::ifstream::in);
-    if (!fileIn) {
-        qDebug() << "Could not open file for reading: " << QString::fromStdString(fileName);
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string err;
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, fileWithPath.c_str());
+    if (!err.empty()) {
+        std::cerr << err << std::endl;
+    }
+    if (!ret)
         return false;
-    }
     mMeshData.Clear();
-    //    tinyobj::attrib_t attrib;
-    //    std::vector<tinyobj::shape_t> shapes;
-    //    std::vector<tinyobj::material_t> materials;
-    //    std::string err;
-    //    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, fileWithPath.c_str());
-    //    if (!err.empty()) {
-    //        std::cerr << err << std::endl;
-    //    }
-    //    if (!ret)
-    //        return false;
-    //    // Append `default` material
-    //    materials.push_back(tinyobj::material_t());
-    //    // Loop over shapes
-    //    for (size_t s = 0; s < shapes.size(); s++) {
-    //        // Loop over faces(polygon)
-    //        size_t index_offset = 0;
-    //        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-    //            int fv = shapes[s].mesh.num_face_vertices[f];
-
-    //            // Loop over vertices in the face.
-    //            for (size_t v = 0; v < fv; v++) {
-    //                // access to vertex
-    //                tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-    //                tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
-    //                tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
-    //                tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
-    //                tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
-    //                tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
-    //                tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
-    //                tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
-    //                tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
-
-    //                mMeshData.mVertices.push_back(Vertex{vx, vy, vz, nx, ny, nz, tx, ty});
-    //                mMeshData.mIndices.push_back(idx.vertex_index);
-    //                // Optional: vertex colors
-    //                // tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
-    //                // tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
-    //                // tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
-    //            }
-    //            index_offset += fv;
-
-    //            //            // per-face material
-    //            //            int current_material_id = shapes[s].mesh.material_ids[f];
-
-    //            //            if ((current_material_id < 0) ||
-    //            //                (current_material_id >= static_cast<int>(materials.size()))) {
-    //            //                // Invaid material ID. Use default material.
-    //            //                current_material_id =
-    //            //                    materials.size() -
-    //            //                    1; // Default material is added to the last item in `materials`.
-    //            //            }
-    //        }
-    //    }
-    //    for (size_t m = 0; m < materials.size(); m++) {
-    //        tinyobj::material_t *mp = &materials[m];
-
-    //        if (mp->diffuse_texname.length() > 0) {
-    //            // Only load the texture if it is not already loaded
-    //            if (mTextures.find(mp->diffuse_texname) != mTextures.end()) {
-    //                loadTexture(mp->diffuse_texname);
-    //            }
-    //        }
-    //    }
-
-    //One line at a time-variable
-    std::string oneLine;
-    //One word at a time-variable
-    std::string oneWord;
-
-    std::vector<gsl::Vector3D> tempVertecies;
-    std::vector<gsl::Vector3D> tempNormals;
-    std::vector<gsl::Vector2D> tempUVs;
-
-    // Variable for constructing the indices vector
-    unsigned int temp_index = 0;
-
-    //Reading one line at a time from file to oneLine
-    while (std::getline(fileIn, oneLine)) {
-        //Doing a trick to get one word at a time
-        std::stringstream sStream;
-        //Pushing line into stream
-        sStream << oneLine;
-        //Streaming one word out of line
-        oneWord = ""; //resetting the value or else the last value might survive!
-        sStream >> oneWord;
-
-        if (oneWord == "#") {
-            //Ignore this line
-            //            qDebug() << "Line is comment "  << QString::fromStdString(oneWord);
-            continue;
-        }
-        if (oneWord == "") {
-            //Ignore this line
-            //            qDebug() << "Line is blank ";
-            continue;
-        }
-        if (oneWord == "v") {
-            //            qDebug() << "Line is vertex "  << QString::fromStdString(oneWord) << " ";
-            gsl::Vector3D tempVertex;
-            sStream >> oneWord;
-            tempVertex.x = std::stof(oneWord);
-            sStream >> oneWord;
-            tempVertex.y = std::stof(oneWord);
-            sStream >> oneWord;
-            tempVertex.z = std::stof(oneWord);
-
-            //Vertex made - pushing it into vertex-vector
-            tempVertecies.push_back(tempVertex);
-            continue;
-        }
-        if (oneWord == "vt") {
-            //            qDebug() << "Line is UV-coordinate "  << QString::fromStdString(oneWord) << " ";
-            gsl::Vector2D tempUV;
-            sStream >> oneWord;
-            tempUV.x = std::stof(oneWord);
-            sStream >> oneWord;
-            tempUV.y = std::stof(oneWord);
-
-            //UV made - pushing it into UV-vector
-            tempUVs.push_back(tempUV);
-
-            continue;
-        }
-        if (oneWord == "vn") {
-            //            qDebug() << "Line is normal "  << QString::fromStdString(oneWord) << " ";
-            gsl::Vector3D tempNormal;
-            sStream >> oneWord;
-            tempNormal.x = std::stof(oneWord);
-            sStream >> oneWord;
-            tempNormal.y = std::stof(oneWord);
-            sStream >> oneWord;
-            tempNormal.z = std::stof(oneWord);
-
-            //Vertex made - pushing it into vertex-vector
-            tempNormals.push_back(tempNormal);
-            continue;
-        }
-        if (oneWord == "f") {
-            //            qDebug() << "Line is a face "  << QString::fromStdString(oneWord) << " ";
-            //int slash; //used to get the / from the v/t/n - format
-            int index, normal, uv;
-            for (int i = 0; i < 3; i++) {
-                sStream >> oneWord;                          //one word read
-                std::stringstream tempWord(oneWord);         //to use getline on this one word
-                std::string segment;                         //the numbers in the f-line
-                std::vector<std::string> segmentArray;       //temp array of the numbers
-                while (std::getline(tempWord, segment, '/')) //splitting word in segments
-                {
-                    segmentArray.push_back(segment);
-                }
-                index = std::stoi(segmentArray[0]); //first is vertex
-                if (segmentArray[1] != "")          //second is uv
-                    uv = std::stoi(segmentArray[1]);
-                else {
-                    //qDebug() << "No uvs in mesh";       //uv not present
-                    uv = 0; //this will become -1 in a couple of lines
-                }
-                normal = std::stoi(segmentArray[2]); //third is normal
-
-                //Fixing the indexes
-                //because obj f-lines starts with 1, not 0
-                --index;
-                --uv;
-                --normal;
-
-                if (uv > -1) //uv present!
-                {
-                    Vertex tempVert(tempVertecies[index], tempNormals[normal], tempUVs[uv]);
-                    mMeshData.mVertices.push_back(tempVert);
-                } else //no uv in mesh data, use 0, 0 as uv
-                {
-                    Vertex tempVert(tempVertecies[index], tempNormals[normal], gsl::Vector2D(0.0f, 0.0f));
-                    mMeshData.mVertices.push_back(tempVert);
-                }
-                mMeshData.mIndices.push_back(temp_index++);
+    // Append `default` material
+    materials.push_back(tinyobj::material_t());
+    std::unordered_map<Vertex, GLuint> uniqueVertices;
+    for (const auto &shape : shapes) {
+        for (const auto &index : shape.mesh.indices) {
+            Vertex vertex{};
+            vertex.set_xyz(attrib.vertices[3 * index.vertex_index],
+                           attrib.vertices[3 * index.vertex_index + 1],
+                           attrib.vertices[3 * index.vertex_index + 2]);
+            vertex.set_normal(attrib.normals[3 * index.normal_index],
+                              attrib.normals[3 * index.normal_index + 1],
+                              attrib.normals[3 * index.normal_index + 2]);
+            if (attrib.texcoords.size() != 0)
+                vertex.set_st(attrib.texcoords[2 * index.texcoord_index],
+                              attrib.texcoords[2 * index.texcoord_index + 1]);
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] = static_cast<GLuint>(mMeshData.mVertices.size());
+                mMeshData.mVertices.push_back(vertex);
             }
-
-            //For some reason the winding order is backwards so fixing this by swapping the last two indices
-            //Update: this was because the matrix library was wrong - now it is corrected so this is no longer needed.
-            //            unsigned int back = mIndices.size() - 1;
-            //            std::swap(mIndices.at(back), mIndices.at(back-1));
-            continue;
+            mMeshData.mIndices.push_back(uniqueVertices[vertex]);
         }
     }
+    for (size_t m = 0; m < materials.size(); m++) {
+        tinyobj::material_t *mp = &materials[m];
 
-    //being a nice boy and closing the file after use
-    fileIn.close();
+        if (mp->diffuse_texname.length() > 0) {
+            // Only load the texture if it is not already loaded
+            if (mTextures.find(mp->diffuse_texname) != mTextures.end()) {
+                loadTexture(mp->diffuse_texname);
+            }
+        }
+    }
 
     auto &mesh = registry->getLastComponent<Mesh>();
     mesh.mName = fileName;
