@@ -342,5 +342,15 @@ public:
         float height;
 
     } Cylinder;
+
+
 };
+
+struct BSpline : Component {
+    vec3 b[4];
+    int n;
+    int d;
+    std::vector<float> t;
+};
+
 #endif // COMPONENT_H
