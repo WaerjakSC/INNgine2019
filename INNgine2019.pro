@@ -114,6 +114,7 @@ HEADERS += \
     triangle.h \
     vertex.h \
     camera.h \
+    tiny_obj_loader.h \
     gltypes.h
 
 

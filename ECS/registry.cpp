@@ -49,8 +49,8 @@ void Registry::removeEntity(GLuint eID) {
     if (isBillBoard(eID)) {
         removeBillBoardID(eID);
     }
-    mEntities.erase(mEntities.find(eID));
-    entityDestroyed(eID); // Pass the message on to the registry
+    mEntities.find(eID)->second->destroy(); // doesn't actually destroy the entity object, simply clears the data and increments the generation variable
+    entityDestroyed(eID);                   // Pass the message on to the registry
     emit entityRemoved(eID);
 }
 
@@ -58,7 +58,6 @@ void Registry::clearScene() {
     mBillBoards.clear();
     for (auto entity : mEntities) {
         entityDestroyed(entity.second->id()); // Pass the message on to the registry
-                                              //        emit entityRemoved(entity.second->id());
     }
     mEntities.clear();
 }
@@ -69,10 +68,17 @@ void Registry::clearScene() {
  */
 GLuint Registry::makeEntity(const QString &name) {
     GLuint eID = numEntities();
-    if (name == "BillBoard")
-        mEntities[eID] = new BillBoard(eID, "BillBoard");
-    else
-        mEntities[eID] = new Entity(eID, name);
+    auto search = mEntities.find(eID);
+    if (search != mEntities.end()) {
+        Entity *entt = search->second;
+        if (entt->isDestroyed())
+            entt->newGeneration(eID, name);
+    } else {
+        if (name == "BillBoard")
+            mEntities[eID] = new BillBoard(eID, "BillBoard");
+        else
+            mEntities[eID] = new Entity(eID, name);
+    }
     emit entityCreated(eID);
     return eID;
 }

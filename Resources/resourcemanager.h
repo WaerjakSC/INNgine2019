@@ -4,9 +4,12 @@
 #include "components.h"
 #include "shader.h"
 #include "texture.h"
+#include "tiny_obj_loader.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <memory>
-
+#ifndef TINYOBJLOADER_IMPLEMENTATION
+#define TINYOBJLOADER_IMPLEMENTATION
+#endif
 class RenderView;
 class LightSystem;
 class Entity;

@@ -3,6 +3,7 @@
 #include "matrix3x3.h"
 #include "matrix4x4.h"
 #include "shader.h"
+#include "tiny_obj_loader.h"
 #include "vertex.h"
 #include <QKeyEvent>
 class MainWindow;
@@ -18,6 +19,7 @@ struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
+    std::vector<tinyobj::index_t> indices;
     std::string mName;
     void Clear() {
         mVertices.clear();
@@ -342,8 +344,6 @@ public:
         float height;
 
     } Cylinder;
-
-
 };
 
 struct BSpline : Component {

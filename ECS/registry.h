@@ -173,6 +173,7 @@ private:
     std::map<std::string, std::shared_ptr<ISystem>> mSystems{};
 
     std::map<GLuint, Entity *> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
+    std::vector<GLuint> mAvailableSlots;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
 

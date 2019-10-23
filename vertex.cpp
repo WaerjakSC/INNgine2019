@@ -13,6 +13,9 @@ Vertex::Vertex(float x, float y, float z, float r, float g, float b) {
     mNormal.setZ(b);
 }
 
+Vertex::Vertex(float x, float y, float z, float r, float g, float b, float s, float t) : mXYZ(x, y, z), mNormal(r, g, b), mST(s, t) {
+}
+
 Vertex::Vertex(vec3 a, vec3 b, gsl::Vector2D c) {
     mXYZ = a;
     mNormal = b;
