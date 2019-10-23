@@ -101,9 +101,9 @@ private:
     //Input mInput;
 
     float mCameraSpeed{0.01f};
-    float mCameraRotateSpeed{0.1f};
-    int mMouseXlast{0};
-    int mMouseYlast{0};
+    float mCameraRotateSpeed{30.f};
+    bool firstRMB{true};
+    QPoint lastPos;
 
     QTimer *mRenderTimer{nullptr}; //timer that drives the gameloop
     QElapsedTimer mTimeStart;      //time variable that reads the actual FPS

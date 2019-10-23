@@ -480,16 +480,26 @@ void RenderWindow::wheelEvent(QWheelEvent *event) {
 }
 
 void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
-    if (mInput->RMB) {
-        //Using mMouseXYlast as deltaXY so we don't need extra variables
-        mMouseXlast = event->pos().x() - mMouseXlast;
-        mMouseYlast = event->pos().y() - mMouseYlast;
 
-        if (mMouseXlast != 0)
-            mCurrentCamera->yaw(mCameraRotateSpeed * mMouseXlast);
-        if (mMouseYlast != 0)
-            mCurrentCamera->pitch(mCameraRotateSpeed * mMouseYlast);
+    if (mInput->RMB) {
+        setCursor(Qt::BlankCursor);
+        QPoint mid = QPoint(width() / 2, height() / 2);
+        QPoint glob = mapToGlobal(mid);
+        QCursor::setPos(glob);
+        lastPos = mid;
+        if (!firstRMB) {
+            GLfloat dx = GLfloat(event->x() - lastPos.x()) / width();
+            GLfloat dy = GLfloat(event->y() - lastPos.y()) / height();
+
+            if (dx != 0)
+                mCurrentCamera->yaw(mCameraRotateSpeed * dx);
+            if (dy != 0)
+                mCurrentCamera->pitch(mCameraRotateSpeed * dy);
+        }
+        firstRMB = false;
     }
-    mMouseXlast = event->pos().x();
-    mMouseYlast = event->pos().y();
+    if (cursor() == Qt::BlankCursor && !mInput->RMB) {
+        setCursor(Qt::ArrowCursor);
+        firstRMB = true;
+    }
 }
