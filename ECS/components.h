@@ -155,15 +155,15 @@ struct Material : public Component {
     Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
-    Material(const QString &type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
-        mType = CType::Material;
-        if (type == "color")
-            mShader = Color;
-        else if (type == "texture")
-            mShader = Tex;
-        else if (type == "phong")
-            mShader = Phong;
-    }
+    //    Material(const QString &type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
+    //        mType = CType::Material;
+    //        if (type == "color")
+    //            mShader = Color;
+    //        else if (type == "texture")
+    //            mShader = Tex;
+    //        else if (type == "phong")
+    //            mShader = Phong;
+    //    }
     virtual void update() {}
 
     vec3 mObjectColor{1.f, 1.f, 1.f};

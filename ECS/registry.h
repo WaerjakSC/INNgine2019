@@ -125,13 +125,14 @@ public:
     }
     bool contains(GLuint eID, CType type) {
         CType typeMask = getEntity(eID)->types();
-        return (typeMask & type) != CType::None;
+        bool success = (typeMask & type) != CType::None;
+        return success;
     }
     void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
     void removeBillBoardID(GLuint entityID);
     std::vector<GLuint> billBoards() { return mBillBoards; }
 
-    GLuint makeEntity(const QString &name = "");
+    GLuint makeEntity(const QString &name = "", bool signal = true);
     std::map<GLuint, Entity *> getEntities() const { return mEntities; }
     Entity *getEntity(GLuint eID);
 

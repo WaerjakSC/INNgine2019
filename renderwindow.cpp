@@ -136,12 +136,13 @@ void RenderWindow::init() {
 
     //********************** Making the objects to be drawn **********************
     mFactory->loadLastProject();
-    mFactory->make3DObject("monkey.obj"); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
+    GLuint cb = mFactory->make3DObject("cube.obj", ShaderType::Phong); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mLight = mFactory->getSceneLoader()->controllerID;
-    mRenderer->init();
     mMoveSys->init();
+    mRenderer->init();
+    mLightSys->init();
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),

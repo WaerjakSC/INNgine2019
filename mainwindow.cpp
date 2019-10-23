@@ -241,7 +241,7 @@ void MainWindow::closeEngine() {
     close();
 }
 void MainWindow::makeEntity() {
-    emit made3DObject(registry->makeEntity("GameObject" + QString::number(unnamedEntityCount)));
+    emit made3DObject(registry->makeEntity("GameObject", false));
 }
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());

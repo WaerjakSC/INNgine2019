@@ -17,7 +17,9 @@ void LightSystem::update(float deltaTime) {
         curEntity++;
     }
 }
-
+void LightSystem::init() {
+    update();
+}
 Pool<Light> *LightSystem::lightPool() const {
     return mLightPool.get();
 }

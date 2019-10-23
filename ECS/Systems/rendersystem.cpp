@@ -17,7 +17,7 @@ RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(sh
  */
 void RenderSystem::iterateEntities() {
     // Iterate through entities -- We know Mesh and Material types will always want to be rendered, so we can iterate through all of the entities that own those types.
-    for (size_t listIndex = 0; listIndex < mView->mTransformPool->groupEnd(); listIndex++) {
+    for (size_t listIndex = 0; listIndex < mView->mMeshPool->groupEnd(); listIndex++) {
         auto &mesh = mView->mMeshPool->data()[listIndex]; // We can access the component directly without any indirections because RenderSystem owns mesh and material types
         auto &material = mView->mMaterialPool->data()[listIndex];
         auto &transform = mView->mTransformPool->data()[listIndex];
@@ -40,6 +40,7 @@ void RenderSystem::iterateEntities() {
 }
 void RenderSystem::init() {
     mView->sortGroup();
+    iterateEntities();
 }
 void RenderSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime);

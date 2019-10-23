@@ -113,17 +113,18 @@ void ComponentList::setupMaterialSettings(const Material &component) {
         switch (type.first) {
         case Color:
             curText = "Color";
-            shaderType->addItem(curText);
             break;
         case Tex:
             curText = "Texture";
-            shaderType->addItem("Texture");
             break;
         case Phong:
             curText = "Phong";
-            shaderType->addItem("Phong");
+            break;
+        default:
+            curText = "Phong";
             break;
         }
+        shaderType->addItem(curText);
         if (type.first == component.mShader)
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }

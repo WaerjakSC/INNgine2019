@@ -49,8 +49,9 @@ void Registry::removeEntity(GLuint eID) {
     if (isBillBoard(eID)) {
         removeBillBoardID(eID);
     }
-    mEntities.find(eID)->second->destroy(); // doesn't actually destroy the entity object, simply clears the data and increments the generation variable
     entityDestroyed(eID);                   // Pass the message on to the registry
+    mEntities.find(eID)->second->destroy(); // doesn't actually destroy the entity object, simply clears the data and increments the generation variable
+
     emit entityRemoved(eID);
 }
 
@@ -66,7 +67,7 @@ void Registry::clearScene() {
  * @param name Name of the gameobject. Leave blank if no name desired.
  * @return Returns the entity ID for use in adding components or other tasks.
  */
-GLuint Registry::makeEntity(const QString &name) {
+GLuint Registry::makeEntity(const QString &name, bool signal) {
     GLuint eID = numEntities();
     auto search = mEntities.find(eID);
     if (search != mEntities.end()) {
@@ -79,7 +80,8 @@ GLuint Registry::makeEntity(const QString &name) {
         else
             mEntities[eID] = new Entity(eID, name);
     }
-    emit entityCreated(eID);
+    if (signal)
+        emit entityCreated(eID);
     return eID;
 }
 /**
