@@ -66,6 +66,7 @@ win32 {
 }
 
 HEADERS += \
+    ECS/Systems/aisystem.h \
     ECS/Systems/inputsystem.h \
     ECS/Systems/isystem.h \
     ECS/entity.h \
@@ -117,6 +118,7 @@ HEADERS += \
 
 
 SOURCES += main.cpp \
+    ECS/Systems/aisystem.cpp \
     ECS/Systems/inputsystem.cpp \
     ECS/entity.cpp \
     GSL/matrix2x2.cpp \
