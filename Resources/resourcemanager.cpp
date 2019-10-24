@@ -477,7 +477,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
     registry->addComponent<Mesh>(eID);
     setMesh(name, eID);
 }
-void ResourceManager::setMesh(std::string name, int eID) {
+void ResourceManager::setMesh(std::string name, GLuint eID) {
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
         registry->getComponent<Mesh>(eID) = search->second;
@@ -493,9 +493,9 @@ void ResourceManager::setMesh(std::string name, int eID) {
         makePlaneMesh(eID);
     else {
         if (name.find(".txt") != std::string::npos)
-            loadTriangleMesh(name);
+            loadTriangleMesh(name, eID);
         else
-            loadMesh(name);
+            loadMesh(name, eID);
     }
     // the mesh at the back is the latest creation
     mMeshMap[name] = registry->getLastComponent<Mesh>();
@@ -505,15 +505,15 @@ void ResourceManager::setMesh(std::string name, int eID) {
  * @param fileName
  * @return
  */
-void ResourceManager::loadMesh(std::string fileName) {
-    if (!readFile(fileName)) { // Should run readFile and add the mesh to the Meshes map if it can be found
+void ResourceManager::loadMesh(std::string fileName, GLuint eID) {
+    if (!readFile(fileName, eID)) { // Should run readFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return;
     }
 }
 
-void ResourceManager::loadTriangleMesh(std::string fileName) {
-    if (!readTriangleFile(fileName)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
+void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID) {
+    if (!readTriangleFile(fileName, eID)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return;
     }
@@ -588,7 +588,7 @@ QString ResourceManager::getMeshName(const Mesh &mesh) {
  * @param fileName
  * @return
  */
-bool ResourceManager::readFile(std::string fileName) {
+bool ResourceManager::readFile(std::string fileName, GLuint eID) {
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
     tinyobj::attrib_t attrib;
@@ -635,7 +635,7 @@ bool ResourceManager::readFile(std::string fileName) {
         }
     }
 
-    auto &mesh = registry->getLastComponent<Mesh>();
+    auto &mesh = registry->getComponent<Mesh>(eID);
     mesh.mName = fileName;
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mIndiceCount = mMeshData.mIndices.size();
@@ -648,7 +648,7 @@ bool ResourceManager::readFile(std::string fileName) {
     return true;
 }
 
-bool ResourceManager::readTriangleFile(std::string fileName) {
+bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
     std::ifstream inn;
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
     mMeshData.Clear();
@@ -667,7 +667,7 @@ bool ResourceManager::readTriangleFile(std::string fileName) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        auto &mesh = registry->getLastComponent<Mesh>();
+        auto &mesh = registry->getComponent<Mesh>(eID);
         mesh.mVerticeCount = mMeshData.mVertices.size();
         mesh.mName = fileName;
         mesh.mDrawType = GL_TRIANGLES;

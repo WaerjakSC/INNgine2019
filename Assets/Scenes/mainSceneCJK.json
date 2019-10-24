@@ -418,5 +418,41 @@
                 "name": "cube.obj"
             }
         }
+    },
+    "GameObject": {
+        "name": "cube.obj",
+        "id": 11,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "textureid": 0,
+                "shader": "phong"
+            },
+            "mesh": {
+                "name": "cube.obj"
+            }
+        }
     }
 }

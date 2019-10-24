@@ -109,11 +109,11 @@ private:
     void initIndexBuffers(Mesh *mesh);
 
     // Reads and loads mesh
-    void loadMesh(std::string fileName);
-    void setMesh(std::string name, int eID);
-    bool readFile(std::string fileName);
-    bool readTriangleFile(std::string filename);
-    void loadTriangleMesh(std::string fileName);
+    void loadMesh(std::string fileName, GLuint eID);
+    void setMesh(std::string name, GLuint eID);
+    bool readFile(std::string fileName, GLuint eID);
+    bool readTriangleFile(std::string filename, GLuint eID);
+    void loadTriangleMesh(std::string fileName, GLuint eID);
 
     // OctahedronBall functions
     void makeUnitOctahedron(GLint recursions);

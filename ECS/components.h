@@ -19,7 +19,6 @@ struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
-    std::vector<tinyobj::index_t> indices;
     std::string mName;
     void Clear() {
         mVertices.clear();
@@ -155,15 +154,7 @@ struct Material : public Component {
     Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
-    //    Material(const QString &type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
-    //        mType = CType::Material;
-    //        if (type == "color")
-    //            mShader = Color;
-    //        else if (type == "texture")
-    //            mShader = Tex;
-    //        else if (type == "phong")
-    //            mShader = Phong;
-    //    }
+
     virtual void update() {}
 
     vec3 mObjectColor{1.f, 1.f, 1.f};
@@ -181,7 +172,6 @@ struct Mesh : public Component {
     }
     Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
     }
-
     virtual void update() {}
 
     GLuint mVAO{0};

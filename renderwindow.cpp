@@ -140,8 +140,11 @@ void RenderWindow::init() {
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mLight = mFactory->getSceneLoader()->controllerID;
+
     mMoveSys->init();
     mRenderer->init();
+    //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
+    //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
     mLightSys->init();
 
     mStereoSound = mSoundManager->createSource(
@@ -151,6 +154,7 @@ void RenderWindow::init() {
 
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
+
     //input
     handleInput();
 
