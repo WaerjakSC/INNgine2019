@@ -2,13 +2,14 @@
 #include "billboard.h"
 #include "registry.h"
 #include "view.h"
+#include "components.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     registry = Registry::instance();
     mView = std::make_unique<RenderView>();
     //    View<Transform, Material, Mesh> test(mView->mTransformPool, mView->mMaterialPool, mView->mMeshPool);
     //    auto [transform, material] = test.get<Transform, Material>(1);
     //    qDebug() << transform.position;
-    //    mColliderPool = registry->registerComponent<Collision>();
+    mColliderPool = registry->registerComponent<Collision>();
 }
 /**
  * @brief RenderSystem::iterateEntities
@@ -31,11 +32,13 @@ void RenderSystem::iterateEntities() {
             glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
         else
             glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
-        //        if(registry->contains(curEntity, CType::Collision))
-        //        auto &collider = mColliderPool->data()[curEntity];
-        //        glBindVertexArray(0);
-        //        glBindVertexArray(collider.mVAO);
-        //        glDrawArrays(GL_LINE_STRIP, 0, collider.mVertices.size()); // With GL_LINE_STRIP it should be enough to create the points of a cube (or whichever square collider)
+        // Doesnt work yet
+        if(registry->contains(listIndex, CType::Collision)){
+            auto &collider = mColliderPool->data()[listIndex];
+            glBindVertexArray(0);
+            glBindVertexArray(collider.mVAO);
+            glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_SHORT, nullptr); // Might use GL_STRIP instead, not sure yet
+        }
     }
 }
 void RenderSystem::init() {

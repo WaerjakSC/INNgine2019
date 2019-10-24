@@ -11,13 +11,13 @@ class AIsystem
 {
 public:
     AIsystem();
-    Registry *reg = Registry::instance();
+    Registry *reg;
 
      // BSplineCurve
      void initVertexBufferObjects();
      void draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute=-1);
      void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
-     vec3 evaluateBSpline(const BSplineCurve,int my, float x);
+     vec3 evaluateBSpline(const BSplineCurve& bspline,int my, float x);
      int findKnotInterval(float x);
      vec3 evaluateBSpline(int degree, int startKnot, float x);
 

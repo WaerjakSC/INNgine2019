@@ -185,6 +185,7 @@ struct Mesh : public Component {
     GLuint mVAO{0};
     GLuint mVBO{0};
     GLuint mEAB{0}; //holds the indices (Element Array Buffer - EAB)
+    GLuint mAABB_VAO{0}; // holds the VAO for the Axis Aligned Bounding Box
 
     GLuint mVerticeCount{0};
     GLuint mIndiceCount{0};
@@ -284,6 +285,7 @@ public:
     virtual void update() {}
     ColType colType;
     bool mTrigger{false};
+    GLuint mVAO{0}; // holds the VAO for the collider
 
     /**
       * @brief Axis Aligned Bounding Box
@@ -348,15 +350,15 @@ public:
 /**
  * @brief The BSplineCurve struct
  */
-struct BSplineCurve : Component {
-    vec3 b[4];              // control points
+struct BSplineCurve : public Component {
+    std::vector<vec3> b;              // control points
     int n;                  // n number of knots
     int d;                  // d degrees
     std::vector<float> t;   // knots
 
     // default constructor
-    BSplineCurve();
-    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree=2);
+    inline BSplineCurve() {}
+    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree=2) : t(knots), b(controlpoints), d(degree) {}
 
 };
 
