@@ -1,13 +1,11 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
-#include "pool.h"
-#include "renderview.h"
 #include "isystem.h"
+#include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <memory>
 class Registry;
-class RenderView;
 class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
@@ -26,7 +24,6 @@ private:
     void updateEntities();
 
     std::map<ShaderType, Shader *> mShaders;
-    std::unique_ptr<RenderView> mView;
     std::shared_ptr<Pool<Collision>> mColliderPool;
 };
 

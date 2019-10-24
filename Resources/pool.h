@@ -2,15 +2,122 @@
 #define POOL_H
 
 #include "components.h"
+#include "entity.h"
 #include <QObject>
 #include <memory>
 #include <vector>
 class IPool {
 public:
+    class iterator;
     virtual ~IPool() = default;
     virtual void remove(int removedEntity) = 0;
     virtual std::shared_ptr<IPool> clone() = 0;
     virtual void swap(std::shared_ptr<IPool> other) = 0;
+    virtual int find(uint eID) const = 0;
+    virtual bool has(uint eID) const = 0;
+    virtual bool has(const Entity &entity) const = 0;
+    virtual size_t size() const = 0;
+    virtual iterator begin() const = 0;
+    virtual iterator end() const = 0;
+
+    class iterator {
+        friend class IPool;
+
+    public:
+        iterator(const std::vector<int> *ref, const std::int32_t idx)
+            : direct{ref}, index{idx} {}
+        using difference_type = std::int32_t;
+        using pointer = const int *;
+        using reference = const int &;
+        using iterator_category = std::random_access_iterator_tag;
+
+        iterator() = default;
+
+        iterator &operator++() {
+            return --index, *this;
+        }
+
+        iterator operator++(int) {
+            iterator orig = *this;
+            return ++(*this), orig;
+        }
+
+        iterator &operator--() {
+            return ++index, *this;
+        }
+
+        iterator operator--(int) {
+            iterator orig = *this;
+            return --(*this), orig;
+        }
+
+        iterator &operator+=(const difference_type value) {
+            index -= value;
+            return *this;
+        }
+
+        iterator operator+(const difference_type value) const {
+            return iterator{direct, index - value};
+        }
+
+        iterator &operator-=(const difference_type value) {
+            return (*this += -value);
+        }
+
+        iterator operator-(const difference_type value) const {
+            return (*this + -value);
+        }
+
+        difference_type operator-(const iterator &other) const {
+            return other.index - index;
+        }
+
+        reference operator[](const difference_type value) const {
+            const auto pos = size_t(index - value - 1);
+            return (*direct)[pos];
+        }
+
+        bool operator==(const iterator &other) const {
+            return other.index == index;
+        }
+
+        bool operator!=(const iterator &other) const {
+            return !(*this == other);
+        }
+
+        bool operator<(const iterator &other) const {
+            return index > other.index;
+        }
+
+        bool operator>(const iterator &other) const {
+            return index < other.index;
+        }
+
+        bool operator<=(const iterator &other) const {
+            return !(*this > other);
+        }
+
+        bool operator>=(const iterator &other) const {
+            return !(*this < other);
+        }
+
+        pointer operator->() const {
+            const auto pos = size_t(index - 1);
+            return &(*direct)[pos];
+        }
+
+        reference operator*() const {
+            return *operator->();
+        }
+
+    private:
+        const std::vector<int> *direct;
+        std::int32_t index;
+    };
+
+protected:
+    std::vector<int> mIndex; // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
+    std::vector<int> mList;  // Value is entityID.
 };
 
 template <typename Type>
@@ -18,9 +125,9 @@ class Pool : public IPool {
 public:
     Pool() = default;
     Pool(Pool *other) {
-        mEntityList = other->mEntityList;
-        mEntityIndices = other->mEntityIndices;
-        mComponentList = other->mComponentList;
+        mList = other->mList;
+        mIndex = other->mIndex;
+        mComponents = other->mComponents;
         mGroupEnd = other->mGroupEnd;
         isSorted = other->isSorted;
     }
@@ -30,9 +137,9 @@ public:
     }
     virtual void swap(std::shared_ptr<IPool> other) override {
         auto swapped = std::static_pointer_cast<Pool<Type>>(other);
-        mEntityList = swapped->mEntityList;
-        mEntityIndices = swapped->mEntityIndices;
-        mComponentList = swapped->mComponentList;
+        mList = swapped->mList;
+        mIndex = swapped->mIndex;
+        mComponents = swapped->mComponents;
         mGroupEnd = swapped->mGroupEnd;
         isSorted = swapped->isSorted;
     }
@@ -47,59 +154,59 @@ public:
     template <class... Args>
     void add(int entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
-        if ((size_t)entityID > mEntityIndices.size()) {
-            for (size_t i = mEntityIndices.size(); i < (size_t)entityID; i++) {
-                mEntityIndices.push_back(-1);
+        if ((size_t)entityID > mIndex.size()) {
+            for (size_t i = mIndex.size(); i < (size_t)entityID; i++) {
+                mIndex.push_back(-1);
             }
         }
-        mEntityIndices.push_back(mEntityList.size()); // entity list size is location of new entityID
-        mEntityList.push_back(entityID);
-        mComponentList.push_back(Type(args...));
+        mIndex.push_back(mList.size()); // entity list size is location of new entityID
+        mList.push_back(entityID);
+        mComponents.push_back(Type(args...));
         if (isSorted) { // Swap the latest entity with the entity pointed at by the group marker, then increment the marker so it points one step right of the newest entity
-            swap(mEntityList[mEntityIndices.back()], mEntityList[mEntityIndices[mGroupEnd++]]);
+            swap(mList[mIndex.back()], mList[mIndex[mGroupEnd++]]);
         }
     }
     /**
      * @brief Removes an entity by swapping the entityID/component with the last element of the dense arrays and popping out the last element.
-     * mEntityIndices[removedEntityID] now holds an invalid value for the dense arrays.
-     * mEntityIndices[swappedEntity] now holds the swapped location of the entityID/component.
+     * mEntities.mIndices[removedEntityID] now holds an invalid value for the dense arrays.
+     * mEntities.mIndices[swappedEntity] now holds the swapped location of the entityID/component.
      * @param removedEntityID
      */
     void remove(int removedEntityID) {
         if (has(removedEntityID)) {
-            bool groupMember = (mEntityIndices[removedEntityID] < (int)mGroupEnd);
-            GLuint swappedEntity = mEntityList.back();
+            bool groupMember = (mIndex[removedEntityID] < (int)mGroupEnd);
+            GLuint swappedEntity = mList.back();
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
             if (isSorted && groupMember) {
-                if (mGroupEnd != mEntityList.size()) {
-                    swap(swappedEntity, mEntityList.back()); // Do a final swap to re-position the group marker
+                if (mGroupEnd != mList.size()) {
+                    swap(swappedEntity, mList.back()); // Do a final swap to re-position the group marker
                 }
                 mGroupEnd--;
             }
-            mEntityList.pop_back();
-            mComponentList.pop_back();
-            mEntityIndices[removedEntityID] = -1; // Set entity location to an invalid value.
+            mList.pop_back();
+            mComponents.pop_back();
+            mIndex[removedEntityID] = -1; // Set entity location to an invalid value.
         }
-        if (mEntityList.empty())
-            mEntityIndices.clear();
+        if (mList.empty())
+            mIndex.clear();
     }
     void swap(GLuint eID, GLuint other) {
         assert(has(eID));
         assert(has(other));
-        std::swap(mEntityList[mEntityIndices[eID]], mEntityList[mEntityIndices[other]]);       // Swap the two entities in the pool
-        std::swap(mComponentList[mEntityIndices[eID]], mComponentList[mEntityIndices[other]]); // Swap the components to keep the dense set up to date
-        std::swap(mEntityIndices[eID], mEntityIndices[other]);                                 // Set the index to point to the location after swap
+        std::swap(mList[mIndex[eID]], mList[mIndex[other]]);             // Swap the two entities in the pool
+        std::swap(mComponents[mIndex[eID]], mComponents[mIndex[other]]); // Swap the components to keep the dense set up to date
+        std::swap(mIndex[eID], mIndex[other]);                           // Set the index to point to the location after swap
     }
     /**
      * @brief sort the pool according to a different index
      * @param otherIndex
      */
     void sort(std::vector<int> otherIndex) {
-        mGroupEnd = mEntityList.size();
+        mGroupEnd = mList.size();
         isSorted = true;
-        for (size_t i = 0; i < mEntityList.size(); i++) {
+        for (size_t i = 0; i < mList.size(); i++) {
             if (has(i)) {
-                swap(mEntityList[mEntityIndices[i]], mEntityList[otherIndex[i]]);
+                swap(mList[mIndex[i]], mList[otherIndex[i]]);
 
             } /*else
                 mGroupEnd--;*/
@@ -110,75 +217,87 @@ public:
      * @return std::vector containing the component type. Use operator[] to access a component if you know the component exists (isn't out of range) --
      * it's faster than .at() BUT doesn't give an out_of_range exception like .at() does, so it can be harder to debug
      */
-    std::vector<Type> &data() { return mComponentList; }
+    std::vector<Type> &data() { return mComponents; }
     /**
      * @brief Returns a list of every entity that exists in the component array.
      * The index is initially meaningless except as an accessor, the component pool can be sorted
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
-    const std::vector<int> &entities() { return mEntityList; }
+    const std::vector<int> &entities() { return mList; }
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
-     * The index location is equal to the entityID. @example The location of Entity 5 in the packed arrays can be found at mEntityIndices[5].
+     * The index location is equal to the entityID. @example The location of Entity 5 in the packed arrays can be found at mEntities.mIndices[5].
      * Both IDs and arrays begin at 0.
      * @return
      */
-    const std::vector<int> &indices() { return mEntityIndices; }
+    const std::vector<int> &indices() { return mIndex; }
     /**
      * @brief get the component belonging to entity with given ID.
-     * Some minor additional overhead due to going through mEntityIndices first -
+     * Some minor additional overhead due to going through mEntities.mIndices first -
      * if you know you want to use all the entities in the Pool you may want data() instead
      * @param eID
      * @return
      */
     Type &get(int eID, CType typeMask) {
         assert(has(eID));
-        if ((typeMask & mComponentList[mEntityIndices[eID]].type()) == CType::None)
+        if ((typeMask & mComponents[mIndex[eID]].type()) == CType::None)
             qDebug() << "something went wrong";
-        return mComponentList[mEntityIndices[eID]];
+        return mComponents[mIndex[eID]];
     }
     Type &get(int eID) {
         assert(has(eID));
-        return mComponentList[mEntityIndices[eID]];
+        return mComponents[mIndex[eID]];
     }
     /**
      * @brief get the last component in the pool, aka the latest creation
      * @return
      */
     Type &back() {
-        return mComponentList.back();
+        return mComponents.back();
     }
-
+    iterator begin() const {
+        const int32_t pos = mList.size();
+        return iterator{&mList, pos};
+    }
+    iterator end() const {
+        return iterator{&mList, {}};
+    }
+    int find(GLuint eID) const override {
+        if (eID < mIndex.size())
+            return mIndex[eID];
+        return -1;
+    }
     /**
      * @brief For checking if the pool contains a given entity.
      * @param eID
      * @return
      */
-    bool has(GLuint eID) {
-        if (mEntityIndices.size() > eID)
-            return mEntityIndices[eID] != -1;
-        return false;
+    bool has(GLuint eID) const override {
+        return find(eID) != -1;
+    }
+    bool has(const Entity &entity) const override {
+        return find(entity.id()) != -1;
     }
 
     /**
      * @brief Actual number of entities with owned components in the pool.
      * @return
      */
-    size_t size() { return mEntityList.size(); }
+    size_t size() const override { return mList.size(); }
     /**
      * @brief Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
-    size_t extent() { return mEntityIndices.size(); }
+    size_t extent() { return mIndex.size(); }
     /**
      * @brief Reset the arrays to empty.
      */
     void clear() {
-        mEntityIndices.clear();
-        mEntityList.clear();
-        mComponentList.clear();
+        mIndex.clear();
+        mList.clear();
+        mComponents.clear();
     }
     // Comparison operator overloads
     template <typename Type2>
@@ -203,16 +322,14 @@ public:
     void setSorted() {
         isSorted = true;
         if (mGroupEnd == 0)
-            mGroupEnd = mEntityList.size();
+            mGroupEnd = mList.size();
     }
 
 private:
-    std::vector<int> mEntityIndices; // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
-
-    // Dense Arrays --  n points to Entity in mEntityList[n] and component data in mComponentList[n]
+    // index vector is in IPool
+    // Dense Arrays --  n points to Entity in list[n] and component data in mComponentList[n]
     // Both should be the same length.
-    std::vector<int> mEntityList; // Value is entityID.
-    std::vector<Type> mComponentList;
+    std::vector<Type> mComponents;
     GLuint mGroupEnd{0};
     bool isSorted{false};
 };

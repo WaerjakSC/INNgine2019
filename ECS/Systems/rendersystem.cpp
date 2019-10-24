@@ -1,11 +1,10 @@
 #include "rendersystem.h"
 #include "billboard.h"
+#include "components.h"
 #include "registry.h"
 #include "view.h"
-#include "components.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     registry = Registry::instance();
-    mView = std::make_unique<RenderView>();
     //    View<Transform, Material, Mesh> test(mView->mTransformPool, mView->mMaterialPool, mView->mMeshPool);
     //    auto [transform, material] = test.get<Transform, Material>(1);
     //    qDebug() << transform.position;
@@ -17,11 +16,11 @@ RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(sh
  * addendum - sort mesh and material pool by whether they are visible or not - hold an iterator that denotes the end of the "watched" group
  */
 void RenderSystem::iterateEntities() {
-    // Iterate through entities -- We know Mesh and Material types will always want to be rendered, so we can iterate through all of the entities that own those types.
-    for (size_t listIndex = 0; listIndex < mView->mMeshPool->groupEnd(); listIndex++) {
-        auto &mesh = mView->mMeshPool->data()[listIndex]; // We can access the component directly without any indirections because RenderSystem owns mesh and material types
-        auto &material = mView->mMaterialPool->data()[listIndex];
-        auto &transform = mView->mTransformPool->data()[listIndex];
+    // Iterate entities. View returns only the entities that own all the given types so it should be safe to iterate all of them equally.
+    auto view = registry->view<Transform, Material, Mesh>();
+    for (auto entity : view) {
+        auto [transform, material, mesh] = view.get<Transform, Material, Mesh>(entity); // Structured bindings (c++17), creates and assigns from tuple
+
         ShaderType type = material.mShader;
 
         initializeOpenGLFunctions();
@@ -32,17 +31,16 @@ void RenderSystem::iterateEntities() {
             glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
         else
             glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
-        // Doesnt work yet
-        if(registry->contains(listIndex, CType::Collision)){
-            auto &collider = mColliderPool->data()[listIndex];
-            glBindVertexArray(0);
-            glBindVertexArray(collider.mVAO);
-            glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_SHORT, nullptr); // Might use GL_STRIP instead, not sure yet
-        }
     }
+    // Doesnt work yet -- Move to CollisionSystem imo
+    //        if (registry->contains(listIndex, CType::Collision)) {
+    //            auto &collider = mColliderPool->data()[listIndex];
+    //            glBindVertexArray(0);
+    //            glBindVertexArray(collider.mVAO);
+    //            glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_SHORT, nullptr); // Might use GL_STRIP instead, not sure yet
+    //        }
 }
 void RenderSystem::init() {
-    mView->sortGroup();
     iterateEntities();
 }
 void RenderSystem::update(float deltaTime) {
@@ -51,5 +49,5 @@ void RenderSystem::update(float deltaTime) {
 }
 
 void RenderSystem::changeShader(int entityID, ShaderType nShader) {
-    mView->mMaterialPool->get(entityID).mShader = nShader;
+    registry->view<Material>().get(entityID).mShader = nShader;
 }

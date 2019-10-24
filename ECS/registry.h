@@ -4,6 +4,8 @@
 #include "entity.h"
 #include "isystem.h"
 #include "pool.h"
+#include "view.h"
+
 #include "resourcemanager.h"
 #include <memory>
 #include <typeinfo>
@@ -15,12 +17,18 @@ public:
     static Registry *instance();
     virtual ~Registry() {}
 
+    template <typename... Comp>
+    View<Comp...> view() {
+        return {getComponentArray<Comp>()...};
+    }
+
     /**
      * Register component type. For systems that own the component type
      */
     template <typename Type>
     void registerComponent(std::shared_ptr<Pool<Type>> pool) {
         std::string typeName = typeid(Type).name();
+
         // Create a ComponentArray pointer and add it to the component arrays map
         mPools.insert({typeName, pool});
     }

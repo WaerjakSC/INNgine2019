@@ -10,7 +10,6 @@
 #ifndef TINYOBJLOADER_IMPLEMENTATION
 #define TINYOBJLOADER_IMPLEMENTATION
 #endif
-class RenderView;
 class LightSystem;
 class Entity;
 class Registry;

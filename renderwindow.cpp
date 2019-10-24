@@ -25,7 +25,6 @@
 #include "raycast.h"
 #include "registry.h"
 #include "rendersystem.h"
-#include "renderview.h"
 #include "textureshader.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)

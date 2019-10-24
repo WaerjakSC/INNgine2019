@@ -6,7 +6,6 @@
 #include "phongshader.h"
 #include "rapidjson/prettywriter.h"
 #include "registry.h"
-#include "renderview.h"
 #include "scene.h"
 #include "textureshader.h"
 #include "tiny_obj_loader.h"
@@ -23,16 +22,16 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
     // Move these elsewhere once they have systems
+    registry->registerComponent<Transform>();
+    registry->registerComponent<Material>();
+    registry->registerComponent<Mesh>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
+
     mSceneLoader = std::make_unique<Scene>();
+
     // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
-    // Initialize shared pointers
-    //    mTransforms = std::make_shared<Pool<TransformComponent>>();
-
-    // Set up Views
-    //    mRenderView = std::make_unique<RenderView>(mTransforms);
 }
 
 void ResourceManager::setCurrentScene(const QString &currentScene) {
