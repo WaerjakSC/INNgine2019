@@ -241,7 +241,7 @@ void MainWindow::closeEngine() {
     close();
 }
 void MainWindow::makeEntity() {
-    emit made3DObject(registry->makeEntity("GameObject" + QString::number(unnamedEntityCount)));
+    emit made3DObject(registry->makeEntity("GameObject", false));
 }
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());
@@ -253,9 +253,9 @@ void MainWindow::makeCube() {
     emit made3DObject(ResourceManager::instance()->makeCube());
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
-    GLuint data = hierarchy->data(newParent, 257).toUInt();
+    int data = hierarchy->data(newParent, 257).toInt();
     Entity *entt = registry->getEntity(data);
-    if (entt) {
+    if (newParent.isValid()) {
         // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
         // Really not sure about this whole "Transform component governs parent/child relationship thing"
         if (registry->contains(entt->id(), CType::Transform) && selectedEntity) {

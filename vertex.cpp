@@ -13,6 +13,9 @@ Vertex::Vertex(float x, float y, float z, float r, float g, float b) {
     mNormal.setZ(b);
 }
 
+Vertex::Vertex(float x, float y, float z, float r, float g, float b, float s, float t) : mXYZ(x, y, z), mNormal(r, g, b), mST(s, t) {
+}
+
 Vertex::Vertex(vec3 a, vec3 b, gsl::Vector2D c) {
     mXYZ = a;
     mNormal = b;
@@ -73,11 +76,6 @@ void Vertex::set_st(GLfloat *st) {
 void Vertex::set_st(GLfloat s, GLfloat t) {
     mST.setX(s);
     mST.setY(t);
-}
-
-void Vertex::set_uv(GLfloat u, GLfloat v) {
-    mST.setX(u);
-    mST.setY(v);
 }
 
 //std::ostream& operator<<(std::ostream& os, const Vertex& v)

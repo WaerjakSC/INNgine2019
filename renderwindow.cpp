@@ -136,11 +136,16 @@ void RenderWindow::init() {
 
     //********************** Making the objects to be drawn **********************
     mFactory->loadLastProject();
+    //    GLuint cb = mFactory->make3DObject("cube.obj", ShaderType::Phong); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mLight = mFactory->getSceneLoader()->controllerID;
-    mRenderer->init();
+
     mMoveSys->init();
+    mRenderer->init();
+    //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
+    //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
+    mLightSys->init();
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
@@ -149,6 +154,7 @@ void RenderWindow::init() {
 
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
+
     //input
     handleInput();
 

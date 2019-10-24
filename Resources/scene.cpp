@@ -215,7 +215,12 @@ void Scene::populateScene(const Document &scene) {
                 } else if (comp->name == "material") {
                     gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                     QString shaderName = comp->value["shader"].GetString();
-                    registry->addComponent<Material>(id, shaderName, comp->value["textureid"].GetInt(), color);
+                    ShaderType shader = ShaderType::Phong;
+                    if (shaderName == "color")
+                        shader = Color;
+                    else if (shaderName == "texture")
+                        shader = Tex;
+                    registry->addComponent<Material>(id, shader, comp->value["textureid"].GetInt(), color);
                 } else if (comp->name == "mesh") {
                     factory->addMeshComponent(comp->value["name"].GetString(), id);
                 } else if (comp->name == "light") { // Again, temporary, very static functionality atm

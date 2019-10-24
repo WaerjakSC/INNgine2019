@@ -19,12 +19,18 @@ public:
     bool operator==(const Entity &other) {
         return eID == other.eID;
     }
+    void destroy();
+    void newGeneration(GLuint id, const QString &text);
+    bool isDestroyed() const;
+
 signals:
     void nameChanged(const Entity &self);
 
 private:
     GLuint eID;
     QString mName;
+    GLuint mGeneration{0};
+    bool mIsDestroyed{false};
     CType mTypes{CType::None};
 };
 #endif // ENTITY_H

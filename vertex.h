@@ -8,6 +8,7 @@ class Vertex {
 public:
     Vertex();
     Vertex(float x, float y, float z, float r, float g, float b);
+    Vertex(float x, float y, float z, float r, float g, float b, float s, float t);
     Vertex(vec3 a, vec3 b, gsl::Vector2D c);
     ~Vertex();
 
@@ -27,12 +28,24 @@ public:
     void set_normal(vec3 normal_in);
     void set_st(GLfloat *st);
     void set_st(GLfloat s, GLfloat t);
-    void set_uv(GLfloat u, GLfloat v);
 
-private:
+    bool operator==(const Vertex &other) const {
+        return mXYZ == other.mXYZ && mNormal == other.mNormal && mST == other.mST;
+    }
+
     vec3 mXYZ;
     vec3 mNormal;
     gsl::Vector2D mST;
 };
-
+namespace std {
+template <>
+struct hash<Vertex> {
+    size_t operator()(Vertex const &vertex) const {
+        return ((hash<gsl::Vector3D>()(vertex.mXYZ) ^
+                 (hash<gsl::Vector3D>()(vertex.mNormal) << 1)) >>
+                1) ^
+               (hash<gsl::Vector2D>()(vertex.mST) << 1);
+    }
+};
+} // namespace std
 #endif // VERTEX_H

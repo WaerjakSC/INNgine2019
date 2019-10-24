@@ -5,11 +5,9 @@
 #include <cmath>
 #include <iostream>
 
-namespace gsl
-{
+namespace gsl {
 
-class Vector2D
-{
+class Vector2D {
 public:
     //Constructors
     Vector2D(GLfloat x_in = 0.f, GLfloat y_in = 0.f);
@@ -17,13 +15,14 @@ public:
     Vector2D(const double v);
 
     //Operators
-    Vector2D operator+(const Vector2D &rhs) const;      // v + v
-    Vector2D operator-(const Vector2D &rhs) const;      // v - v
-    Vector2D& operator+=(const Vector2D &rhs);          // v += v
-    Vector2D& operator-=(const Vector2D &rhs);          // v -= v
+    Vector2D operator+(const Vector2D &rhs) const;  // v + v
+    Vector2D operator-(const Vector2D &rhs) const;  // v - v
+    Vector2D &operator+=(const Vector2D &rhs);      // v += v
+    Vector2D &operator-=(const Vector2D &rhs);      // v -= v
     Vector2D operator-() const;                     // -v
     Vector2D operator*(GLfloat lhs) const;          // v * f
-    const Vector2D& operator =(const Vector2D &rhs);    // v = v
+    const Vector2D &operator=(const Vector2D &rhs); // v = v
+    bool operator==(const Vector2D &compared) const;
 
     //Functions
     GLfloat length() const;
@@ -40,8 +39,7 @@ public:
     void setY(const GLfloat &value);
 
     //Friend functions
-    friend std::ostream& operator<<(std::ostream &output, const Vector2D &rhs)
-    {
+    friend std::ostream &operator<<(std::ostream &output, const Vector2D &rhs) {
         output << "(" << rhs.x << "," << rhs.y << ")";
         return output;
     }
@@ -50,6 +48,15 @@ public:
     GLfloat y;
 };
 
-} //namespace
-
+} // namespace gsl
+namespace std {
+template <>
+struct hash<gsl::Vector2D> {
+    size_t operator()(gsl::Vector2D const &v) const {
+        return ((hash<GLfloat>()(v.x) ^
+                 (hash<GLfloat>()(v.y) << 1)) >>
+                1);
+    }
+};
+} // namespace std
 #endif // VECTOR2D_H

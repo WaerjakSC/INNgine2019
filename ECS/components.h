@@ -3,6 +3,7 @@
 #include "matrix3x3.h"
 #include "matrix4x4.h"
 #include "shader.h"
+#include "tiny_obj_loader.h"
 #include "vertex.h"
 #include <QKeyEvent>
 class MainWindow;
@@ -153,15 +154,7 @@ struct Material : public Component {
     Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
-    Material(const QString &type, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture) {
-        mType = CType::Material;
-        if (type == "color")
-            mShader = Color;
-        else if (type == "texture")
-            mShader = Tex;
-        else if (type == "phong")
-            mShader = Phong;
-    }
+
     virtual void update() {}
 
     vec3 mObjectColor{1.f, 1.f, 1.f};
@@ -179,7 +172,6 @@ struct Mesh : public Component {
     }
     Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
     }
-
     virtual void update() {}
 
     GLuint mVAO{0};
@@ -344,22 +336,23 @@ public:
         float height;
 
     } Cylinder;
-
-
 };
 /**
  * @brief The BSplineCurve struct
  */
-struct BSplineCurve : public Component {
-    std::vector<vec3> b;              // control points
-    int n;                  // n number of knots
-    int d;                  // d degrees
-    std::vector<float> t;   // knots
+struct BSplineCurve : Component {
+    std::vector<vec3> b;  // control points
+    int n;                // n number of knots
+    int d;                // d degrees
+    std::vector<float> t; // knots
+
+    virtual void update() {}
 
     // default constructor
-    inline BSplineCurve() {}
-    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree=2) : t(knots), b(controlpoints), d(degree) {}
-
+    BSplineCurve() {}
+    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree = 2) : b(controlpoints), d(degree), t(knots) {
+        n = knots.size();
+    }
 };
 
 #endif // COMPONENT_H
