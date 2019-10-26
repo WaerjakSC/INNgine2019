@@ -30,6 +30,7 @@ public slots:
     void addMeshComponent();
     void addMaterialComponent();
     void addTransformComponent();
+    void addCollisionComponent();
 signals:
     void posX(GLfloat xIn);
     void posY(GLfloat yIn);

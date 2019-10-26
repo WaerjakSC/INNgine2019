@@ -148,67 +148,82 @@ void MainWindow::snapToObject() {
         mRenderWindow->snapToObject(selectedEntity->id());
 }
 void MainWindow::createActions() {
-    QMenu *projectActions = ui->menuBar->addMenu(tr("Project"));
-    QAction *saveScene = new QAction(tr("Save"));
+    QMenu *projectActions = ui->menuBar->addMenu(tr("&File"));
+    QAction *saveScene = new QAction(tr("&Save"));
     projectActions->addAction(saveScene);
     connect(saveScene, &QAction::triggered, mRenderWindow, &RenderWindow::save);
-    QAction *saveAs = new QAction(tr("Save As"));
+    QAction *saveAs = new QAction(tr("Save &As"));
     projectActions->addAction(saveAs);
     connect(saveAs, &QAction::triggered, mRenderWindow, &RenderWindow::saveAs);
-    QAction *loadScene = new QAction(tr("Load"));
+    QAction *loadScene = new QAction(tr("&Load"));
     projectActions->addAction(loadScene);
     connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
 
-    QAction *saveProject = new QAction(tr("Save Project"));
+    QAction *saveProject = new QAction(tr("Save &Project"));
     projectActions->addAction(saveProject);
     connect(saveProject, &QAction::triggered, mRenderWindow, &RenderWindow::saveProject);
-    QAction *loadProject = new QAction(tr("Open Project"));
+    QAction *loadProject = new QAction(tr("&Open Project"));
     projectActions->addAction(loadProject);
     connect(loadProject, &QAction::triggered, mRenderWindow, &RenderWindow::loadProject);
 
-    QAction *exit = new QAction(tr("Exit"));
+    QAction *exit = new QAction(tr("&Exit"));
     projectActions->addAction(exit);
     connect(exit, &QAction::triggered, this, &MainWindow::closeEngine);
 
-    QMenu *gameObject = ui->menuBar->addMenu(tr("GameObject"));
-    QAction *empty = new QAction(tr("Empty GameObject"), this);
+    QMenu *editor = ui->menuBar->addMenu(tr("&Editor"));
+    QAction *wireframe = new QAction(tr("&Wireframe"), this);
+    wireframe->setCheckable(true);
+    connect(wireframe, &QAction::triggered, mRenderWindow, &RenderWindow::toggleWireframe);
+    editor->addAction(wireframe);
+    QAction *xyz = new QAction(tr("&XYZ Lines"), this);
+    xyz->setCheckable(true);
+    xyz->setChecked(true);
+    connect(xyz, &QAction::triggered, mRenderWindow, &RenderWindow::toggleXYZ);
+    editor->addAction(xyz);
+
+    QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
+    QAction *empty = new QAction(tr("Empty &GameObject"), this);
     gameObject->addAction(empty);
-    QMenu *make3D = gameObject->addMenu(tr("3D Object"));
-    QAction *cube = new QAction(tr("Cube"), this);
+    QMenu *make3D = gameObject->addMenu(tr("3D &Object"));
+    QAction *cube = new QAction(tr("&Cube"), this);
     make3D->addAction(cube);
-    QAction *sphere = new QAction(tr("Sphere"), this);
+    QAction *sphere = new QAction(tr("&Sphere"), this);
     make3D->addAction(sphere);
-    QAction *plane = new QAction(tr("Plane"), this);
+    QAction *plane = new QAction(tr("&Plane"), this);
     make3D->addAction(plane);
 
-    QMenu *components = ui->menuBar->addMenu(tr("Add Components")); // Maybe disable specific component if selected entity has that component already
-    QAction *transform = new QAction(tr("Transform"), this);
-    components->addAction(transform);
-    connect(transform, &QAction::triggered, mComponentList, &ComponentList::addTransformComponent);
+    QMenu *components = ui->menuBar->addMenu(tr("Add &Components")); // Maybe disable specific component if selected entity has that component already
+    transAction = new QAction(tr("Transform"), this);
+    components->addAction(transAction);
+    connect(transAction, &QAction::triggered, mComponentList, &ComponentList::addTransformComponent);
 
-    QAction *material = new QAction(tr("Material"), this);
-    components->addAction(material);
-    connect(material, &QAction::triggered, mComponentList, &ComponentList::addMaterialComponent);
+    matAction = new QAction(tr("Material"), this);
+    components->addAction(matAction);
+    connect(matAction, &QAction::triggered, mComponentList, &ComponentList::addMaterialComponent);
 
-    QAction *mesh = new QAction(tr("Mesh"), this);
-    components->addAction(mesh);
-    connect(mesh, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
+    meshAction = new QAction(tr("Mesh"), this);
+    components->addAction(meshAction);
+    connect(meshAction, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
-    QAction *light = new QAction(tr("Light"), this);
-    components->addAction(light);
-    connect(light, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
+    lightAction = new QAction(tr("Light"), this);
+    components->addAction(lightAction);
+    connect(lightAction, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
 
-    QAction *input = new QAction(tr("Input"), this);
-    components->addAction(input);
-    connect(input, &QAction::triggered, mComponentList, &ComponentList::addInputComponent);
+    inputAction = new QAction(tr("Input"), this);
+    components->addAction(inputAction);
+    connect(inputAction, &QAction::triggered, mComponentList, &ComponentList::addInputComponent);
 
-    QAction *physics = new QAction(tr("Physics"), this);
-    components->addAction(physics);
-    connect(physics, &QAction::triggered, mComponentList, &ComponentList::addPhysicsComponent);
+    physicsAction = new QAction(tr("Physics"), this);
+    components->addAction(physicsAction);
+    connect(physicsAction, &QAction::triggered, mComponentList, &ComponentList::addPhysicsComponent);
 
-    QAction *sound = new QAction(tr("Sound"), this);
-    components->addAction(sound);
-    connect(sound, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
+    soundAction = new QAction(tr("Sound"), this);
+    components->addAction(soundAction);
+    connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
+
+    collisionAction = new QAction(tr("Collision"), this);
+    components->addAction(collisionAction);
+    connect(collisionAction, &QAction::triggered, mComponentList, &ComponentList::addCollisionComponent);
 
     ui->mainToolBar->setMovable(false);
 

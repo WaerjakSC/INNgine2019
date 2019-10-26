@@ -35,7 +35,6 @@ public:
     QOpenGLContext *context() { return mContext; }
 
     void exposeEvent(QExposeEvent *) override;
-    void toggleWireframe();
 
     void checkForGLerrors();
     void setCameraSpeed(float value);
@@ -63,6 +62,9 @@ public slots:
     void saveAs();
     void saveProject();
     void loadProject();
+    void toggleWireframe();
+    void toggleXYZ();
+
 private slots:
     void render();
     void changeMsg();
@@ -93,6 +95,7 @@ private:
 
     Camera *mCurrentCamera{nullptr};
 
+    GLuint xyz; // Refers to the colored lines pointing in the X, Y and Z directions.
     bool mWireframe{false};
     bool mShowingMsg{false};
     bool mIsPlaying{false};
@@ -126,6 +129,7 @@ private:
     std::vector<GLuint *> Cull(const Camera::Frustum &f);
 
     void showMessage(const QString &message);
+    friend class MainWindow;
 
 protected:
     //The QWindow that we inherit from has these functions to capture

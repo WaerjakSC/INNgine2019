@@ -37,6 +37,21 @@ void ComponentList::setupComponentList() {
     if ((typeMask & CType::Mesh) != CType::None) {
         setupMeshSettings(registry->getComponent<Mesh>(mMainWindow->selectedEntity->id()));
     }
+    //    if ((typeMask & CType::Input) != CType::None) {
+    //        setupTransformSettings(registry->getComponent<Transform>(mMainWindow->selectedEntity->id()));
+    //    }
+    //    if ((typeMask & CType::Light) != CType::None) {
+    //        setupMaterialSettings(registry->getComponent<Material>(mMainWindow->selectedEntity->id()));
+    //    }
+    //    if ((typeMask & CType::Physics) != CType::None) {
+    //        setupMeshSettings(registry->getComponent<Mesh>(mMainWindow->selectedEntity->id()));
+    //    }
+    //    if ((typeMask & CType::Sound) != CType::None) {
+    //        setupTransformSettings(registry->getComponent<Transform>(mMainWindow->selectedEntity->id()));
+    //    }
+    //    if ((typeMask & CType::Collision) != CType::None) {
+    //        setupMaterialSettings(registry->getComponent<Material>(mMainWindow->selectedEntity->id()));
+    //    }
 }
 void ComponentList::addTransformComponent() {
     CType typeMask = mMainWindow->selectedEntity->types();
@@ -80,7 +95,12 @@ void ComponentList::addSoundComponent() {
         registry->addComponent<Sound>(mMainWindow->selectedEntity->id());
     setupComponentList();
 }
-
+void ComponentList::addCollisionComponent() {
+    CType typeMask = mMainWindow->selectedEntity->types();
+    if ((typeMask & CType::Collision) == CType::None)
+        registry->addComponent<Collision>(mMainWindow->selectedEntity->id());
+    setupComponentList();
+}
 void ComponentList::setupMeshSettings(const Mesh &mesh) {
     QStyle *fusion = QStyleFactory::create("fusion");
     QGroupBox *box = new QGroupBox(tr("Mesh"));

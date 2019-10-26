@@ -1,41 +1,5 @@
 {
     "GameObject": {
-        "name": "XYZ",
-        "id": 0,
-        "components": {
-            "transform": {
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "textureid": 0,
-                "shader": "color"
-            },
-            "mesh": {
-                "name": "XYZ"
-            }
-        }
-    },
-    "GameObject": {
         "name": "Skybox",
         "id": 1,
         "components": {

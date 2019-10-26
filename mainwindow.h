@@ -77,6 +77,7 @@ private:
     ComponentList *mComponentList;
     Entity *selectedEntity;
     quint32 unnamedEntityCount{0};
+    QAction *transAction, *matAction, *meshAction, *lightAction, *inputAction, *collisionAction, *soundAction, *physicsAction;
     Registry *registry;
 
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());

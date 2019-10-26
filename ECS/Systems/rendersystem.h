@@ -17,6 +17,8 @@ public:
 public slots:
     void changeShader(int entityID, ShaderType nShader);
 
+    void toggleRendered(GLuint entityID);
+
 private:
     Registry *registry{nullptr};
 

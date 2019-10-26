@@ -134,6 +134,7 @@ void RenderWindow::init() {
     ray = new Raycast(this, mCurrentCamera);
 
     //********************** Making the objects to be drawn **********************
+    xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
     //    GLuint cb = mFactory->make3DObject("cube.obj", ShaderType::Phong); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
 
@@ -245,6 +246,10 @@ void RenderWindow::toggleWireframe() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //turn off wireframe mode
         glEnable(GL_CULL_FACE);
     }
+}
+// Whether something should be rendered or not is handled in RenderSystem
+void RenderWindow::toggleXYZ() {
+    mRenderer->toggleRendered(xyz);
 }
 
 //The way this is set up is that we start the clock before doing the draw call,

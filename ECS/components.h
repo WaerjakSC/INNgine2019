@@ -176,12 +176,13 @@ struct Mesh : public Component {
 
     GLuint mVAO{0};
     GLuint mVBO{0};
-    GLuint mEAB{0}; //holds the indices (Element Array Buffer - EAB)
+    GLuint mEAB{0};      //holds the indices (Element Array Buffer - EAB)
     GLuint mAABB_VAO{0}; // holds the VAO for the Axis Aligned Bounding Box
 
     GLuint mVerticeCount{0};
     GLuint mIndiceCount{0};
     GLenum mDrawType{0};
+    bool mRendered{true};
 
     std::string mName;
 
@@ -273,6 +274,7 @@ enum ColType {
  */
 struct Collision : public Component {
 public:
+    Collision() {}
     Collision(ColType type, vec3 size) : colType(type) {}
     virtual void update() {}
     ColType colType;

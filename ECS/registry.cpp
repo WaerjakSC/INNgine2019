@@ -58,9 +58,11 @@ void Registry::removeEntity(GLuint eID) {
 void Registry::clearScene() {
     mBillBoards.clear();
     for (auto entity : mEntities) {
-        entityDestroyed(entity.second->id()); // Pass the message on to the registry
+        if (entity.first != 0) {
+            entityDestroyed(entity.first); // Pass the message on to the registry
+            mEntities.erase(entity.first);
+        }
     }
-    mEntities.clear();
 }
 /**
  * @brief Make a generic game object with no components attached.

@@ -16,17 +16,18 @@ void RenderSystem::iterateEntities() {
     auto view = registry->view<Transform, Material, Mesh>();
     for (auto entity : view) {
         auto [transform, material, mesh] = view.get<Transform, Material, Mesh>(entity); // Structured bindings (c++17), creates and assigns from tuple
+        if (mesh.mRendered) {
+            ShaderType type = material.mShader;
 
-        ShaderType type = material.mShader;
-
-        initializeOpenGLFunctions();
-        glUseProgram(mShaders[type]->getProgram());
-        mShaders[type]->transmitUniformData(transform.modelMatrix, &material);
-        glBindVertexArray(mesh.mVAO);
-        if (mesh.mIndiceCount > 0)
-            glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
-        else
-            glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
+            initializeOpenGLFunctions();
+            glUseProgram(mShaders[type]->getProgram());
+            mShaders[type]->transmitUniformData(transform.modelMatrix, &material);
+            glBindVertexArray(mesh.mVAO);
+            if (mesh.mIndiceCount > 0)
+                glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
+            else
+                glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
+        }
     }
     // Doesnt work yet -- Move to CollisionSystem imo
     //        if (registry->contains(listIndex, CType::Collision)) {
@@ -43,7 +44,10 @@ void RenderSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime);
     iterateEntities();
 }
-
+void RenderSystem::toggleRendered(GLuint entityID) {
+    bool &isRendered = registry->view<Mesh>().get(entityID).mRendered;
+    isRendered = !isRendered;
+}
 void RenderSystem::changeShader(int entityID, ShaderType nShader) {
     registry->view<Material>().get(entityID).mShader = nShader;
 }
