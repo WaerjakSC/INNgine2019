@@ -169,6 +169,9 @@ void Scene::saveScene(const QString &fileName) {
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
 void Scene::loadScene(const QString &fileName) {
+    if (fileName.isEmpty()) {
+        return;
+    }
     Registry *registry = Registry::instance();
     ResourceManager *factory = ResourceManager::instance();
     factory->setLoading(true);
@@ -248,8 +251,10 @@ void Scene::populateScene(const Document &scene) {
 }
 void Scene::loadSceneFromFile(const QString &fileName) {
     std::ifstream file(gsl::sceneFilePath + fileName.toStdString());
-    if (!file.good())
-        throw std::runtime_error("Can't read the JSON file!");
+    if (!file.good()) {
+        qDebug() << "Can't read the JSON scene file!";
+        return;
+    }
     std::stringstream stream;
     stream << file.rdbuf();
     const std::string fileCopy = stream.str();

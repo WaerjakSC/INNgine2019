@@ -98,8 +98,10 @@ void ResourceManager::saveProjectSettings(const QString &fileName) {
 void ResourceManager::loadProject(const QString &fileName) {
     QFileInfo file(fileName);
     std::ifstream fileStream(gsl::settingsFilePath + file.fileName().toStdString());
-    if (!fileStream.good())
-        throw std::runtime_error("Can't read the JSON file!");
+    if (!fileStream.good()) {
+        qDebug() << "Can't read the JSON project file!";
+        return;
+    }
     std::stringstream stream;
     stream << fileStream.rdbuf();
     fileStream.close();
@@ -110,14 +112,16 @@ void ResourceManager::loadProject(const QString &fileName) {
     mCurrentProject = QString::fromStdString(project.MemberBegin()->name.GetString());
     if (project[mCurrentProject.toStdString().c_str()].HasMember("default scene")) {
         mDefaultScene = project[mCurrentProject.toStdString().c_str()]["default scene"].GetString();
+        mCurrentScene = mDefaultScene;
+        mSceneLoader->loadScene(mDefaultScene + ".json");
     }
-    mCurrentScene = mDefaultScene;
-    mSceneLoader->loadScene(mDefaultScene + ".json");
 }
 void ResourceManager::loadLastProject() {
     std::ifstream fileStream(gsl::settingsFilePath + "EngineSettings/settings.json");
-    if (!fileStream.good())
-        throw std::runtime_error("Can't read the JSON file!");
+    if (!fileStream.good()) {
+        qDebug() << "Can't read the JSON settings file!";
+        return;
+    }
     std::stringstream stream;
     stream << fileStream.rdbuf();
     fileStream.close();

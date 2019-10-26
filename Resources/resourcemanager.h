@@ -84,9 +84,9 @@ private:
     Registry *registry;
 
     std::unique_ptr<Scene> mSceneLoader;
-    QString mCurrentProject{"defaultProject"};
-    QString mCurrentScene{"mainSceneCJK"};
-    QString mDefaultScene{"mainSceneCJK"};
+    QString mCurrentProject;
+    QString mCurrentScene;
+    QString mDefaultScene;
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage
