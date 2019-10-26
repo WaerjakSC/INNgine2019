@@ -105,8 +105,8 @@ public:
         return iterator{unchecked(view), view->end(), view->end()};
     }
     template <typename Comp>
-    std::vector<Comp> &data() const {
-        return std::get<Pool<Comp>>(pools)->data();
+    std::vector<Comp> &data() {
+        return std::get<Pool<Comp>>(pools).data();
     }
     template <typename Comp>
     std::vector<int> &entities() const {
@@ -119,7 +119,7 @@ public:
         return find(entt) != -1;
     }
     template <typename... Comp>
-    decltype(auto) get(const int &entt) {
+    decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         if constexpr (sizeof...(Comp) == 1) {
             return (std::get<std::shared_ptr<Pool<Comp>>>(pools)->get(entt), ...);
@@ -151,7 +151,7 @@ private:
 public:
     using iterator_type = typename IPool::iterator;
     size_t size() const {
-        return std::shared_ptr<Pool<Component>>(pool)->size();
+        return pool->size();
     }
     iterator_type begin() const {
         return pool->begin();
@@ -160,10 +160,10 @@ public:
         return pool->end();
     }
     std::vector<Component> &data() const {
-        return Pool<Component>(pool)->data();
+        return pool->data();
     }
     std::vector<int> &entities() const {
-        return Pool<Component>(pool)->entities();
+        return pool->entities();
     }
     int find(const int &entt) const {
         return pool->find(entt);
@@ -171,7 +171,7 @@ public:
     bool contains(const int &entt) const {
         return find(entt) != -1;
     }
-    decltype(auto) get(const int &entt) {
+    decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         return pool->get(entt);
     }

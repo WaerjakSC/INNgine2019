@@ -5,10 +5,6 @@
 #include "view.h"
 RenderSystem::RenderSystem(std::map<ShaderType, Shader *> shaders) : mShaders(shaders) {
     registry = Registry::instance();
-    //    View<Transform, Material, Mesh> test(mView->mTransformPool, mView->mMaterialPool, mView->mMeshPool);
-    //    auto [transform, material] = test.get<Transform, Material>(1);
-    //    qDebug() << transform.position;
-    mColliderPool = registry->registerComponent<Collision>();
 }
 /**
  * @brief RenderSystem::iterateEntities

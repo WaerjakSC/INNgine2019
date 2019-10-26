@@ -24,7 +24,6 @@ private:
     void updateEntities();
 
     std::map<ShaderType, Shader *> mShaders;
-    std::shared_ptr<Pool<Collision>> mColliderPool;
 };
 
 #endif // RENDERSYSTEM_H

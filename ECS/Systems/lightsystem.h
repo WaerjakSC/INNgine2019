@@ -3,6 +3,7 @@
 #include "isystem.h"
 #include "pool.h"
 #include <memory>
+class Registry;
 class PhongShader;
 class LightSystem : public ISystem {
 public:
@@ -10,13 +11,10 @@ public:
 
     void update(float deltaTime = 0.016) override;
 
-    Pool<Light> *lightPool() const;
-
     void init();
 
 private:
-    std::shared_ptr<Pool<Light>> mLightPool;
-    std::shared_ptr<Pool<Transform>> mTransforms;
+    Registry *registry;
     PhongShader *mPhong;
 };
 

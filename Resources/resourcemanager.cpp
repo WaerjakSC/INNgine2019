@@ -27,6 +27,8 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Mesh>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
+    registry->registerComponent<Collision>();
+    registry->registerComponent<Light>();
 
     mSceneLoader = std::make_unique<Scene>();
 

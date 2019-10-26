@@ -13,7 +13,6 @@ class MovementSystem : public QObject, public ISystem {
     friend class RenderWindow;
 
 private:
-    std::shared_ptr<Pool<Transform>> mTransforms;
     Registry *registry;
 
     void updateModelMatrix(Transform &comp);

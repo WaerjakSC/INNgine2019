@@ -3,23 +3,17 @@
 #include "registry.h"
 
 LightSystem::LightSystem(PhongShader *shader)
-    : mPhong(shader) {
-    mTransforms = Registry::instance()->registerComponent<Transform>();
-    mLightPool = std::make_shared<Pool<Light>>();
-    Registry::instance()->registerComponent<Light>(mLightPool);
+    : registry(Registry::instance()), mPhong(shader) {
 }
 void LightSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime);
-    GLuint curEntity{0}; // Get the actual ID.
-    for (auto entityID : mLightPool->entities()) {
+    auto view = registry->view<Transform, Light>();
+    for (auto entityID : view) {
+        auto [transform, light] = view.get<Transform, Light>(entityID);
         // Send the entity's model matrix as well as the light data.
-        mPhong->updateLightUniforms(mTransforms->get(entityID).modelMatrix, mLightPool->data()[curEntity].mLight);
-        curEntity++;
+        mPhong->updateLightUniforms(transform.modelMatrix, light.mLight);
     }
 }
 void LightSystem::init() {
     update();
-}
-Pool<Light> *LightSystem::lightPool() const {
-    return mLightPool.get();
 }

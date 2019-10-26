@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "constants.h"
+#include "movementsystem.h"
 #include "registry.h"
 #include "resourcemanager.h"
 #include <fstream>
@@ -212,6 +213,7 @@ void Scene::populateScene(const Document &scene) {
                         else
                             parentID[id] = comp->value["parent"].GetInt(); // if not, add it to the list of parent/child pairs that must be updated after the loop
                     }
+                    registry->getSystem<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
                 } else if (comp->name == "material") {
                     gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                     QString shaderName = comp->value["shader"].GetString();
