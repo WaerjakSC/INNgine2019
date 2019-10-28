@@ -75,6 +75,14 @@ public:
 
     void onExit();
     void loadLastProject();
+    bool isPlaying() const;
+
+    bool getPaused() const;
+
+    void setCurrentCamera(Camera *currentCamera);
+
+    Camera *getCurrentCamera() const;
+
 public slots:
     void save();
     void load();
@@ -83,7 +91,7 @@ public slots:
     void stop();
     void saveAs();
     void saveProject();
-    void loadProject();
+    void loadProj();
 
 private:
     // Private constructor
@@ -96,6 +104,7 @@ private:
     QString mCurrentProject;
     QString mCurrentScene;
     QString mDefaultScene;
+    Camera *mCurrentCamera;
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage

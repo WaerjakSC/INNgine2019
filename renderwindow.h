@@ -51,8 +51,6 @@ public:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 
-    bool isPlaying() const;
-
 public slots:
     void snapToObject(int eID);
 
@@ -61,7 +59,6 @@ public slots:
 
 private slots:
     void render();
-    void changeMsg();
 
 private:
     void init();
@@ -72,17 +69,15 @@ private:
     RenderSystem *mRenderer;
     MovementSystem *mMoveSys;
     LightSystem *mLightSys;
+    InputSystem *mInput;
 
     ResourceManager *mFactory;
     Registry *mRegistry;
     SoundManager *mSoundManager;
-    Raycast *ray;
 
     Entity *mPlayer; //the controllable object
 
     GLuint mLight;
-
-    InputSystem *mInput;
 
     Camera *mCurrentCamera{nullptr};
 
@@ -90,11 +85,6 @@ private:
     bool mWireframe{false};
 
     //Input mInput;
-
-    float mCameraSpeed{0.01f};
-    float mCameraRotateSpeed{30.f};
-    bool firstRMB{true};
-    QPoint lastPos;
 
     QTimer *mRenderTimer{nullptr}; //timer that drives the gameloop
     QElapsedTimer mTimeStart;      //time variable that reads the actual FPS

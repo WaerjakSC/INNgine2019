@@ -43,9 +43,6 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
         mContext = nullptr;
         qDebug() << "Context could not be made - quitting this application";
     }
-    // Create Resource Manager instance
-    mInput = new Input();
-    mInput->setMainWindow(mMainWindow);
     //Make the gameloop timer:
     mRenderTimer = new QTimer(this);
 }
@@ -99,7 +96,8 @@ void RenderWindow::init() {
     mSoundManager->init();
 
     //********************** Set up camera **********************
-    mCurrentCamera = new Camera();
+    mFactory->setCurrentCamera(new Camera());
+    mCurrentCamera = mFactory->getCurrentCamera();
     mCurrentCamera->setPosition(vec3(0.f, 8.f, 15.0f));
     //    mCurrentCamera->yaw(45.f);
     mCurrentCamera->pitch(25.f);
@@ -130,8 +128,7 @@ void RenderWindow::init() {
     mRenderer = mRegistry->registerSystem<RenderSystem>(mFactory->getShaders());
     mMoveSys = mRegistry->registerSystem<MovementSystem>();
     mLightSys = mRegistry->registerSystem<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
-    mInput = mRegistry->registerSystem<InputSystem>(mCurrentCamera);
-    ray = new Raycast(this, mCurrentCamera);
+    mInput = mRegistry->registerSystem<InputSystem>(this);
 
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
@@ -139,17 +136,21 @@ void RenderWindow::init() {
     //    GLuint cb = mFactory->make3DObject("cube.obj", ShaderType::Phong); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    mLight = mFactory->getSceneLoader()->controllerID;
 
     mMoveSys->init();
     mRenderer->init();
     //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
     //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
     mLightSys->init();
+    mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
+    mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
 
     mStereoSound = mSoundManager->createSource(
         "Explosion", Vector3(0.0f, 0.0f, 0.0f),
         "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
+    connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
+    connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
+    connect(mRegistry->getSystem<InputSystem>(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
 }
 
 ///Called each frame - doing the rendering
@@ -163,7 +164,7 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
-        if (mIsPlaying) {
+        if (mFactory->isPlaying()) {
             mMoveSys->update();
         }
         mRenderer->update();
@@ -199,9 +200,7 @@ MovementSystem *RenderWindow::movement() const {
 SoundManager *RenderWindow::soundManager() const {
     return mSoundManager;
 }
-bool RenderWindow::isPlaying() const {
-    return mIsPlaying;
-}
+
 void RenderWindow::playSound() {
     //plays the sounds
     mStereoSound->play();
@@ -263,7 +262,7 @@ void RenderWindow::calculateFramerate() {
         ++frameCount;
         if (frameCount > 30) //once pr 30 frames = update the message twice pr second (on a 60Hz monitor)
         {
-            if (!mShowingMsg) {
+            if (!mMainWindow->mShowingMsg) {
                 //showing some statistics in status bar
                 mMainWindow->statusBar()->showMessage(" Time pr FrameDraw: " +
                                                       QString::number(nsecElapsed / 1000000., 'g', 4) + " ms  |  " +
@@ -308,24 +307,6 @@ void RenderWindow::startOpenGLDebugger() {
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
-
-void RenderWindow::keyPressEvent(QKeyEvent *event) {
-    mInput->keyPressEvent(event);
-}
-
-void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
-    mInput->keyReleaseEvent(event);
-}
-
-void RenderWindow::setCameraSpeed(float value) {
-    mCameraSpeed += value;
-    //Keep within min and max values
-    if (mCameraSpeed < 0.01f)
-        mCameraSpeed = 0.01f;
-    if (mCameraSpeed > 0.3f)
-        mCameraSpeed = 0.3f;
-}
-
 //std::vector<GLuint> RenderWindow::Cull(const Camera::Frustum &f) {
 //    std::vector<GLuint> result;
 
@@ -340,49 +321,30 @@ void RenderWindow::setCameraSpeed(float value) {
 //    }
 //    return result;
 //}
+void RenderWindow::keyPressEvent(QKeyEvent *event) {
+    if (mInput)
+        mInput->keyPressEvent(event);
+}
+
+void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
+    if (mInput)
+        mInput->keyReleaseEvent(event);
+}
 
 void RenderWindow::mousePressEvent(QMouseEvent *event) {
-    mInput->mousePressEvent(event);
+    if (mInput)
+        mInput->mousePressEvent(event);
 }
 
 void RenderWindow::mouseReleaseEvent(QMouseEvent *event) {
-    mInput->mouseReleaseEvent(event);
+    if (mInput)
+        mInput->mouseReleaseEvent(event);
 }
-
-void RenderWindow::wheelEvent(QWheelEvent *event) {
-    QPoint numDegrees = event->angleDelta() / 8;
-
-    //if RMB, change the speed of the camera
-    if (mInput->RMB) {
-        if (numDegrees.y() < 1)
-            setCameraSpeed(0.001f);
-        if (numDegrees.y() > 1)
-            setCameraSpeed(-0.001f);
-    }
-    event->accept();
-}
-
 void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
-
-    if (mInput->RMB) {
-        setCursor(Qt::BlankCursor);
-        QPoint mid = QPoint(width() / 2, height() / 2);
-        QPoint glob = mapToGlobal(mid);
-        QCursor::setPos(glob);
-        lastPos = mid;
-        if (!firstRMB) {
-            GLfloat dx = GLfloat(event->x() - lastPos.x()) / width();
-            GLfloat dy = GLfloat(event->y() - lastPos.y()) / height();
-
-            if (dx != 0)
-                mCurrentCamera->yaw(mCameraRotateSpeed * dx);
-            if (dy != 0)
-                mCurrentCamera->pitch(mCameraRotateSpeed * dy);
-        }
-        firstRMB = false;
-    }
-    if (cursor() == Qt::BlankCursor && !mInput->RMB) {
-        setCursor(Qt::ArrowCursor);
-        firstRMB = true;
-    }
+    if (mInput)
+        mInput->mouseMoveEvent(event);
+}
+void RenderWindow::wheelEvent(QWheelEvent *event) {
+    if (mInput)
+        mInput->wheelEvent(event);
 }

@@ -32,6 +32,7 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Mesh>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
+    registry->registerComponent<Input>();
     registry->registerComponent<Collision>();
     registry->registerComponent<Light>();
 
@@ -39,6 +40,14 @@ ResourceManager::ResourceManager() {
 
     // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
+}
+
+Camera *ResourceManager::getCurrentCamera() const {
+    return mCurrentCamera;
+}
+
+void ResourceManager::setCurrentCamera(Camera *currentCamera) {
+    mCurrentCamera = currentCamera;
 }
 
 void ResourceManager::setCurrentScene(const QString &currentScene) {
@@ -697,6 +706,14 @@ void ResourceManager::showMessage(const QString &message) {
     mMainWindow->mShowingMsg = true;
     QTimer::singleShot(1000, this, &ResourceManager::changeMsg);
 }
+
+bool ResourceManager::getPaused() const {
+    return mPaused;
+}
+
+bool ResourceManager::isPlaying() const {
+    return mIsPlaying;
+}
 void ResourceManager::changeMsg() {
     bool &msg = mMainWindow->mShowingMsg;
     msg = !msg;
@@ -725,7 +742,7 @@ void ResourceManager::load() {
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
     showMessage("Loaded Scene!");
 }
-void ResourceManager::loadProject() {
+void ResourceManager::loadProj() {
     QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"), QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)")));
     if (file.fileName().isEmpty())
         return;

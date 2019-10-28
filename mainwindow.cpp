@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "hierarchymodel.h"
 #include "innpch.h"
+#include "inputsystem.h"
 #include "movementsystem.h"
 #include "registry.h"
 #include "rendersystem.h"
@@ -97,8 +98,7 @@ void MainWindow::init() {
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onEntityDragged);
     connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
-    connect(mRenderWindow, &RenderWindow::snapSignal, this, &MainWindow::snapToObject);
-    connect(mRenderWindow, &RenderWindow::rayHitEntity, this, &MainWindow::mouseRayHit);
+
     connect(registry, &Registry::entityCreated, this, &MainWindow::onEntityAdded);
     connect(registry, &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
     connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
@@ -106,25 +106,26 @@ void MainWindow::init() {
 void MainWindow::playButtons() {
     QToolBar *toolbar = ui->mainToolBar;
     QHBoxLayout *buttons = new QHBoxLayout;
+    ResourceManager *factory = ResourceManager::instance();
     buttons->setMargin(0);
     play = new QToolButton;
     play->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     play->setToolTip("Play");
-    connect(play, &QToolButton::clicked, mRenderWindow, &RenderWindow::play);
+    connect(play, &QToolButton::clicked, factory, &ResourceManager::play);
     buttons->addWidget(play);
 
     pause = new QToolButton;
     pause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
     pause->setEnabled(false);
     pause->setToolTip("Pause");
-    connect(pause, &QToolButton::clicked, mRenderWindow, &RenderWindow::pause);
+    connect(pause, &QToolButton::clicked, factory, &ResourceManager::pause);
     buttons->addWidget(pause);
 
     stop = new QToolButton;
     stop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     stop->setEnabled(false);
     stop->setToolTip("Stop");
-    connect(stop, &QToolButton::clicked, mRenderWindow, &RenderWindow::stop);
+    connect(stop, &QToolButton::clicked, factory, &ResourceManager::stop);
     buttons->addWidget(stop);
 
     QGroupBox *box = new QGroupBox;
@@ -151,20 +152,21 @@ void MainWindow::createActions() {
     QMenu *projectActions = ui->menuBar->addMenu(tr("&File"));
     QAction *saveScene = new QAction(tr("&Save"));
     projectActions->addAction(saveScene);
-    connect(saveScene, &QAction::triggered, mRenderWindow, &RenderWindow::save);
+    ResourceManager *factory = ResourceManager::instance();
+    connect(saveScene, &QAction::triggered, factory, &ResourceManager::save);
     QAction *saveAs = new QAction(tr("Save &As"));
     projectActions->addAction(saveAs);
-    connect(saveAs, &QAction::triggered, mRenderWindow, &RenderWindow::saveAs);
+    connect(saveAs, &QAction::triggered, factory, &ResourceManager::saveAs);
     QAction *loadScene = new QAction(tr("&Load"));
     projectActions->addAction(loadScene);
-    connect(loadScene, &QAction::triggered, mRenderWindow, &RenderWindow::load);
+    connect(loadScene, &QAction::triggered, factory, &ResourceManager::load);
 
     QAction *saveProject = new QAction(tr("Save &Project"));
     projectActions->addAction(saveProject);
-    connect(saveProject, &QAction::triggered, mRenderWindow, &RenderWindow::saveProject);
+    connect(saveProject, &QAction::triggered, factory, &ResourceManager::saveProject);
     QAction *loadProject = new QAction(tr("&Open Project"));
     projectActions->addAction(loadProject);
-    connect(loadProject, &QAction::triggered, mRenderWindow, &RenderWindow::loadProject);
+    connect(loadProject, &QAction::triggered, factory, &ResourceManager::loadProj);
 
     QAction *exit = new QAction(tr("&Exit"));
     projectActions->addAction(exit);

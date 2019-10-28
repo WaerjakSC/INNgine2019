@@ -89,6 +89,7 @@ private:
     friend class ComponentGroupBox;
     friend class HierarchyView;
     friend class ResourceManager;
+    friend class RenderWindow;
 };
 
 #endif // MAINWINDOW_H

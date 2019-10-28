@@ -477,7 +477,7 @@ void ComponentList::setPositionX(double xIn) {
     else
         movement->setLocalPositionX(mMainWindow->selectedEntity->id(), xIn, false);
 
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setPositionY(double yIn) {
@@ -486,7 +486,7 @@ void ComponentList::setPositionY(double yIn) {
         movement->setAbsolutePositionY(mMainWindow->selectedEntity->id(), yIn, false);
     else
         movement->setLocalPositionY(mMainWindow->selectedEntity->id(), yIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setPositionZ(double zIn) {
@@ -495,42 +495,42 @@ void ComponentList::setPositionZ(double zIn) {
         movement->setAbsolutePositionZ(mMainWindow->selectedEntity->id(), zIn, false);
     else
         movement->setLocalPositionZ(mMainWindow->selectedEntity->id(), zIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setRotationX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
     movement->setRotationX(mMainWindow->selectedEntity->id(), xIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setRotationY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
     movement->setRotationY(mMainWindow->selectedEntity->id(), yIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setRotationZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
     movement->setRotationZ(mMainWindow->selectedEntity->id(), zIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setScaleX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
     movement->setScaleX(mMainWindow->selectedEntity->id(), xIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setScaleY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
     movement->setScaleY(mMainWindow->selectedEntity->id(), yIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setScaleZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
     movement->setScaleZ(mMainWindow->selectedEntity->id(), zIn, false);
-    if (!mMainWindow->mRenderWindow->isPlaying())
+    if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }

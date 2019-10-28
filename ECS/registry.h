@@ -55,7 +55,7 @@ public:
         std::string typeName = typeid(Type).name();
         Type *system;
 
-        if (mSystems.find(typeName) != mSystems.end()) {
+        if (mSystems.find(typeName) != mSystems.end() && mSystems[typeName]) {
             system = getSystem<Type>();
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
