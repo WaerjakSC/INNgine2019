@@ -86,6 +86,26 @@ GLuint Registry::makeEntity(const QString &name, bool signal) {
         emit entityCreated(eID);
     return eID;
 }
+
+GLuint Registry::duplicateEntity(GLuint dupedEntity) {
+    // Remember it also needs to be at the same parent level
+    Entity *dupe = getEntity(dupedEntity);
+    GLuint entityID = makeEntity(dupe->name());
+    for (auto pool : mPools) {
+        if (pool.second->has(dupedEntity)) {
+            pool.second->cloneComponent(dupedEntity, entityID);
+        }
+    }
+    if (contains<Transform>(entityID)) {
+        Transform &trans = getPool<Transform>()->get(entityID);
+        setParent(entityID, trans.parentID);
+        for (auto &child : trans.children) {
+            GLuint newChild = duplicateEntity(child);
+            child = newChild;
+        }
+    }
+    return entityID;
+}
 /**
  * @brief Set the parent of a gameobject (or rather its transform component).
  * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
@@ -170,7 +190,7 @@ void Registry::loadSnapshot() {
     for (auto pool : tempPools) {
         mPools[pool.first]->swap(pool.second);
     }
-    for (auto &transform : getComponentArray<Transform>()->data()) {
+    for (auto &transform : getPool<Transform>()->data()) {
         transform.matrixOutdated = true;
     }
     // To-do: Make scene view load back to its pre-parented state if something is parented during play

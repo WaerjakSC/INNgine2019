@@ -3,6 +3,7 @@
 #include "gsl_math.h"
 #include <QTreeView>
 class MainWindow;
+class Entity;
 class HierarchyView : public QTreeView {
     Q_OBJECT
 public:
@@ -14,11 +15,18 @@ public:
 signals:
     void dragSelection(GLuint id);
 
+private slots:
+    void renameEntity();
+    void removeEntity();
+    void duplicateEntity();
+
 private:
     MainWindow *mMainWindow{nullptr};
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void createContextActions();
+    GLuint rightClickEntity;
 };
 
 #endif // HIERARCHYVIEW_H

@@ -27,78 +27,78 @@ ComponentList::ComponentList(MainWindow *window, VerticalScrollArea *inScrollAre
  */
 void ComponentList::setupComponentList() {
     scrollArea->clearLayout();
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Transform) != CType::None) {
-        setupTransformSettings(registry->getComponent<Transform>(mMainWindow->selectedEntity->id()));
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (registry->contains<Transform>(eID)) {
+        setupTransformSettings(registry->getComponent<Transform>(eID));
     }
-    if ((typeMask & CType::Material) != CType::None) {
-        setupMaterialSettings(registry->getComponent<Material>(mMainWindow->selectedEntity->id()));
+    if (registry->contains<Material>(eID)) {
+        setupMaterialSettings(registry->getComponent<Material>(eID));
     }
-    if ((typeMask & CType::Mesh) != CType::None) {
-        setupMeshSettings(registry->getComponent<Mesh>(mMainWindow->selectedEntity->id()));
+    if (registry->contains<Mesh>(eID)) {
+        setupMeshSettings(registry->getComponent<Mesh>(eID));
     }
-    //    if ((typeMask & CType::Input) != CType::None) {
-    //        setupTransformSettings(registry->getComponent<Transform>(mMainWindow->selectedEntity->id()));
+    //    if (registry->contains<Light>(eID)) {
+    //        setupTransformSettings(registry->getComponent<Light>(eID));
     //    }
-    //    if ((typeMask & CType::Light) != CType::None) {
-    //        setupMaterialSettings(registry->getComponent<Material>(mMainWindow->selectedEntity->id()));
+    //    if (registry->contains<Transform>(eID)) {
+    //        setupMaterialSettings(registry->getComponent<Material>(eID));
     //    }
-    //    if ((typeMask & CType::Physics) != CType::None) {
-    //        setupMeshSettings(registry->getComponent<Mesh>(mMainWindow->selectedEntity->id()));
+    //    if (registry->contains<Transform>(eID)) {
+    //        setupMeshSettings(registry->getComponent<Mesh>(eID));
     //    }
-    //    if ((typeMask & CType::Sound) != CType::None) {
-    //        setupTransformSettings(registry->getComponent<Transform>(mMainWindow->selectedEntity->id()));
+    //    if (registry->contains<Transform>(eID)) {
+    //        setupTransformSettings(registry->getComponent<Transform>(eID));
     //    }
-    //    if ((typeMask & CType::Collision) != CType::None) {
-    //        setupMaterialSettings(registry->getComponent<Material>(mMainWindow->selectedEntity->id()));
+    //    if (registry->contains<Transform>(eID)) {
+    //        setupMaterialSettings(registry->getComponent<Material>(eID));
     //    }
 }
 void ComponentList::addTransformComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Transform) == CType::None)
-        registry->addComponent<Transform>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Transform>(eID))
+        registry->addComponent<Transform>(eID);
     setupComponentList();
 }
 void ComponentList::addMaterialComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Material) == CType::None)
-        registry->addComponent<Material>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Material>(eID))
+        registry->addComponent<Material>(eID);
     setupComponentList();
 }
 void ComponentList::addMeshComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Mesh) == CType::None)
-        registry->addComponent<Mesh>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Mesh>(eID))
+        registry->addComponent<Mesh>(eID);
     setupComponentList();
 }
 void ComponentList::addLightComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Light) == CType::None)
-        registry->addComponent<Light>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Light>(eID))
+        registry->addComponent<Light>(eID);
     setupComponentList();
 }
 void ComponentList::addInputComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Input) == CType::None)
-        registry->addComponent<Input>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Input>(eID))
+        registry->addComponent<Input>(eID);
     setupComponentList();
 }
 void ComponentList::addPhysicsComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Physics) == CType::None)
-        registry->addComponent<Physics>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Physics>(eID))
+        registry->addComponent<Physics>(eID);
     setupComponentList();
 }
 void ComponentList::addSoundComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Sound) == CType::None)
-        registry->addComponent<Sound>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Sound>(eID))
+        registry->addComponent<Sound>(eID);
     setupComponentList();
 }
 void ComponentList::addCollisionComponent() {
-    CType typeMask = mMainWindow->selectedEntity->types();
-    if ((typeMask & CType::Collision) == CType::None)
-        registry->addComponent<Collision>(mMainWindow->selectedEntity->id());
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Collision>(eID))
+        registry->addComponent<Collision>(eID);
     setupComponentList();
 }
 void ComponentList::setupMeshSettings(const Mesh &mesh) {
@@ -186,12 +186,13 @@ void ComponentList::setupMaterialSettings(const Material &component) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setNewShader(const QString &text) {
+    GLuint eID = mMainWindow->selectedEntity->id();
     if (text == "Texture")
-        emit newShader(mMainWindow->selectedEntity->id(), Tex);
+        emit newShader(eID, Tex);
     else if (text == "Color")
-        emit newShader(mMainWindow->selectedEntity->id(), Color);
+        emit newShader(eID, Color);
     else if (text == "Phong")
-        emit newShader(mMainWindow->selectedEntity->id(), Phong);
+        emit newShader(eID, Phong);
 }
 void ComponentList::setNewTextureFile() {
     QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";

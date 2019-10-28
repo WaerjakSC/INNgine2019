@@ -19,7 +19,7 @@ public:
 
     template <typename... Comp>
     View<Comp...> view() {
-        return {getComponentArray<Comp>()...};
+        return {getPool<Comp>()...};
     }
 
     /**
@@ -42,7 +42,7 @@ public:
         std::shared_ptr<Pool<Type>> pool;
 
         if (mPools.find(typeName) != mPools.end()) {
-            pool = getComponentArray<Type>();
+            pool = getPool<Type>();
         } else {
             pool = std::make_shared<Pool<Type>>();
             // Create a ComponentArray pointer and add it to the component arrays map
@@ -74,26 +74,25 @@ public:
     template <typename Type, class... Args>
     void addComponent(int entityID, Args... args) {
         // Add a component to the array for an entity
-        getComponentArray<Type>()->add(entityID, args...);
-        getEntity(entityID)->types() |= getComponentArray<Type>()->get(entityID).type();
+        getPool<Type>()->add(entityID, args...);
+        getEntity(entityID)->types() |= getPool<Type>()->get(entityID).type();
     }
     /**
      * @brief Remove a component of type Type from the entity/gameobject with entityID.
      */
     template <typename Type>
     void removeComponent(int entityID) {
-        getEntity(entityID)->types() &= ~getComponentArray<Type>()->get(entityID).type();
+        getEntity(entityID)->types() &= ~getPool<Type>()->get(entityID).type();
         // Remove a component from the array for an entity
-        getComponentArray<Type>()->remove(entityID);
+        getPool<Type>()->remove(entityID);
     }
     /**
      * @brief Get a reference to the Type component owned by entityID
      */
     template <typename Type>
     Type &getComponent(int entityID) {
-        CType typeMask = getEntity(entityID)->types();
         // Get a reference to a component from the array for an entity
-        return getComponentArray<Type>()->get(entityID, typeMask);
+        return getPool<Type>()->get(entityID);
     }
     template <typename Type>
     std::shared_ptr<Type> getSystem() {
@@ -106,7 +105,7 @@ public:
     template <typename Type>
     Type &getLastComponent() {
         // Get a reference to a component from the array for an entity
-        return getComponentArray<Type>()->back();
+        return getPool<Type>()->back();
     }
     /**
      * @brief entityDestroyed is called when an entity is removed from the game.
@@ -116,31 +115,27 @@ public:
     void entityDestroyed(int entityID) {
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
-        if (contains(entityID, CType::Transform))
-            getComponentArray<Transform>()->remove(entityID);
-        if (contains(entityID, CType::Material))
-            getComponentArray<Material>()->remove(entityID);
-        if (contains(entityID, CType::Mesh))
-            getComponentArray<Mesh>()->remove(entityID);
-        if (contains(entityID, CType::Light))
-            getComponentArray<Light>()->remove(entityID);
-        if (contains(entityID, CType::Input))
-            getComponentArray<Input>()->remove(entityID);
-        if (contains(entityID, CType::Physics))
-            getComponentArray<Physics>()->remove(entityID);
-        if (contains(entityID, CType::Sound))
-            getComponentArray<Sound>()->remove(entityID);
+        for (auto pool : mPools) {
+            if (pool.second->has(entityID)) {
+                pool.second->remove(entityID);
+            }
+        }
     }
-    bool contains(GLuint eID, CType type) {
-        CType typeMask = getEntity(eID)->types();
-        bool success = (typeMask & type) != CType::None;
-        return success;
+    //    bool contains(GLuint eID, CType type) {
+    //        CType typeMask = getEntity(eID)->types();
+    //        bool success = (typeMask & type) != CType::None;
+    //        return success;
+    //    }
+    template <typename Type>
+    bool contains(GLuint eID) {
+        return getPool<Type>()->has(eID);
     }
     void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
     void removeBillBoardID(GLuint entityID);
     std::vector<GLuint> billBoards() { return mBillBoards; }
 
     GLuint makeEntity(const QString &name = "", bool signal = true);
+    GLuint duplicateEntity(GLuint dupedEntity);
     std::map<GLuint, Entity *> getEntities() const { return mEntities; }
     Entity *getEntity(GLuint eID);
 
@@ -190,7 +185,7 @@ private:
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>
-    std::shared_ptr<Pool<Type>> getComponentArray() {
+    std::shared_ptr<Pool<Type>> getPool() {
         std::string typeName = typeid(Type).name();
         return std::static_pointer_cast<Pool<Type>>(mPools[typeName]);
     }

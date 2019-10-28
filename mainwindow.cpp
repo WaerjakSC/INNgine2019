@@ -273,14 +273,14 @@ void MainWindow::onParentChanged(const QModelIndex &newParent) {
     if (newParent.isValid()) {
         // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
         // Really not sure about this whole "Transform component governs parent/child relationship thing"
-        if (registry->contains(entt->id(), CType::Transform) && selectedEntity) {
+        if (registry->contains<Transform>(entt->id()) && selectedEntity) {
             int parentID = entt->id();
             // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
             registry->setParent(selectedEntity->id(), parentID, true);
             registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
         }
     } else if (selectedEntity)
-        if (registry->contains(selectedEntity->id(), CType::Transform)) {
+        if (registry->contains<Transform>(selectedEntity->id())) {
             registry->setParent(selectedEntity->id(), -1, true);
             registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
         }
@@ -334,6 +334,11 @@ void MainWindow::onEntityAdded(GLuint eID) {
     parentItem->appendRow(item);
 
     connect(entt, &Entity::nameChanged, this, &MainWindow::changeEntityName);
+}
+
+void MainWindow::onEntityRemoved(GLuint entity) {
+    QStandardItem *item = hierarchy->itemFromEntityID(entity);
+    hierarchy->removeRow(hierarchy->indexFromItem(item).row());
 }
 void MainWindow::changeEntityName(const Entity &entt) {
     QStandardItem *item = hierarchy->itemFromEntityID(entt.id());

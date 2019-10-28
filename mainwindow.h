@@ -50,6 +50,7 @@ private slots:
 
     void onNameChanged(const QModelIndex &index);
     void onEntityAdded(GLuint entity);
+    void onEntityRemoved(GLuint entity);
 
     void onParentChanged(const QModelIndex &index);
 
@@ -84,6 +85,7 @@ private:
     void createActions();
     void playButtons();
     friend class ComponentList;
+    friend class HierarchyView;
 };
 
 #endif // MAINWINDOW_H

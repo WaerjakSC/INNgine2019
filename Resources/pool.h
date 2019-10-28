@@ -12,6 +12,7 @@ public:
     virtual ~IPool() = default;
     virtual void remove(int removedEntity) = 0;
     virtual std::shared_ptr<IPool> clone() = 0;
+    virtual void cloneComponent(GLuint cloneFrom, GLuint cloneTo) = 0;
     virtual void swap(std::shared_ptr<IPool> other) = 0;
     virtual int find(uint eID) const = 0;
     virtual bool has(uint eID) const = 0;
@@ -143,6 +144,7 @@ public:
         mGroupEnd = swapped->mGroupEnd;
         isSorted = swapped->isSorted;
     }
+
     /**
      * @brief Adds an entity and its new component to this pool.
      * Entity is equivalent to Component in this case, since pool won't contain the entity if the entity doesn't have the component.
@@ -165,6 +167,19 @@ public:
         if (isSorted) { // Swap the latest entity with the entity pointed at by the group marker, then increment the marker so it points one step right of the newest entity
             swap(mList[mIndex.back()], mList[mIndex[mGroupEnd++]]);
         }
+    }
+    void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override {
+        assert(!has(cloneTo));
+        assert(has(cloneFrom));
+        if ((size_t)cloneTo > mIndex.size()) {
+            for (size_t i = mIndex.size(); i < (size_t)cloneTo; i++) {
+                mIndex.push_back(-1);
+            }
+        }
+        mIndex.push_back(mList.size()); // entity list size is location of new entityID
+        mList.push_back(cloneTo);
+        Type component = get(cloneFrom);
+        mComponents.push_back(component);
     }
     /**
      * @brief Removes an entity by swapping the entityID/component with the last element of the dense arrays and popping out the last element.
@@ -239,12 +254,6 @@ public:
      * @param eID
      * @return
      */
-    Type &get(int eID, CType typeMask) {
-        assert(has(eID));
-        if ((typeMask & mComponents[mIndex[eID]].type()) == CType::None)
-            qDebug() << "something went wrong";
-        return mComponents[mIndex[eID]];
-    }
     Type &get(int eID) {
         assert(has(eID));
         return mComponents[mIndex[eID]];
