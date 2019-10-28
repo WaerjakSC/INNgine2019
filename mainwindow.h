@@ -85,6 +85,7 @@ private:
     void createActions();
     void playButtons();
     friend class ComponentList;
+    friend class ComponentGroupBox;
     friend class HierarchyView;
 };
 

@@ -1,4 +1,5 @@
 #include "componentlist.h"
+#include "componentgroupbox.h"
 #include "components.h"
 #include "constants.h"
 #include "hierarchymodel.h"
@@ -23,7 +24,7 @@ ComponentList::ComponentList(MainWindow *window, VerticalScrollArea *inScrollAre
 }
 /**
  * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
- * @todo Right click a QGroupBox to get options like remove component (look at Unity for inspiration)
+ * @todo Right click a ComponentGroupBox to get options like remove component (look at Unity for inspiration)
  */
 void ComponentList::setupComponentList() {
     scrollArea->clearLayout();
@@ -103,7 +104,7 @@ void ComponentList::addCollisionComponent() {
 }
 void ComponentList::setupMeshSettings(const Mesh &mesh) {
     QStyle *fusion = QStyleFactory::create("fusion");
-    QGroupBox *box = new QGroupBox(tr("Mesh"));
+    ComponentGroupBox *box = new ComponentGroupBox(mesh.type(), mMainWindow);
     box->setAlignment(Qt::AlignCenter);
     box->setStyle(fusion);
 
@@ -119,9 +120,9 @@ void ComponentList::setupMeshSettings(const Mesh &mesh) {
     box->setLayout(meshLayout);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupMaterialSettings(const Material &component) {
+void ComponentList::setupMaterialSettings(const Material &mat) {
     QStyle *fusion = QStyleFactory::create("fusion");
-    QGroupBox *box = new QGroupBox(tr("Material"));
+    ComponentGroupBox *box = new ComponentGroupBox(mat.type(), mMainWindow);
     box->setAlignment(Qt::AlignCenter);
     box->setStyle(fusion);
 
@@ -145,13 +146,13 @@ void ComponentList::setupMaterialSettings(const Material &component) {
             break;
         }
         shaderType->addItem(curText);
-        if (type.first == component.mShader)
+        if (type.first == mat.mShader)
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
     connect(this, &ComponentList::newShader, registry->getSystem<RenderSystem>().get(), &RenderSystem::changeShader);
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setNewShader(const QString &)));
 
-    QString curTexture = ResourceManager::instance()->getTextureName(component.mTextureUnit);
+    QString curTexture = ResourceManager::instance()->getTextureName(mat.mTextureUnit);
     QLabel *textureThumb = new QLabel(box);
     QPixmap thumbNail;
     thumbNail.load(QString::fromStdString(gsl::assetFilePath) + "Textures/" + curTexture); // Load the texture image into the pixmap
@@ -168,7 +169,7 @@ void ComponentList::setupMaterialSettings(const Material &component) {
 
     colorLabel = new QLabel;
     QPixmap curColor(18, 18);
-    vec3 oColor = component.mObjectColor;
+    vec3 oColor = mat.mObjectColor;
     rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
     curColor.fill(rgb);
     colorLabel->setPixmap(curColor);
@@ -231,9 +232,9 @@ void ComponentList::setColor() {
     }
     registry->getComponent<Material>(mMainWindow->selectedEntity->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
 }
-void ComponentList::setupTransformSettings(const Transform &component) {
+void ComponentList::setupTransformSettings(const Transform &trans) {
     QStyle *fusion = QStyleFactory::create("fusion");
-    QGroupBox *box = new QGroupBox(tr("Transform"));
+    ComponentGroupBox *box = new ComponentGroupBox(trans.type(), mMainWindow);
     box->setAlignment(Qt::AlignCenter);
     box->setStyle(fusion);
 
@@ -275,7 +276,7 @@ void ComponentList::setupTransformSettings(const Transform &component) {
                 xVal->setRange(-5000, 5000);
                 xVal->setMaximumWidth(58);
                 xVal->setStyle(fusion);
-                xVal->setValue(component.localPosition.x);
+                xVal->setValue(trans.localPosition.x);
                 connect(this, &ComponentList::posX, xVal, &QDoubleSpinBox::setValue);
                 connect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
                 position->addWidget(xVal);
@@ -286,7 +287,7 @@ void ComponentList::setupTransformSettings(const Transform &component) {
                 yVal->setRange(-5000, 5000);
                 yVal->setMaximumWidth(58);
                 yVal->setStyle(fusion);
-                yVal->setValue(component.localPosition.y);
+                yVal->setValue(trans.localPosition.y);
                 connect(this, &ComponentList::posY, yVal, &QDoubleSpinBox::setValue);
                 connect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
                 position->addWidget(yVal);
@@ -297,7 +298,7 @@ void ComponentList::setupTransformSettings(const Transform &component) {
                 zVal->setRange(-5000, 5000);
                 zVal->setMaximumWidth(58);
                 zVal->setStyle(fusion);
-                zVal->setValue(component.localPosition.z);
+                zVal->setValue(trans.localPosition.z);
                 connect(this, &ComponentList::posZ, zVal, &QDoubleSpinBox::setValue);
                 connect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
                 position->addWidget(zVal);
@@ -345,17 +346,17 @@ void ComponentList::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component.localRotation.x);
+                val->setValue(trans.localRotation.x);
                 connect(this, &ComponentList::rotX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
                 break;
             case 3:
-                val->setValue(component.localRotation.y);
+                val->setValue(trans.localRotation.y);
                 connect(this, &ComponentList::rotY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationY(double)));
                 break;
             case 5:
-                val->setValue(component.localRotation.z);
+                val->setValue(trans.localRotation.z);
                 connect(this, &ComponentList::rotZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setRotationZ(double)));
                 break;
@@ -398,17 +399,17 @@ void ComponentList::setupTransformSettings(const Transform &component) {
             val->setStyle(fusion);
             switch (i) {
             case 1:
-                val->setValue(component.localScale.x);
+                val->setValue(trans.localScale.x);
                 connect(this, &ComponentList::scaleX, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
                 break;
             case 3:
-                val->setValue(component.localScale.y);
+                val->setValue(trans.localScale.y);
                 connect(this, &ComponentList::scaleY, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleY(double)));
                 break;
             case 5:
-                val->setValue(component.localScale.z);
+                val->setValue(trans.localScale.z);
                 connect(this, &ComponentList::scaleZ, val, &QDoubleSpinBox::setValue);
                 connect(val, SIGNAL(valueChanged(double)), this, SLOT(setScaleZ(double)));
                 break;
