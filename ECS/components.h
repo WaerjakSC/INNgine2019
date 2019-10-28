@@ -348,4 +348,19 @@ struct BSplineCurve : Component {
     }
 };
 
+enum State{
+    Walk,
+    Run,
+    Death
+};
+
+/**
+ * @brief The StateMachineComponent struct
+ */
+struct StateMachineComponent : Component {
+    float enterTime;
+    float exitTime;
+
+};
+
 #endif // COMPONENT_H

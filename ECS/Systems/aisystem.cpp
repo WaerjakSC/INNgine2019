@@ -3,12 +3,7 @@
 #include "registry.h"
 
 AIsystem::AIsystem(){
-    // Feilmeldinger:
-    // 'Invalid new-expression of abstract class type 'BSplineCurve'' og fler
-
-    //reg = Registry::instance();
-    //reg->registerComponent<BSplineCurve>();
-    //Registry::instance()->registerComponent<BSplineCurve>();
+    Registry::instance()->registerComponent<BSplineCurve>();
 }
 
 void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute)
