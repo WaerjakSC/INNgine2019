@@ -358,6 +358,7 @@ enum State{
  * @brief The StateMachineComponent struct
  */
 struct StateMachineComponent : Component {
+    State currentState;
     float enterTime;
     float exitTime;
 

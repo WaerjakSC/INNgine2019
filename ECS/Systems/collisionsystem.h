@@ -4,7 +4,8 @@
 #include "components.h"
 #include "registry.h"
 #include "isystem.h"
-class CollisionSystem : public ISystem {
+#include <QOpenGLFunctions_4_1_Core>
+class CollisionSystem : public ISystem, public QOpenGLFunctions_4_1_Core {
 public:
     CollisionSystem();
 
@@ -34,6 +35,8 @@ public:
     vec3 ClosestPoint(const Collision::OBB &obb, const vec3 &point);
     vec3 ClosestPoint(const Collision::Sphere &sphere, const vec3 &point);
     bool SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb);
+
+    void DrawColliders();
 };
 
 #endif // COLLISIONSYSTEM_H
