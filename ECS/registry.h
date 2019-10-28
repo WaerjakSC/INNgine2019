@@ -26,7 +26,7 @@ public:
      * Register component type. For systems that own the component type
      */
     template <typename Type>
-    void registerComponent(std::shared_ptr<Pool<Type>> pool) {
+    void registerComponent(Pool<Type> *pool) {
         std::string typeName = typeid(Type).name();
 
         // Create a ComponentArray pointer and add it to the component arrays map
@@ -37,29 +37,29 @@ public:
      * Will register the component type if it exists, otherwise just returns the pool type
      */
     template <typename Type>
-    std::shared_ptr<Pool<Type>> registerComponent() {
+    Pool<Type> *registerComponent() {
         std::string typeName = typeid(Type).name();
-        std::shared_ptr<Pool<Type>> pool;
+        Pool<Type> *pool;
 
         if (mPools.find(typeName) != mPools.end()) {
             pool = getPool<Type>();
         } else {
-            pool = std::make_shared<Pool<Type>>();
             // Create a ComponentArray pointer and add it to the component arrays map
+            pool = new Pool<Type>;
             mPools.insert({typeName, pool});
         }
         return pool;
     }
     template <typename Type, class... Args>
-    std::shared_ptr<Type> registerSystem(Args... args) {
+    Type *registerSystem(Args... args) {
         std::string typeName = typeid(Type).name();
-        std::shared_ptr<Type> system;
+        Type *system;
 
         if (mSystems.find(typeName) != mSystems.end()) {
             system = getSystem<Type>();
         } else {
-            system = std::make_shared<Type>(args...);
             // Create a ComponentArray pointer and add it to the component arrays map
+            system = new Type(args...);
             mSystems.insert({typeName, system});
         }
         return system;
@@ -95,9 +95,9 @@ public:
         return getPool<Type>()->get(entityID);
     }
     template <typename Type>
-    std::shared_ptr<Type> getSystem() {
+    Type *getSystem() {
         std::string typeName = typeid(Type).name();
-        return std::static_pointer_cast<Type>(mSystems[typeName]);
+        return static_cast<Type *>(mSystems[typeName]);
     }
     /**
      * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
@@ -115,17 +115,12 @@ public:
     void entityDestroyed(int entityID) {
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
-        for (auto pool : mPools) {
+        for (auto &pool : mPools) {
             if (pool.second->has(entityID)) {
                 pool.second->remove(entityID);
             }
         }
     }
-    //    bool contains(GLuint eID, CType type) {
-    //        CType typeMask = getEntity(eID)->types();
-    //        bool success = (typeMask & type) != CType::None;
-    //        return success;
-    //    }
     template <typename Type>
     bool contains(GLuint eID) {
         return getPool<Type>()->has(eID);
@@ -169,25 +164,25 @@ signals:
     void entityCreated(GLuint eID);
     void entityRemoved(GLuint eID);
     void parentChanged(GLuint childID);
-    void poolChanged(std::shared_ptr<IPool>);
+    void poolChanged(IPool *pool);
 
 private:
     static Registry *mInstance;
-    std::map<std::string, std::shared_ptr<IPool>> mPools{};
-    std::map<std::string, std::shared_ptr<ISystem>> mSystems{};
+    std::map<std::string, IPool *> mPools{};
+    std::map<std::string, ISystem *> mSystems{};
 
     std::map<GLuint, Entity *> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
     std::vector<GLuint> mAvailableSlots;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
 
-    std::tuple<std::map<GLuint, Entity *>, std::vector<GLuint>, std::map<std::string, std::shared_ptr<IPool>>> mSnapshot;
+    std::tuple<std::map<GLuint, Entity *>, std::vector<GLuint>, std::map<std::string, IPool *>> mSnapshot;
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>
-    std::shared_ptr<Pool<Type>> getPool() {
+    Pool<Type> *getPool() {
         std::string typeName = typeid(Type).name();
-        return std::static_pointer_cast<Pool<Type>>(mPools[typeName]);
+        return static_cast<Pool<Type> *>(mPools[typeName]);
     }
 };
 

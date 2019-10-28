@@ -91,7 +91,7 @@ GLuint Registry::duplicateEntity(GLuint dupedEntity) {
     // Remember it also needs to be at the same parent level
     Entity *dupe = getEntity(dupedEntity);
     GLuint entityID = makeEntity(dupe->name());
-    for (auto pool : mPools) {
+    for (auto &pool : mPools) {
         if (pool.second->has(dupedEntity)) {
             pool.second->cloneComponent(dupedEntity, entityID);
         }
@@ -156,7 +156,7 @@ void Registry::removeChild(const GLuint eID, const GLuint childID) {
 void Registry::updateChildParent() {
     for (auto entity : getEntities()) // For every gameobject
     {
-        if ((entity.second->types() & CType::Transform) != CType::None) {
+        if (contains<Transform>(entity.second->id())) {
             Transform &comp = getComponent<Transform>(entity.second->id());
             if (comp.parentID != -1) {                         // If this entity has a parent then,
                 setParent(entity.second->id(), comp.parentID); // add this entity's ID to the parent's list of children.
@@ -175,19 +175,18 @@ void Registry::makeSnapshot() {
             newEntityMap[entity.first] = entt;
         }
     }
-    std::map<std::string, std::shared_ptr<IPool>> snapPools;
-    for (auto pool : mPools) {
-        auto newPool = pool.second->clone();
-        snapPools[pool.first] = newPool;
+    std::map<std::string, IPool *> snapPools;
+    for (auto &pool : mPools) {
+        snapPools[pool.first] = pool.second->clone();
     }
 
     mSnapshot = std::make_tuple(newEntityMap, mBillBoards, snapPools);
 }
 
 void Registry::loadSnapshot() {
-    std::map<std::string, std::shared_ptr<IPool>> tempPools;
+    std::map<std::string, IPool *> tempPools;
     std::tie(mEntities, mBillBoards, tempPools) = mSnapshot;
-    for (auto pool : tempPools) {
+    for (auto &pool : tempPools) {
         mPools[pool.first]->swap(pool.second);
     }
     for (auto &transform : getPool<Transform>()->data()) {

@@ -683,7 +683,7 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
         return false;
     }
 }
-void ResourceManager::setLightSystem(const std::shared_ptr<LightSystem> &lightSystem) {
+void ResourceManager::setLightSystem(LightSystem *lightSystem) {
     mLightSystem = lightSystem;
 }
 

@@ -8,7 +8,6 @@ public:
     void update(float deltaTime = 0.016) override;
 
 private:
-    std::shared_ptr<Pool<Input>> mInputs;
 };
 
 #endif // INPUTSYSTEM_H

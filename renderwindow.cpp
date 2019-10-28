@@ -192,10 +192,10 @@ void RenderWindow::snapToObject(int eID) {
 }
 
 RenderSystem *RenderWindow::renderer() const {
-    return mRenderer.get();
+    return mRenderer;
 }
 MovementSystem *RenderWindow::movement() const {
-    return mMoveSys.get();
+    return mMoveSys;
 }
 
 SoundManager *RenderWindow::soundManager() const {

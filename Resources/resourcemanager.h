@@ -38,7 +38,7 @@ public:
 
     std::map<ShaderType, Shader *> getShaders() const;
 
-    void setLightSystem(const std::shared_ptr<LightSystem> &lightSystem);
+    void setLightSystem(LightSystem *lightSystem);
 
     std::vector<Component *> getComponents(int eID);
 
@@ -101,7 +101,7 @@ private:
     //    std::vector<int> mGameObjectIndices;    // Holds the sparse array for gameobjects.
 
     // Systems
-    std::shared_ptr<LightSystem> mLightSystem;
+    LightSystem *mLightSystem;
 
     // OpenGL init functions
     void initVertexBuffers(Mesh *mesh);
