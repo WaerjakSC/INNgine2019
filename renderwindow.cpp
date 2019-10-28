@@ -1,6 +1,9 @@
 #include "renderwindow.h"
 #include "innpch.h"
+#include "inputsystem.h"
 #include "scene.h"
+#include "soundmanager.h"
+#include "soundsource.h"
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QOpenGLContext>
@@ -10,9 +13,6 @@
 #include <QTimer>
 #include <QToolButton>
 #include <chrono>
-
-#include "soundmanager.h"
-#include "soundsource.h"
 #include <iostream>
 #include <thread> //for sleep_for
 
@@ -130,7 +130,7 @@ void RenderWindow::init() {
     mRenderer = mRegistry->registerSystem<RenderSystem>(mFactory->getShaders());
     mMoveSys = mRegistry->registerSystem<MovementSystem>();
     mLightSys = mRegistry->registerSystem<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
-    mFactory->setLightSystem(mLightSys);
+    mInput = mRegistry->registerSystem<InputSystem>(mCurrentCamera);
     ray = new Raycast(this, mCurrentCamera);
 
     //********************** Making the objects to be drawn **********************
@@ -155,9 +155,6 @@ void RenderWindow::init() {
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
 
-    //input
-    handleInput();
-
     mCurrentCamera->update();
 
     mTimeStart.restart();        //restart FPS clock
@@ -171,6 +168,7 @@ void RenderWindow::render() {
         }
         mRenderer->update();
         mLightSys->update();
+        mInput->update();
         mSoundManager->updateListener(mCurrentCamera->position(), vec3(1), mCurrentCamera->forward(), mCurrentCamera->up());
     }
     //Calculate framerate before
@@ -318,85 +316,7 @@ void RenderWindow::keyPressEvent(QKeyEvent *event) {
 void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
     mInput->keyReleaseEvent(event);
 }
-void RenderWindow::showMessage(const QString &message) {
-    mMainWindow->statusBar()->showMessage(message, 1000);
-    mShowingMsg = true;
-    QTimer::singleShot(1000, this, &RenderWindow::changeMsg);
-}
 
-void RenderWindow::save() {
-    mFactory->getSceneLoader()->saveScene(mFactory->getCurrentScene());
-    showMessage("Saved Scene!");
-}
-void RenderWindow::saveAs() {
-    QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
-    if (file.fileName().isEmpty())
-        return;
-    mFactory->getSceneLoader()->saveScene(file.fileName());
-    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    showMessage("Saved Scene!");
-}
-void RenderWindow::load() {
-    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
-    if (file.fileName().isEmpty())
-        return;
-    stop(); // Stop the editor if it's in play
-    mMainWindow->clearEditor();
-    mFactory->getSceneLoader()->loadScene(file.fileName());
-    mFactory->setCurrentScene(file.fileName());
-    mMoveSys->init();
-    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    showMessage("Loaded Scene!");
-}
-void RenderWindow::loadProject() {
-    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"), QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)")));
-    if (file.fileName().isEmpty())
-        return;
-    stop(); // Stop the editor if it's in play
-    mMainWindow->clearEditor();
-    mFactory->loadProject(file.fileName());
-    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    mMoveSys->init();
-    showMessage("Loaded Project: " + mFactory->getProjectName());
-}
-void RenderWindow::saveProject() {
-    mFactory->saveProjectSettings(QString::fromStdString(gsl::settingsFilePath + mFactory->getProjectName().toStdString()));
-    showMessage("Saved Project!");
-}
-void RenderWindow::play() {
-    if (!mIsPlaying) {
-        if (mPaused) { // Only make snapshot if not resuming from pause
-            mPaused = false;
-        } else
-            mRegistry->makeSnapshot();
-        mIsPlaying = true;
-        mMainWindow->play->setEnabled(false);
-        mMainWindow->pause->setEnabled(true);
-        mMainWindow->stop->setEnabled(true);
-        playSound();
-    }
-}
-void RenderWindow::pause() {
-    if (mIsPlaying) {
-        mIsPlaying = false;
-        mPaused = true;
-        mMainWindow->play->setEnabled(true);
-        mMainWindow->pause->setEnabled(false);
-        mStereoSound->pause();
-    }
-}
-void RenderWindow::stop() {
-    if (mIsPlaying) {
-        mRegistry->loadSnapshot();
-        mMoveSys->init();
-        mIsPlaying = false;
-        mMainWindow->insertEntities();
-        mMainWindow->play->setEnabled(true);
-        mMainWindow->pause->setEnabled(false);
-        mMainWindow->stop->setEnabled(false);
-        mStereoSound->stop();
-    }
-}
 void RenderWindow::setCameraSpeed(float value) {
     mCameraSpeed += value;
     //Keep within min and max values
@@ -404,53 +324,6 @@ void RenderWindow::setCameraSpeed(float value) {
         mCameraSpeed = 0.01f;
     if (mCameraSpeed > 0.3f)
         mCameraSpeed = 0.3f;
-}
-void RenderWindow::changeMsg() {
-    mShowingMsg = !mShowingMsg;
-}
-void RenderWindow::handleInput() {
-    //Camera
-    mCurrentCamera->setSpeed(0.f); //cancel last frame movement
-    if (mInput->F) {
-        emit snapSignal();
-    }
-    if (mInput->CTRL) {
-        if (mInput->S) {
-            save();
-        }
-    } else if (mInput->LMB) {
-        int entityID = ray->rayCast(mapFromGlobal(QCursor::pos()));
-        if (entityID != -1) {
-            emit rayHitEntity(entityID);
-        }
-    } else if (mInput->RMB) {
-        if (mInput->W)
-            mCurrentCamera->setSpeed(-mCameraSpeed);
-        if (mInput->S)
-            mCurrentCamera->setSpeed(mCameraSpeed);
-        if (mInput->D)
-            mCurrentCamera->moveRight(mCameraSpeed);
-        if (mInput->A)
-            mCurrentCamera->moveRight(-mCameraSpeed);
-        if (mInput->Q)
-            mCurrentCamera->updateHeight(-mCameraSpeed);
-        if (mInput->E) {
-            mCurrentCamera->updateHeight(mCameraSpeed);
-        }
-    } else if (mIsPlaying) {
-        if (mInput->W)
-            mMoveSys->moveZ(mLight, -mCameraSpeed);
-        if (mInput->S)
-            mMoveSys->moveZ(mLight, mCameraSpeed);
-        if (mInput->D)
-            mMoveSys->moveX(mLight, mCameraSpeed);
-        if (mInput->A)
-            mMoveSys->moveX(mLight, -mCameraSpeed);
-        if (mInput->Q)
-            mMoveSys->moveY(mLight, mCameraSpeed);
-        if (mInput->E)
-            mMoveSys->moveY(mLight, -mCameraSpeed);
-    }
 }
 
 //std::vector<GLuint> RenderWindow::Cull(const Camera::Frustum &f) {

@@ -19,6 +19,7 @@ class MovementSystem;
 class SoundSource;
 class SoundManager;
 class LightSystem;
+class InputSystem;
 class Registry;
 class Raycast;
 /// This inherits from QWindow to get access to the Qt functionality and
@@ -54,23 +55,13 @@ public:
 
 public slots:
     void snapToObject(int eID);
-    void save();
-    void load();
-    void play();
-    void pause();
-    void stop();
-    void saveAs();
-    void saveProject();
-    void loadProject();
+
     void toggleWireframe();
     void toggleXYZ();
 
 private slots:
     void render();
     void changeMsg();
-signals:
-    void snapSignal();
-    void rayHitEntity(GLuint eID);
 
 private:
     void init();
@@ -91,15 +82,12 @@ private:
 
     GLuint mLight;
 
-    Input *mInput;
+    InputSystem *mInput;
 
     Camera *mCurrentCamera{nullptr};
 
     GLuint xyz; // Refers to the colored lines pointing in the X, Y and Z directions.
     bool mWireframe{false};
-    bool mShowingMsg{false};
-    bool mIsPlaying{false};
-    bool mPaused{false}; // Don't make a snapshot if it was just restarted from a pause
 
     //Input mInput;
 
@@ -121,14 +109,11 @@ private:
 
     void startOpenGLDebugger();
 
-    void handleInput();
-
     std::chrono::high_resolution_clock::time_point mLastTime;
     friend class MainWindow;
 
     std::vector<GLuint *> Cull(const Camera::Frustum &f);
 
-    void showMessage(const QString &message);
     friend class MainWindow;
 
 protected:

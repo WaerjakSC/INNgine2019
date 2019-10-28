@@ -16,7 +16,9 @@ class Registry;
 class MainWindow;
 class Scene;
 typedef gsl::Vector3D vec3;
-class ResourceManager : public QOpenGLFunctions_4_1_Core {
+class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {
+    Q_OBJECT
+
     friend class Scene;
 
 public:
@@ -37,8 +39,6 @@ public:
     void addMeshComponent(std::string name, int eID = -1);
 
     std::map<ShaderType, Shader *> getShaders() const;
-
-    void setLightSystem(LightSystem *lightSystem);
 
     std::vector<Component *> getComponents(int eID);
 
@@ -75,6 +75,15 @@ public:
 
     void onExit();
     void loadLastProject();
+public slots:
+    void save();
+    void load();
+    void play();
+    void pause();
+    void stop();
+    void saveAs();
+    void saveProject();
+    void loadProject();
 
 private:
     // Private constructor
@@ -102,6 +111,9 @@ private:
 
     // Systems
     LightSystem *mLightSystem;
+    void showMessage(const QString &message);
+    bool mIsPlaying{false};
+    bool mPaused{false}; // Don't make a snapshot if it was just restarted from a pause
 
     // OpenGL init functions
     void initVertexBuffers(Mesh *mesh);
@@ -125,6 +137,7 @@ private:
     void makeBallMesh(GLuint eID, int n = 3);
     void makeBillBoardMesh(int eID);
     friend class ComponentList;
+    void changeMsg();
 };
 
 #endif // RESOURCEMANAGER_H

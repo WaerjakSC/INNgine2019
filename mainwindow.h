@@ -24,7 +24,6 @@ class MainWindow;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
-
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -81,12 +80,15 @@ private:
     QAction *transAction, *matAction, *meshAction, *lightAction, *inputAction, *collisionAction, *soundAction, *physicsAction;
     Registry *registry;
 
+    bool mShowingMsg{false};
+
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void playButtons();
     friend class ComponentList;
     friend class ComponentGroupBox;
     friend class HierarchyView;
+    friend class ResourceManager;
 };
 
 #endif // MAINWINDOW_H

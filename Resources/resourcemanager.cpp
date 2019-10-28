@@ -3,6 +3,8 @@
 #include "colorshader.h"
 #include "innpch.h"
 #include "lightsystem.h"
+#include "mainwindow.h"
+#include "movementsystem.h"
 #include "phongshader.h"
 #include "rapidjson/prettywriter.h"
 #include "registry.h"
@@ -10,9 +12,12 @@
 #include "textureshader.h"
 #include "tiny_obj_loader.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QFileInfo>
+#include <QStatusBar>
+#include <QTimer>
+#include <QToolButton>
 #include <fstream>
-
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -683,14 +688,93 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
         return false;
     }
 }
-void ResourceManager::setLightSystem(LightSystem *lightSystem) {
-    mLightSystem = lightSystem;
-}
 
 std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
     return mShaders;
 }
-
+void ResourceManager::showMessage(const QString &message) {
+    mMainWindow->statusBar()->showMessage(message, 1000);
+    mMainWindow->mShowingMsg = true;
+    QTimer::singleShot(1000, this, &ResourceManager::changeMsg);
+}
+void ResourceManager::changeMsg() {
+    bool &msg = mMainWindow->mShowingMsg;
+    msg = !msg;
+}
+void ResourceManager::save() {
+    getSceneLoader()->saveScene(getCurrentScene());
+    showMessage("Saved Scene!");
+}
+void ResourceManager::saveAs() {
+    QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
+    if (file.fileName().isEmpty())
+        return;
+    getSceneLoader()->saveScene(file.fileName());
+    mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
+    showMessage("Saved Scene!");
+}
+void ResourceManager::load() {
+    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
+    if (file.fileName().isEmpty())
+        return;
+    stop(); // Stop the editor if it's in play
+    mMainWindow->clearEditor();
+    getSceneLoader()->loadScene(file.fileName());
+    setCurrentScene(file.fileName());
+    Registry::instance()->getSystem<MovementSystem>()->init();
+    mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
+    showMessage("Loaded Scene!");
+}
+void ResourceManager::loadProject() {
+    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"), QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)")));
+    if (file.fileName().isEmpty())
+        return;
+    stop(); // Stop the editor if it's in play
+    mMainWindow->clearEditor();
+    loadProject(file.fileName());
+    mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
+    Registry::instance()->getSystem<MovementSystem>()->init();
+    showMessage("Loaded Project: " + getProjectName());
+}
+void ResourceManager::saveProject() {
+    saveProjectSettings(QString::fromStdString(gsl::settingsFilePath + getProjectName().toStdString()));
+    showMessage("Saved Project!");
+}
+void ResourceManager::play() {
+    if (!mIsPlaying) {
+        if (mPaused) { // Only make snapshot if not resuming from pause
+            mPaused = false;
+        } else
+            Registry::instance()->makeSnapshot();
+        mIsPlaying = true;
+        mMainWindow->play->setEnabled(false);
+        mMainWindow->pause->setEnabled(true);
+        mMainWindow->stop->setEnabled(true);
+        //        playSound();
+    }
+}
+void ResourceManager::pause() {
+    if (mIsPlaying) {
+        mIsPlaying = false;
+        mPaused = true;
+        mMainWindow->play->setEnabled(true);
+        mMainWindow->pause->setEnabled(false);
+        //        mStereoSound->pause();
+    }
+}
+void ResourceManager::stop() {
+    if (mIsPlaying) {
+        Registry *reg = Registry::instance();
+        reg->loadSnapshot();
+        reg->getSystem<MovementSystem>()->init();
+        mIsPlaying = false;
+        mMainWindow->insertEntities();
+        mMainWindow->play->setEnabled(true);
+        mMainWindow->pause->setEnabled(false);
+        mMainWindow->stop->setEnabled(false);
+        //        mStereoSound->stop();
+    }
+}
 //=========================== Octahedron Functions =========================== //
 void ResourceManager::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3) {
     mMeshData.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
