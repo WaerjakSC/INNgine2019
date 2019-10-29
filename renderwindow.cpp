@@ -48,7 +48,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
 }
 
 RenderWindow::~RenderWindow() {
-    SoundManager::instance()->cleanUp();
+    mSoundSys->cleanUp();
 }
 
 /// Sets up the general OpenGL stuff and the buffers needed to render a triangle
@@ -127,7 +127,8 @@ void RenderWindow::init() {
     mLightSys = mRegistry->registerSystem<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
     mInput = mRegistry->registerSystem<InputSystem>(this);
     mSoundSys = mRegistry->registerSystem<SoundSystem>();
-
+    mSoundSys->createContext();
+    //    SoundManager::instance()->init();
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
@@ -137,18 +138,19 @@ void RenderWindow::init() {
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
 
     mMoveSys->init();
-    mSoundSys->init();
     // These components don't have a scene thingy yet
     mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
     mRegistry->addComponent<Sound>(2, "gnomed.wav", true, 1.0f);
-    mSoundSys->prepareSounds();
+    mSoundSys->init();
     mRenderer->init();
     //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
     //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
     mLightSys->init();
 
     mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
-
+    //    SoundManager::instance()->createSource(
+    //        "Explosion", Vector3(0.0f, 0.0f, 0.0f),
+    //        "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
@@ -165,8 +167,8 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
+        mSoundSys->update();
         if (mFactory->isPlaying()) {
-            mSoundSys->update();
             mMoveSys->update();
         }
         mRenderer->update();

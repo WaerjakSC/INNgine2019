@@ -17,7 +17,7 @@ class Registry;
 class SoundSystem : public ISystem {
 public:
     SoundSystem();
-    ~SoundSystem();
+    void cleanUp();
     void init();
     void update(float deltaTime = 0.016) override;
 
@@ -28,7 +28,11 @@ public:
     void pause(GLuint eID);
     void stop(GLuint eID);
 
-    void prepareSounds();
+    bool createContext();
+
+    void playAll();
+    void pauseAll();
+    void stopAll();
 
 private:
     Registry *reg;
@@ -38,6 +42,9 @@ private:
     void pause(Sound &sound);
     void stop(Sound &sound);
     void updateListener();
+    bool checkError(std::string name);
+    friend class Sound;
+    friend class ResourceManager;
 };
 
 #endif // SOUNDSYSTEM_H

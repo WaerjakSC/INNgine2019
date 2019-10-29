@@ -256,17 +256,6 @@ struct Sound : public Component {
 public:
     Sound() {}
     Sound(std::string name, bool loop = false, float gain = 1.0);
-    ~Sound() {
-        std::cout << "Destroying SoundSource " + mName + "\n";
-        //        stop();
-        alGetError();
-        alSourcei(mSource, AL_BUFFER, 0);
-        checkError("alSourcei");
-        alDeleteSources(1, &mSource);
-        checkError("alDeleteSources");
-        alDeleteBuffers(1, &mBuffer);
-        checkError("alDeleteBuffers");
-    }
 
     virtual void update() {}
 
@@ -274,7 +263,6 @@ public:
     bool mPlaying{true}; // Might want to change this, but atm it will just be playing by default immediately
     bool mPaused{false};
     bool mOutDated{true};
-    bool checkError(std::string name);
 
     std::string mName; ///< The name of the sound source (Not used).
     ALuint mSource;    ///< The sound source.

@@ -2,18 +2,12 @@
 #include "camera.h"
 #include "registry.h"
 #include "resourcemanager.h"
-SoundSystem::SoundSystem() : reg(Registry::instance()) {
+SoundSystem::SoundSystem() : reg(Registry::instance()),
+                             mDevice(NULL),
+                             mContext(NULL) {
 }
 
-SoundSystem::~SoundSystem() {
-    mContext = alcGetCurrentContext();
-    mDevice = alcGetContextsDevice(mContext);
-    alcMakeContextCurrent(NULL);
-    alcDestroyContext(mContext);
-    alcCloseDevice(mDevice);
-}
-
-void SoundSystem::init() {
+bool SoundSystem::createContext() {
     qDebug() << "Intializing OpenAL!\n";
     mDevice = alcOpenDevice(NULL);
     if (mDevice) {
@@ -28,16 +22,29 @@ void SoundSystem::init() {
         qDebug() << "Device not made!\n";
     } else
         qDebug() << "Intialization complete!\n";
-
-    //Start listing of found sound devices:
-    //Not jet implemented
-    //ALDeviceList *pDeviceList = NULL;
-    //ALCcontext *pContext = NULL;
-    //ALCdevice *pDevice = NULL;
-    //ALint i;	//will hold the number of the preferred device
-    //ALboolean bReturn = AL_FALSE;
+    return true;
 }
-void SoundSystem::prepareSounds() {
+void SoundSystem::cleanUp() {
+    auto view = reg->view<Sound>();
+    for (auto entity : view) {
+        Sound &sound = view.get(entity);
+        qDebug() << "Destroying SoundSource " + QString::fromStdString(sound.mName) + "\n";
+        stop(sound);
+        alGetError();
+        alSourcei(sound.mSource, AL_BUFFER, 0);
+        checkError("alSourcei");
+        alDeleteSources(1, &sound.mSource);
+        checkError("alDeleteSources");
+        alDeleteBuffers(1, &sound.mBuffer);
+        checkError("alDeleteBuffers");
+    }
+    mContext = alcGetCurrentContext();
+    mDevice = alcGetContextsDevice(mContext);
+    alcMakeContextCurrent(NULL);
+    alcDestroyContext(mContext);
+    alcCloseDevice(mDevice);
+}
+void SoundSystem::init() {
     auto view = reg->view<Sound, Transform>();
     for (auto entity : view) {
         auto [trans, sound] = view.get<Transform, Sound>(entity);
@@ -49,7 +56,15 @@ void SoundSystem::prepareSounds() {
         alSourcei(sound.mSource, AL_LOOPING, sound.mLooping);
         ResourceManager::instance()->loadWave(gsl::soundFilePath + sound.mName, sound);
     }
+    //Start listing of found sound devices:
+    //Not jet implemented
+    //ALDeviceList *pDeviceList = NULL;
+    //ALCcontext *pContext = NULL;
+    //ALCdevice *pDevice = NULL;
+    //ALint i;	//will hold the number of the preferred device
+    //ALboolean bReturn = AL_FALSE;
 }
+
 void SoundSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime);
     updateListener();
@@ -77,6 +92,24 @@ void SoundSystem::pause(Sound &sound) {
 }
 void SoundSystem::stop(Sound &sound) {
     alSourceStop(sound.mSource);
+}
+void SoundSystem::playAll() {
+    auto view = reg->view<Sound>();
+    for (auto entity : view) {
+        play(entity);
+    }
+}
+void SoundSystem::pauseAll() {
+    auto view = reg->view<Sound>();
+    for (auto entity : view) {
+        pause(entity);
+    }
+}
+void SoundSystem::stopAll() {
+    auto view = reg->view<Sound>();
+    for (auto entity : view) {
+        stop(entity);
+    }
 }
 void SoundSystem::play(GLuint eID) {
     Sound &sound = reg->getComponent<Sound>(eID);
@@ -131,4 +164,29 @@ void SoundSystem::updateListener() {
     alListenerfv(AL_POSITION, posVec);
     alListenerfv(AL_VELOCITY, velVec);
     alListenerfv(AL_ORIENTATION, headVec);
+}
+bool SoundSystem::checkError(std::string name) {
+    QString qname = QString::fromStdString(name);
+    switch (alGetError()) {
+    case AL_NO_ERROR:
+        break;
+    case AL_INVALID_NAME:
+        qDebug() << "OpenAL Error: " + qname + ": Invalid name!\n";
+        return false;
+    case AL_INVALID_ENUM:
+        qDebug() << "OpenAL Error: " + qname + ": Invalid enum!\n";
+        return false;
+    case AL_INVALID_VALUE:
+        qDebug() << "OpenAL Error: " + qname + ": Invalid value!\n";
+        return false;
+    case AL_INVALID_OPERATION:
+        qDebug() << "OpenAL Error: " + qname + ": Invalid operation!\n";
+        return false;
+    case AL_OUT_OF_MEMORY:
+        qDebug() << "OpenAL Error: " + qname + ": Out of memory!\n";
+        return false;
+    default:
+        break;
+    }
+    return true;
 }

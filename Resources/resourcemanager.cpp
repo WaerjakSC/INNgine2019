@@ -9,6 +9,7 @@
 #include "rapidjson/prettywriter.h"
 #include "registry.h"
 #include "scene.h"
+#include "soundsystem.h"
 #include "textureshader.h"
 #include "tiny_obj_loader.h"
 #include "wavfilehandler.h"
@@ -594,9 +595,10 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
 
     alGetError();
     alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
-    sound.checkError("alBufferData");
+    SoundSystem *soundSys = registry->getSystem<SoundSystem>();
+    soundSys->checkError("alBufferData");
     alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
-    sound.checkError("alSourcei (loadWave)");
+    soundSys->checkError("alSourcei (loadWave)");
 
     qDebug() << "Loading complete!\n";
     if (waveData->buffer)
@@ -831,11 +833,11 @@ void ResourceManager::play() {
             mPaused = false;
         } else
             Registry::instance()->makeSnapshot();
+        registry->getSystem<SoundSystem>()->playAll();
         mIsPlaying = true;
         mMainWindow->play->setEnabled(false);
         mMainWindow->pause->setEnabled(true);
         mMainWindow->stop->setEnabled(true);
-        //        playSound();
     }
 }
 void ResourceManager::pause() {
@@ -844,20 +846,19 @@ void ResourceManager::pause() {
         mPaused = true;
         mMainWindow->play->setEnabled(true);
         mMainWindow->pause->setEnabled(false);
-        //        mStereoSound->pause();
+        registry->getSystem<SoundSystem>()->pauseAll();
     }
 }
 void ResourceManager::stop() {
     if (mIsPlaying) {
-        Registry *reg = Registry::instance();
-        reg->loadSnapshot();
-        reg->getSystem<MovementSystem>()->init();
+        registry->loadSnapshot();
+        registry->getSystem<MovementSystem>()->init();
+        registry->getSystem<SoundSystem>()->stopAll();
         mIsPlaying = false;
         mMainWindow->insertEntities();
         mMainWindow->play->setEnabled(true);
         mMainWindow->pause->setEnabled(false);
         mMainWindow->stop->setEnabled(false);
-        //        mStereoSound->stop();
     }
 }
 //=========================== Octahedron Functions =========================== //
