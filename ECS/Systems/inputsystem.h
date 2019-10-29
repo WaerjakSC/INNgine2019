@@ -35,7 +35,7 @@ private:
     void handleMouseInput();
 
     float mCameraSpeed{0.01f};
-    float mCameraRotateSpeed{30.f};
+    float mCameraRotateSpeed{-30.f};
     bool firstRMB{true};
     QPoint lastPos;
     Raycast *ray;

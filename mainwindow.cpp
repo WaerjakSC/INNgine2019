@@ -8,8 +8,8 @@
 #include "renderwindow.h"
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
-#include <QDesktopWidget>
 #include <QFileDialog>
+#include <QScreen>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 #include <QToolButton>
@@ -92,7 +92,7 @@ void MainWindow::init() {
     mRenderWindowContainer->setFocus();
 
     //Set size of program in % of available screen
-    resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
+    resize(QGuiApplication::primaryScreen()->size() * 0.7);
 
     connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);

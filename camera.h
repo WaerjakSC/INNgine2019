@@ -1,8 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "innpch.h"
 #include "components.h"
+#include "innpch.h"
 typedef gsl::Vector3D vec3;
 typedef gsl::Vector4D vec4;
 typedef gsl::Matrix4x4 mat4;
@@ -40,6 +40,11 @@ public:
     gsl::Matrix4x4 getViewMatrix() const;
     gsl::Matrix4x4 getProjectionMatrix() const;
 
+    float mNearPlane{0.5f};
+    float mFarPlane{500.f};
+    float mFieldOfView{45.f};
+    float mAspectRatio{1.33f};
+
     /**
       * @brief Frustum struct
       */
@@ -59,18 +64,21 @@ public:
             } planeType;
             plane planes[6];
         };
-        inline Frustum() { }
+        inline Frustum() {}
         vec3 Intersection(plane p1, plane p2, plane p3);
-        void GetCorners(const Frustum& f, vec3* outCorners);
-        bool Intersects(const Frustum& f, const sphere& s);
-        float Classify(const aABB& aabb, const plane& plane);
-        float Classify(const oBB& obb, const plane& plane);
-        bool Intersects(const Frustum& f, const aABB& aabb);
-        bool Intersects(const Frustum& f, const oBB& obb);
+        void GetCorners(const Frustum &f, vec3 *outCorners);
+        bool Intersects(const Frustum &f, const sphere &s);
+        float Classify(const aABB &aabb, const plane &plane);
+        float Classify(const oBB &obb, const plane &plane);
+        bool Intersects(const Frustum &f, const aABB &aabb);
+        bool Intersects(const Frustum &f, const oBB &obb);
 
     } Frustum;
 
     Frustum getFrustum();
+
+    void setProjectionMatrix(float fov, float aspect, float nearPlane, float farPlane);
+    void setProjectionMatrix();
 
 private:
     vec3 mForward{0.f, 0.f, -1.f};

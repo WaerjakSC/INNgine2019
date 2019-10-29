@@ -96,7 +96,7 @@ void RenderWindow::init() {
     mCurrentCamera = mFactory->getCurrentCamera();
     mCurrentCamera->setPosition(vec3(0.f, 8.f, 15.0f));
     //    mCurrentCamera->yaw(45.f);
-    mCurrentCamera->pitch(25.f);
+    mCurrentCamera->pitch(-25.f);
 
     //Compile shaders:
     mFactory->loadShader<ColorShader>();
@@ -198,10 +198,6 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
     if (!mInitialized)
         init();
 
-    //This is just to support modern screens with "double" pixels
-    const qreal retinaScale = devicePixelRatio();
-    glViewport(0, 0, static_cast<GLint>(width() * retinaScale), static_cast<GLint>(height() * retinaScale));
-
     //If the window actually is exposed to the screen we start the main loop
     //isExposed() is a function in QWindow
     if (isExposed()) {
@@ -210,8 +206,12 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
         mRenderTimer->start(1);
         mTimeStart.start();
     }
-    mAspectratio = static_cast<float>(width()) / height();
-    mCurrentCamera->mProjectionMatrix.perspective(45.f, mAspectratio, 1.f, 100.f);
+    //This is just to support modern screens with "double" pixels
+    const qreal retinaScale = devicePixelRatio();
+    glViewport(0, 0, static_cast<GLint>(width() * retinaScale), static_cast<GLint>(height() * retinaScale));
+    mCurrentCamera->mAspectRatio = static_cast<float>(width()) / height();
+    mCurrentCamera->mFieldOfView = 45.f;
+    mCurrentCamera->setProjectionMatrix();
     //    qDebug() << mCamera.mProjectionMatrix;
 }
 

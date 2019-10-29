@@ -11,9 +11,11 @@ PhongShader::PhongShader(const GLchar *geometryPath)
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
 
+    textureUniform = glGetUniformLocation(program, "textureSampler");
     mLightColorUniform = glGetUniformLocation(program, "lightColor");
     mObjectColorUniform = glGetUniformLocation(program, "objectColor");
     mAmbientLightStrengthUniform = glGetUniformLocation(program, "ambientStrength");
+    mAmbientColorUniform = glGetUniformLocation(program, "ambientColor");
     mLightPositionUniform = glGetUniformLocation(program, "lightPosition");
     mSpecularStrengthUniform = glGetUniformLocation(program, "specularStrength");
     mSpecularExponentUniform = glGetUniformLocation(program, "specularExponent");
@@ -28,6 +30,7 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
     Shader::transmitUniformData(modelMatrix);
     Light &light = Registry::instance()->getComponent<Light>(mLight->id());
     Transform &lightTrans = Registry::instance()->getComponent<Transform>(mLight->id());
+
     glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);
     glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
     glUniform3f(mAmbientColorUniform, light.mAmbientColor.x, light.mAmbientColor.y, light.mAmbientColor.z);

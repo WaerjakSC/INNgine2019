@@ -64,8 +64,8 @@ void Camera::update() {
     mYawMatrix.setToIdentity();
     mPitchMatrix.setToIdentity();
 
-    mPitchMatrix.rotateX(-mPitch);
-    mYawMatrix.rotateY(-mYaw);
+    mPitchMatrix.rotateX(mPitch);
+    mYawMatrix.rotateY(mYaw);
 
     mPosition -= mForward * mSpeed;
 
@@ -79,6 +79,13 @@ gsl::Matrix4x4 Camera::getProjectionMatrix() const {
 
 gsl::Matrix4x4 Camera::getViewMatrix() const {
     return mViewMatrix;
+}
+void Camera::setProjectionMatrix(float fov, float aspect, float nearPlane, float farPlane) {
+    mProjectionMatrix.perspective(fov, aspect, nearPlane, farPlane);
+}
+
+void Camera::setProjectionMatrix() {
+    mProjectionMatrix.perspective(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
 
 void Camera::setPosition(const vec3 &position) {
