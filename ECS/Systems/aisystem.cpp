@@ -7,6 +7,20 @@ AIsystem::AIsystem() {
 }
 
 void AIsystem::update(float deltaTime) {
+    // RUN FSM HERE?
+    switch (state) {
+
+    case MOVE:
+        move();
+        break;
+    case DEATH:
+        // Whatever happens when gnomes reach endpoint
+        break;
+    case SLEEP:
+        // NPC IDLE, do we need it? /doubt
+        break;
+
+    }
 }
 
 void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute) {
@@ -16,7 +30,7 @@ void AIsystem::setKnotsAndControlPoints(std::vector<float> knots, std::vector<ve
 }
 
 /**
- * @brief AIsystem::evaluateBSpline
+ * @brief AIsystem::evaluateBSpline, deBoor's algorithm for b-splines
  * @param bspline referanse til en bsplinecurve
  * @param my et tall slik at bspline.t[my] <= x < bspline.t[my+1]
  * @param x paramterverdi på skjøtvektor
@@ -45,4 +59,9 @@ int AIsystem::findKnotInterval(float x) {
 }
 
 vec3 AIsystem::evaluateBSpline(int degree, int startKnot, float x) {
+}
+
+void AIsystem::move()
+{
+
 }

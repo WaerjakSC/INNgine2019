@@ -4,6 +4,7 @@
 #include "components.h"
 #include "isystem.h"
 #include "registry.h"
+#include <queue>
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
 
@@ -23,6 +24,10 @@ public:
     vec3 evaluateBSpline(int degree, int startKnot, float x);
 
     // FSM
+    void move();
+    NPCstates state;
+    void notify(int notification);
+    std::queue<int> notification_queue;
 };
 
 #endif // AISYSTEM_H

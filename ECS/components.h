@@ -361,17 +361,16 @@ struct BSplineCurve : Component {
     }
 };
 
-enum State {
-    Walk,
-    Run,
-    Death
-};
+// TD enemies følger en path fra A til B
+// de kan bevege seg, ta skade, dø
+enum NPCstates {MOVE, SLEEP, DEATH};
+enum NPCevents {ENDPOINT_ARRIVED, DAMAGE_TAKEN};
 
 /**
  * @brief The StateMachineComponent struct
  */
 struct StateMachineComponent : Component {
-    State currentState;
+    NPCstates currentState;
     float enterTime;
     float exitTime;
 };
