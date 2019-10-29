@@ -37,7 +37,7 @@ public:
         std::string shaderName = typeid(ShaderType).name();
         if (mShaders.find(shaderName) == mShaders.end()) {
             mShaders[shaderName] = new ShaderType(geometryPath);
-            qDebug() << "ResourceManager: Added shader " << QString::fromStdString(shaderName);
+            qDebug() << "ResourceManager: Added shader " << QString::fromStdString(mShaders[shaderName]->getName());
         } else {
             qDebug() << "ResourceManager: Shader already loaded, ignoring...";
         }

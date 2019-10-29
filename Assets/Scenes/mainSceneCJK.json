@@ -28,7 +28,7 @@
                     1.0
                 ],
                 "textureid": 2,
-                "shader": "textureshader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "Skybox"
@@ -46,9 +46,9 @@
                     -3.5
                 ],
                 "rotation": [
-                    -5.728983402252197,
-                    -1.3344793319702149,
-                    -0.13386821746826173
+                    -25.000001907348634,
+                    -0.0,
+                    -0.0
                 ],
                 "scale": [
                     1.0,
@@ -64,7 +64,7 @@
                     1.0
                 ],
                 "textureid": 1,
-                "shader": "textureshader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "BillBoard"
@@ -100,7 +100,7 @@
                     0.800000011920929
                 ],
                 "textureid": 0,
-                "shader": "textureshader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "Light"
@@ -160,7 +160,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "colorshader"
+                "shader": "PlainShader"
             },
             "mesh": {
                 "name": "box2.txt"
@@ -196,7 +196,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "phongshader"
+                "shader": "PhongShader"
             },
             "mesh": {
                 "name": "monkey.obj"
@@ -232,7 +232,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "colorshader"
+                "shader": "PlainShader"
             },
             "mesh": {
                 "name": "Plane"
@@ -268,7 +268,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "colorshader"
+                "shader": "PlainShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -304,7 +304,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "colorshader"
+                "shader": "PlainShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -340,7 +340,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "colorshader"
+                "shader": "PlainShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -353,7 +353,7 @@
         "components": {
             "transform": {
                 "position": [
-                    7.0,
+                    8.0,
                     0.0,
                     0.0
                 ],
@@ -363,7 +363,7 @@
                     0.0
                 ],
                 "scale": [
-                    1.0,
+                    0.5,
                     1.0,
                     8.0
                 ],
@@ -376,7 +376,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "colorshader"
+                "shader": "PlainShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -412,7 +412,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "phongshader"
+                "shader": "PhongShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -448,7 +448,7 @@
                     1.0
                 ],
                 "textureid": 0,
-                "shader": "phongshader"
+                "shader": "PhongShader"
             },
             "mesh": {
                 "name": "cube.obj"

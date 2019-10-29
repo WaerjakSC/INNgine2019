@@ -132,8 +132,6 @@ void RenderWindow::init() {
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
 
-    //    GLuint cb = mFactory->make3DObject("cube.obj", ShaderType::Phong); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
-
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
 
     mMoveSys->init();
@@ -144,13 +142,8 @@ void RenderWindow::init() {
     mRenderer->init();
     mLightSys->init();
 
-    //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
-    //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
-
     mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
-    //    SoundManager::instance()->createSource(
-    //        "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-    //        "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
+
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
@@ -171,8 +164,8 @@ void RenderWindow::render() {
         if (mFactory->isPlaying()) {
             mMoveSys->update();
         }
-        mRenderer->update();
         mLightSys->update();
+        mRenderer->update();
         mInput->update();
     }
     //Calculate framerate before
@@ -219,7 +212,6 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
         mTimeStart.start();
     }
     mAspectratio = static_cast<float>(width()) / height();
-    //    qDebug() << mAspectratio;
     mCurrentCamera->mProjectionMatrix.perspective(45.f, mAspectratio, 1.f, 100.f);
     //    qDebug() << mCamera.mProjectionMatrix;
 }

@@ -3,7 +3,7 @@
 #include "innpch.h"
 
 TextureShader::TextureShader(const GLchar *geometryPath)
-    : Shader("textureshader", geometryPath) {
+    : Shader("TextureShader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");

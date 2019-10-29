@@ -10,6 +10,8 @@ public:
 
     void updateLightUniforms(gsl::Matrix4x4 &modelMatrix, const LightData &light);
 
+    void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) override;
+
 private:
     //    GLint textureUniform{-1};
     GLint mLightColorUniform{-1};

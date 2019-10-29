@@ -46,7 +46,7 @@ void RenderSystem::toggleRendered(GLuint entityID) {
 void RenderSystem::changeShader(int entityID, std::string nShader) {
     Shader *shader{nullptr};
     ResourceManager *factory = ResourceManager::instance();
-    if (nShader == "colorshader")
+    if (nShader == "plainshader")
         shader = factory->getShader<ColorShader>();
     else if (nShader == "textureshader")
         shader = factory->getShader<TextureShader>();

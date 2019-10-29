@@ -4,7 +4,7 @@
 #include "innpch.h"
 
 PhongShader::PhongShader(const GLchar *geometryPath)
-    : Shader("phongshader", geometryPath) {
+    : Shader("PhongShader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
@@ -22,7 +22,10 @@ PhongShader::PhongShader(const GLchar *geometryPath)
 PhongShader::~PhongShader() {
     qDebug() << "Deleting PhongShader";
 }
-
+void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
+    Shader::transmitUniformData(modelMatrix, material);
+    //    std::cout << modelMatrix;
+}
 void PhongShader::updateLightUniforms(gsl::Matrix4x4 &modelMatrix, const LightData &light) {
     glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
     glUniform1f(mLightPowerUniform, light.mLightStrength);

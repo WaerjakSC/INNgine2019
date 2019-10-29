@@ -2,7 +2,7 @@
 #include "innpch.h"
 
 ColorShader::ColorShader(const GLchar *geometryPath)
-    : Shader("plainshader", geometryPath) {
+    : Shader("PlainShader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");

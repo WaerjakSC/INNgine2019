@@ -129,7 +129,7 @@ Shader::Shader(const std::string shaderName, const GLchar *geometryPath) : mName
 }
 
 Shader::~Shader() {
-    qDebug() << "shader program " << program;
+    qDebug() << "Shader program " << program;
     glDeleteProgram(program);
 }
 

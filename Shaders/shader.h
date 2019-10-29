@@ -14,15 +14,10 @@
 
 class Camera;
 struct Material;
-enum ShaderType {
-    Color = 0,
-    Tex = 1,
-    Phong = 2
-};
 class Shader : protected QOpenGLFunctions_4_1_Core {
 public:
     // Constructor generates the shader on the fly
-    Shader(const std::string shaderName = "plainshader", const GLchar *geometryPath = nullptr);
+    Shader(const std::string shaderName = "PlainShader", const GLchar *geometryPath = nullptr);
     virtual ~Shader();
 
     // Use the current shader

@@ -215,11 +215,11 @@ void Scene::populateScene(const Document &scene) {
                 QString shaderName = comp->value["shader"].GetString();
                 Shader *shader{nullptr};
                 ResourceManager *factory = ResourceManager::instance();
-                if (shaderName == "colorshader")
+                if (shaderName == "PlainShader")
                     shader = factory->getShader<ColorShader>();
-                else if (shaderName == "textureshader")
+                else if (shaderName == "TextureShader")
                     shader = factory->getShader<TextureShader>();
-                else if (shaderName == "phongshader")
+                else if (shaderName == "PhongShader")
                     shader = factory->getShader<PhongShader>();
                 registry->addComponent<Material>(id, shader, comp->value["textureid"].GetInt(), color);
             } else if (comp->name == "mesh") {
