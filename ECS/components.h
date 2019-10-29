@@ -35,25 +35,6 @@ struct meshData {
         mName.clear();
     }
 };
-struct LightData {
-    LightData() {}
-    LightData(GLfloat ambientStrength, vec3 ambientColor, GLfloat lightStrength, vec3 lightColor,
-              GLfloat specularStrength, GLint specularExponent,
-              vec3 objectColor)
-        : mAmbientStrength(ambientStrength), mAmbientColor(ambientColor),
-          mLightStrength(lightStrength), mLightColor(lightColor),
-          mSpecularStrength(specularStrength), mSpecularExponent(specularExponent),
-          mObjectColor(objectColor) {}
-    GLfloat mAmbientStrength{0.3f};
-    vec3 mAmbientColor{0.3f, 0.3f, 0.3f};
-
-    GLfloat mLightStrength{0.7f};
-    vec3 mLightColor{0.3f, 0.3f, 0.3f};
-
-    GLfloat mSpecularStrength{0.3f};
-    GLint mSpecularExponent{4};
-    vec3 mObjectColor{1.f, 1.f, 1.f};
-};
 enum class CType {
     None = 0,
     Transform = 1 << 0,
@@ -160,14 +141,18 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(Shader *type = new ColorShader(), GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
+    Material(Shader *type = new ColorShader(), GLuint texture = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4)
+        : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
+          mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
 
     virtual void update() {}
 
-    vec3 mObjectColor{1.f, 1.f, 1.f};
-    GLuint mTextureUnit{0}; //the actual texture to put into the uniform
+    GLfloat mSpecularStrength;
+    GLint mSpecularExponent;
+    vec3 mObjectColor;
+    GLuint mTextureUnit; //the actual texture to put into the uniform
     Shader *mShader;
 };
 
@@ -211,12 +196,21 @@ struct Mesh : public Component {
     }
 };
 struct Light : public Component {
-    Light(LightData light = LightData()) : mLight(light) {
+    Light(GLfloat ambStr = 0.3f, vec3 ambColor = vec3(0.3f, 0.3f, 0.3f),
+          GLfloat lightStr = 0.7f, vec3 lightColor = vec3(0.3f, 0.3f, 0.3f),
+          vec3 color = vec3(1.f, 1.f, 1.f))
+        : mAmbientStrength(ambStr), mAmbientColor(ambColor), mLightStrength(lightStr),
+          mLightColor(lightColor), mObjectColor(color) {
         mType = CType::Light;
     }
     virtual void update() {}
 
-    LightData mLight;
+    GLfloat mAmbientStrength;
+    vec3 mAmbientColor;
+
+    GLfloat mLightStrength;
+    vec3 mLightColor;
+    vec3 mObjectColor;
 };
 struct Input : public Component {
     Input() {

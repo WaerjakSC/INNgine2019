@@ -139,8 +139,8 @@ void RenderWindow::init() {
     mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
     mRegistry->addComponent<Sound>(2, "gnomed.wav", true, 1.0f);
     mSoundSys->init();
+    mLightSys->init(mRegistry->getEntity(mFactory->getSceneLoader()->controllerID));
     mRenderer->init();
-    mLightSys->init();
 
     mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
 

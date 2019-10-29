@@ -31,7 +31,7 @@ void Scene::saveScene(const QString &fileName) {
     writer.StartObject();
 
     for (auto entity : entities) {
-        if (entity.second->id() != 0) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
+        if (entity.second->id() != 0 && entity.second->types() != CType::None) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("GameObject");
             writer.StartObject();
             writer.Key("name");
@@ -92,6 +92,11 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(mat.mObjectColor.z);
                 writer.EndArray();
 
+                writer.Key("specstr");
+                writer.Double(mat.mSpecularStrength);
+                writer.Key("specexp");
+                writer.Int(mat.mSpecularExponent);
+
                 writer.Key("textureid");
                 writer.Int(mat.mTextureUnit);
 
@@ -113,8 +118,8 @@ void Scene::saveScene(const QString &fileName) {
             if ((typeMask & CType::Light) != CType::None) {
                 writer.Key("light");
                 writer.StartObject();
-                const Light lightcomp = registry->getComponent<Light>(entity.second->id());
-                LightData light = lightcomp.mLight;
+                const Light light = registry->getComponent<Light>(entity.second->id());
+
                 writer.Key("ambstr");
                 writer.Double(light.mAmbientStrength);
 
@@ -134,11 +139,6 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(light.mLightColor.y);
                 writer.Double(light.mLightColor.z);
                 writer.EndArray();
-
-                writer.Key("specstr");
-                writer.Double(light.mSpecularStrength);
-                writer.Key("specexp");
-                writer.Int(light.mSpecularExponent);
 
                 writer.Key("color");
                 writer.StartArray();
@@ -212,6 +212,8 @@ void Scene::populateScene(const Document &scene) {
                 registry->getSystem<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
             } else if (comp->name == "material") {
                 gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
+                GLfloat specStr = comp->value["specstr"].GetFloat();
+                GLint specExp = comp->value["specexp"].GetInt();
                 QString shaderName = comp->value["shader"].GetString();
                 Shader *shader{nullptr};
                 ResourceManager *factory = ResourceManager::instance();
@@ -221,7 +223,7 @@ void Scene::populateScene(const Document &scene) {
                     shader = factory->getShader<TextureShader>();
                 else if (shaderName == "PhongShader")
                     shader = factory->getShader<PhongShader>();
-                registry->addComponent<Material>(id, shader, comp->value["textureid"].GetInt(), color);
+                registry->addComponent<Material>(id, shader, comp->value["textureid"].GetInt(), color, specStr, specExp);
             } else if (comp->name == "mesh") {
                 factory->addMeshComponent(comp->value["name"].GetString(), id);
             } else if (comp->name == "light") { // Again, temporary, very static functionality atm
@@ -229,12 +231,9 @@ void Scene::populateScene(const Document &scene) {
                 gsl::Vector3D ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());
                 GLfloat lightStr = comp->value["lightstr"].GetFloat();
                 gsl::Vector3D lightColor(comp->value["lightcolor"][0].GetDouble(), comp->value["lightcolor"][1].GetDouble(), comp->value["lightcolor"][2].GetDouble());
-                GLfloat specStr = comp->value["specstr"].GetFloat();
-                GLint specExp = comp->value["specexp"].GetInt();
                 gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
 
-                LightData data(ambStr, ambColor, lightStr, lightColor, specStr, specExp, color);
-                registry->addComponent<Light>(id, data);
+                registry->addComponent<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
             } else if (comp->name == "collision") {
                 // Set collision variables here
             }

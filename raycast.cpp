@@ -19,7 +19,7 @@ int Raycast::rayCast(const QPoint &mousePos) {
     int entityID{-1};
     double closestTarget{rayRange};
     for (auto entity : registry->getEntities()) {
-        if (entity.second->name() != "Skybox" && entity.second->name() != "XYZ") {
+        if (entity.second->name() != "Skybox" && entity.second->name() != "XYZ" && registry->contains<Transform>(entity.first)) {
             double intersectionPoint;
             if (RayToSphere(ray, registry->getSystem<MovementSystem>()->getAbsolutePosition(entity.first), 1, intersectionPoint)) { // Setting radius to 1 just for testing
                 if (intersectionPoint < closestTarget) {

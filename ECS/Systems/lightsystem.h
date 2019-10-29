@@ -11,7 +11,7 @@ public:
 
     void update(float deltaTime = 0.016) override;
 
-    void init();
+    void init(Entity *light);
 
 private:
     Registry *registry;

@@ -27,6 +27,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 2,
                 "shader": "TextureShader"
             },
@@ -63,6 +65,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 1,
                 "shader": "TextureShader"
             },
@@ -99,6 +103,8 @@
                     0.10000000149011612,
                     0.800000011920929
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "TextureShader"
             },
@@ -118,8 +124,6 @@
                     0.30000001192092898,
                     0.30000001192092898
                 ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
                 "color": [
                     1.0,
                     1.0,
@@ -159,6 +163,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PlainShader"
             },
@@ -195,6 +201,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PhongShader"
             },
@@ -231,6 +239,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PlainShader"
             },
@@ -267,6 +277,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PlainShader"
             },
@@ -303,6 +315,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PlainShader"
             },
@@ -339,6 +353,8 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PlainShader"
             },
@@ -375,80 +391,10 @@
                     1.0,
                     1.0
                 ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
                 "textureid": 0,
                 "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": "cube.obj"
-            }
-        }
-    },
-    "GameObject": {
-        "name": "cube.obj",
-        "id": 11,
-        "components": {
-            "transform": {
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "textureid": 0,
-                "shader": "PhongShader"
-            },
-            "mesh": {
-                "name": "cube.obj"
-            }
-        }
-    },
-    "GameObject": {
-        "name": "cube.obj",
-        "id": 12,
-        "components": {
-            "transform": {
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "textureid": 0,
-                "shader": "PhongShader"
             },
             "mesh": {
                 "name": "cube.obj"

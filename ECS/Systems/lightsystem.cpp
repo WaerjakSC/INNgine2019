@@ -7,13 +7,14 @@ LightSystem::LightSystem(PhongShader *shader)
 }
 void LightSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime);
-    auto view = registry->view<Transform, Light>();
-    for (auto entityID : view) {
-        auto [transform, light] = view.get<Transform, Light>(entityID);
-        // Send the entity's model matrix as well as the light data.
-        mPhong->updateLightUniforms(transform.modelMatrix, light.mLight);
-    }
+    //    auto view = registry->view<Transform, Light>();
+    //    for (auto entityID : view) {
+    //        auto [transform, light] = view.get<Transform, Light>(entityID);
+    //        // Send the entity's model matrix as well as the light data.
+    //        mPhong->updateLightUniforms(transform.modelMatrix, light.mLight);
+    //    }
 }
-void LightSystem::init() {
+void LightSystem::init(Entity *light) {
+    mPhong->setLight(light);
     update();
 }
