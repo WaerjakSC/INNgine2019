@@ -3,7 +3,6 @@
 
 #include "camera.h"
 #include "entity.h"
-#include "resourcemanager.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>
@@ -19,6 +18,7 @@ class MovementSystem;
 class LightSystem;
 class SoundSystem;
 class InputSystem;
+class ResourceManager;
 class Registry;
 class Raycast;
 /// This inherits from QWindow to get access to the Qt functionality and
@@ -63,10 +63,10 @@ private:
     bool mInitialized{false};
 
     RenderSystem *mRenderer;
-    MovementSystem *mMoveSys;
-    LightSystem *mLightSys;
-    SoundSystem *mSoundSys;
-    InputSystem *mInput;
+    MovementSystem *mMoveSystem;
+    LightSystem *mLightSystem;
+    SoundSystem *mSoundSystem;
+    InputSystem *mInputSystem;
 
     ResourceManager *mFactory;
     Registry *mRegistry;

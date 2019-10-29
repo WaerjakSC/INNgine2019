@@ -1,32 +1,31 @@
 ﻿#include "renderwindow.h"
 #include "innpch.h"
-#include "inputsystem.h"
-#include "scene.h"
-#include "soundmanager.h"
-#include "soundsource.h"
-#include <QFileDialog>
+#include "mainwindow.h"
 #include <QKeyEvent>
 #include <QOpenGLContext>
 #include <QOpenGLDebugLogger>
 #include <QOpenGLFunctions>
 #include <QStatusBar>
 #include <QTimer>
-#include <QToolButton>
 #include <chrono>
 #include <iostream>
 #include <thread> //for sleep_for
 
-#include "mainwindow.h"
-
-#include "colorshader.h"
+#include "inputsystem.h"
 #include "lightsystem.h"
 #include "movementsystem.h"
-#include "phongshader.h"
-#include "raycast.h"
-#include "registry.h"
 #include "rendersystem.h"
 #include "soundsystem.h"
+
+#include "colorshader.h"
+#include "phongshader.h"
 #include "textureshader.h"
+
+#include "raycast.h"
+#include "registry.h"
+#include "resourcemanager.h"
+#include "scene.h"
+
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false),
       mFactory(ResourceManager::instance()), mRegistry(Registry::instance()),
@@ -48,7 +47,7 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
 }
 
 RenderWindow::~RenderWindow() {
-    mSoundSys->cleanUp();
+    mSoundSystem->cleanUp();
 }
 
 /// Sets up the general OpenGL stuff and the buffers needed to render a triangle
@@ -123,26 +122,26 @@ void RenderWindow::init() {
 
     // Set up the systems.
     mRenderer = mRegistry->registerSystem<RenderSystem>(mFactory->getShaders());
-    mMoveSys = mRegistry->registerSystem<MovementSystem>();
-    mLightSys = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
-    mInput = mRegistry->registerSystem<InputSystem>(this);
-    mSoundSys = mRegistry->registerSystem<SoundSystem>();
-    mSoundSys->createContext();
+    mMoveSystem = mRegistry->registerSystem<MovementSystem>();
+    mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
+    mInputSystem = mRegistry->registerSystem<InputSystem>(this);
+    mSoundSystem = mRegistry->registerSystem<SoundSystem>();
+    mSoundSystem->createContext();
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
 
-    mMoveSys->init();
+    mMoveSystem->init();
     // These components don't have a scene thingy yet
     mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
     mRegistry->addComponent<Sound>(2, "gnomed.wav", true, 1.0f);
-    mSoundSys->init();
-    mLightSys->init(mRegistry->getEntity(mFactory->getSceneLoader()->controllerID));
+    mSoundSystem->init();
+    mLightSystem->init(mRegistry->getEntity(mFactory->getSceneLoader()->controllerID));
     mRenderer->init();
 
-    mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
+    mInputSystem->setPlayerController(mFactory->getSceneLoader()->controllerID);
 
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
@@ -160,13 +159,13 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
-        mSoundSys->update();
+        mSoundSystem->update();
         if (mFactory->isPlaying()) {
-            mMoveSys->update();
+            mMoveSystem->update();
         }
-        mLightSys->update();
+        mLightSystem->update();
         mRenderer->update();
-        mInput->update();
+        mInputSystem->update();
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -183,14 +182,14 @@ void RenderWindow::render() {
     mContext->swapBuffers(this);
 }
 void RenderWindow::snapToObject(int eID) {
-    mCurrentCamera->goTo(mMoveSys->getAbsolutePosition(eID));
+    mCurrentCamera->goTo(mMoveSystem->getAbsolutePosition(eID));
 }
 
 RenderSystem *RenderWindow::renderer() const {
     return mRenderer;
 }
 MovementSystem *RenderWindow::movement() const {
-    return mMoveSys;
+    return mMoveSystem;
 }
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized
@@ -307,29 +306,29 @@ void RenderWindow::startOpenGLDebugger() {
 //    return result;
 //}
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
-    if (mInput)
-        mInput->keyPressEvent(event);
+    if (mInputSystem)
+        mInputSystem->keyPressEvent(event);
 }
 
 void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
-    if (mInput)
-        mInput->keyReleaseEvent(event);
+    if (mInputSystem)
+        mInputSystem->keyReleaseEvent(event);
 }
 
 void RenderWindow::mousePressEvent(QMouseEvent *event) {
-    if (mInput)
-        mInput->mousePressEvent(event);
+    if (mInputSystem)
+        mInputSystem->mousePressEvent(event);
 }
 
 void RenderWindow::mouseReleaseEvent(QMouseEvent *event) {
-    if (mInput)
-        mInput->mouseReleaseEvent(event);
+    if (mInputSystem)
+        mInputSystem->mouseReleaseEvent(event);
 }
 void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
-    if (mInput)
-        mInput->mouseMoveEvent(event);
+    if (mInputSystem)
+        mInputSystem->mouseMoveEvent(event);
 }
 void RenderWindow::wheelEvent(QWheelEvent *event) {
-    if (mInput)
-        mInput->wheelEvent(event);
+    if (mInputSystem)
+        mInputSystem->wheelEvent(event);
 }

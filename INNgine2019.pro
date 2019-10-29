@@ -151,8 +151,6 @@ SOURCES += main.cpp \
     ECS/Systems/movementsystem.cpp \
     ECS/Systems/collisionsystem.cpp \
 #
-    Resources/soundmanager.cpp \
-    Resources/soundsource.cpp \
     Resources/wavfilehandler.cpp \
     Resources/resourcemanager.cpp \
     Resources/texture.cpp \

@@ -95,8 +95,8 @@ void Camera::updateHeight(float deltaHeight) {
 
 void Camera::moveRight(float delta) {
     //This fixes a bug in the up and right calculations
-    //so camera always holds its height when straifing
-    //should be fixed thru correct right calculations!
+    //so camera always holds its height when strafing
+    //should be fixed through correct right calculations!
     vec3 right = mRight;
     right.y = 0.f;
     mPosition += right * delta;
