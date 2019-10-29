@@ -5,7 +5,6 @@
 #include "lightsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
-#include "phongshader.h"
 #include "rapidjson/prettywriter.h"
 #include "registry.h"
 #include "scene.h"
@@ -168,7 +167,7 @@ void ResourceManager::onExit() {
  * @param type
  * @return The entity ID of the gameobject.
  */
-GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
+GLuint ResourceManager::make3DObject(std::string name, Shader *type) {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
@@ -186,7 +185,7 @@ GLuint ResourceManager::make3DObject(std::string name, ShaderType type) {
 GLuint ResourceManager::makePlane(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, Color);
+    registry->addComponent<Material>(eID, getShader<ColorShader>());
     makePlaneMesh(eID);
 
     return eID;
@@ -217,7 +216,7 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
 GLuint ResourceManager::makeCube(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, Color);
+    registry->addComponent<Material>(eID, getShader<ColorShader>());
     registry->addComponent<Mesh>(eID);
     setMesh("cube.obj", eID);
 
@@ -229,7 +228,7 @@ GLuint ResourceManager::makeCube(const QString &name) {
 GLuint ResourceManager::makeXYZ(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, Color);
+    registry->addComponent<Material>(eID, getShader<ColorShader>());
     makeXYZMesh(eID);
 
     return eID;
@@ -260,7 +259,7 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
 GLuint ResourceManager::makeSkyBox(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
-    registry->addComponent<Material>(eID, Tex, mTextures["skybox.bmp"]->id() - 1);
+    registry->addComponent<Material>(eID, getShader<TextureShader>(), mTextures["skybox.bmp"]->id() - 1);
 
     makeSkyBoxMesh(eID);
     return eID;
@@ -333,7 +332,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @param fileName
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType type) {
+GLuint ResourceManager::makeTriangleSurface(std::string fileName, Shader *type) {
     GLuint eID = registry->makeEntity(QString::fromStdString(fileName));
 
     initializeOpenGLFunctions();
@@ -353,7 +352,7 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, ShaderType typ
 GLuint ResourceManager::makeBillBoard(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
-    registry->addComponent<Material>(eID, Tex, mTextures["gnome.bmp"]->id() - 1);
+    registry->addComponent<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->id() - 1);
     makeBillBoardMesh(eID);
 
     return eID;
@@ -386,7 +385,7 @@ GLuint ResourceManager::makeOctBall(int n) {
     GLuint eID = registry->makeEntity("Ball");
 
     registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, Color);
+    registry->addComponent<Material>(eID, getShader<ColorShader>());
     makeBallMesh(eID, n);
 
     return eID;
@@ -417,7 +416,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
 GLuint ResourceManager::makeLightObject(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
-    registry->addComponent<Material>(eID, Tex, mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
+    registry->addComponent<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->addComponent<Light>(eID);
     makeLightMesh(eID);
     return eID;
@@ -607,35 +606,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
         delete waveData;
     return true;
 }
-/**
- * @brief Load shader for the first time if it's not already in storage.
- * @param type
- * @param geometryPath
- */
-void ResourceManager::loadShader(ShaderType type, const GLchar *geometryPath) {
-    if (mShaders.find(type) == mShaders.end()) {
-        std::string shaderName;
-        switch (type) {
-        case ShaderType::Color:
-            shaderName = "plainshader";
-            mShaders[type] = new ColorShader(shaderName, geometryPath);
-            break;
-        case ShaderType::Tex:
-            shaderName = "textureshader";
-            mShaders[type] = new TextureShader(shaderName, geometryPath);
-            break;
-        case ShaderType::Phong:
-            shaderName = "phongshader";
-            mShaders[type] = new PhongShader(shaderName, geometryPath);
-            break;
-        default:
-            qDebug() << "Failed to find shader in switch statement";
-        }
-        qDebug() << "ResourceManager: Added shader " << QString::fromStdString(shaderName);
-    } else {
-        qDebug() << "ResourceManager: Shader already loaded, ignoring...";
-    }
-}
+
 /**
  * @brief Load texture if it's not already in storage.
  * @param fileName
@@ -647,10 +618,6 @@ void ResourceManager::loadTexture(std::string fileName) {
 
         qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
     }
-}
-
-Shader *ResourceManager::getShader(ShaderType type) {
-    return mShaders[type];
 }
 
 Texture *ResourceManager::getTexture(std::string fileName) {
@@ -768,7 +735,7 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
     }
 }
 
-std::map<ShaderType, Shader *> ResourceManager::getShaders() const {
+std::map<std::string, Shader *> ResourceManager::getShaders() const {
     return mShaders;
 }
 void ResourceManager::showMessage(const QString &message) {

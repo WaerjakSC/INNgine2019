@@ -3,8 +3,8 @@
 #include "components.h"
 #include "innpch.h"
 
-PhongShader::PhongShader(const std::string shaderName, const GLchar *geometryPath)
-    : Shader(shaderName, geometryPath) {
+PhongShader::PhongShader(const GLchar *geometryPath)
+    : Shader("phongshader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
@@ -23,7 +23,7 @@ PhongShader::~PhongShader() {
     qDebug() << "Deleting PhongShader";
 }
 
-void PhongShader::updateLightUniforms(gsl::Matrix4x4 modelMatrix, const LightData &light) {
+void PhongShader::updateLightUniforms(gsl::Matrix4x4 &modelMatrix, const LightData &light) {
     glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
     glUniform1f(mLightPowerUniform, light.mLightStrength);
     glUniform3f(mLightColorUniform, light.mLightColor.x, light.mLightColor.y, light.mLightColor.z);

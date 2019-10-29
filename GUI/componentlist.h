@@ -41,7 +41,7 @@ signals:
     void scaleX(GLfloat xIn);
     void scaleY(GLfloat yIn);
     void scaleZ(GLfloat zIn);
-    void newShader(int entityID, ShaderType shader);
+    void newShader(int entityID, std::string shader);
 
 private slots:
     void updatePosSpinBoxes(int state);

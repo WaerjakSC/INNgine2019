@@ -130,23 +130,9 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     shader->setMargin(1);
     QComboBox *shaderType = new QComboBox;
     for (auto type : ResourceManager::instance()->getShaders()) {
-        QString curText;
-        switch (type.first) {
-        case Color:
-            curText = "Color";
-            break;
-        case Tex:
-            curText = "Texture";
-            break;
-        case Phong:
-            curText = "Phong";
-            break;
-        default:
-            curText = "Phong";
-            break;
-        }
+        QString curText = QString::fromStdString(type.second->getName());
         shaderType->addItem(curText);
-        if (type.first == mat.mShader)
+        if (curText == QString::fromStdString(mat.mShader->getName()))
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
     connect(this, &ComponentList::newShader, registry->getSystem<RenderSystem>(), &RenderSystem::changeShader);
@@ -188,12 +174,7 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
 }
 void ComponentList::setNewShader(const QString &text) {
     GLuint eID = mMainWindow->selectedEntity->id();
-    if (text == "Texture")
-        emit newShader(eID, Tex);
-    else if (text == "Color")
-        emit newShader(eID, Color);
-    else if (text == "Phong")
-        emit newShader(eID, Phong);
+    emit newShader(eID, text.toStdString());
 }
 void ComponentList::setNewTextureFile() {
     QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";

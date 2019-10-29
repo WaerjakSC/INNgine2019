@@ -100,13 +100,13 @@ void RenderWindow::init() {
     mCurrentCamera->pitch(25.f);
 
     //Compile shaders:
-    mFactory->loadShader(Color);
-    mFactory->loadShader(Tex);
-    mFactory->loadShader(Phong);
+    mFactory->loadShader<ColorShader>();
+    mFactory->loadShader<TextureShader>();
+    mFactory->loadShader<PhongShader>();
     //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    mFactory->getShader(ShaderType::Color)->setCurrentCamera(mCurrentCamera);
-    mFactory->getShader(ShaderType::Tex)->setCurrentCamera(mCurrentCamera);
-    mFactory->getShader(ShaderType::Phong)->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader<ColorShader>()->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader<TextureShader>()->setCurrentCamera(mCurrentCamera);
+    mFactory->getShader<PhongShader>()->setCurrentCamera(mCurrentCamera);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
@@ -124,11 +124,10 @@ void RenderWindow::init() {
     // Set up the systems.
     mRenderer = mRegistry->registerSystem<RenderSystem>(mFactory->getShaders());
     mMoveSys = mRegistry->registerSystem<MovementSystem>();
-    mLightSys = mRegistry->registerSystem<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
+    mLightSys = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
     mInput = mRegistry->registerSystem<InputSystem>(this);
     mSoundSys = mRegistry->registerSystem<SoundSystem>();
     mSoundSys->createContext();
-    //    SoundManager::instance()->init();
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
@@ -143,9 +142,10 @@ void RenderWindow::init() {
     mRegistry->addComponent<Sound>(2, "gnomed.wav", true, 1.0f);
     mSoundSys->init();
     mRenderer->init();
+    mLightSys->init();
+
     //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
     //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
-    mLightSys->init();
 
     mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
     //    SoundManager::instance()->createSource(

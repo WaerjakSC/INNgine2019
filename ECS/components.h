@@ -1,5 +1,6 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
+#include "colorshader.h"
 #include "matrix3x3.h"
 #include "matrix4x4.h"
 #include "shader.h"
@@ -159,7 +160,7 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(ShaderType type = Color, GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
+    Material(Shader *type = new ColorShader(), GLuint texture = 0, vec3 color = 1) : mObjectColor(color), mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
     }
 
@@ -167,7 +168,7 @@ struct Material : public Component {
 
     vec3 mObjectColor{1.f, 1.f, 1.f};
     GLuint mTextureUnit{0}; //the actual texture to put into the uniform
-    ShaderType mShader;
+    Shader *mShader;
 };
 
 struct Mesh : public Component {

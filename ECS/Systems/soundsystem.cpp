@@ -28,7 +28,7 @@ void SoundSystem::cleanUp() {
     auto view = reg->view<Sound>();
     for (auto entity : view) {
         Sound &sound = view.get(entity);
-        qDebug() << "Destroying SoundSource " + QString::fromStdString(sound.mName) + "\n";
+        qDebug() << "Destroying SoundSource " + QString::fromStdString(sound.mName);
         stop(sound);
         alGetError();
         alSourcei(sound.mSource, AL_BUFFER, 0);

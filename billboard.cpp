@@ -14,13 +14,13 @@ void BillBoard::update() {
     // find direction between this and camera
     vec3 direction{};
     if (mNormalVersion) {
-        vec3 camPosition = factory->getShader(mat.mShader)->getCurrentCamera()->position();
+        vec3 camPosition = mat.mShader->getCurrentCamera()->position();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
             camPosition.setY(transform.modelMatrix.getPosition().y);
         direction = camPosition - vec3(transform.modelMatrix.getPosition());
     } else {
-        vec3 camDirection = factory->getShader(mat.mShader)->getCurrentCamera()->forward();
+        vec3 camDirection = mat.mShader->getCurrentCamera()->forward();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
             camDirection.setY(transform.modelMatrix.getPosition().y);

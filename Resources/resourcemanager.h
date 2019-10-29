@@ -2,6 +2,7 @@
 #define RESOURCEMANAGER_H
 
 #include "components.h"
+#include "phongshader.h"
 #include "shader.h"
 #include "texture.h"
 #include "tiny_obj_loader.h"
@@ -26,9 +27,27 @@ public:
     virtual ~ResourceManager();
 
     // Loads and generates shader (takes name and the shader)
-    void loadShader(ShaderType type, const GLchar *geometryPath = nullptr);
+    /**
+     * @brief Load shader for the first time if it's not already in storage.
+     * @param type
+     * @param geometryPath
+     */
+    template <typename ShaderType>
+    void loadShader(const GLchar *geometryPath = nullptr) {
+        std::string shaderName = typeid(ShaderType).name();
+        if (mShaders.find(shaderName) == mShaders.end()) {
+            mShaders[shaderName] = new ShaderType(geometryPath);
+            qDebug() << "ResourceManager: Added shader " << QString::fromStdString(shaderName);
+        } else {
+            qDebug() << "ResourceManager: Shader already loaded, ignoring...";
+        }
+    }
     // Gets stored shader
-    Shader *getShader(ShaderType type);
+    template <typename Type>
+    Type *getShader() {
+        std::string type = typeid(Type).name();
+        return static_cast<Type *>(mShaders[type]);
+    }
     // Loads and generates texture from file
     void loadTexture(std::string name);
     // Gets stored texture
@@ -38,7 +57,7 @@ public:
 
     void addMeshComponent(std::string name, int eID = -1);
 
-    std::map<ShaderType, Shader *> getShaders() const;
+    std::map<std::string, Shader *> getShaders() const;
 
     std::vector<Component *> getComponents(int eID);
 
@@ -58,8 +77,8 @@ public:
     GLuint makePlane(const QString &name = "Plane");
     GLuint makeCube(const QString &name = "Cube");
     GLuint makeLightObject(const QString &name = "Light");
-    GLuint make3DObject(std::string name, ShaderType type = Phong);
-    GLuint makeTriangleSurface(std::string fileName, ShaderType type);
+    GLuint make3DObject(std::string name, Shader *type = new PhongShader());
+    GLuint makeTriangleSurface(std::string fileName, Shader *type);
 
     Scene *getSceneLoader() const;
 
@@ -113,7 +132,7 @@ private:
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage
-    std::map<ShaderType, Shader *> mShaders;
+    std::map<std::string, Shader *> mShaders;
     std::map<std::string, Texture *> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
 

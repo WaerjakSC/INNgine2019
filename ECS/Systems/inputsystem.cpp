@@ -255,7 +255,7 @@ void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input) {
         input.RMB = false;
         break;
     case Qt::LeftButton:
-        input.LMB = true;
+        input.LMB = false;
         break;
     case Qt::MiddleButton:
         break;

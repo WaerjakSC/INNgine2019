@@ -1,8 +1,11 @@
 #include "scene.h"
 #include "constants.h"
 #include "movementsystem.h"
+#include "phongshader.h"
 #include "registry.h"
 #include "resourcemanager.h"
+#include "shader.h"
+#include "textureshader.h"
 #include <fstream>
 #include <iostream>
 #include <rapidjson/document.h>
@@ -93,17 +96,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Int(mat.mTextureUnit);
 
                 writer.Key("shader");
-                switch (mat.mShader) {
-                case Color:
-                    writer.String("color");
-                    break;
-                case Tex:
-                    writer.String("texture");
-                    break;
-                case Phong:
-                    writer.String("phong");
-                    break;
-                }
+                writer.String(mat.mShader->getName().c_str());
+
                 writer.EndObject();
             }
             if ((typeMask & CType::Mesh) != CType::None) {
@@ -219,11 +213,14 @@ void Scene::populateScene(const Document &scene) {
             } else if (comp->name == "material") {
                 gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                 QString shaderName = comp->value["shader"].GetString();
-                ShaderType shader = ShaderType::Phong;
-                if (shaderName == "color")
-                    shader = Color;
-                else if (shaderName == "texture")
-                    shader = Tex;
+                Shader *shader{nullptr};
+                ResourceManager *factory = ResourceManager::instance();
+                if (shaderName == "colorshader")
+                    shader = factory->getShader<ColorShader>();
+                else if (shaderName == "textureshader")
+                    shader = factory->getShader<TextureShader>();
+                else if (shaderName == "phongshader")
+                    shader = factory->getShader<PhongShader>();
                 registry->addComponent<Material>(id, shader, comp->value["textureid"].GetInt(), color);
             } else if (comp->name == "mesh") {
                 factory->addMeshComponent(comp->value["name"].GetString(), id);

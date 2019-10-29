@@ -5,10 +5,10 @@
 struct LightData;
 class PhongShader : public Shader {
 public:
-    PhongShader(const std::string shaderName, const GLchar *geometryPath = nullptr);
+    PhongShader(const GLchar *geometryPath = nullptr);
     virtual ~PhongShader() override;
 
-    void updateLightUniforms(gsl::Matrix4x4 modelMatrix, const LightData &light);
+    void updateLightUniforms(gsl::Matrix4x4 &modelMatrix, const LightData &light);
 
 private:
     //    GLint textureUniform{-1};

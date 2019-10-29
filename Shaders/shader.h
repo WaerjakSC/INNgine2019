@@ -22,7 +22,7 @@ enum ShaderType {
 class Shader : protected QOpenGLFunctions_4_1_Core {
 public:
     // Constructor generates the shader on the fly
-    Shader(const std::string shaderName, const GLchar *geometryPath = nullptr);
+    Shader(const std::string shaderName = "plainshader", const GLchar *geometryPath = nullptr);
     virtual ~Shader();
 
     // Use the current shader
@@ -30,17 +30,20 @@ public:
 
     //Get program number for this shader
     GLuint getProgram() const;
-    virtual void transmitUniformData(gsl::Matrix4x4 modelMatrix, Material *material = nullptr);
+    virtual void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material = nullptr);
 
     void setCurrentCamera(Camera *currentCamera);
 
     Camera *getCurrentCamera() const;
+
+    std::string getName() const;
 
 protected:
     GLuint program{0};
     GLint mMatrixUniform{-1};
     GLint vMatrixUniform{-1};
     GLint pMatrixUniform{-1};
+    std::string mName;
 
     Camera *mCurrentCamera{nullptr};
 };
