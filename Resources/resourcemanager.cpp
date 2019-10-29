@@ -11,6 +11,7 @@
 #include "scene.h"
 #include "textureshader.h"
 #include "tiny_obj_loader.h"
+#include "wavfilehandler.h"
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -536,6 +537,73 @@ void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID) {
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return;
     }
+}
+
+bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
+    qDebug() << "Loading wave file!\n";
+    ALuint frequency{};
+    ALenum format{};
+    wave_t *waveData = new wave_t();
+    if (!WavFileHandler::loadWave(filePath, waveData)) {
+        qDebug() << "Error loading wave file!\n";
+        return false; // error loading wave file data
+    }
+
+    frequency = waveData->sampleRate;
+
+    switch (waveData->bitsPerSample) {
+    case 8:
+        switch (waveData->channels) {
+        case 1:
+            format = AL_FORMAT_MONO8;
+            qDebug() << "Format: 8bit Mono\n";
+            break;
+        case 2:
+            format = AL_FORMAT_STEREO8;
+            qDebug() << "Format: 8bit Stereo\n";
+            break;
+        default:
+            break;
+        }
+        break;
+    case 16:
+        switch (waveData->channels) {
+        case 1:
+            format = AL_FORMAT_MONO16;
+            qDebug() << "Format: 16bit Mono\n";
+            break;
+        case 2:
+            format = AL_FORMAT_STEREO16;
+            qDebug() << "Format: 16bit Stereo\n";
+            break;
+        default:
+            break;
+        }
+        break;
+    default:
+        break;
+    }
+
+    if (waveData->buffer == NULL) {
+        qDebug() << "NO WAVE DATA!\n";
+    }
+
+    std::ostringstream i2s;
+    i2s << waveData->dataSize;
+    qDebug() << "DataSize: " << QString::fromStdString(i2s.str()) << " bytes\n";
+
+    alGetError();
+    alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
+    sound.checkError("alBufferData");
+    alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
+    sound.checkError("alSourcei (loadWave)");
+
+    qDebug() << "Loading complete!\n";
+    if (waveData->buffer)
+        delete waveData->buffer;
+    if (waveData)
+        delete waveData;
+    return true;
 }
 /**
  * @brief Load shader for the first time if it's not already in storage.

@@ -82,7 +82,12 @@ public:
     void setCurrentCamera(Camera *currentCamera);
 
     Camera *getCurrentCamera() const;
-
+    /// Loads one given WAVE file.
+    /**
+        Calls the wave loader from the FileHandler class, parses the wave data and buffers it.
+        \param The file path relative to execution directory.
+    **/
+    bool loadWave(std::string filePath, Sound &sound);
 public slots:
     void save();
     void load();

@@ -7,10 +7,12 @@
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
 
-class AIsystem {
+class AIsystem : public ISystem {
 public:
     AIsystem();
     Registry *reg;
+
+    virtual void update(float deltaTime = 0.016);
 
     // BSplineCurve
     void initVertexBufferObjects();

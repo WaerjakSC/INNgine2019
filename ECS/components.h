@@ -6,6 +6,14 @@
 #include "tiny_obj_loader.h"
 #include "vertex.h"
 #include <QKeyEvent>
+#ifdef _WIN32
+#include <al.h>
+#include <alc.h>
+#endif
+#ifdef __APPLE__
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#endif
 class MainWindow;
 
 // must undefine for Frustum.
@@ -247,11 +255,33 @@ public:
 struct Sound : public Component {
 public:
     Sound() {}
+    Sound(std::string name, bool loop = false, float gain = 1.0);
+    ~Sound() {
+        std::cout << "Destroying SoundSource " + mName + "\n";
+        //        stop();
+        alGetError();
+        alSourcei(mSource, AL_BUFFER, 0);
+        checkError("alSourcei");
+        alDeleteSources(1, &mSource);
+        checkError("alDeleteSources");
+        alDeleteBuffers(1, &mBuffer);
+        checkError("alDeleteBuffers");
+    }
+
     virtual void update() {}
 
     bool mLooping{false};
-    bool mPlay{false};
-    bool mPlaying{false};
+    bool mPlaying{true}; // Might want to change this, but atm it will just be playing by default immediately
+    bool mPaused{false};
+    bool mOutDated{true};
+    bool checkError(std::string name);
+
+    std::string mName; ///< The name of the sound source (Not used).
+    ALuint mSource;    ///< The sound source.
+    ALuint mBuffer;    ///< The data buffer.
+    float mGain;
+    vec3 mPosition;    ///< Vector containing source position.
+    vec3 mVelocity{0}; ///< Vector containing source velocity.
 };
 
 enum ColType {
@@ -348,7 +378,7 @@ struct BSplineCurve : Component {
     }
 };
 
-enum State{
+enum State {
     Walk,
     Run,
     Death
@@ -361,7 +391,6 @@ struct StateMachineComponent : Component {
     State currentState;
     float enterTime;
     float exitTime;
-
 };
 
 #endif // COMPONENT_H

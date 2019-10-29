@@ -69,6 +69,7 @@ HEADERS += \
     ECS/Systems/aisystem.h \
     ECS/Systems/inputsystem.h \
     ECS/Systems/isystem.h \
+    ECS/Systems/soundsystem.h \
     ECS/entity.h \
     ECS/view.h \
     GSL/matrix2x2.h \
@@ -121,6 +122,7 @@ HEADERS += \
 SOURCES += main.cpp \
     ECS/Systems/aisystem.cpp \
     ECS/Systems/inputsystem.cpp \
+    ECS/Systems/soundsystem.cpp \
     ECS/entity.cpp \
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \

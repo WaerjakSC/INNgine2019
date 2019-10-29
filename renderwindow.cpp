@@ -1,4 +1,4 @@
-#include "renderwindow.h"
+﻿#include "renderwindow.h"
 #include "innpch.h"
 #include "inputsystem.h"
 #include "scene.h"
@@ -25,11 +25,11 @@
 #include "raycast.h"
 #include "registry.h"
 #include "rendersystem.h"
+#include "soundsystem.h"
 #include "textureshader.h"
-
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false),
-      mFactory(ResourceManager::instance()), mRegistry(Registry::instance()), mSoundManager(SoundManager::instance()),
+      mFactory(ResourceManager::instance()), mRegistry(Registry::instance()),
       mMainWindow(mainWindow) {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
@@ -91,9 +91,6 @@ void RenderWindow::init() {
     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); //color used in glClear GL_COLOR_BUFFER_BIT
 
     mFactory->setMainWindow(mMainWindow);
-    //makes the soundmanager
-    //it is a Singleton!
-    mSoundManager->init();
 
     //********************** Set up camera **********************
     mFactory->setCurrentCamera(new Camera());
@@ -129,25 +126,29 @@ void RenderWindow::init() {
     mMoveSys = mRegistry->registerSystem<MovementSystem>();
     mLightSys = mRegistry->registerSystem<LightSystem>(static_cast<PhongShader *>(mFactory->getShader(ShaderType::Phong)));
     mInput = mRegistry->registerSystem<InputSystem>(this);
+    mSoundSys = mRegistry->registerSystem<SoundSystem>();
 
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
+
     //    GLuint cb = mFactory->make3DObject("cube.obj", ShaderType::Phong); // WHY DOES THIS CAUSE PHONG SHADING TO WORK?
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
 
     mMoveSys->init();
+    mSoundSys->init();
+    // These components don't have a scene thingy yet
+    mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
+    mRegistry->addComponent<Sound>(2, "gnomed.wav", true, 1.0f);
+    mSoundSys->prepareSounds();
     mRenderer->init();
     //    if (mRegistry->getEntity(cb))    // Super scuffed workaround until I figure out why manually creating a 3d phong object "turns on" phong shading
     //        mRegistry->removeEntity(cb); // Removing the created object here lets me keep the shading
     mLightSys->init();
-    mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
+
     mInput->setPlayerController(mFactory->getSceneLoader()->controllerID);
 
-    mStereoSound = mSoundManager->createSource(
-        "Explosion", Vector3(0.0f, 0.0f, 0.0f),
-        "../INNgine2019/Assets/Sounds/gnomed.wav", true, 1.0f);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
@@ -165,12 +166,12 @@ void RenderWindow::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
         if (mFactory->isPlaying()) {
+            mSoundSys->update();
             mMoveSys->update();
         }
         mRenderer->update();
         mLightSys->update();
         mInput->update();
-        mSoundManager->updateListener(mCurrentCamera->position(), vec3(1), mCurrentCamera->forward(), mCurrentCamera->up());
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -195,16 +196,6 @@ RenderSystem *RenderWindow::renderer() const {
 }
 MovementSystem *RenderWindow::movement() const {
     return mMoveSys;
-}
-
-SoundManager *RenderWindow::soundManager() const {
-    return mSoundManager;
-}
-
-void RenderWindow::playSound() {
-    //plays the sounds
-    mStereoSound->play();
-    mStereoSound->setPosition(Vector3(4.f, 2.f, -3.5f));
 }
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized

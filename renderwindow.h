@@ -16,9 +16,8 @@ class Shader;
 class MainWindow;
 class RenderSystem;
 class MovementSystem;
-class SoundSource;
-class SoundManager;
 class LightSystem;
+class SoundSystem;
 class InputSystem;
 class Registry;
 class Raycast;
@@ -45,9 +44,6 @@ public:
 
     MovementSystem *movement() const;
 
-    SoundSource *mStereoSound{};
-
-    SoundManager *soundManager() const;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 
@@ -69,11 +65,11 @@ private:
     RenderSystem *mRenderer;
     MovementSystem *mMoveSys;
     LightSystem *mLightSys;
+    SoundSystem *mSoundSys;
     InputSystem *mInput;
 
     ResourceManager *mFactory;
     Registry *mRegistry;
-    SoundManager *mSoundManager;
 
     Entity *mPlayer; //the controllable object
 

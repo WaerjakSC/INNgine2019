@@ -41,8 +41,11 @@ void MovementSystem::updateModelMatrix(Transform &comp) {
         if (comp.parentID != -1) {
             Transform &parent = view.get(comp.parentID);
             parentMatrix = getTRMatrix(parent);
-        } else
+        } else {
             parentMatrix.setToIdentity();
+            comp.position = comp.localPosition;
+            comp.rotation = comp.localRotation;
+        }
         comp.modelMatrix = parentMatrix * comp.translationMatrix * comp.rotationMatrix * comp.scaleMatrix;
         comp.matrixOutdated = false;
         for (auto child : comp.children) {
