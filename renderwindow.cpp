@@ -130,18 +130,13 @@ void RenderWindow::init() {
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
+    mLight = mFactory->getSceneLoader()->mLight;
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-
     mMoveSystem->init();
-    // These components don't have a scene thingy yet
-    mRegistry->addComponent<Input>(mFactory->getSceneLoader()->controllerID);
-    mRegistry->addComponent<Sound>(2, "gnomed.wav", true, 1.0f);
     mSoundSystem->init();
-    mLightSystem->init(mRegistry->getEntity(mFactory->getSceneLoader()->controllerID));
+    mLightSystem->init(mRegistry->getEntity(mLight));
     mRenderer->init();
-
-    mInputSystem->setPlayerController(mFactory->getSceneLoader()->controllerID);
 
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
     connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);

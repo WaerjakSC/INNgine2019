@@ -115,19 +115,19 @@ void SoundSystem::play(GLuint eID) {
     Sound &sound = reg->getComponent<Sound>(eID);
     sound.mPlaying = true;
     sound.mPaused = false;
-    sound.mOutDated = false;
+    sound.mOutDated = true;
 }
 void SoundSystem::pause(GLuint eID) {
     Sound &sound = reg->getComponent<Sound>(eID);
     sound.mPlaying = false;
     sound.mPaused = true;
-    sound.mOutDated = false;
+    sound.mOutDated = true;
 }
 void SoundSystem::stop(GLuint eID) {
     Sound &sound = reg->getComponent<Sound>(eID);
     sound.mPlaying = false;
     sound.mPaused = false;
-    sound.mOutDated = false;
+    sound.mOutDated = true;
 }
 void SoundSystem::setPosition(GLuint eID, vec3 newPos) {
     Sound &sound = reg->getComponent<Sound>(eID);

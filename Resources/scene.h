@@ -14,9 +14,9 @@ public:
 
     void loadScene(const QString &fileName);
 
-    GLuint controllerID;
-
     QString name() const;
+
+    GLuint mLight;
 
 private:
     std::map<QString, std::string> mScenes;

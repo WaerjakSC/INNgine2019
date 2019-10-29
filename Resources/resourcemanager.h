@@ -73,7 +73,7 @@ public:
     GLuint makeXYZ(const QString &name = "XYZ");
     GLuint makeSkyBox(const QString &name = "Skybox");
     GLuint makeBillBoard(const QString &name = "BillBoard");
-    GLuint makeOctBall(int n = 3);
+    GLuint makeOctBall(const QString &name = "Ball", int n = 3);
     GLuint makePlane(const QString &name = "Plane");
     GLuint makeCube(const QString &name = "Cube");
     GLuint makeLightObject(const QString &name = "Light");

@@ -22,6 +22,7 @@ public:
     void destroy();
     void newGeneration(GLuint id, const QString &text);
     bool isDestroyed() const;
+    bool isEmpty();
 
 signals:
     void nameChanged(const Entity &self);

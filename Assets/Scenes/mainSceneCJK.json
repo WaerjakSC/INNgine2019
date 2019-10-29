@@ -72,6 +72,11 @@
             },
             "mesh": {
                 "name": "BillBoard"
+            },
+            "sound": {
+                "filename": "gnomed.wav",
+                "loop": true,
+                "gain": 1.0
             }
         }
     },
@@ -109,7 +114,7 @@
                 "shader": "TextureShader"
             },
             "mesh": {
-                "name": "Light"
+                "name": "Pyramid"
             },
             "light": {
                 "ambstr": 0.30000001192092898,
@@ -398,6 +403,47 @@
             },
             "mesh": {
                 "name": "cube.obj"
+            }
+        }
+    },
+    "GameObject": {
+        "name": "Player",
+        "id": 11,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": "Ball"
+            },
+            "input": {
+                "isController": true
             }
         }
     }

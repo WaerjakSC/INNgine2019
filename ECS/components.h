@@ -166,6 +166,9 @@ struct Mesh : public Component {
     }
     Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
     }
+    Mesh(const Mesh &other) {
+        *this = other;
+    }
     virtual void update() {}
 
     GLuint mVAO{0};
@@ -255,11 +258,11 @@ public:
     virtual void update() {}
 
     bool mLooping{false};
-    bool mPlaying{true}; // Might want to change this, but atm it will just be playing by default immediately
+    bool mPlaying{false}; // Might want to change this, but atm it will just be playing by default immediately
     bool mPaused{false};
     bool mOutDated{true};
 
-    std::string mName; ///< The name of the sound source (Not used).
+    std::string mName; ///< The name of the sound source.
     ALuint mSource;    ///< The sound source.
     ALuint mBuffer;    ///< The data buffer.
     float mGain;
@@ -363,8 +366,11 @@ struct BSplineCurve : Component {
 
 // TD enemies følger en path fra A til B
 // de kan bevege seg, ta skade, dø
-enum NPCstates {MOVE, SLEEP, DEATH};
-enum NPCevents {ENDPOINT_ARRIVED, DAMAGE_TAKEN};
+enum NPCstates { MOVE,
+                 SLEEP,
+                 DEATH };
+enum NPCevents { ENDPOINT_ARRIVED,
+                 DAMAGE_TAKEN };
 
 /**
  * @brief The StateMachineComponent struct

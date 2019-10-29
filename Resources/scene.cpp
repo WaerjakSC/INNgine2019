@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "constants.h"
+#include "inputsystem.h"
 #include "movementsystem.h"
 #include "phongshader.h"
 #include "registry.h"
@@ -31,18 +32,18 @@ void Scene::saveScene(const QString &fileName) {
     writer.StartObject();
 
     for (auto entity : entities) {
-        if (entity.second->id() != 0 && entity.second->types() != CType::None) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
+        GLuint eID = entity.first;
+        if (eID != 0 && !entity.second->isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("GameObject");
             writer.StartObject();
             writer.Key("name");
             writer.String(entity.second->name().toStdString().c_str());
             writer.Key("id");
-            writer.Uint(entity.second->id());
+            writer.Uint(eID);
             writer.Key("components");
             writer.StartObject();
-            CType typeMask = entity.second->types();
-            if ((typeMask & CType::Transform) != CType::None) {
-                const Transform trans = registry->getComponent<Transform>(entity.second->id());
+            if (registry->contains<Transform>(eID)) {
+                const Transform trans = registry->getComponent<Transform>(eID);
                 writer.Key("transform");
                 writer.StartObject();
 
@@ -80,10 +81,10 @@ void Scene::saveScene(const QString &fileName) {
                 }
                 writer.EndObject();
             }
-            if ((typeMask & CType::Material) != CType::None) {
+            if (registry->contains<Material>(eID)) {
                 writer.Key("material");
                 writer.StartObject();
-                const Material mat = registry->getComponent<Material>(entity.second->id());
+                const Material mat = registry->getComponent<Material>(eID);
 
                 writer.Key("color");
                 writer.StartArray();
@@ -105,20 +106,20 @@ void Scene::saveScene(const QString &fileName) {
 
                 writer.EndObject();
             }
-            if ((typeMask & CType::Mesh) != CType::None) {
+            if (registry->contains<Mesh>(eID)) {
                 writer.Key("mesh");
                 writer.StartObject();
-                const Mesh mesh = registry->getComponent<Mesh>(entity.second->id());
+                const Mesh mesh = registry->getComponent<Mesh>(eID);
                 if (mesh.mName == "")
                     qDebug() << "No mesh name!";
                 writer.Key("name");
                 writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
                 writer.EndObject();
             }
-            if ((typeMask & CType::Light) != CType::None) {
+            if (registry->contains<Light>(eID)) {
                 writer.Key("light");
                 writer.StartObject();
-                const Light light = registry->getComponent<Light>(entity.second->id());
+                const Light &light = registry->getComponent<Light>(eID);
 
                 writer.Key("ambstr");
                 writer.Double(light.mAmbientStrength);
@@ -149,7 +150,26 @@ void Scene::saveScene(const QString &fileName) {
 
                 writer.EndObject();
             }
-            if ((typeMask & CType::Collision) != CType::None) {
+            if (registry->contains<Input>(eID)) {
+                writer.Key("input");
+                writer.StartObject();
+                writer.Key("isController");
+                writer.Bool(true);
+                writer.EndObject();
+            }
+            if (registry->contains<Sound>(eID)) {
+                const Sound &sound = registry->getComponent<Sound>(eID);
+                writer.Key("sound");
+                writer.StartObject();
+                writer.Key("filename");
+                writer.String(sound.mName.c_str());
+                writer.Key("loop");
+                writer.Bool(sound.mLooping);
+                writer.Key("gain");
+                writer.Double(sound.mGain);
+                writer.EndObject();
+            }
+            if (registry->contains<Collision>(eID)) {
                 // Write Collision data to json here.
             }
             writer.EndObject();
@@ -187,16 +207,11 @@ void Scene::populateScene(const Document &scene) {
     std::map<int, int> idPairs;
     Registry *registry = Registry::instance();
     ResourceManager *factory = ResourceManager::instance();
-
     // Iterate through each gameobject in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
-
         // Iterate through each of the members in the gameobject (name, id, components)
-
         GLuint id = registry->makeEntity(itr->value["name"].GetString());
         idPairs[itr->value["id"].GetInt()] = id;
-        if (itr->value["name"] == "Light") // Temporary
-            controllerID = id;
         for (Value::ConstMemberIterator comp = itr->value["components"].MemberBegin(); comp != itr->value["components"].MemberEnd(); ++comp) {
             if (comp->name == "transform") {
                 gsl::Vector3D position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
@@ -232,8 +247,16 @@ void Scene::populateScene(const Document &scene) {
                 GLfloat lightStr = comp->value["lightstr"].GetFloat();
                 gsl::Vector3D lightColor(comp->value["lightcolor"][0].GetDouble(), comp->value["lightcolor"][1].GetDouble(), comp->value["lightcolor"][2].GetDouble());
                 gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
-
                 registry->addComponent<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
+                mLight = id;
+            } else if (comp->name == "input") { // Atm just going to assume we only ever have one inputcomponent
+                registry->addComponent<Input>(id);
+                registry->getSystem<InputSystem>()->setPlayerController(id);
+            } else if (comp->name == "sound") {
+                std::string filename = comp->value["filename"].GetString();
+                bool looping = comp->value["loop"].GetBool();
+                float gain = comp->value["gain"].GetDouble();
+                registry->addComponent<Sound>(id, filename, looping, gain);
             } else if (comp->name == "collision") {
                 // Set collision variables here
             }
