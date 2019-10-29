@@ -96,7 +96,7 @@ void RenderWindow::init() {
     mCurrentCamera = mFactory->getCurrentCamera();
     mCurrentCamera->setPosition(vec3(0.f, 8.f, 15.0f));
     //    mCurrentCamera->yaw(45.f);
-    mCurrentCamera->pitch(-25.f);
+    mCurrentCamera->pitch(25.f);
 
     //Compile shaders:
     mFactory->loadShader<ColorShader>();

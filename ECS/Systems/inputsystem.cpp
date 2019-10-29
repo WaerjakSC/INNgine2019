@@ -52,6 +52,7 @@ void InputSystem::handlePlayerController(float deltaTime) {
     }
 }
 void InputSystem::handleMouseInput() {
+    mCurrentCamera->setSpeed(0.f);
     if (editorInput.LMB) {
         int entityID = ray->rayCast(mRenderWindow->mapFromGlobal(QCursor::pos()));
         if (entityID != -1) {
@@ -72,8 +73,6 @@ void InputSystem::handleMouseInput() {
             mCurrentCamera->updateHeight(mCameraSpeed);
         }
     }
-
-    // else ???
 }
 
 GLuint InputSystem::playerController() const {

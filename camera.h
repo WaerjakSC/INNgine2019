@@ -77,7 +77,7 @@ public:
 
     Frustum getFrustum();
 
-    void setProjectionMatrix(float fov, float aspect, float nearPlane, float farPlane);
+    void setProjectionMatrix(float fov, float aspect, float nearPlane = 0.5f, float farPlane = 200.f);
     void setProjectionMatrix();
 
 private:

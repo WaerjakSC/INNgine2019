@@ -14,31 +14,17 @@ void Camera::pitch(float degrees) {
     mPitch -= degrees;
     updateForwardVector();
 }
+void Camera::yaw(float degrees) {
+    // rotate around mUp
+    mYaw -= degrees;
+    updateForwardVector();
+}
 void Camera::setPitch(float newPitch) {
     mPitch = newPitch;
     updateForwardVector();
 }
 void Camera::setYaw(float newYaw) {
     mPitch = newYaw;
-    updateForwardVector();
-}
-/**
- * @brief go to location
- * @param target
- */
-void Camera::goTo(vec3 target) {
-    vec3 targetDistance{0, 0, 5};
-    const vec3 position = target + targetDistance;
-    const vec3 direction = (position - target).normalized();
-
-    mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
-    mPitch = gsl::rad2degf(gsl::asin(-direction.y));
-    mPosition = position;
-    updateForwardVector();
-}
-void Camera::yaw(float degrees) {
-    // rotate around mUp
-    mYaw -= degrees;
     updateForwardVector();
 }
 
@@ -56,6 +42,7 @@ void Camera::updateForwardVector() {
     mUp.rotateX(mPitch);
     mUp.normalize();
     mForward = mUp ^ mRight;
+    mForward.normalize();
 
     updateRightVector();
 }
@@ -64,8 +51,8 @@ void Camera::update() {
     mYawMatrix.setToIdentity();
     mPitchMatrix.setToIdentity();
 
-    mPitchMatrix.rotateX(mPitch);
-    mYawMatrix.rotateY(mYaw);
+    mPitchMatrix.rotateX(-mPitch);
+    mYawMatrix.rotateY(-mYaw);
 
     mPosition -= mForward * mSpeed;
 
@@ -144,7 +131,20 @@ vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
     float z = mouse.z;
     return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
 }
+/**
+ * @brief go to location
+ * @param target
+ */
+void Camera::goTo(vec3 target) {
+    vec3 targetDistance{0, 0, 5};
+    const vec3 position = target + targetDistance;
+    const vec3 direction = (position - target).normalized();
 
+    mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
+    mPitch = gsl::rad2degf(gsl::asin(-direction.y));
+    mPosition = position;
+    updateForwardVector();
+}
 Camera::Frustum Camera::getFrustum() {
     Frustum result;
     mat4 vp = getViewMatrix() * getProjectionMatrix();
