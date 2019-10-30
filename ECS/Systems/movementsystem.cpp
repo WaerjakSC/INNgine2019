@@ -16,7 +16,7 @@ void MovementSystem::update(float deltaTime) {
         updateModelMatrix(comp);
     }
     for (auto billBoard : registry->billBoards()) {
-        if (BillBoard *board = dynamic_cast<BillBoard *>(registry->getEntity(billBoard)))
+        if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(registry->getEntity(billBoard)))
             board->update();
     }
 }

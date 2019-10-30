@@ -26,7 +26,7 @@ public:
      * Register component type. For systems that own the component type
      */
     template <typename Type>
-    void registerComponent(Pool<Type> *pool) {
+    void registerComponent(Ref<Pool<Type>> pool) {
         std::string typeName = typeid(Type).name();
 
         // Create a ComponentArray pointer and add it to the component arrays map
@@ -37,29 +37,29 @@ public:
      * Will register the component type if it exists, otherwise just returns the pool type
      */
     template <typename Type>
-    Pool<Type> *registerComponent() {
+    Ref<Pool<Type>> registerComponent() {
         std::string typeName = typeid(Type).name();
-        Pool<Type> *pool;
+        Ref<Pool<Type>> pool;
 
         if (mPools.find(typeName) != mPools.end()) {
             pool = getPool<Type>();
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            pool = new Pool<Type>;
+            pool = std::make_shared<Pool<Type>>();
             mPools.insert({typeName, pool});
         }
         return pool;
     }
     template <typename Type, class... Args>
-    Type *registerSystem(Args... args) {
+    Ref<Type> registerSystem(Args... args) {
         std::string typeName = typeid(Type).name();
-        Type *system;
+        Ref<Type> system;
 
         if (mSystems.find(typeName) != mSystems.end() && mSystems[typeName]) {
             system = getSystem<Type>();
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            system = new Type(args...);
+            system = std::make_shared<Type>(args...);
             mSystems.insert({typeName, system});
         }
         return system;
@@ -95,9 +95,9 @@ public:
         return getPool<Type>()->get(entityID);
     }
     template <typename Type>
-    Type *getSystem() {
+    Ref<Type> getSystem() {
         std::string typeName = typeid(Type).name();
-        return static_cast<Type *>(mSystems[typeName]);
+        return std::static_pointer_cast<Type>(mSystems[typeName]);
     }
     /**
      * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
@@ -131,8 +131,8 @@ public:
 
     GLuint makeEntity(const QString &name = "", bool signal = true);
     GLuint duplicateEntity(GLuint dupedEntity);
-    std::map<GLuint, Entity *> getEntities() const { return mEntities; }
-    Entity *getEntity(GLuint eID);
+    std::map<GLuint, Ref<Entity>> getEntities() const { return mEntities; }
+    Ref<Entity> getEntity(GLuint eID);
 
     void removeEntity(GLuint eID);
     GLuint numEntities() { return mEntities.size(); }
@@ -164,25 +164,25 @@ signals:
     void entityCreated(GLuint eID);
     void entityRemoved(GLuint eID);
     void parentChanged(GLuint childID);
-    void poolChanged(IPool *pool);
+    void poolChanged(Ref<IPool> pool);
 
 private:
     static Registry *mInstance;
-    std::map<std::string, IPool *> mPools{};
-    std::map<std::string, ISystem *> mSystems{};
+    std::map<std::string, Ref<IPool>> mPools{};
+    std::map<std::string, Ref<ISystem>> mSystems{};
 
-    std::map<GLuint, Entity *> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
+    std::map<GLuint, Ref<Entity>> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
     std::vector<GLuint> mAvailableSlots;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
 
-    std::tuple<std::map<GLuint, Entity *>, std::vector<GLuint>, std::map<std::string, IPool *>> mSnapshot;
+    std::tuple<std::map<GLuint, Ref<Entity>>, std::vector<GLuint>, std::map<std::string, Ref<IPool>>> mSnapshot;
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>
-    Pool<Type> *getPool() {
+    Ref<Pool<Type>> getPool() {
         std::string typeName = typeid(Type).name();
-        return static_cast<Pool<Type> *>(mPools[typeName]);
+        return std::static_pointer_cast<Pool<Type>>(mPools[typeName]);
     }
 };
 

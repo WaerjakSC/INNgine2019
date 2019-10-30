@@ -42,6 +42,6 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
     glUniform3f(mObjectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
     glUniform3f(mCameraPositionUniform, mCurrentCamera->position().x, mCurrentCamera->position().y, mCurrentCamera->position().z);
 }
-void PhongShader::setLight(Entity *entt) {
+void PhongShader::setLight(cjk::Ref<Entity> entt) {
     mLight = entt;
 }

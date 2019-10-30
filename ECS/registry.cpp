@@ -34,7 +34,7 @@ bool Registry::isBillBoard(GLuint entityID) {
  * @param eID
  * @return
  */
-Entity *Registry::getEntity(GLuint eID) {
+Ref<Entity> Registry::getEntity(GLuint eID) {
     auto search = mEntities.find(eID);
     if (search != mEntities.end())
         return search->second;
@@ -73,14 +73,14 @@ GLuint Registry::makeEntity(const QString &name, bool signal) {
     GLuint eID = numEntities();
     auto search = mEntities.find(eID);
     if (search != mEntities.end()) {
-        Entity *entt = search->second;
+        Ref<Entity> entt = search->second;
         if (entt->isDestroyed())
             entt->newGeneration(eID, name);
     } else {
         if (name == "BillBoard")
-            mEntities[eID] = new BillBoard(eID, "BillBoard");
+            mEntities[eID] = std::make_shared<BillBoard>(eID, "BillBoard");
         else
-            mEntities[eID] = new Entity(eID, name);
+            mEntities[eID] = std::make_shared<Entity>(eID, name);
     }
     if (signal)
         emit entityCreated(eID);
@@ -89,7 +89,7 @@ GLuint Registry::makeEntity(const QString &name, bool signal) {
 
 GLuint Registry::duplicateEntity(GLuint dupedEntity) {
     // Remember it also needs to be at the same parent level
-    Entity *dupe = getEntity(dupedEntity);
+    Ref<Entity> dupe = getEntity(dupedEntity);
     GLuint entityID = makeEntity(dupe->name());
     for (auto &pool : mPools) {
         if (pool.second->has(dupedEntity)) {
@@ -166,16 +166,16 @@ void Registry::updateChildParent() {
 }
 
 void Registry::makeSnapshot() {
-    std::map<GLuint, Entity *> newEntityMap;
+    std::map<GLuint, Ref<Entity>> newEntityMap;
     for (auto entity : mEntities) {
-        if (BillBoard *board = dynamic_cast<BillBoard *>(entity.second)) {
+        if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(entity.second)) {
             newEntityMap[entity.first] = board;
         } else {
-            Entity *entt = entity.second;
+            Ref<Entity> entt = entity.second;
             newEntityMap[entity.first] = entt;
         }
     }
-    std::map<std::string, IPool *> snapPools;
+    std::map<std::string, Ref<IPool>> snapPools;
     for (auto &pool : mPools) {
         snapPools[pool.first] = pool.second->clone();
     }
@@ -184,7 +184,7 @@ void Registry::makeSnapshot() {
 }
 
 void Registry::loadSnapshot() {
-    std::map<std::string, IPool *> tempPools;
+    std::map<std::string, Ref<IPool>> tempPools;
     std::tie(mEntities, mBillBoards, tempPools) = mSnapshot;
     for (auto &pool : tempPools) {
         mPools[pool.first]->swap(pool.second);

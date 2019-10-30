@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "Core.h"
 #include "constants.h"
 #include "inputsystem.h"
 #include "movementsystem.h"
@@ -23,7 +24,7 @@ void Scene::saveScene(const QString &fileName) {
         return;
 
     Registry *registry = Registry::instance();
-    std::map<GLuint, Entity *> entities = registry->getEntities();
+    std::map<GLuint, cjk::Ref<Entity>> entities = registry->getEntities();
 
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer(buf);
@@ -230,7 +231,7 @@ void Scene::populateScene(const Document &scene) {
                 GLfloat specStr = comp->value["specstr"].GetFloat();
                 GLint specExp = comp->value["specexp"].GetInt();
                 QString shaderName = comp->value["shader"].GetString();
-                Shader *shader{nullptr};
+                cjk::Ref<Shader> shader{nullptr};
                 ResourceManager *factory = ResourceManager::instance();
                 if (shaderName == "PlainShader")
                     shader = factory->getShader<ColorShader>();

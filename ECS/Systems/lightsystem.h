@@ -1,21 +1,21 @@
 #ifndef LIGHTSYSTEM_H
 #define LIGHTSYSTEM_H
+#include "Core.h"
 #include "isystem.h"
 #include "pool.h"
-#include <memory>
 class Registry;
 class PhongShader;
 class LightSystem : public ISystem {
 public:
-    LightSystem(PhongShader *shader);
+    LightSystem(Ref<PhongShader> shader);
 
     void update(float deltaTime = 0.016) override;
 
-    void init(Entity *light);
+    void init(Ref<Entity> light);
 
 private:
     Registry *registry;
-    PhongShader *mPhong;
+    Ref<PhongShader> mPhong;
 };
 
 #endif // LIGHTSYSTEM_H

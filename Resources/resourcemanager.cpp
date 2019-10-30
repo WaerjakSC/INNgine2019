@@ -43,11 +43,11 @@ ResourceManager::ResourceManager() {
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
 }
 
-Camera *ResourceManager::getCurrentCamera() const {
+Ref<Camera> ResourceManager::getCurrentCamera() const {
     return mCurrentCamera;
 }
 
-void ResourceManager::setCurrentCamera(Camera *currentCamera) {
+void ResourceManager::setCurrentCamera(Ref<Camera> currentCamera) {
     mCurrentCamera = currentCamera;
 }
 
@@ -73,12 +73,6 @@ bool ResourceManager::isLoading() const {
 
 // Do resource manager stuff -- Aka actually delete the pointers after application end
 ResourceManager::~ResourceManager() {
-    for (auto &shader : mShaders) {
-        delete shader.second;
-    }
-    for (auto &texture : mTextures) {
-        delete texture.second;
-    }
 }
 ResourceManager *ResourceManager::instance() {
     if (!mInstance)
@@ -167,7 +161,7 @@ void ResourceManager::onExit() {
  * @param type
  * @return The entity ID of the gameobject.
  */
-GLuint ResourceManager::make3DObject(std::string name, Shader *type) {
+GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
@@ -349,7 +343,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @param fileName
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeTriangleSurface(std::string fileName, Shader *type) {
+GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> type) {
     GLuint eID = registry->makeEntity(QString::fromStdString(fileName));
 
     initializeOpenGLFunctions();
@@ -634,7 +628,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
 
     alGetError();
     alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
-    SoundSystem *soundSys = registry->getSystem<SoundSystem>();
+    SoundSystem *soundSys = registry->getSystem<SoundSystem>().get();
     soundSys->checkError("alBufferData");
     alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
     soundSys->checkError("alSourcei (loadWave)");
@@ -654,13 +648,13 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
  */
 void ResourceManager::loadTexture(std::string fileName) {
     if (mTextures.find(fileName) == mTextures.end()) {
-        mTextures[fileName] = new Texture(fileName, mTextures.size());
+        mTextures[fileName] = std::make_shared<Texture>(fileName, mTextures.size());
 
         qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
     }
 }
 
-Texture *ResourceManager::getTexture(std::string fileName) {
+Ref<Texture> ResourceManager::getTexture(std::string fileName) {
     return mTextures[fileName];
 }
 QString ResourceManager::getTextureName(GLuint id) {
@@ -775,7 +769,7 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
     }
 }
 
-std::map<std::string, Shader *> ResourceManager::getShaders() const {
+std::map<std::string, Ref<Shader>> ResourceManager::getShaders() const {
     return mShaders;
 }
 void ResourceManager::showMessage(const QString &message) {

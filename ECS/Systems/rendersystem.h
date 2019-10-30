@@ -1,15 +1,16 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
+#include "Core.h"
 #include "isystem.h"
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
-#include <memory>
+using namespace cjk;
 class Registry;
 class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
-    RenderSystem(std::map<std::string, Shader *> shaders);
+    RenderSystem(std::map<std::string, Ref<Shader>> shaders);
 
     void update(float deltaTime = 0.016) override;
 
@@ -25,7 +26,7 @@ private:
     void iterateEntities();
     void updateEntities();
 
-    std::map<std::string, Shader *> mShaders;
+    std::map<std::string, Ref<Shader>> mShaders;
 };
 
 #endif // RENDERSYSTEM_H

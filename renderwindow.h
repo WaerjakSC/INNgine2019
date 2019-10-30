@@ -1,6 +1,7 @@
 #ifndef RENDERWINDOW_H
 #define RENDERWINDOW_H
 
+#include "Core.h"
 #include "camera.h"
 #include "entity.h"
 #include "texture.h"
@@ -9,7 +10,7 @@
 #include <QWindow>
 #include <chrono>
 #include <memory>
-typedef gsl::Vector3D vec3;
+using namespace cjk;
 class QOpenGLContext;
 class Shader;
 class MainWindow;
@@ -40,9 +41,9 @@ public:
     void setCameraSpeed(float value);
     void playSound();
 
-    RenderSystem *renderer() const;
+    Ref<RenderSystem> renderer() const;
 
-    MovementSystem *movement() const;
+    Ref<MovementSystem> movement() const;
 
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -62,20 +63,20 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    RenderSystem *mRenderer;
-    MovementSystem *mMoveSystem;
-    LightSystem *mLightSystem;
-    SoundSystem *mSoundSystem;
-    InputSystem *mInputSystem;
+    Ref<RenderSystem> mRenderer;
+    Ref<MovementSystem> mMoveSystem;
+    Ref<LightSystem> mLightSystem;
+    Ref<SoundSystem> mSoundSystem;
+    Ref<InputSystem> mInputSystem;
 
     ResourceManager *mFactory;
     Registry *mRegistry;
 
-    Entity *mPlayer; //the controllable object
+    Ref<Entity> mPlayer; //the controllable object
 
     GLuint mLight;
 
-    Camera *mCurrentCamera{nullptr};
+    Ref<Camera> mCurrentCamera{nullptr};
 
     GLuint xyz; // Refers to the colored lines pointing in the X, Y and Z directions.
     bool mWireframe{false};

@@ -92,7 +92,7 @@ void RenderWindow::init() {
     mFactory->setMainWindow(mMainWindow);
 
     //********************** Set up camera **********************
-    mFactory->setCurrentCamera(new Camera());
+    mFactory->setCurrentCamera(std::make_shared<Camera>());
     mCurrentCamera = mFactory->getCurrentCamera();
     mCurrentCamera->setPosition(vec3(0.f, 8.f, 15.0f));
     //    mCurrentCamera->yaw(45.f);
@@ -138,9 +138,9 @@ void RenderWindow::init() {
     mLightSystem->init(mRegistry->getEntity(mLight));
     mRenderer->init();
 
-    connect(mRegistry->getSystem<InputSystem>(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
-    connect(mRegistry->getSystem<InputSystem>(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
-    connect(mRegistry->getSystem<InputSystem>(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
+    connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
+    connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
+    connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
 }
 
 ///Called each frame - doing the rendering
@@ -180,10 +180,10 @@ void RenderWindow::snapToObject(int eID) {
     mCurrentCamera->goTo(mMoveSystem->getAbsolutePosition(eID));
 }
 
-RenderSystem *RenderWindow::renderer() const {
+Ref<RenderSystem> RenderWindow::renderer() const {
     return mRenderer;
 }
-MovementSystem *RenderWindow::movement() const {
+Ref<MovementSystem> RenderWindow::movement() const {
     return mMoveSystem;
 }
 //This function is called from Qt when window is exposed (shown)

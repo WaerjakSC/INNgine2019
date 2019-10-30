@@ -1,11 +1,10 @@
 #ifndef MOVEMENTSYSTEM_H
 #define MOVEMENTSYSTEM_H
 
+#include "Core.h"
 #include "isystem.h"
 #include "pool.h"
-#include <memory>
-
-typedef gsl::Vector3D vec3;
+using namespace cjk;
 class Registry;
 class Transform;
 class MovementSystem : public QObject, public ISystem {
@@ -70,8 +69,8 @@ public:
     void move(GLuint eID, const vec3 &moveDelta, bool signal = true);
     void scale(GLuint eID, const vec3 &scaleDelta, bool signal = true);
     void rotate(GLuint eID, const vec3 &rotDelta, bool signal = true);
-    gsl::Vector3D getAbsoluteRotation(GLuint eID);
-    gsl::Vector3D getRelativeRotation(GLuint eID);
+    vec3 getAbsoluteRotation(GLuint eID);
+    vec3 getRelativeRotation(GLuint eID);
 
 signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);

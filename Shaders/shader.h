@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "Core.h"
 #include "matrix4x4.h"
 #include <QOpenGLFunctions_4_1_Core>
 
@@ -27,9 +28,9 @@ public:
     GLuint getProgram() const;
     virtual void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material = nullptr);
 
-    void setCurrentCamera(Camera *currentCamera);
+    void setCurrentCamera(cjk::Ref<Camera> currentCamera);
 
-    Camera *getCurrentCamera() const;
+    cjk::Ref<Camera> getCurrentCamera() const;
 
     std::string getName() const;
 
@@ -40,7 +41,7 @@ protected:
     GLint pMatrixUniform{-1};
     std::string mName;
 
-    Camera *mCurrentCamera{nullptr};
+    cjk::Ref<Camera> mCurrentCamera{nullptr};
 };
 
 #endif

@@ -1,7 +1,9 @@
 #ifndef INPUTSYSTEM_H
 #define INPUTSYSTEM_H
+#include "Core.h"
 #include "isystem.h"
 #include "pool.h"
+using namespace cjk;
 class RenderWindow;
 class Registry;
 class ResourceManager;
@@ -42,11 +44,12 @@ private:
 
     Registry *registry{};
     ResourceManager *factory;
-    MovementSystem *mMoveSys{nullptr};
-    GLuint mPlayerController;
-    Camera *mCurrentCamera{nullptr};
+    Ref<Camera> mCurrentCamera{nullptr};
     RenderWindow *mRenderWindow;
+
+    GLuint mPlayerController;
     Input editorInput;
+
     void handlePlayerController(float deltaTime);
     void setCameraSpeed(float value);
     void inputKeyRelease(QKeyEvent *event, Input &input);

@@ -1,19 +1,21 @@
 #ifndef POOL_H
 #define POOL_H
 
+#include "Core.h"
 #include "components.h"
 #include "entity.h"
 #include <QObject>
 #include <memory>
 #include <vector>
+using namespace cjk;
 class IPool {
 public:
     class iterator;
     virtual ~IPool() = default;
     virtual void remove(int removedEntity) = 0;
-    virtual IPool *clone() = 0;
+    virtual Ref<IPool> clone() = 0;
     virtual void cloneComponent(GLuint cloneFrom, GLuint cloneTo) = 0;
-    virtual void swap(IPool *other) = 0;
+    virtual void swap(Ref<IPool> other) = 0;
     virtual int find(uint eID) const = 0;
     virtual bool has(uint eID) const = 0;
     virtual bool has(const Entity &entity) const = 0;
@@ -133,11 +135,11 @@ public:
         isSorted = other->isSorted;
     }
     ~Pool() {}
-    virtual IPool *clone() override {
-        return new Pool(*this);
+    virtual Ref<IPool> clone() override {
+        return std::make_shared<Pool>(*this);
     }
-    virtual void swap(IPool *other) override {
-        auto swapped = static_cast<Pool<Type> *>(other);
+    virtual void swap(Ref<IPool> other) override {
+        auto swapped = std::static_pointer_cast<Pool<Type>>(other);
         mList = swapped->mList;
         mIndex = swapped->mIndex;
         mComponents = swapped->mComponents;

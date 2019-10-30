@@ -12,7 +12,7 @@ public:
 
     void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) override;
 
-    void setLight(Entity *entt);
+    void setLight(cjk::Ref<Entity> entt);
 
 private:
     //    GLint textureUniform{-1};
@@ -27,7 +27,7 @@ private:
     GLint mLightPowerUniform{-1};
     GLint textureUniform{-1};
 
-    Entity *mLight;
+    cjk::Ref<Entity> mLight;
 };
 
 #endif // PHONGSHADER_H

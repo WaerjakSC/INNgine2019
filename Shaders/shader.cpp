@@ -146,11 +146,11 @@ void Shader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material
     glUniformMatrix4fv(pMatrixUniform, 1, GL_TRUE, mCurrentCamera->mProjectionMatrix.constData());
     glUniformMatrix4fv(mMatrixUniform, 1, GL_TRUE, modelMatrix.constData());
 }
-void Shader::setCurrentCamera(Camera *currentCamera) {
+void Shader::setCurrentCamera(cjk::Ref<Camera> currentCamera) {
     mCurrentCamera = currentCamera;
 }
 
-Camera *Shader::getCurrentCamera() const {
+cjk::Ref<Camera> Shader::getCurrentCamera() const {
     return mCurrentCamera;
 }
 

@@ -2,7 +2,7 @@
 #include "phongshader.h"
 #include "registry.h"
 
-LightSystem::LightSystem(PhongShader *shader)
+LightSystem::LightSystem(Ref<PhongShader> shader)
     : registry(Registry::instance()), mPhong(shader) {
 }
 void LightSystem::update(float deltaTime) {
@@ -14,7 +14,7 @@ void LightSystem::update(float deltaTime) {
     //        mPhong->updateLightUniforms(transform.modelMatrix, light.mLight);
     //    }
 }
-void LightSystem::init(Entity *light) {
+void LightSystem::init(Ref<Entity> light) {
     mPhong->setLight(light);
     update();
 }

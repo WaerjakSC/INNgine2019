@@ -6,7 +6,7 @@
 #include "registry.h"
 #include "textureshader.h"
 #include "view.h"
-RenderSystem::RenderSystem(std::map<std::string, Shader *> shaders) : mShaders(shaders) {
+RenderSystem::RenderSystem(std::map<std::string, Ref<Shader>> shaders) : mShaders(shaders) {
     registry = Registry::instance();
 }
 /**
@@ -44,7 +44,7 @@ void RenderSystem::toggleRendered(GLuint entityID) {
     isRendered = !isRendered;
 }
 void RenderSystem::changeShader(int entityID, std::string nShader) {
-    Shader *shader{nullptr};
+    Ref<Shader> shader{nullptr};
     ResourceManager *factory = ResourceManager::instance();
     if (nShader == "PlainShader")
         shader = factory->getShader<ColorShader>();

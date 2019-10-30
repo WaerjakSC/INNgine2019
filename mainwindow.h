@@ -1,13 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "Core.h"
 #include "components.h"
 #include "gltypes.h"
 #include "vector3d.h"
 #include <QMainWindow>
 #include <QStringListModel>
 
-typedef gsl::Vector3D vec3;
+using namespace cjk;
 class QWidget;
 class RenderWindow;
 class Entity;
@@ -75,7 +76,7 @@ private:
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
     ComponentList *mComponentList;
-    Entity *selectedEntity;
+    Ref<Entity> selectedEntity;
     quint32 unnamedEntityCount{0};
     QAction *transAction, *matAction, *meshAction, *lightAction, *inputAction, *collisionAction, *soundAction, *physicsAction;
     Registry *registry;

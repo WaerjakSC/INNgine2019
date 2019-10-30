@@ -8,8 +8,7 @@
 InputSystem::InputSystem(RenderWindow *window)
     : registry(Registry::instance()), factory(ResourceManager::instance()),
       mRenderWindow(window) {
-    mMoveSys = Registry::instance()->getSystem<MovementSystem>();
-    ray = new Raycast(window, factory->getCurrentCamera());
+    ray = new Raycast(window, factory->getCurrentCamera().get());
     mCurrentCamera = factory->getCurrentCamera();
 }
 
@@ -48,7 +47,7 @@ void InputSystem::handlePlayerController(float deltaTime) {
             desiredVelocity.y += mCameraSpeed;
         if (player.E)
             desiredVelocity.y -= mCameraSpeed;
-        mMoveSys->move(mPlayerController, desiredVelocity.normalized() * deltaTime);
+        registry->getSystem<MovementSystem>()->move(mPlayerController, desiredVelocity.normalized() * deltaTime);
     }
 }
 void InputSystem::handleMouseInput() {

@@ -135,7 +135,7 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
         if (curText == QString::fromStdString(mat.mShader->getName()))
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
-    connect(this, &ComponentList::newShader, registry->getSystem<RenderSystem>(), &RenderSystem::changeShader);
+    connect(this, &ComponentList::newShader, registry->getSystem<RenderSystem>().get(), &RenderSystem::changeShader);
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setNewShader(const QString &)));
 
     QString curTexture = ResourceManager::instance()->getTextureName(mat.mTextureUnit);
@@ -227,7 +227,7 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
 
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    MovementSystem *movement = registry->getSystem<MovementSystem>();
+    MovementSystem *movement = registry->getSystem<MovementSystem>().get();
     connect(movement, &MovementSystem::positionChanged, this, &ComponentList::updatePositionVals);
     connect(movement, &MovementSystem::rotationChanged, this, &ComponentList::updateRotationVals);
     connect(movement, &MovementSystem::scaleChanged, this, &ComponentList::updateScaleVals);

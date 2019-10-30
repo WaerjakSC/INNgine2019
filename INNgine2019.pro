@@ -66,12 +66,22 @@ win32 {
 }
 
 HEADERS += \
+    Core.h \
+    ECS/Systems/isystem.h \
     ECS/Systems/aisystem.h \
     ECS/Systems/inputsystem.h \
-    ECS/Systems/isystem.h \
     ECS/Systems/soundsystem.h \
+    ECS/Systems/lightsystem.h \
+    ECS/Systems/rendersystem.h \
+    ECS/Systems/movementsystem.h \
+    ECS/Systems/collisionsystem.h \
+#
     ECS/entity.h \
+    ECS/pool.h \
     ECS/view.h \
+    ECS/components.h \
+    ECS/registry.h \
+#
     GSL/matrix2x2.h \
     GSL/matrix3x3.h \
     GSL/matrix4x4.h \
@@ -79,43 +89,33 @@ HEADERS += \
     GSL/vector3d.h \
     GSL/vector4d.h \
     GSL/gsl_math.h \
+    GSL/vertex.h \
     GSL/math_constants.h \
 #
     GUI/componentgroupbox.h \
     GUI/componentlist.h \
     GUI/hierarchymodel.h \
     GUI/hierarchyview.h \
-#
     GUI/verticalscrollarea.h \
-    Resources/scene.h \
+#    
     Shaders/colorshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
     Shaders/shader.h \
 #
-    ECS/components.h \
-    ECS/registry.h \
-    ECS/Systems/lightsystem.h \
-    ECS/Systems/rendersystem.h \
-    ECS/Systems/movementsystem.h \
-    ECS/Systems/collisionsystem.h \
-#
-    Resources/soundmanager.h \
-    Resources/soundsource.h \
+    Resources/scene.h \
     Resources/wavfilehandler.h \
     Resources/resourcemanager.h \
-    Resources/pool.h \
     Resources/texture.h \
+    Resources/triangle.h \
+    Resources/tiny_obj_loader.h \
 #
     constants.h \
     billboard.h \
     raycast.h \
     renderwindow.h \
     mainwindow.h \
-    triangle.h \
-    vertex.h \
     camera.h \
-    tiny_obj_loader.h \
     gltypes.h
 
 
@@ -123,44 +123,45 @@ SOURCES += main.cpp \
     ECS/Systems/aisystem.cpp \
     ECS/Systems/inputsystem.cpp \
     ECS/Systems/soundsystem.cpp \
+    ECS/Systems/lightsystem.cpp \
+    ECS/Systems/rendersystem.cpp \
+    ECS/Systems/movementsystem.cpp \
+    ECS/Systems/collisionsystem.cpp \
+#
     ECS/entity.cpp \
+    ECS/components.cpp \
+    ECS/registry.cpp \
+#
     GSL/matrix2x2.cpp \
     GSL/matrix3x3.cpp \
     GSL/matrix4x4.cpp \
     GSL/vector2d.cpp \
     GSL/vector3d.cpp \
     GSL/vector4d.cpp \
+    GSL/vertex.cpp \
     GSL/gsl_math.cpp \
 #
     GUI/componentgroupbox.cpp \
     GUI/componentlist.cpp \
     GUI/hierarchymodel.cpp \
     GUI/hierarchyview.cpp \
-#
     GUI/verticalscrollarea.cpp \
-    Resources/scene.cpp \
+#
     Shaders/colorshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
 #
-    ECS/components.cpp \
-    ECS/registry.cpp \
-    ECS/Systems/lightsystem.cpp \
-    ECS/Systems/rendersystem.cpp \
-    ECS/Systems/movementsystem.cpp \
-    ECS/Systems/collisionsystem.cpp \
-#
     Resources/wavfilehandler.cpp \
     Resources/resourcemanager.cpp \
     Resources/texture.cpp \
+    Resources/triangle.cpp \
+    Resources/scene.cpp \
 #
     billboard.cpp \
     raycast.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
-    triangle.cpp \
-    vertex.cpp \
     camera.cpp
 
 

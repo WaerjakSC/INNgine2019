@@ -271,7 +271,7 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     int data = hierarchy->data(newParent, 257).toInt();
-    Entity *entt = registry->getEntity(data);
+    Entity *entt = registry->getEntity(data).get();
     if (newParent.isValid()) {
         // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
         // Really not sure about this whole "Transform component governs parent/child relationship thing"
@@ -293,7 +293,7 @@ void MainWindow::parentChanged(GLuint eID) {
     QStandardItem *item = hierarchy->itemFromEntityID(eID);
     if (item) {
         hierarchy->removeRow(item->row());
-        Entity *entt = registry->getEntity(eID);
+        Entity *entt = registry->getEntity(eID).get();
         item = new QStandardItem;
         item->setText(entt->name());
         item->setData(entt->id());
@@ -330,7 +330,7 @@ void MainWindow::onNameChanged(const QModelIndex &index) {
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     QStandardItem *item = new QStandardItem;
-    Entity *entt = registry->getEntity(eID);
+    Entity *entt = registry->getEntity(eID).get();
     item->setText(entt->name());
     item->setData(entt->id());
     parentItem->appendRow(item);

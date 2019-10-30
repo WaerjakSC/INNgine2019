@@ -1,5 +1,6 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
+#include "Core.h"
 #include "colorshader.h"
 #include "matrix3x3.h"
 #include "matrix4x4.h"
@@ -20,8 +21,7 @@ class MainWindow;
 // must undefine for Frustum.
 #undef near
 #undef far
-
-typedef gsl::Vector3D vec3;
+using namespace cjk;
 typedef gsl::Matrix3x3 mat3;
 typedef gsl::Matrix4x4 mat4;
 struct meshData {
@@ -141,7 +141,7 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(Shader *type = new ColorShader(), GLuint texture = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4)
+    Material(Ref<Shader> type = std::make_shared<ColorShader>(), GLuint texture = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4)
         : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
           mTextureUnit(texture), mShader(type) {
         mType = CType::Material;
@@ -153,7 +153,7 @@ struct Material : public Component {
     GLint mSpecularExponent;
     vec3 mObjectColor;
     GLuint mTextureUnit; //the actual texture to put into the uniform
-    Shader *mShader;
+    Ref<Shader> mShader;
 };
 
 struct Mesh : public Component {
@@ -247,8 +247,10 @@ struct Input : public Component {
 };
 struct Physics : public Component {
 public:
-    Physics() {}
+    Physics(float speed = 1.0f) : mSpeed(speed) {}
     virtual void update() {}
+    float mSpeed;
+    vec3 mVelocity;
 };
 struct Sound : public Component {
 public:

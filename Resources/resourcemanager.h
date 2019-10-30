@@ -1,13 +1,13 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
+#include "Core.h"
 #include "components.h"
 #include "phongshader.h"
 #include "shader.h"
 #include "texture.h"
 #include "tiny_obj_loader.h"
 #include <QOpenGLFunctions_4_1_Core>
-#include <memory>
 #ifndef TINYOBJLOADER_IMPLEMENTATION
 #define TINYOBJLOADER_IMPLEMENTATION
 #endif
@@ -16,7 +16,7 @@ class Entity;
 class Registry;
 class MainWindow;
 class Scene;
-typedef gsl::Vector3D vec3;
+using namespace cjk;
 class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 
@@ -36,7 +36,7 @@ public:
     void loadShader(const GLchar *geometryPath = nullptr) {
         std::string shaderName = typeid(ShaderType).name();
         if (mShaders.find(shaderName) == mShaders.end()) {
-            mShaders[shaderName] = new ShaderType(geometryPath);
+            mShaders[shaderName] = std::make_shared<ShaderType>(geometryPath);
             qDebug() << "ResourceManager: Added shader " << QString::fromStdString(mShaders[shaderName]->getName());
         } else {
             qDebug() << "ResourceManager: Shader already loaded, ignoring...";
@@ -44,22 +44,20 @@ public:
     }
     // Gets stored shader
     template <typename Type>
-    Type *getShader() {
+    Ref<Type> getShader() {
         std::string type = typeid(Type).name();
-        return static_cast<Type *>(mShaders[type]);
+        return std::static_pointer_cast<Type>(mShaders[type]);
     }
     // Loads and generates texture from file
     void loadTexture(std::string name);
     // Gets stored texture
-    Texture *getTexture(std::string name);
+    Ref<Texture> getTexture(std::string name);
 
     void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
     void addMeshComponent(std::string name, int eID = -1);
 
-    std::map<std::string, Shader *> getShaders() const;
-
-    std::vector<Component *> getComponents(int eID);
+    std::map<std::string, Ref<Shader>> getShaders() const;
 
     QString getTextureName(GLuint id);
 
@@ -77,8 +75,8 @@ public:
     GLuint makePlane(const QString &name = "Plane");
     GLuint makeCube(const QString &name = "Cube");
     GLuint makeLightObject(const QString &name = "Light");
-    GLuint make3DObject(std::string name, Shader *type = new PhongShader());
-    GLuint makeTriangleSurface(std::string fileName, Shader *type);
+    GLuint make3DObject(std::string name, Ref<Shader> type = std::make_shared<PhongShader>());
+    GLuint makeTriangleSurface(std::string fileName, Ref<Shader> type);
 
     Scene *getSceneLoader() const;
 
@@ -98,9 +96,9 @@ public:
 
     bool getPaused() const;
 
-    void setCurrentCamera(Camera *currentCamera);
+    void setCurrentCamera(Ref<Camera> currentCamera);
 
-    Camera *getCurrentCamera() const;
+    Ref<Camera> getCurrentCamera() const;
     /// Loads one given WAVE file.
     /**
         Calls the wave loader from the FileHandler class, parses the wave data and buffers it.
@@ -124,16 +122,16 @@ private:
     static ResourceManager *mInstance;
     Registry *registry;
 
-    std::unique_ptr<Scene> mSceneLoader;
+    Scope<Scene> mSceneLoader;
     QString mCurrentProject;
     QString mCurrentScene;
     QString mDefaultScene;
-    Camera *mCurrentCamera;
+    Ref<Camera> mCurrentCamera;
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage
-    std::map<std::string, Shader *> mShaders;
-    std::map<std::string, Texture *> mTextures;
+    std::map<std::string, Ref<Shader>> mShaders;
+    std::map<std::string, Ref<Texture>> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
 
     // Temp mVertices/mIndices container. Cleared before each use.
@@ -143,7 +141,7 @@ private:
     //    std::vector<int> mGameObjectIndices;    // Holds the sparse array for gameobjects.
 
     // Systems
-    LightSystem *mLightSystem;
+    Ref<LightSystem> mLightSystem;
     void showMessage(const QString &message);
     bool mIsPlaying{false};
     bool mPaused{false}; // Don't make a snapshot if it was just restarted from a pause
