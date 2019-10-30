@@ -1,7 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
-#include "Core.h"
 #include "colorshader.h"
+#include "core.h"
 #include "matrix3x3.h"
 #include "matrix4x4.h"
 #include "shader.h"

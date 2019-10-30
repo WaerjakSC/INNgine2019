@@ -7,7 +7,7 @@ struct Light;
 class Entity;
 class PhongShader : public Shader {
 public:
-    PhongShader(const GLchar *geometryPath = nullptr);
+    PhongShader(cjk::Ref<CameraController> camController = nullptr, const GLchar *geometryPath = nullptr);
     virtual ~PhongShader() override;
 
     void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) override;

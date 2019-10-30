@@ -1,6 +1,6 @@
 #ifndef INPUTSYSTEM_H
 #define INPUTSYSTEM_H
-#include "Core.h"
+#include "core.h"
 #include "isystem.h"
 #include "pool.h"
 using namespace cjk;
@@ -9,6 +9,7 @@ class Registry;
 class ResourceManager;
 class MovementSystem;
 class Raycast;
+class CameraController;
 class InputSystem : public QObject, public ISystem {
     Q_OBJECT
 public:
@@ -44,7 +45,7 @@ private:
 
     Registry *registry{};
     ResourceManager *factory;
-    Ref<Camera> mCurrentCamera{nullptr};
+    Ref<CameraController> mCurrentCameraController{nullptr};
     RenderWindow *mRenderWindow;
 
     GLuint mPlayerController;

@@ -1,6 +1,6 @@
 #ifndef LIGHTSYSTEM_H
 #define LIGHTSYSTEM_H
-#include "Core.h"
+#include "core.h"
 #include "isystem.h"
 #include "pool.h"
 class Registry;

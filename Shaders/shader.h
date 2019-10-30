@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "Core.h"
+#include "core.h"
 #include "matrix4x4.h"
 #include <QOpenGLFunctions_4_1_Core>
 
@@ -12,13 +12,12 @@
 //which is based on stuff from http://learnopengl.com/ and http://open.gl/.
 
 //must inherit from QOpenGLFunctions_4_1_Core, since we use that instead of glfw/glew/glad
-
-class Camera;
+class CameraController;
 struct Material;
 class Shader : protected QOpenGLFunctions_4_1_Core {
 public:
     // Constructor generates the shader on the fly
-    Shader(const std::string shaderName = "PlainShader", const GLchar *geometryPath = nullptr);
+    Shader(cjk::Ref<CameraController> camController = nullptr, const std::string shaderName = "PlainShader", const GLchar *geometryPath = nullptr);
     virtual ~Shader();
 
     // Use the current shader
@@ -28,9 +27,9 @@ public:
     GLuint getProgram() const;
     virtual void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material = nullptr);
 
-    void setCurrentCamera(cjk::Ref<Camera> currentCamera);
+    void setCameraController(cjk::Ref<CameraController> currentController);
 
-    cjk::Ref<Camera> getCurrentCamera() const;
+    cjk::Ref<CameraController> getCameraController() const;
 
     std::string getName() const;
 
@@ -41,7 +40,7 @@ protected:
     GLint pMatrixUniform{-1};
     std::string mName;
 
-    cjk::Ref<Camera> mCurrentCamera{nullptr};
+    cjk::Ref<CameraController> mCameraController;
 };
 
 #endif

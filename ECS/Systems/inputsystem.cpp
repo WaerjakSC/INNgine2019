@@ -8,8 +8,8 @@
 InputSystem::InputSystem(RenderWindow *window)
     : registry(Registry::instance()), factory(ResourceManager::instance()),
       mRenderWindow(window) {
-    ray = new Raycast(window, factory->getCurrentCamera().get());
-    mCurrentCamera = factory->getCurrentCamera();
+    ray = new Raycast(window, factory->getCurrentCameraController());
+    mCurrentCameraController = factory->getCurrentCameraController();
 }
 
 void InputSystem::update(float deltaTime) {
@@ -18,8 +18,6 @@ void InputSystem::update(float deltaTime) {
     handleMouseInput();
 }
 void InputSystem::handleKeyInput() {
-    //Camera
-    mCurrentCamera->setSpeed(0.f);                                                     //cancel last frame movement
     if (editorInput.ESCAPE || registry->getComponent<Input>(mPlayerController).ESCAPE) //Shuts down whole program
     {
         emit closeEngine();
@@ -51,7 +49,7 @@ void InputSystem::handlePlayerController(float deltaTime) {
     }
 }
 void InputSystem::handleMouseInput() {
-    mCurrentCamera->setSpeed(0.f);
+    mCurrentCameraController->setSpeed(0.f);
     if (editorInput.LMB) {
         int entityID = ray->rayCast(mRenderWindow->mapFromGlobal(QCursor::pos()));
         if (entityID != -1) {
@@ -59,17 +57,17 @@ void InputSystem::handleMouseInput() {
         }
     } else if (editorInput.RMB) {
         if (editorInput.W)
-            mCurrentCamera->setSpeed(-mCameraSpeed);
+            mCurrentCameraController->setSpeed(-mCameraSpeed);
         if (editorInput.S)
-            mCurrentCamera->setSpeed(mCameraSpeed);
+            mCurrentCameraController->setSpeed(mCameraSpeed);
         if (editorInput.D)
-            mCurrentCamera->moveRight(mCameraSpeed);
+            mCurrentCameraController->moveRight(mCameraSpeed);
         if (editorInput.A)
-            mCurrentCamera->moveRight(-mCameraSpeed);
+            mCurrentCameraController->moveRight(-mCameraSpeed);
         if (editorInput.Q)
-            mCurrentCamera->updateHeight(-mCameraSpeed);
+            mCurrentCameraController->updateHeight(-mCameraSpeed);
         if (editorInput.E) {
-            mCurrentCamera->updateHeight(mCameraSpeed);
+            mCurrentCameraController->updateHeight(mCameraSpeed);
         }
     }
 }
@@ -221,9 +219,9 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
             GLfloat dy = GLfloat(event->y() - lastPos.y()) / mRenderWindow->height();
 
             if (dx != 0)
-                mCurrentCamera->yaw(mCameraRotateSpeed * dx);
+                mCurrentCameraController->yaw(mCameraRotateSpeed * dx);
             if (dy != 0)
-                mCurrentCamera->pitch(mCameraRotateSpeed * dy);
+                mCurrentCameraController->pitch(mCameraRotateSpeed * dy);
         }
         firstRMB = false;
     }

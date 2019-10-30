@@ -2,8 +2,8 @@
 #include "components.h"
 #include "innpch.h"
 
-TextureShader::TextureShader(const GLchar *geometryPath)
-    : Shader("TextureShader", geometryPath) {
+TextureShader::TextureShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
+    : Shader(camController, "TextureShader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");

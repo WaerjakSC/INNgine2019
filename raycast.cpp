@@ -4,7 +4,7 @@
 #include "registry.h"
 #include "renderwindow.h"
 #include <QWindow>
-Raycast::Raycast(RenderWindow *window, Camera *camera) : mOpenGLWindow(window), mCurrentCamera(camera) {
+Raycast::Raycast(RenderWindow *window, cjk::Ref<CameraController> controller) : mOpenGLWindow(window), mCurrentController(controller) {
 }
 /**
  * @brief Raycast::rayCast
@@ -39,8 +39,8 @@ Ray Raycast::getRay(const QPoint &mousePos) {
     const QRect &rect = mOpenGLWindow->geometry();
 
     vec3 mousePoint(mousePos.x(), mousePos.y(), 0.0f);
-    vec3 direction = mCurrentCamera->calculateMouseRay(mousePoint, rect.height(), rect.width());
-    vec3 origin = mCurrentCamera->position();
+    vec3 direction = mCurrentController->getCamera().calculateMouseRay(mousePoint, rect.height(), rect.width());
+    vec3 origin = mCurrentController->cameraPosition();
 
     return Ray{origin, direction};
 }

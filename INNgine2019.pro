@@ -66,7 +66,6 @@ win32 {
 }
 
 HEADERS += \
-    Core.h \
     ECS/Systems/isystem.h \
     ECS/Systems/aisystem.h \
     ECS/Systems/inputsystem.h \
@@ -110,8 +109,13 @@ HEADERS += \
     Resources/triangle.h \
     Resources/tiny_obj_loader.h \
 #
+    cameracontroller.h \
     constants.h \
     billboard.h \
+    core.h \
+    core.h \
+    deltaTime.h \
+    deltaTime.h \
     raycast.h \
     renderwindow.h \
     mainwindow.h \
@@ -159,6 +163,7 @@ SOURCES += main.cpp \
     Resources/scene.cpp \
 #
     billboard.cpp \
+    cameracontroller.cpp \
     raycast.cpp \
     renderwindow.cpp \
     mainwindow.cpp \

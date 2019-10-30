@@ -1,8 +1,8 @@
 #include "colorshader.h"
 #include "innpch.h"
 
-ColorShader::ColorShader(const GLchar *geometryPath)
-    : Shader("PlainShader", geometryPath) {
+ColorShader::ColorShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
+    : Shader(camController, "PlainShader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");

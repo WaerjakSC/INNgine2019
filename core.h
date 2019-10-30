@@ -15,5 +15,4 @@ using Ref = std::shared_ptr<T>;
 using vec3 = gsl::Vector3D;
 
 } // namespace cjk
-
 #endif // CORE_H

@@ -1,5 +1,6 @@
 #include "resourcemanager.h"
 #include "billboard.h"
+#include "cameracontroller.h"
 #include "colorshader.h"
 #include "innpch.h"
 #include "lightsystem.h"
@@ -43,12 +44,12 @@ ResourceManager::ResourceManager() {
     // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
 }
 
-Ref<Camera> ResourceManager::getCurrentCamera() const {
-    return mCurrentCamera;
+Ref<CameraController> ResourceManager::getCurrentCameraController() const {
+    return mCurrentCameraController;
 }
 
-void ResourceManager::setCurrentCamera(Ref<Camera> currentCamera) {
-    mCurrentCamera = currentCamera;
+void ResourceManager::setCurrentCameraController(Ref<CameraController> currentCameraController) {
+    mCurrentCameraController = currentCameraController;
 }
 
 void ResourceManager::setCurrentScene(const QString &currentScene) {
@@ -574,7 +575,6 @@ void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID) {
 }
 
 bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
-    qDebug() << "Loading wave file!\n";
     ALuint frequency{};
     ALenum format{};
     wave_t *waveData = new wave_t();
@@ -590,11 +590,11 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
         switch (waveData->channels) {
         case 1:
             format = AL_FORMAT_MONO8;
-            qDebug() << "Format: 8bit Mono\n";
+            //            qDebug() << "Format: 8bit Mono\n";
             break;
         case 2:
             format = AL_FORMAT_STEREO8;
-            qDebug() << "Format: 8bit Stereo\n";
+            //            qDebug() << "Format: 8bit Stereo\n";
             break;
         default:
             break;
@@ -604,11 +604,11 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
         switch (waveData->channels) {
         case 1:
             format = AL_FORMAT_MONO16;
-            qDebug() << "Format: 16bit Mono\n";
+            //            qDebug() << "Format: 16bit Mono\n";
             break;
         case 2:
             format = AL_FORMAT_STEREO16;
-            qDebug() << "Format: 16bit Stereo\n";
+            //            qDebug() << "Format: 16bit Stereo\n";
             break;
         default:
             break;
@@ -624,7 +624,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
 
     std::ostringstream i2s;
     i2s << waveData->dataSize;
-    qDebug() << "DataSize: " << QString::fromStdString(i2s.str()) << " bytes\n";
+    //    qDebug() << "DataSize: " << QString::fromStdString(i2s.str()) << " bytes\n";
 
     alGetError();
     alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
@@ -633,7 +633,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
     alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
     soundSys->checkError("alSourcei (loadWave)");
 
-    qDebug() << "Loading complete!\n";
+    //    qDebug() << "Loading complete!\n";
     if (waveData->buffer)
         delete waveData->buffer;
     if (waveData)

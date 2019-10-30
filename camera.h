@@ -8,13 +8,8 @@ typedef gsl::Vector4D vec4;
 typedef gsl::Matrix4x4 mat4;
 class Camera {
 public:
-    Camera();
-
-    void pitch(float degrees);
-    void yaw(float degrees);
-    void updateRightVector();
-    void updateForwardVector();
-    void update();
+    Camera() {}
+    Camera(float fov, float aspectRatio, float near, float far);
 
     gsl::Matrix4x4 mViewMatrix;
     gsl::Matrix4x4 mProjectionMatrix;
@@ -30,20 +25,11 @@ public:
 
     vec3 forward() const;
 
-    void setPitch(float newPitch);
-    void setYaw(float newYaw);
-    void goTo(vec3 target);
-
     vec3 getNormalizedDeviceCoords(const vec3 &viewportPoint, int height, int width);
     vec3 calculateMouseRay(const vec3 &viewportPoint, int height, int width);
 
     gsl::Matrix4x4 getViewMatrix() const;
     gsl::Matrix4x4 getProjectionMatrix() const;
-
-    float mNearPlane{0.5f};
-    float mFarPlane{500.f};
-    float mFieldOfView{45.f};
-    float mAspectRatio{1.33f};
 
     /**
       * @brief Frustum struct
@@ -80,19 +66,17 @@ public:
     void setProjectionMatrix(float fov, float aspect, float nearPlane = 0.5f, float farPlane = 200.f);
     void setProjectionMatrix();
 
-private:
-    vec3 mForward{0.f, 0.f, -1.f};
-    vec3 mRight{1.f, 0.f, 0.f};
-    vec3 mUp{0.f, 1.f, 0.f};
+    void setRotation(float pitch, float yaw);
 
+private:
     vec3 mPosition{0.f, 0.f, 0.f};
-    float mPitch{0.f};
-    float mYaw{0.f};
+    float mPitch, mYaw;
 
     gsl::Matrix4x4 mYawMatrix;
     gsl::Matrix4x4 mPitchMatrix;
 
-    float mSpeed{0.f}; //camera will move by this speed along the mForward vector
+    friend class CameraController;
+    void calculateViewMatrix();
 };
 
 #endif // CAMERA_H

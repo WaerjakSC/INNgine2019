@@ -6,7 +6,7 @@ struct Material;
 
 class TextureShader : public Shader {
 public:
-    TextureShader(const GLchar *geometryPath = nullptr);
+    TextureShader(cjk::Ref<CameraController> camController = nullptr, const GLchar *geometryPath = nullptr);
     virtual ~TextureShader() override;
 
     void transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) override;

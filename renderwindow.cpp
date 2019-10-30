@@ -11,6 +11,7 @@
 #include <iostream>
 #include <thread> //for sleep_for
 
+#include "deltaTime.h"
 #include "inputsystem.h"
 #include "lightsystem.h"
 #include "movementsystem.h"
@@ -92,20 +93,16 @@ void RenderWindow::init() {
     mFactory->setMainWindow(mMainWindow);
 
     //********************** Set up camera **********************
-    mFactory->setCurrentCamera(std::make_shared<Camera>());
-    mCurrentCamera = mFactory->getCurrentCamera();
-    mCurrentCamera->setPosition(vec3(0.f, 8.f, 15.0f));
+    mFactory->setCurrentCameraController(std::make_shared<CameraController>(static_cast<float>(width()) / height()));
+    mEditorCameraController = mFactory->getCurrentCameraController();
+    mEditorCameraController->setPosition(vec3(0.f, 8.f, 15.0f));
     //    mCurrentCamera->yaw(45.f);
-    mCurrentCamera->pitch(25.f);
+    mEditorCameraController->pitch(25.f);
 
-    //Compile shaders:
-    mFactory->loadShader<ColorShader>();
-    mFactory->loadShader<TextureShader>();
-    mFactory->loadShader<PhongShader>();
-    //new system - shader sends uniforms so needs to get the view and projection matrixes from camera
-    mFactory->getShader<ColorShader>()->setCurrentCamera(mCurrentCamera);
-    mFactory->getShader<TextureShader>()->setCurrentCamera(mCurrentCamera);
-    mFactory->getShader<PhongShader>()->setCurrentCamera(mCurrentCamera);
+    //Compile shaders - init them with reference to current camera:
+    mFactory->loadShader<ColorShader>(mEditorCameraController);
+    mFactory->loadShader<TextureShader>(mEditorCameraController);
+    mFactory->loadShader<PhongShader>(mEditorCameraController);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
@@ -146,7 +143,11 @@ void RenderWindow::init() {
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
 
-    mCurrentCamera->update();
+    float time = static_cast<float>(mTime.elapsed());
+    DeltaTime dt = time - mLastFrameTime;
+    mLastFrameTime = time;
+
+    mEditorCameraController->update(dt);
 
     mTimeStart.restart();        //restart FPS clock
     mContext->makeCurrent(this); //must be called every frame (every time mContext->swapBuffers is called)
@@ -154,13 +155,13 @@ void RenderWindow::render() {
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
-        mSoundSystem->update();
+        mSoundSystem->update(dt);
         if (mFactory->isPlaying()) {
-            mMoveSystem->update();
+            mMoveSystem->update(dt);
         }
-        mLightSystem->update();
-        mRenderer->update();
-        mInputSystem->update();
+        mLightSystem->update(dt);
+        mRenderer->update(dt);
+        mInputSystem->update(dt);
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -177,7 +178,7 @@ void RenderWindow::render() {
     mContext->swapBuffers(this);
 }
 void RenderWindow::snapToObject(int eID) {
-    mCurrentCamera->goTo(mMoveSystem->getAbsolutePosition(eID));
+    mEditorCameraController->goTo(mMoveSystem->getAbsolutePosition(eID));
 }
 
 Ref<RenderSystem> RenderWindow::renderer() const {
@@ -200,14 +201,12 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
         //16 means 16ms = 60 Frames pr second (should be 16.6666666 to be exact..)
         mRenderTimer->start(1);
         mTimeStart.start();
+        mTime.start();
     }
     //This is just to support modern screens with "double" pixels
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, static_cast<GLint>(width() * retinaScale), static_cast<GLint>(height() * retinaScale));
-    mCurrentCamera->mAspectRatio = static_cast<float>(width()) / height();
-    mCurrentCamera->mFieldOfView = 45.f;
-    mCurrentCamera->setProjectionMatrix();
-    //    qDebug() << mCamera.mProjectionMatrix;
+    mEditorCameraController->resize(static_cast<float>(width()) / height());
 }
 
 //Simple way to turn on/off wireframe mode

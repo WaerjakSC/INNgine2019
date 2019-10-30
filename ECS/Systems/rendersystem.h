@@ -1,7 +1,7 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
-#include "Core.h"
+#include "core.h"
 #include "isystem.h"
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>

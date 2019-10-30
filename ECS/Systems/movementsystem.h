@@ -1,7 +1,7 @@
 #ifndef MOVEMENTSYSTEM_H
 #define MOVEMENTSYSTEM_H
 
-#include "Core.h"
+#include "core.h"
 #include "isystem.h"
 #include "pool.h"
 using namespace cjk;

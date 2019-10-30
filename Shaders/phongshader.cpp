@@ -1,12 +1,13 @@
 
 #include "phongshader.h"
 #include "camera.h"
+#include "cameracontroller.h"
 #include "components.h"
 #include "innpch.h"
 #include "registry.h"
 
-PhongShader::PhongShader(const GLchar *geometryPath)
-    : Shader("PhongShader", geometryPath) {
+PhongShader::PhongShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
+    : Shader(camController, "PhongShader", geometryPath) {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
@@ -40,7 +41,7 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
     glUniform1i(mSpecularExponentUniform, material->mSpecularExponent);
     glUniform1f(mSpecularStrengthUniform, material->mSpecularStrength);
     glUniform3f(mObjectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
-    glUniform3f(mCameraPositionUniform, mCurrentCamera->position().x, mCurrentCamera->position().y, mCurrentCamera->position().z);
+    glUniform3f(mCameraPositionUniform, mCameraController->getCamera().position().x, mCameraController->getCamera().position().y, mCameraController->getCamera().position().z);
 }
 void PhongShader::setLight(cjk::Ref<Entity> entt) {
     mLight = entt;

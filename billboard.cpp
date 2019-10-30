@@ -1,5 +1,6 @@
 #include "billboard.h"
 #include "camera.h"
+#include "cameracontroller.h"
 #include "registry.h"
 #include "resourcemanager.h"
 BillBoard::BillBoard(GLuint eID, const QString &name) : Entity(eID, name) {
@@ -14,13 +15,13 @@ void BillBoard::update() {
     // find direction between this and camera
     vec3 direction{};
     if (mNormalVersion) {
-        vec3 camPosition = mat.mShader->getCurrentCamera()->position();
+        vec3 camPosition = mat.mShader->getCameraController()->cameraPosition();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
             camPosition.setY(transform.modelMatrix.getPosition().y);
         direction = camPosition - vec3(transform.modelMatrix.getPosition());
     } else {
-        vec3 camDirection = mat.mShader->getCurrentCamera()->forward();
+        vec3 camDirection = mat.mShader->getCameraController()->forward();
         //cancel heigth info so billboard is allways upright:
         if (mConstantYUp)
             camDirection.setY(transform.modelMatrix.getPosition().y);

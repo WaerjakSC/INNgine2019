@@ -1,5 +1,5 @@
 #include "soundsystem.h"
-#include "camera.h"
+#include "cameracontroller.h"
 #include "registry.h"
 #include "resourcemanager.h"
 SoundSystem::SoundSystem() : reg(Registry::instance()),
@@ -28,7 +28,6 @@ void SoundSystem::cleanUp() {
     auto view = reg->view<Sound>();
     for (auto entity : view) {
         Sound &sound = view.get(entity);
-        qDebug() << "Destroying SoundSource " + QString::fromStdString(sound.mName);
         stop(sound);
         alGetError();
         alSourcei(sound.mSource, AL_BUFFER, 0);
@@ -145,7 +144,7 @@ void SoundSystem::updateListener() {
     ALfloat velVec[3];
     ALfloat headVec[6];
     ResourceManager *factory = ResourceManager::instance();
-    vec3 pos = factory->getCurrentCamera()->position();
+    vec3 pos = factory->getCurrentCameraController()->cameraPosition();
     posVec[0] = pos.x;
     posVec[1] = pos.y;
     posVec[2] = pos.z;
@@ -153,11 +152,11 @@ void SoundSystem::updateListener() {
     velVec[0] = vel.x;
     velVec[1] = vel.y;
     velVec[2] = vel.z;
-    vec3 dir = factory->getCurrentCamera()->forward();
+    vec3 dir = factory->getCurrentCameraController()->forward();
     headVec[0] = dir.x;
     headVec[1] = dir.y;
     headVec[2] = dir.z;
-    vec3 up = factory->getCurrentCamera()->up();
+    vec3 up = factory->getCurrentCameraController()->up();
     headVec[3] = up.x;
     headVec[4] = up.y;
     headVec[5] = up.z;

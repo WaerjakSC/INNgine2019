@@ -1,8 +1,8 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include "Core.h"
 #include "components.h"
+#include "core.h"
 #include "phongshader.h"
 #include "shader.h"
 #include "texture.h"
@@ -16,6 +16,7 @@ class Entity;
 class Registry;
 class MainWindow;
 class Scene;
+class CameraController;
 using namespace cjk;
 class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {
     Q_OBJECT
@@ -33,10 +34,10 @@ public:
      * @param geometryPath
      */
     template <typename ShaderType>
-    void loadShader(const GLchar *geometryPath = nullptr) {
+    void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr) {
         std::string shaderName = typeid(ShaderType).name();
         if (mShaders.find(shaderName) == mShaders.end()) {
-            mShaders[shaderName] = std::make_shared<ShaderType>(geometryPath);
+            mShaders[shaderName] = std::make_shared<ShaderType>(camController, geometryPath);
             qDebug() << "ResourceManager: Added shader " << QString::fromStdString(mShaders[shaderName]->getName());
         } else {
             qDebug() << "ResourceManager: Shader already loaded, ignoring...";
@@ -96,9 +97,9 @@ public:
 
     bool getPaused() const;
 
-    void setCurrentCamera(Ref<Camera> currentCamera);
+    void setCurrentCameraController(Ref<CameraController> currentCameraController);
 
-    Ref<Camera> getCurrentCamera() const;
+    Ref<CameraController> getCurrentCameraController() const;
     /// Loads one given WAVE file.
     /**
         Calls the wave loader from the FileHandler class, parses the wave data and buffers it.
@@ -126,7 +127,7 @@ private:
     QString mCurrentProject;
     QString mCurrentScene;
     QString mDefaultScene;
-    Ref<Camera> mCurrentCamera;
+    Ref<CameraController> mCurrentCameraController;
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage

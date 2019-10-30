@@ -1,5 +1,5 @@
 #include "scene.h"
-#include "Core.h"
+#include "core.h"
 #include "constants.h"
 #include "inputsystem.h"
 #include "movementsystem.h"

@@ -1,63 +1,13 @@
 #include "camera.h"
 #include "innpch.h"
 
-Camera::Camera() {
+Camera::Camera(float fov, float aspectRatio, float near, float far) {
     mViewMatrix.setToIdentity();
     mProjectionMatrix.setToIdentity();
 
     mYawMatrix.setToIdentity();
     mPitchMatrix.setToIdentity();
-}
-
-void Camera::pitch(float degrees) {
-    //  rotate around mRight
-    mPitch -= degrees;
-    updateForwardVector();
-}
-void Camera::yaw(float degrees) {
-    // rotate around mUp
-    mYaw -= degrees;
-    updateForwardVector();
-}
-void Camera::setPitch(float newPitch) {
-    mPitch = newPitch;
-    updateForwardVector();
-}
-void Camera::setYaw(float newYaw) {
-    mPitch = newYaw;
-    updateForwardVector();
-}
-
-void Camera::updateRightVector() {
-    mRight = mForward ^ mUp;
-    mRight.normalize();
-    //    qDebug() << "Right " << mRight;
-}
-
-void Camera::updateForwardVector() {
-    mRight = vec3(1.f, 0.f, 0.f);
-    mRight.rotateY(mYaw);
-    mRight.normalize();
-    mUp = vec3(0.f, 1.f, 0.f);
-    mUp.rotateX(mPitch);
-    mUp.normalize();
-    mForward = mUp ^ mRight;
-    mForward.normalize();
-
-    updateRightVector();
-}
-
-void Camera::update() {
-    mYawMatrix.setToIdentity();
-    mPitchMatrix.setToIdentity();
-
-    mPitchMatrix.rotateX(-mPitch);
-    mYawMatrix.rotateY(-mYaw);
-
-    mPosition -= mForward * mSpeed;
-
-    mViewMatrix = mPitchMatrix * mYawMatrix;
-    mViewMatrix.translate(-mPosition);
+    setProjectionMatrix(fov, aspectRatio, near, far);
 }
 
 gsl::Matrix4x4 Camera::getProjectionMatrix() const {
@@ -71,42 +21,27 @@ void Camera::setProjectionMatrix(float fov, float aspect, float nearPlane, float
     mProjectionMatrix.perspective(fov, aspect, nearPlane, farPlane);
 }
 
-void Camera::setProjectionMatrix() {
-    mProjectionMatrix.perspective(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
-}
-
 void Camera::setPosition(const vec3 &position) {
-    mPosition = position;
+    mPosition = -position;
 }
+void Camera::setRotation(float pitch, float yaw) {
+    mPitch = -pitch;
+    mYaw = -yaw;
 
-void Camera::setSpeed(float speed) {
-    mSpeed = speed;
+    mYawMatrix.setToIdentity();
+    mPitchMatrix.setToIdentity();
+
+    mPitchMatrix.rotateX(mPitch);
+    mYawMatrix.rotateY(mYaw);
 }
-
-void Camera::updateHeight(float deltaHeight) {
-    mPosition.y += deltaHeight;
+void Camera::calculateViewMatrix() {
+    mViewMatrix = mPitchMatrix * mYawMatrix;
+    mViewMatrix.translate(mPosition);
 }
-
-void Camera::moveRight(float delta) {
-    //This fixes a bug in the up and right calculations
-    //so camera always holds its height when strafing
-    //should be fixed through correct right calculations!
-    vec3 right = mRight;
-    right.y = 0.f;
-    mPosition += right * delta;
-}
-
 vec3 Camera::position() const {
     return mPosition;
 }
 
-vec3 Camera::up() const {
-    return mUp;
-}
-
-vec3 Camera::forward() const {
-    return mForward;
-}
 vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width) {
     vec3 rayNDC = getNormalizedDeviceCoords(viewportPoint, height, width);
 
@@ -131,20 +66,7 @@ vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
     float z = mouse.z;
     return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
 }
-/**
- * @brief go to location
- * @param target
- */
-void Camera::goTo(vec3 target) {
-    vec3 targetDistance{0, 0, 5};
-    const vec3 position = target + targetDistance;
-    const vec3 direction = (position - target).normalized();
 
-    mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
-    mPitch = gsl::rad2degf(gsl::asin(-direction.y));
-    mPosition = position;
-    updateForwardVector();
-}
 Camera::Frustum Camera::getFrustum() {
     Frustum result;
     mat4 vp = getViewMatrix() * getProjectionMatrix();

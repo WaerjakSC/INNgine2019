@@ -1,7 +1,7 @@
 #ifndef POOL_H
 #define POOL_H
 
-#include "Core.h"
+#include "core.h"
 #include "components.h"
 #include "entity.h"
 #include <QObject>

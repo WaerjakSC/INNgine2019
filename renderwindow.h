@@ -1,8 +1,9 @@
 #ifndef RENDERWINDOW_H
 #define RENDERWINDOW_H
 
-#include "Core.h"
 #include "camera.h"
+#include "cameracontroller.h"
+#include "core.h"
 #include "entity.h"
 #include "texture.h"
 #include <QElapsedTimer>
@@ -76,7 +77,7 @@ private:
 
     GLuint mLight;
 
-    Ref<Camera> mCurrentCamera{nullptr};
+    Ref<CameraController> mEditorCameraController{nullptr};
 
     GLuint xyz; // Refers to the colored lines pointing in the X, Y and Z directions.
     bool mWireframe{false};
@@ -85,6 +86,8 @@ private:
 
     QTimer *mRenderTimer{nullptr}; //timer that drives the gameloop
     QElapsedTimer mTimeStart;      //time variable that reads the actual FPS
+    QElapsedTimer mTime;
+    float mLastFrameTime{0};
 
     float mAspectratio{1.f};
 

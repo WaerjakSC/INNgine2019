@@ -1,8 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "Core.h"
 #include "components.h"
+#include "core.h"
 #include "gltypes.h"
 #include "vector3d.h"
 #include <QMainWindow>
