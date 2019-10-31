@@ -286,9 +286,8 @@ public:
 struct Collision : public Component {
 public:
     Collision() {}
-    Collision(ColType type, vec3 size) : colType(type) {}
+//    Collision(vec3 size) : colType(type) {}
     virtual void update() {}
-    ColType colType;
     bool mTrigger{false};
     GLuint mVAO{0}; // holds the VAO for the collider
 

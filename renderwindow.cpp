@@ -130,6 +130,7 @@ void RenderWindow::init() {
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
     mLight = mFactory->getSceneLoader()->mLight;
+    mRegistry->addComponent<AABB>(5);
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     //    mMoveSystem->init();
@@ -290,6 +291,11 @@ void RenderWindow::startOpenGLDebugger() {
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
+
+/**
+ * @brief RenderWindow::Cull, Cull furries right now
+ * @param f, the frustum
+ */
 void RenderWindow::Cull(const Camera::Frustum &f) {
     auto view = mRegistry->view<Mesh, Collision>();
     for (auto entity : view) {
@@ -301,6 +307,7 @@ void RenderWindow::Cull(const Camera::Frustum &f) {
             view.get<Mesh>(entity).mRendered = false;
     }
 }
+
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
     if (mInputSystem)
         mInputSystem->keyPressEvent(event);

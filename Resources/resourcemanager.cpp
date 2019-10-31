@@ -28,7 +28,7 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
-    // Move these elsewhere once they have systems
+
     registry->registerComponent<Transform>();
     registry->registerComponent<Material>();
     registry->registerComponent<Mesh>();
@@ -37,6 +37,11 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Input>();
     registry->registerComponent<Collision>();
     registry->registerComponent<Light>();
+    registry->registerComponent<AABB>();
+    registry->registerComponent<OBB>();
+    registry->registerComponent<Sphere>();
+    registry->registerComponent<Plane>();
+    registry->registerComponent<Cylinder>();
 
     mSceneLoader = std::make_unique<Scene>();
 
