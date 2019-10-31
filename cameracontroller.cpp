@@ -53,8 +53,7 @@ void CameraController::setPosition(const vec3 &position) {
     mCameraPosition = position;
 }
 void CameraController::update(float dt) {
-    mCameraPosition -= mForward * mTranslationSpeed * dt;
-
+    Q_UNUSED(dt);
     mCamera.setRotation(mPitch, mYaw);
     mCamera.setPosition(mCameraPosition);
     mCamera.calculateViewMatrix();
@@ -62,6 +61,7 @@ void CameraController::update(float dt) {
 void CameraController::setSpeed(float speed) {
     mTranslationSpeed = speed;
 }
+
 /**
  * @brief go to location
  * @param target
@@ -76,12 +76,11 @@ void CameraController::goTo(vec3 target) {
     mCameraPosition = position;
     updateForwardVector();
 }
-void CameraController::updateHeight(float deltaHeight) {
-    mCameraPosition.y += deltaHeight;
+void CameraController::moveForward(float delta) {
+    mCameraPosition += mForward * mTranslationSpeed * delta;
 }
-void CameraController::resize(float aspectRatio) {
-    mAspectRatio = aspectRatio;
-    mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
+void CameraController::moveUp(float deltaHeight) {
+    mCameraPosition.y += mTranslationSpeed * deltaHeight;
 }
 void CameraController::moveRight(float delta) {
     //This fixes a bug in the up and right calculations
@@ -89,5 +88,21 @@ void CameraController::moveRight(float delta) {
     //should be fixed through correct right calculations!
     vec3 right = mRight;
     right.y = 0.f;
-    mCameraPosition += right * delta;
+    mCameraPosition += right * mTranslationSpeed * delta;
+}
+void CameraController::resize(float aspectRatio) {
+    mAspectRatio = aspectRatio;
+    mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
+}
+
+GameCameraController::GameCameraController(float aspectRatio) : CameraController(aspectRatio) {
+    // Set desired pitch and yaw here, they will not be changeable by the player
+}
+
+void GameCameraController::pitch(float degrees) {
+    Q_UNUSED(degrees);
+}
+
+void GameCameraController::yaw(float degrees) {
+    Q_UNUSED(degrees);
 }

@@ -112,9 +112,17 @@ struct Transform : Component {
     Transform() {
         mType = CType::Transform;
         modelMatrix.setToIdentity();
+        //calculate matrix from position, scale, rotation
         translationMatrix.setToIdentity();
+        translationMatrix.translate(localPosition);
+
         rotationMatrix.setToIdentity();
+        rotationMatrix.rotateX(localRotation.x);
+        rotationMatrix.rotateY(localRotation.y);
+        rotationMatrix.rotateZ(localRotation.z);
+
         scaleMatrix.setToIdentity();
+        scaleMatrix.scale(localScale);
     }
     Transform(vec3 pos, vec3 rot = 0, vec3 newScale = 1) : Transform() {
         localPosition = pos;

@@ -93,11 +93,11 @@ void RenderWindow::init() {
     mFactory->setMainWindow(mMainWindow);
 
     //********************** Set up camera **********************
-    mFactory->setCurrentCameraController(std::make_shared<CameraController>(static_cast<float>(width()) / height()));
-    mEditorCameraController = mFactory->getCurrentCameraController();
+    float aspectRatio = static_cast<float>(width()) / height();
+    Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>(aspectRatio);
+    mEditorCameraController = std::make_shared<CameraController>(aspectRatio);
     mEditorCameraController->setPosition(vec3(0.f, 8.f, 15.0f));
-    //    mCurrentCamera->yaw(45.f);
-    mEditorCameraController->pitch(25.f);
+    mFactory->setCurrentCameraController(mEditorCameraController);
 
     //Compile shaders - init them with reference to current camera:
     mFactory->loadShader<ColorShader>(mEditorCameraController);
@@ -122,6 +122,8 @@ void RenderWindow::init() {
     mMoveSystem = mRegistry->registerSystem<MovementSystem>();
     mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
     mInputSystem = mRegistry->registerSystem<InputSystem>(this);
+    mInputSystem->setEditorCamController(mEditorCameraController);
+    mInputSystem->setGameCameraController(gameCam);
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mSoundSystem->createContext();
     //********************** Making the objects to be drawn **********************
@@ -130,7 +132,7 @@ void RenderWindow::init() {
     mLight = mFactory->getSceneLoader()->mLight;
 
     mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    mMoveSystem->init();
+    //    mMoveSystem->init();
     mSoundSystem->init();
     mLightSystem->init(mRegistry->getEntity(mLight));
     mRenderer->init();
@@ -147,7 +149,7 @@ void RenderWindow::render() {
     DeltaTime dt = time - mLastFrameTime;
     mLastFrameTime = time;
 
-    mEditorCameraController->update(dt);
+    mInputSystem->update(dt);
 
     mTimeStart.restart();        //restart FPS clock
     mContext->makeCurrent(this); //must be called every frame (every time mContext->swapBuffers is called)
@@ -161,7 +163,6 @@ void RenderWindow::render() {
         }
         mLightSystem->update(dt);
         mRenderer->update(dt);
-        mInputSystem->update(dt);
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
@@ -206,7 +207,11 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
     //This is just to support modern screens with "double" pixels
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, static_cast<GLint>(width() * retinaScale), static_cast<GLint>(height() * retinaScale));
-    mEditorCameraController->resize(static_cast<float>(width()) / height());
+    float aspectRatio = static_cast<float>(width()) / height();
+    if (!mFactory->isPlaying())
+        mInputSystem->editorCamController()->resize(aspectRatio);
+    else
+        mInputSystem->gameCameraController()->resize(aspectRatio);
 }
 
 //Simple way to turn on/off wireframe mode

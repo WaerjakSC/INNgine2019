@@ -10,6 +10,7 @@ class ResourceManager;
 class MovementSystem;
 class Raycast;
 class CameraController;
+class GameCameraController;
 class InputSystem : public QObject, public ISystem {
     Q_OBJECT
 public:
@@ -26,6 +27,12 @@ public:
 
     GLuint playerController() const;
 
+    Ref<CameraController> editorCamController() const;
+    void setEditorCamController(const Ref<CameraController> &editorCamController);
+
+    Ref<GameCameraController> gameCameraController() const;
+    void setGameCameraController(const Ref<GameCameraController> &gameCameraController);
+
 signals:
     void snapSignal();
     void rayHitEntity(GLuint entityID);
@@ -37,7 +44,7 @@ private:
     void handleKeyInput();
     void handleMouseInput();
 
-    float mCameraSpeed{0.01f};
+    float mCameraSpeed{1.f};
     float mCameraRotateSpeed{30.f};
     bool firstRMB{true};
     QPoint lastPos;
@@ -45,7 +52,8 @@ private:
 
     Registry *registry{};
     ResourceManager *factory;
-    Ref<CameraController> mCurrentCameraController{nullptr};
+    Ref<CameraController> mEditorCamController;
+    Ref<GameCameraController> mGameCameraController;
     RenderWindow *mRenderWindow;
 
     GLuint mPlayerController;

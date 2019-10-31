@@ -12,13 +12,13 @@ public:
     void update(float dt);
 
     void setSpeed(float speed);
-    void updateHeight(float deltaHeight);
+    void moveUp(float deltaHeight);
     void moveRight(float delta);
     void setPosition(const vec3 &position);
     vec3 cameraPosition() const;
 
-    void pitch(float degrees);
-    void yaw(float degrees);
+    virtual void pitch(float degrees);
+    virtual void yaw(float degrees);
     void setPitch(float newPitch);
     void setYaw(float newYaw);
 
@@ -30,6 +30,8 @@ public:
     Camera &getCamera() { return mCamera; }
     const Camera &getCamera() const { return mCamera; }
     void resize(float aspectRatio);
+
+    void moveForward(float dt);
 
 private:
     float mNearPlane{0.5f};
@@ -44,10 +46,18 @@ private:
     vec3 mUp{0.f, 1.f, 0.f};
     vec3 mCameraPosition{0.f, 0.f, 0.f};
 
-    float mPitch{0.f};
-    float mYaw{0.f};
-    float mTranslationSpeed{5.f}; //camera will move by this speed along the mForward vector
+    float mTranslationSpeed{0.02f}; //camera will move by this speed along the mForward vector
     float mRotationSpeed{180.f};
+
+protected:
+    float mPitch{-25.f};
+    float mYaw{0.f};
+};
+class GameCameraController : public CameraController {
+public:
+    GameCameraController(float aspectRatio);
+    void pitch(float degrees) override;
+    void yaw(float degrees) override;
 };
 
 #endif // CAMERACONTROLLER_H

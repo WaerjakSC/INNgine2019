@@ -8,11 +8,13 @@
 InputSystem::InputSystem(RenderWindow *window)
     : registry(Registry::instance()), factory(ResourceManager::instance()),
       mRenderWindow(window) {
-    ray = new Raycast(window, factory->getCurrentCameraController());
-    mCurrentCameraController = factory->getCurrentCameraController();
 }
 
 void InputSystem::update(float deltaTime) {
+    if (factory->isPlaying())
+        gameCameraController()->update(deltaTime);
+    else
+        editorCamController()->update(deltaTime);
     handlePlayerController(deltaTime);
     handleKeyInput();
     handleMouseInput();
@@ -49,7 +51,6 @@ void InputSystem::handlePlayerController(float deltaTime) {
     }
 }
 void InputSystem::handleMouseInput() {
-    mCurrentCameraController->setSpeed(0.f);
     if (editorInput.LMB) {
         int entityID = ray->rayCast(mRenderWindow->mapFromGlobal(QCursor::pos()));
         if (entityID != -1) {
@@ -57,19 +58,36 @@ void InputSystem::handleMouseInput() {
         }
     } else if (editorInput.RMB) {
         if (editorInput.W)
-            mCurrentCameraController->setSpeed(-mCameraSpeed);
+            mEditorCamController->moveForward(mCameraSpeed);
         if (editorInput.S)
-            mCurrentCameraController->setSpeed(mCameraSpeed);
+            mEditorCamController->moveForward(-mCameraSpeed);
         if (editorInput.D)
-            mCurrentCameraController->moveRight(mCameraSpeed);
+            mEditorCamController->moveRight(mCameraSpeed);
         if (editorInput.A)
-            mCurrentCameraController->moveRight(-mCameraSpeed);
+            mEditorCamController->moveRight(-mCameraSpeed);
         if (editorInput.Q)
-            mCurrentCameraController->updateHeight(-mCameraSpeed);
+            mEditorCamController->moveUp(-mCameraSpeed);
         if (editorInput.E) {
-            mCurrentCameraController->updateHeight(mCameraSpeed);
+            mEditorCamController->moveUp(mCameraSpeed);
         }
     }
+}
+
+Ref<CameraController> InputSystem::editorCamController() const {
+    return mEditorCamController;
+}
+
+Ref<GameCameraController> InputSystem::gameCameraController() const {
+    return mGameCameraController;
+}
+
+void InputSystem::setGameCameraController(const Ref<GameCameraController> &gameCameraController) {
+    mGameCameraController = gameCameraController;
+}
+
+void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController) {
+    mEditorCamController = editorCamController;
+    ray = new Raycast(mRenderWindow, mEditorCamController);
 }
 
 GLuint InputSystem::playerController() const {
@@ -79,6 +97,7 @@ GLuint InputSystem::playerController() const {
 void InputSystem::setPlayerController(const GLuint &playerController) {
     mPlayerController = playerController;
 }
+
 void InputSystem::setCameraSpeed(float value) {
     mCameraSpeed += value;
     //Keep within min and max values
@@ -219,9 +238,9 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
             GLfloat dy = GLfloat(event->y() - lastPos.y()) / mRenderWindow->height();
 
             if (dx != 0)
-                mCurrentCameraController->yaw(mCameraRotateSpeed * dx);
+                mEditorCamController->yaw(mCameraRotateSpeed * dx);
             if (dy != 0)
-                mCurrentCameraController->pitch(mCameraRotateSpeed * dy);
+                mEditorCamController->pitch(mCameraRotateSpeed * dy);
         }
         firstRMB = false;
     }

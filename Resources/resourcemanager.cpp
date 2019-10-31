@@ -220,7 +220,7 @@ GLuint ResourceManager::makeCube(const QString &name) {
     registry->addComponent<Transform>(eID);
     registry->addComponent<Material>(eID, getShader<ColorShader>());
     registry->addComponent<Mesh>(eID);
-    setMesh("cube.obj", eID);
+    setMesh("Cube.obj", eID);
 
     return eID;
 }
