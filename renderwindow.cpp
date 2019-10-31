@@ -290,19 +290,16 @@ void RenderWindow::startOpenGLDebugger() {
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
-//std::vector<GLuint> RenderWindow::Cull(const Camera::Frustum &f) {
-//    std::vector<GLuint> result;
-
-//    for(auto entity : Registry::instance()->getEntities())
-//    GLuint entityID = entity.first;
-
-//    for (int i = 0; i < objects.size(); i++) {
-//        oBB bounds = GetOBB(*(objects[i]));
+//void RenderWindow::Cull(const Camera::Frustum &f) {
+//    auto view = mRegistry->view<Mesh, Collision>();
+//    for (auto entity : view) {
+//        auto &collider = view.get<Collision>(entity);
+//        const OBB &bounds = dynamic_cast<OBB>(collider);
 //        if (Intersects(f, bounds)) {
-//            result.push_back(objects[i]);
-//        }
+//            view.get<Mesh>(entity).mRendered = false;
+//        } else
+//            view.get<Mesh>(entity).mRendered = true;
 //    }
-//    return result;
 //}
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
     if (mInputSystem)
