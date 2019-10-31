@@ -81,8 +81,9 @@ private:
     MainWindow *mMainWindow;
     friend class MainWindow;
     void setupAABBSettings(const AABB &col);
-    std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorGrid(const vec3 &vector, QHBoxLayout *layout = nullptr,
-                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
+                                                                                   const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    void setupOBBSettings(const OBB &col);
 };
 
 #endif // COMPONENTLIST_H

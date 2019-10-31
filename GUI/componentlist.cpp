@@ -107,7 +107,7 @@ void ComponentList::addCollisionComponent() {
 }
 void ComponentList::setupAABBSettings(const AABB &col) {
     ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
-
+    box->setTitle("AABB Collider");
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
     QGroupBox *originBox = new QGroupBox(tr("Origin"));
@@ -115,7 +115,7 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     originBox->setFlat(true);
     QHBoxLayout *origin = new QHBoxLayout;
     origin->setMargin(1);
-    /*auto [originX, originY, originZ] = */ makeVectorGrid(col.origin, origin); // Not sure yet if this is something that's supposed to be updated
+    /*auto [originX, originY, originZ] = */ makeVectorBox(col.origin, origin); // Not sure yet if this is something that's supposed to be updated
     //    connect(this, &ComponentList::/* some signal here */, originX, &QDoubleSpinBox::setValue);
     //    connect(originX, SIGNAL(valueChanged(double)), this, SLOT(setOriginX(double)));
     //    connect(this, &ComponentList::/* some signal here */, originY, &QDoubleSpinBox::setValue);
@@ -126,14 +126,51 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     originBox->setLayout(origin);
     grid->addWidget(originBox, 0, 0);
 
-    QGroupBox *hSizeBox = new QGroupBox(tr("Half-size"));
+    QGroupBox *hSizeBox = new QGroupBox(tr("Half-Size"));
     hSizeBox->setStyle(fusion);
     hSizeBox->setFlat(true);
 
     QHBoxLayout *hSize = new QHBoxLayout;
     hSize->setMargin(1);
 
-    makeVectorGrid(col.size, hSize);
+    makeVectorBox(col.size, hSize);
+
+    hSizeBox->setLayout(hSize);
+    grid->addWidget(hSizeBox, 1, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
+}
+void ComponentList::setupOBBSettings(const OBB &col) {
+    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
+    box->setTitle("OBB Collider");
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    posBox->setStyle(fusion);
+    posBox->setFlat(true);
+    QHBoxLayout *position = new QHBoxLayout;
+    position->setMargin(1);
+    /*auto [originX, originY, originZ] = */ makeVectorBox(col.position, position); // Not sure yet if this is something that's supposed to be updated
+    //    connect(this, &ComponentList::/* some signal here */, originX, &QDoubleSpinBox::setValue);
+    //    connect(originX, SIGNAL(valueChanged(double)), this, SLOT(setOriginX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, originY, &QDoubleSpinBox::setValue);
+    //    connect(originY, SIGNAL(valueChanged(double)), this, SLOT(setOriginY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, originZ, &QDoubleSpinBox::setValue);
+    //    connect(originZ, SIGNAL(valueChanged(double)), this, SLOT(setOriginZ(double)));
+    posBox->setLayout(position);
+    grid->addWidget(posBox, 0, 0);
+
+    QGroupBox *hSizeBox = new QGroupBox(tr("Half-Size"));
+    hSizeBox->setStyle(fusion);
+    hSizeBox->setFlat(true);
+
+    QHBoxLayout *hSize = new QHBoxLayout;
+    hSize->setMargin(1);
+
+    makeVectorBox(col.size, hSize);
+
+    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
@@ -222,7 +259,7 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     posBox->setFlat(true);
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    std::tie(xVal, yVal, zVal) = makeVectorGrid(trans.localPosition, position);
+    std::tie(xVal, yVal, zVal) = makeVectorBox(trans.localPosition, position);
     connect(this, &ComponentList::posX, xVal, &QDoubleSpinBox::setValue);
     connect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
     connect(this, &ComponentList::posY, yVal, &QDoubleSpinBox::setValue);
@@ -245,7 +282,7 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     rotBox->setFlat(true);
     QHBoxLayout *rotation = new QHBoxLayout;
     rotation->setMargin(1);
-    auto [rotX, rotY, rotZ] = makeVectorGrid(trans.localRotation, rotation, -180, 180);
+    auto [rotX, rotY, rotZ] = makeVectorBox(trans.localRotation, rotation, -180, 180);
     connect(this, &ComponentList::rotX, rotX, &QDoubleSpinBox::setValue);
     connect(rotX, SIGNAL(valueChanged(double)), this, SLOT(setRotationX(double)));
     connect(this, &ComponentList::rotY, rotY, &QDoubleSpinBox::setValue);
@@ -261,7 +298,7 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     scaleBox->setFlat(true);
     QHBoxLayout *scale = new QHBoxLayout(box);
     scale->setMargin(1);
-    auto [scaleX, scaleY, scaleZ] = makeVectorGrid(trans.localScale, scale, 0.1, 100);
+    auto [scaleX, scaleY, scaleZ] = makeVectorBox(trans.localScale, scale, 0.1, 100);
     connect(this, &ComponentList::scaleX, scaleX, &QDoubleSpinBox::setValue);
     connect(scaleX, SIGNAL(valueChanged(double)), this, SLOT(setScaleX(double)));
     connect(this, &ComponentList::scaleY, scaleY, &QDoubleSpinBox::setValue);
@@ -274,62 +311,7 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> ComponentList::makeVectorGrid(const vec3 &vector,
-                                                                                               QHBoxLayout *layout,
-                                                                                               const std::optional<float> &minRange, const std::optional<float> &maxRange) {
-    layout->setMargin(1);
-    QDoubleSpinBox *xBox, *yBox, *zBox;
-    // Set up the Vector Display
-    for (int i = 0; i < 6; i++) {
-        if (i % 2 == 0) {
-            QLabel *label = new QLabel;
-            label->setStyle(fusion);
-            switch (i) {
-            case 0:
-                label->setText("X:");
-                break;
-            case 2:
-                label->setText("Y:");
-                break;
-            case 4:
-                label->setText("Z:");
-                break;
-            }
-            layout->addWidget(label);
-        } else {
-            switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
-            case 1:
-                xBox = new QDoubleSpinBox;
-                xBox->setDecimals(1);
-                xBox->setRange(minRange.value_or(-5000), maxRange.value_or(5000));
-                xBox->setMaximumWidth(58);
-                xBox->setStyle(fusion);
-                xBox->setValue(vector.x);
-                layout->addWidget(xBox);
-                break;
-            case 3:
-                yBox = new QDoubleSpinBox;
-                yBox->setDecimals(1);
-                yBox->setRange(minRange.value_or(-5000), maxRange.value_or(5000));
-                yBox->setMaximumWidth(58);
-                yBox->setStyle(fusion);
-                yBox->setValue(vector.y);
-                layout->addWidget(yBox);
-                break;
-            case 5:
-                zBox = new QDoubleSpinBox;
-                zBox->setDecimals(1);
-                zBox->setRange(minRange.value_or(-5000), maxRange.value_or(5000));
-                zBox->setMaximumWidth(58);
-                zBox->setStyle(fusion);
-                zBox->setValue(vector.z);
-                layout->addWidget(zBox);
-                break;
-            }
-        }
-    }
-    return std::make_tuple(xBox, yBox, zBox);
-}
+
 void ComponentList::setNewShader(const QString &text) {
     GLuint eID = mMainWindow->selectedEntity->id();
     emit newShader(eID, text.toStdString());
@@ -481,4 +463,68 @@ void ComponentList::setScaleZ(double zIn) {
     movement->setScaleZ(mMainWindow->selectedEntity->id(), zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
+}
+/**
+ * @brief Utility function for making an XYZ box layout from a given vector
+ * @param vector The vector to make the layout from
+ * @param layout The layout being created/added to
+ * @param minRange Minimum range of the QDoubleSpinBox
+ * @param maxRange Maximum range of the QDoubleSpinBox
+ * @return Returns a tuple containing the XYZ spinboxes in case you want to plug them into Qt's signal/slot system
+ */
+std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> ComponentList::makeVectorBox(const vec3 &vector,
+                                                                                              QHBoxLayout *layout,
+                                                                                              const std::optional<float> &minRange, const std::optional<float> &maxRange) {
+    layout->setMargin(1);
+    QDoubleSpinBox *xBox, *yBox, *zBox;
+    // Set up the Vector Display
+    for (int i = 0; i < 6; i++) {
+        if (i % 2 == 0) {
+            QLabel *label = new QLabel;
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("X:");
+                break;
+            case 2:
+                label->setText("Y:");
+                break;
+            case 4:
+                label->setText("Z:");
+                break;
+            }
+            layout->addWidget(label);
+        } else {
+            switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
+            case 1:
+                xBox = new QDoubleSpinBox;
+                xBox->setDecimals(1);
+                xBox->setRange(minRange.value_or(-5000), maxRange.value_or(5000));
+                xBox->setMaximumWidth(58);
+                xBox->setStyle(fusion);
+                xBox->setValue(vector.x);
+                layout->addWidget(xBox);
+                break;
+            case 3:
+                yBox = new QDoubleSpinBox;
+                yBox->setDecimals(1);
+                yBox->setRange(minRange.value_or(-5000), maxRange.value_or(5000));
+                yBox->setMaximumWidth(58);
+                yBox->setStyle(fusion);
+                yBox->setValue(vector.y);
+                layout->addWidget(yBox);
+                break;
+            case 5:
+                zBox = new QDoubleSpinBox;
+                zBox->setDecimals(1);
+                zBox->setRange(minRange.value_or(-5000), maxRange.value_or(5000));
+                zBox->setMaximumWidth(58);
+                zBox->setStyle(fusion);
+                zBox->setValue(vector.z);
+                layout->addWidget(zBox);
+                break;
+            }
+        }
+    }
+    return std::make_tuple(xBox, yBox, zBox);
 }
