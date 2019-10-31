@@ -34,30 +34,29 @@ public:
     /**
       * @brief Frustum struct
       */
-    typedef Collision::Plane plane;
-    typedef Collision::Sphere sphere;
-    typedef Collision::AABB aABB;
-    typedef Collision::OBB oBB;
+
     typedef struct Frustum {
-        union {
+
             struct {
-                plane top;
-                plane bottom;
-                plane left;
-                plane right;
-                plane near;
-                plane far;
+                Plane top;
+                Plane bottom;
+                Plane left;
+                Plane right;
+                Plane near;
+                Plane far;
             } planeType;
-            plane planes[6];
-        };
+
+            Plane planes[6];
+
+
         inline Frustum() {}
-        vec3 Intersection(plane p1, plane p2, plane p3);
+        vec3 Intersection(Plane p1, Plane p2, Plane p3);
         void GetCorners(const Frustum &f, vec3 *outCorners);
-        bool Intersects(const Frustum &f, const sphere &s);
-        float Classify(const aABB &aabb, const plane &plane);
-        float Classify(const oBB &obb, const plane &plane);
-        bool Intersects(const Frustum &f, const aABB &aabb);
-        bool Intersects(const Frustum &f, const oBB &obb);
+        bool Intersects(const Frustum &f, const Sphere &s);
+        float Classify(const AABB &aabb, const Plane &plane);
+        float Classify(const OBB &obb, const Plane &plane);
+        bool Intersects(const Frustum &f, const AABB &aabb);
+        bool Intersects(const Frustum &f, const OBB &obb);
 
     } Frustum;
 

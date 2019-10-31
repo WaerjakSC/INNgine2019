@@ -290,17 +290,17 @@ void RenderWindow::startOpenGLDebugger() {
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
-//void RenderWindow::Cull(const Camera::Frustum &f) {
-//    auto view = mRegistry->view<Mesh, Collision>();
-//    for (auto entity : view) {
-//        auto &collider = view.get<Collision>(entity);
-//        const OBB &bounds = dynamic_cast<OBB>(collider);
-//        if (Intersects(f, bounds)) {
-//            view.get<Mesh>(entity).mRendered = false;
-//        } else
-//            view.get<Mesh>(entity).mRendered = true;
-//    }
-//}
+void RenderWindow::Cull(const Camera::Frustum &f) {
+    auto view = mRegistry->view<Mesh, Collision>();
+    for (auto entity : view) {
+        auto &collider = view.get<Collision>(entity);
+        const AABB &bounds = dynamic_cast<AABB&>(collider);
+        if (mInputSystem->editorCamController()->getCamera().getFrustum().Intersects(f, bounds)) {
+            view.get<Mesh>(entity).mRendered = true;
+        } else
+            view.get<Mesh>(entity).mRendered = false;
+    }
+}
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
     if (mInputSystem)
         mInputSystem->keyPressEvent(event);

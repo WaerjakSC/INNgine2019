@@ -101,7 +101,7 @@ Camera::Frustum Camera::getFrustum() {
 }
 
 // Finds the corners where the planes p1, p2 and p3 intersect.
-vec3 Camera::Frustum::Intersection(plane p1, plane p2, plane p3) {
+vec3 Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3) {
     mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
            p1.normal.y, p2.normal.y, p3.normal.y,
            p1.normal.z, p2.normal.z, p3.normal.z};
@@ -143,7 +143,7 @@ void Camera::Frustum::GetCorners(const Frustum &f, vec3 *outCorners) {
     outCorners[7] = Intersection(f.planeType.far, f.planeType.bottom, f.planeType.right);
 }
 
-bool Camera::Frustum::Intersects(const Frustum &f, const sphere &s) {
+bool Camera::Frustum::Intersects(const Frustum &f, const Sphere &s) {
     for (int i = 0; i < 6; i++) {
         vec3 normal = f.planes[i].normal;
         float dist = f.planes[i].distance;
@@ -155,7 +155,7 @@ bool Camera::Frustum::Intersects(const Frustum &f, const sphere &s) {
     return true;
 }
 
-float Camera::Frustum::Classify(const aABB &aabb, const plane &plane) {
+float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
     // maximum extent in direction of plane normal
     float r = fabsf(aabb.size.x * plane.normal.x) + fabsf(aabb.size.y * plane.normal.y) + fabsf(aabb.size.z * plane.normal.z);
     // signed distance between box center and plane
@@ -168,7 +168,7 @@ float Camera::Frustum::Classify(const aABB &aabb, const plane &plane) {
     return d - r;
 }
 
-//float Camera::Frustum::Classify(const oBB &obb, const plane &plane) {
+//float Camera::Frustum::Classify(const OBB &obb, const Plane &plane) {
 //    vec3 normal = MultiplyVector(plane.normal, obb.orientation);
 
 //    // maximum extent in direction of plane normal
@@ -188,7 +188,7 @@ float Camera::Frustum::Classify(const aABB &aabb, const plane &plane) {
 //    return d - r;
 //}
 
-bool Camera::Frustum::Intersects(const Frustum &f, const aABB &aabb) {
+bool Camera::Frustum::Intersects(const Frustum &f, const AABB &aabb) {
     for (int i = 0; i < 6; ++i) {
         if (Classify(aabb, f.planes[i]) < 0) {
             return false;
@@ -197,7 +197,7 @@ bool Camera::Frustum::Intersects(const Frustum &f, const aABB &aabb) {
     return true;
 }
 
-//bool Camera::Frustum::Intersects(const Frustum &f, const oBB &obb) {
+//bool Camera::Frustum::Intersects(const Frustum &f, const OBB &obb) {
 //    for (int i = 0; i < 6; ++i) {
 //        if (Classify(obb, f.planes[i]) < 0) {
 //            return false;

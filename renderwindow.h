@@ -103,6 +103,7 @@ private:
     friend class MainWindow;
 
     void Cull(const Camera::Frustum &f);
+    Camera mCamera;
 
     friend class MainWindow;
 
