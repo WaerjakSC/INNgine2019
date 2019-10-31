@@ -36,8 +36,8 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
     registry->registerComponent<Input>();
-    registry->registerComponent<Collision>();
     registry->registerComponent<Light>();
+    // Collision Types
     registry->registerComponent<AABB>();
     registry->registerComponent<OBB>();
     registry->registerComponent<Sphere>();

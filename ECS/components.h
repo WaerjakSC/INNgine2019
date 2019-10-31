@@ -35,61 +35,6 @@ struct meshData {
         mName.clear();
     }
 };
-enum class CType {
-    None = 0,
-    Transform = 1 << 0,
-    Material = 1 << 1,
-    Mesh = 1 << 2,
-    Light = 1 << 3,
-    Input = 1 << 4,
-    Physics = 1 << 5,
-    Sound = 1 << 6,
-    Collision = 1 << 7
-};
-
-template <typename E>
-struct enableBitmaskOperators {
-    static constexpr bool enable = false;
-};
-template <>
-struct enableBitmaskOperators<CType> {
-    static constexpr bool enable = true;
-};
-template <typename E>
-typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
-operator|(E lhs, E rhs) {
-    typedef typename std::underlying_type<E>::type underlying;
-    return static_cast<E>(static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
-}
-template <typename E>
-typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
-operator~(E type) {
-    typedef typename std::underlying_type<E>::type underlying;
-    return static_cast<E>(static_cast<underlying>(type));
-}
-template <typename E>
-typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
-operator|=(E &lhs, E rhs) {
-    typedef typename std::underlying_type<E>::type underlying;
-    lhs = static_cast<E>(
-                static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
-    return lhs;
-}
-template <typename E>
-typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
-operator&=(E &lhs, E rhs) {
-    typedef typename std::underlying_type<E>::type underlying;
-    lhs = static_cast<E>(
-                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
-    return lhs;
-}
-template <typename E>
-typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
-operator&(E lhs, E rhs) {
-    typedef typename std::underlying_type<E>::type underlying;
-    return static_cast<E>(
-                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
-}
 /**
  * @brief The Component class is the base class for all components.
  */
@@ -97,7 +42,7 @@ class Component {
 
 public:
     Component() = default;
-    virtual ~Component();
+    virtual ~Component() {}
 
     virtual void update() = 0;
 
@@ -233,15 +178,18 @@ struct Input : public Component {
     bool A{false};
     bool S{false};
     bool D{false};
-    bool L{false};
-    bool UP{false}; //Arrow keys
+    bool Q{false};
+    bool E{false};
+
+    //Arrow keys
+    bool UP{false};
     bool DOWN{false};
     bool LEFT{false};
     bool RIGHT{false};
-    bool Q{false};
-    bool E{false};
+
     bool F{false};
     bool C{false};
+    bool L{false};
     bool ESCAPE{false};
     bool LSHIFT{false};
     bool CTRL{false};
@@ -281,26 +229,26 @@ public:
 };
 
 /**
- * @brief The Collision component class holds the collider types and bounds
+ * @brief The Collision component class is the base class for our various collider types.
+ * Don't use on its own.
  */
 struct Collision : public Component {
 public:
     Collision() {}
-//    Collision(vec3 size) : colType(type) {}
+    //    Collision(vec3 size) : colType(type) {}
     virtual void update() {}
     bool mTrigger{false};
     GLuint mVAO{0}; // holds the VAO for the collider
-
 };
 
 /**
   * @brief Axis Aligned Bounding Box
   */
 struct AABB : public Collision {
-    vec3 origin;
+    vec3 origin{0};
     vec3 size; // Half size
 
-    inline AABB() : size(2, 2, 2) {}
+    inline AABB() : size(vec3(2)) {}
     inline AABB(const vec3 &o, const vec3 &s) : origin(o), size(s) {}
 };
 
@@ -308,14 +256,14 @@ struct AABB : public Collision {
   * @brief Oriented Bounding Box
   */
 struct OBB : public Collision {
-    vec3 position;
+    vec3 position{0};
     vec3 size;
     mat3 orientation;
 
     // default constructor: lager en OBB ved origo
-    inline OBB() : size(2, 2, 2) {}
+    inline OBB() : size(vec3(2, 2, 2)) {}
     // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
-    inline OBB(const vec3 &p, const vec3 &s) {}
+    inline OBB(const vec3 &p, const vec3 &s) : position(p), size(s) {}
     // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
     inline OBB(const vec3 &p, const vec3 &s, const mat3 &o) : position(p), size(s), orientation(o) {}
 };
@@ -323,7 +271,7 @@ struct OBB : public Collision {
 /**
   * @brief Sphere struct
   */
-struct Sphere : public Collision{
+struct Sphere : public Collision {
     vec3 position;
     float radius;
 
@@ -348,7 +296,6 @@ struct Cylinder : public Collision {
     vec3 position;
     float radius;
     float height;
-
 };
 /**
  * @brief The BSplineCurve struct

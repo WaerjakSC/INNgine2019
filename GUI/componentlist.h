@@ -11,6 +11,7 @@ class Registry;
 class Entity;
 class QLabel;
 class QCheckBox;
+class QHBoxLayout;
 class QDoubleSpinBox;
 class HierarchyModel;
 class HierarchyView;
@@ -71,6 +72,7 @@ private:
 
     Registry *registry;
     QColor rgb;
+    QStyle *fusion;
     QLabel *colorLabel, *texFileLabel, *objFileLabel;
     QCheckBox *abs;
     QDoubleSpinBox *xVal, *yVal, *zVal;
@@ -78,6 +80,9 @@ private:
     VerticalScrollArea *scrollArea;
     MainWindow *mMainWindow;
     friend class MainWindow;
+    void setupAABBSettings(const AABB &col);
+    std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorGrid(const vec3 &vector, QHBoxLayout *layout = nullptr,
+                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
 };
 
 #endif // COMPONENTLIST_H

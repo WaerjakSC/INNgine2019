@@ -4,23 +4,13 @@
 #include "registry.h"
 #include "resourcemanager.h"
 #include "soundsystem.h"
-Component::~Component() {
-}
 
-/*
-void Input::wheelEvent(QWheelEvent *event){
-    QPoint numDegrees = event->angleDelta() / 8;
-    RenderWindow r;
-    //if RMB, change the speed of the camera
-    if (RMB) {
-        if (numDegrees.y() < 1)
-        r.setCameraSpeed(0.001f);
-        if (numDegrees.y() > 1)
-        r.setCameraSpeed(-0.001f);
-    }
-    event->accept();
-}
-*/
+/**
+ * @brief Sound constructor - Have to put this in .cpp file to avoid circular dependency with registry
+ * @param name Name of the file to be loaded
+ * @param loop Whether to loop or play only once
+ * @param gain Not sure
+ */
 Sound::Sound(std::string name, bool loop, float gain)
     : mLooping(loop), mName(name), mGain(gain) {
     alGetError();

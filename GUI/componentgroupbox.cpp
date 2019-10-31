@@ -42,7 +42,16 @@ void ComponentGroupBox::removeComponent() {
         registry->removeComponent<Sound>(entityID);
         break;
     case CType::Collision:
-        registry->removeComponent<Collision>(entityID);
+        if (registry->contains<AABB>(entityID))
+            registry->removeComponent<AABB>(entityID);
+        else if (registry->contains<OBB>(entityID))
+            registry->removeComponent<OBB>(entityID);
+        else if (registry->contains<Plane>(entityID))
+            registry->removeComponent<Plane>(entityID);
+        else if (registry->contains<Sphere>(entityID))
+            registry->removeComponent<Sphere>(entityID);
+        else if (registry->contains<Cylinder>(entityID))
+            registry->removeComponent<Cylinder>(entityID);
         break;
     default:
         break;
