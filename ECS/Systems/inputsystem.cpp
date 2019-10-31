@@ -52,10 +52,8 @@ void InputSystem::handlePlayerController(float deltaTime) {
 }
 void InputSystem::handleMouseInput() {
     if (editorInput.LMB) {
-        int entityID = ray->rayCast(mRenderWindow->mapFromGlobal(QCursor::pos()));
-        if (entityID != -1) {
-            emit rayHitEntity(entityID);
-        }
+        int entityID = ray->mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry());
+        emit rayHitEntity(entityID);
     } else if (editorInput.RMB) {
         if (editorInput.W)
             mEditorCamController->moveForward(mCameraSpeed);
@@ -87,7 +85,7 @@ void InputSystem::setGameCameraController(const Ref<GameCameraController> &gameC
 
 void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController) {
     mEditorCamController = editorCamController;
-    ray = new Raycast(mRenderWindow, mEditorCamController);
+    ray = new Raycast(mEditorCamController);
 }
 
 GLuint InputSystem::playerController() const {
@@ -249,7 +247,10 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
         firstRMB = true;
     }
 }
-
+void InputSystem::onResize(float aspectRatio) {
+    mEditorCamController->resize(aspectRatio);
+    mGameCameraController->resize(aspectRatio);
+}
 void InputSystem::inputMousePress(QMouseEvent *event, Input &input) {
     switch (event->button()) {
     case Qt::RightButton:

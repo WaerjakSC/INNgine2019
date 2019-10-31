@@ -33,6 +33,7 @@ public:
     Ref<GameCameraController> gameCameraController() const;
     void setGameCameraController(const Ref<GameCameraController> &gameCameraController);
 
+    void onResize(float aspectRatio);
 signals:
     void snapSignal();
     void rayHitEntity(GLuint entityID);

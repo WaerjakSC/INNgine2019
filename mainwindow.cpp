@@ -316,7 +316,12 @@ void MainWindow::onEntityClicked(const QModelIndex &index) {
 void MainWindow::onEntityDragged(GLuint eID) {
     selectedEntity = registry->getEntity(eID);
 }
-void MainWindow::mouseRayHit(GLuint eID) {
+void MainWindow::mouseRayHit(int eID) {
+    if (eID == -1) {
+        hView->setCurrentIndex(hierarchy->invisibleRootItem()->index());
+        scrollArea->clearLayout();
+        return;
+    }
     QStandardItem *entity = hierarchy->itemFromEntityID(eID);
     hView->setCurrentIndex(hierarchy->indexFromItem(entity));
     selectedEntity = registry->getEntity(eID);

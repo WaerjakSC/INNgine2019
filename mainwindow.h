@@ -41,7 +41,7 @@ signals:
     void goToLoc(GLuint eID);
 public slots:
     void parentChanged(GLuint eID);
-    void mouseRayHit(GLuint eID);
+    void mouseRayHit(int eID);
     void closeEngine();
 
 private slots:

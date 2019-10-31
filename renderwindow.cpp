@@ -210,10 +210,7 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, static_cast<GLint>(width() * retinaScale), static_cast<GLint>(height() * retinaScale));
     float aspectRatio = static_cast<float>(width()) / height();
-    if (!mFactory->isPlaying())
-        mInputSystem->editorCamController()->resize(aspectRatio);
-    else
-        mInputSystem->gameCameraController()->resize(aspectRatio);
+    mInputSystem->onResize(aspectRatio);
 }
 
 //Simple way to turn on/off wireframe mode

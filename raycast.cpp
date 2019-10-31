@@ -4,16 +4,16 @@
 #include "registry.h"
 #include "renderwindow.h"
 #include <QWindow>
-Raycast::Raycast(RenderWindow *window, cjk::Ref<CameraController> controller) : mOpenGLWindow(window), mCurrentController(controller) {
+Raycast::Raycast(cjk::Ref<CameraController> controller) : mCurrentController(controller) {
 }
 /**
  * @brief Raycast::rayCast
  * @param mousePos
  * @return For now this returns -1 if it doesn't hit any targets. Make sure to check if it's valid a valid entity before using it
  */
-int Raycast::rayCast(const QPoint &mousePos) {
+int Raycast::mousePick(const QPoint &mousePos, const QRect &rect) {
     Registry *registry = Registry::instance();
-    Ray ray = getRay(mousePos);
+    Ray ray = getRayFromMouse(mousePos, rect);
     // actual point in world space
     //    vec3 rayPoint = getPointOnRay(ray, 5);
     int entityID{-1};
@@ -35,9 +35,7 @@ int Raycast::rayCast(const QPoint &mousePos) {
 vec3 Raycast::getPointOnRay(const Ray &ray, float distance) {
     return ray.origin + (ray.direction * distance);
 }
-Ray Raycast::getRay(const QPoint &mousePos) {
-    const QRect &rect = mOpenGLWindow->geometry();
-
+Ray Raycast::getRayFromMouse(const QPoint &mousePos, const QRect &rect) {
     vec3 mousePoint(mousePos.x(), mousePos.y(), 0.0f);
     vec3 direction = mCurrentController->getCamera().calculateMouseRay(mousePoint, rect.height(), rect.width());
     vec3 origin = mCurrentController->cameraPosition();
