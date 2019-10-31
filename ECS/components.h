@@ -72,7 +72,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator|=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -80,7 +80,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E &>::type
 operator&=(E &lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     lhs = static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
     return lhs;
 }
 template <typename E>
@@ -88,7 +88,7 @@ typename std::enable_if<enableBitmaskOperators<E>::enable, E>::type
 operator&(E lhs, E rhs) {
     typedef typename std::underlying_type<E>::type underlying;
     return static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+                static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
 }
 /**
  * @brief The Component class is the base class for all components.
@@ -280,12 +280,6 @@ public:
     vec3 mVelocity{0}; ///< Vector containing source velocity.
 };
 
-enum ColType {
-    AABB,
-    OBB,
-    Sphere,
-    Capsule
-};
 /**
  * @brief The Collision component class holds the collider types and bounds
  */
@@ -298,63 +292,64 @@ public:
     bool mTrigger{false};
     GLuint mVAO{0}; // holds the VAO for the collider
 
-    /**
-      * @brief Axis Aligned Bounding Box
-      */
-    typedef struct AABB {
-        vec3 origin;
-        vec3 size; // Half size
+};
 
-        inline AABB() : size(2, 2, 2) {}
-        inline AABB(const vec3 &o, const vec3 &s) : origin(o), size(s) {}
-    } AABB;
+/**
+  * @brief Axis Aligned Bounding Box
+  */
+struct AABB : public Collision {
+    vec3 origin;
+    vec3 size; // Half size
 
-    /**
-      * @brief Oriented Bounding Box
-      */
-    typedef struct OBB {
-        vec3 position;
-        vec3 size;
-        mat3 orientation;
+    inline AABB() : size(2, 2, 2) {}
+    inline AABB(const vec3 &o, const vec3 &s) : origin(o), size(s) {}
+};
 
-        // default constructor: lager en OBB ved origo
-        inline OBB() : size(2, 2, 2) {}
-        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
-        inline OBB(const vec3 &p, const vec3 &s) {}
-        // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
-        inline OBB(const vec3 &p, const vec3 &s, const mat3 &o) : position(p), size(s), orientation(o) {}
-    } OBB;
+/**
+  * @brief Oriented Bounding Box
+  */
+struct OBB : public Collision {
+    vec3 position;
+    vec3 size;
+    mat3 orientation;
 
-    /**
-      * @brief Sphere struct
-      */
-    typedef struct Sphere {
-        vec3 position;
-        float radius;
+    // default constructor: lager en OBB ved origo
+    inline OBB() : size(2, 2, 2) {}
+    // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
+    inline OBB(const vec3 &p, const vec3 &s) {}
+    // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
+    inline OBB(const vec3 &p, const vec3 &s, const mat3 &o) : position(p), size(s), orientation(o) {}
+};
 
-        // default constructor
-        inline Sphere() : radius(3.0f){};
-        // constructor with radius and position params
-        inline Sphere(const vec3 &pos, const float &r) : position(pos), radius(r) {}
-    } Sphere;
+/**
+  * @brief Sphere struct
+  */
+struct Sphere : public Collision{
+    vec3 position;
+    float radius;
 
-    /**
-      * @brief Plane struct
-      */
-    typedef struct Plane {
-        vec3 normal;
-        float distance;
+    // default constructor
+    inline Sphere() : radius(3.0f){};
+    // constructor with radius and position params
+    inline Sphere(const vec3 &pos, const float &r) : position(pos), radius(r) {}
+};
 
-        inline Plane() : normal(1, 0, 0) {}
-        inline Plane(const vec3 &n, float d) : normal(n), distance(d) {}
-    } Plane;
+/**
+  * @brief Plane struct
+  */
+struct Plane : public Collision {
+    vec3 normal;
+    float distance;
 
-    typedef struct Cylinder {
-        vec3 position;
-        float radius;
-        float height;
+    inline Plane() : normal(1, 0, 0) {}
+    inline Plane(const vec3 &n, float d) : normal(n), distance(d) {}
+};
 
-    } Cylinder;
+struct Cylinder : public Collision {
+    vec3 position;
+    float radius;
+    float height;
+
 };
 /**
  * @brief The BSplineCurve struct
@@ -379,6 +374,7 @@ struct BSplineCurve : Component {
 enum NPCstates { MOVE,
                  SLEEP,
                  DEATH };
+
 enum NPCevents { ENDPOINT_ARRIVED,
                  DAMAGE_TAKEN };
 

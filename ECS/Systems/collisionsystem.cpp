@@ -15,7 +15,7 @@ void CollisionSystem::update(float deltaTime) {
  * @param aabb
  * @return a vector minimum point found in the AABB
  */
-vec3 CollisionSystem::getMin(const Collision::AABB &aabb) {
+vec3 CollisionSystem::getMin(const AABB &aabb) {
     vec3 p1 = aabb.origin + aabb.size;
     vec3 p2 = aabb.origin - aabb.size;
 
@@ -29,7 +29,7 @@ vec3 CollisionSystem::getMin(const Collision::AABB &aabb) {
  * @param aabb
  * @return a vector maximum point found in the AABB
  */
-vec3 CollisionSystem::getMax(const Collision::AABB &aabb) {
+vec3 CollisionSystem::getMax(const AABB &aabb) {
     vec3 p1 = aabb.origin + aabb.size;
     vec3 p2 = aabb.origin - aabb.size;
 
@@ -44,7 +44,7 @@ vec3 CollisionSystem::getMax(const Collision::AABB &aabb) {
  * @param obb
  * @return true if distance less than radius squared ( We have an intersection )
  */
-bool CollisionSystem::SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb) {
+bool CollisionSystem::SphereOBB(const Sphere &sphere, const OBB &obb) {
 
     // Finner først nærmeste punktet i OBB til sphere center
     vec3 p = ClosestPoint(obb, sphere.position);
@@ -75,7 +75,7 @@ void CollisionSystem::DrawColliders()
  * @param sphere2
  * @return true if distance is less than radius^2 (intersection)
  */
-bool CollisionSystem::SphereSphere(const Collision::Sphere &sphere1, const Collision::Sphere &sphere2) {
+bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2) {
     // sum of radius
     float rs = sphere1.radius + sphere2.radius;
     // dist squared
@@ -90,7 +90,7 @@ bool CollisionSystem::SphereSphere(const Collision::Sphere &sphere1, const Colli
  * @param plane
  * @return
  */
-bool CollisionSystem::AABBPlane(const Collision::AABB &aabb, const Collision::Plane &plane) { // WIP - not sure if this works
+bool CollisionSystem::AABBPlane(const AABB &aabb, const Plane &plane) { // WIP - not sure if this works
     float mHalfExtent = aabb.size.x * fabsf(plane.normal.x) +
             aabb.size.y * fabsf(plane.normal.y) +
             aabb.size.z * fabsf(plane.normal.z);
@@ -108,7 +108,7 @@ bool CollisionSystem::AABBPlane(const Collision::AABB &aabb, const Collision::Pl
  * @param aabb
  * @return true if distance is less than radius (we have an intersection)
  */
-bool CollisionSystem::SphereAABB(const Collision::Sphere &sphere, const Collision::AABB &aabb) {
+bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
     vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
     // not 100% sure about this one
     float dist = (sphere.position - closestPoint).length();
@@ -122,7 +122,7 @@ bool CollisionSystem::SphereAABB(const Collision::Sphere &sphere, const Collisio
  * @param AABB2
  * @return true if all axis overlap (we have an intersection)
  */
-bool CollisionSystem::AABBAABB(const Collision::AABB &AABB1, const Collision::AABB &AABB2) {
+bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
 
     vec3 aMin = getMin(AABB1);
     vec3 aMax = getMax(AABB1);
@@ -141,7 +141,7 @@ bool CollisionSystem::AABBAABB(const Collision::AABB &AABB1, const Collision::AA
  * @param vec3 point
  * @return the vec3 closest point
  */
-vec3 CollisionSystem::ClosestPoint(const Collision::AABB &aabb, const vec3 &point) {
+vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point) {
     vec3 result = point;
     vec3 min = getMin(aabb);
     vec3 max = getMax(aabb);
@@ -164,7 +164,7 @@ vec3 CollisionSystem::ClosestPoint(const Collision::AABB &aabb, const vec3 &poin
  * @param point
  * @return
  */
-vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point) {
+vec3 CollisionSystem::ClosestPoint(const OBB &obb, const vec3 &point) {
     vec3 result = obb.position;
     //     move the point relative to the OBB
     vec3 dir = point - obb.position;
@@ -202,7 +202,7 @@ vec3 CollisionSystem::ClosestPoint(const Collision::OBB &obb, const vec3 &point)
  * @param point
  * @return resized vector, offset by sphere.position
  */
-vec3 CollisionSystem::ClosestPoint(const Collision::Sphere &sphere, const vec3 &point) {
+vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
     vec3 sphereCenterToPoint = point - sphere.position;
     sphereCenterToPoint.normalize();
     sphereCenterToPoint = sphereCenterToPoint * sphere.radius;
