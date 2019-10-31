@@ -12,9 +12,9 @@ InputSystem::InputSystem(RenderWindow *window)
 
 void InputSystem::update(float deltaTime) {
     if (factory->isPlaying())
-        gameCameraController()->update(deltaTime);
+        gameCameraController()->update();
     else
-        editorCamController()->update(deltaTime);
+        editorCamController()->update();
     handlePlayerController(deltaTime);
     handleKeyInput();
     handleMouseInput();
@@ -47,7 +47,7 @@ void InputSystem::handlePlayerController(float deltaTime) {
             desiredVelocity.y += mCameraSpeed;
         if (player.E)
             desiredVelocity.y -= mCameraSpeed;
-        registry->getSystem<MovementSystem>()->move(mPlayerController, desiredVelocity.normalized() * deltaTime);
+        registry->getSystem<MovementSystem>()->move(mPlayerController, desiredVelocity.normalized() * mMoveSpeed * deltaTime);
     }
 }
 void InputSystem::handleMouseInput() {

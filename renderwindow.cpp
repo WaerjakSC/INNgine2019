@@ -95,6 +95,7 @@ void RenderWindow::init() {
     //********************** Set up camera **********************
     float aspectRatio = static_cast<float>(width()) / height();
     Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>(aspectRatio);
+    gameCam->setPosition(vec3(0.f, 12.f, 10.0f));
     mEditorCameraController = std::make_shared<CameraController>(aspectRatio);
     mEditorCameraController->setPosition(vec3(0.f, 8.f, 15.0f));
     mFactory->setCurrentCameraController(mEditorCameraController);
@@ -146,7 +147,7 @@ void RenderWindow::init() {
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
 
-    float time = static_cast<float>(mTime.elapsed());
+    float time = static_cast<float>(mTime.elapsed()) / 1000.f;
     DeltaTime dt = time - mLastFrameTime;
     mLastFrameTime = time;
 
@@ -300,7 +301,7 @@ void RenderWindow::Cull(const Camera::Frustum &f) {
     auto view = mRegistry->view<Mesh, Collision>();
     for (auto entity : view) {
         auto &collider = view.get<Collision>(entity);
-        const AABB &bounds = dynamic_cast<AABB&>(collider);
+        const AABB &bounds = dynamic_cast<AABB &>(collider);
         if (mInputSystem->editorCamController()->getCamera().getFrustum().Intersects(f, bounds)) {
             view.get<Mesh>(entity).mRendered = true;
         } else

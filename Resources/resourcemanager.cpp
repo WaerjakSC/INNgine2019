@@ -3,6 +3,7 @@
 #include "cameracontroller.h"
 #include "colorshader.h"
 #include "innpch.h"
+#include "inputsystem.h"
 #include "lightsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
@@ -840,6 +841,10 @@ void ResourceManager::play() {
         } else
             Registry::instance()->makeSnapshot();
         registry->getSystem<SoundSystem>()->playAll();
+        auto inputsys = registry->getSystem<InputSystem>();
+        for (auto shader : mShaders) {
+            shader.second->setCameraController(inputsys->gameCameraController());
+        }
         mIsPlaying = true;
         mMainWindow->play->setEnabled(false);
         mMainWindow->pause->setEnabled(true);
@@ -860,6 +865,10 @@ void ResourceManager::stop() {
         registry->loadSnapshot();
         registry->getSystem<MovementSystem>()->init();
         registry->getSystem<SoundSystem>()->stopAll();
+        auto inputsys = registry->getSystem<InputSystem>();
+        for (auto shader : mShaders) {
+            shader.second->setCameraController(inputsys->editorCamController());
+        }
         mIsPlaying = false;
         mMainWindow->insertEntities();
         mMainWindow->play->setEnabled(true);

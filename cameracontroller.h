@@ -9,7 +9,7 @@ public:
 
     void updateRightVector();
     void updateForwardVector();
-    void update(float dt);
+    void update();
 
     void setSpeed(float speed);
     void moveUp(float deltaHeight);

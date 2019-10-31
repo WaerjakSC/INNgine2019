@@ -52,8 +52,7 @@ void CameraController::updateForwardVector() {
 void CameraController::setPosition(const vec3 &position) {
     mCameraPosition = position;
 }
-void CameraController::update(float dt) {
-    Q_UNUSED(dt);
+void CameraController::update() {
     mCamera.setRotation(mPitch, mYaw);
     mCamera.setPosition(mCameraPosition);
     mCamera.calculateViewMatrix();
@@ -96,6 +95,7 @@ void CameraController::resize(float aspectRatio) {
 }
 
 GameCameraController::GameCameraController(float aspectRatio) : CameraController(aspectRatio) {
+    mPitch = -45.f;
     // Set desired pitch and yaw here, they will not be changeable by the player
 }
 

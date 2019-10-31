@@ -45,6 +45,7 @@ private:
     void handleMouseInput();
 
     float mCameraSpeed{1.f};
+    float mMoveSpeed{10.f};
     float mCameraRotateSpeed{30.f};
     bool firstRMB{true};
     QPoint lastPos;
