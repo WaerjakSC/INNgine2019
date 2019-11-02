@@ -36,6 +36,18 @@ void ComponentList::setupComponentList() {
     if (registry->contains<AABB>(eID)) {
         setupAABBSettings(registry->getComponent<AABB>(eID));
     }
+    if (registry->contains<OBB>(eID)) {
+        setupOBBSettings(registry->getComponent<OBB>(eID));
+    }
+    if (registry->contains<Sphere>(eID)) {
+        setupSphereColliderSettings(registry->getComponent<Sphere>(eID));
+    }
+    if (registry->contains<Cylinder>(eID)) {
+        setupCylinderColliderSettings(registry->getComponent<Cylinder>(eID));
+    }
+    if (registry->contains<Plane>(eID)) {
+        setupPlaneColliderSettings(registry->getComponent<Plane>(eID));
+    }
     if (registry->contains<Material>(eID)) {
         setupMaterialSettings(registry->getComponent<Material>(eID));
     }
@@ -99,11 +111,35 @@ void ComponentList::addSoundComponent() {
         registry->addComponent<Sound>(eID);
     setupComponentList();
 }
-void ComponentList::addCollisionComponent() {
-    //    GLuint eID = mMainWindow->selectedEntity->id();
-    //    if (!registry->contains<Collision>(eID))
-    //        registry->addComponent<Collision>(eID);
-    //    setupComponentList();
+void ComponentList::addAABBCollider() {
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<AABB>(eID))
+        registry->addComponent<AABB>(eID);
+    setupComponentList();
+}
+void ComponentList::addOBBCollider() {
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<OBB>(eID))
+        registry->addComponent<OBB>(eID);
+    setupComponentList();
+}
+void ComponentList::addSphereCollider() {
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Sphere>(eID))
+        registry->addComponent<Sphere>(eID);
+    setupComponentList();
+}
+void ComponentList::addPlaneCollider() {
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Plane>(eID))
+        registry->addComponent<Plane>(eID);
+    setupComponentList();
+}
+void ComponentList::addCylinderCollider() {
+    GLuint eID = mMainWindow->selectedEntity->id();
+    if (!registry->contains<Cylinder>(eID))
+        registry->addComponent<Cylinder>(eID);
+    setupComponentList();
 }
 void ComponentList::setupAABBSettings(const AABB &col) {
     ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
@@ -151,13 +187,8 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     posBox->setFlat(true);
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    /*auto [originX, originY, originZ] = */ makeVectorBox(col.position, position); // Not sure yet if this is something that's supposed to be updated
-    //    connect(this, &ComponentList::/* some signal here */, originX, &QDoubleSpinBox::setValue);
-    //    connect(originX, SIGNAL(valueChanged(double)), this, SLOT(setOriginX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, originY, &QDoubleSpinBox::setValue);
-    //    connect(originY, SIGNAL(valueChanged(double)), this, SLOT(setOriginY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, originZ, &QDoubleSpinBox::setValue);
-    //    connect(originZ, SIGNAL(valueChanged(double)), this, SLOT(setOriginZ(double)));
+    makeVectorBox(col.position, position);
+
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
 
@@ -174,6 +205,138 @@ void ComponentList::setupOBBSettings(const OBB &col) {
 
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
+}
+void ComponentList::setupSphereColliderSettings(const Sphere &col) {
+    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
+    box->setTitle("Sphere Collider");
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    posBox->setStyle(fusion);
+    posBox->setFlat(true);
+    QHBoxLayout *position = new QHBoxLayout;
+    position->setMargin(1);
+    makeVectorBox(col.position, position);
+
+    posBox->setLayout(position);
+    grid->addWidget(posBox, 0, 0);
+
+    QGroupBox *radiusBox = new QGroupBox(tr("Radius"));
+    radiusBox->setStyle(fusion);
+    radiusBox->setFlat(true);
+
+    QHBoxLayout *radiusLayout = new QHBoxLayout;
+    radiusLayout->setMargin(1);
+    QDoubleSpinBox *radius = new QDoubleSpinBox;
+    radius->setDecimals(1);
+    radius->setRange(0.1f, 5000);
+    radius->setMaximumWidth(58);
+    radius->setStyle(fusion);
+    radius->setValue(col.radius);
+    radiusLayout->addWidget(radius);
+
+    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
+
+    radiusBox->setLayout(radiusLayout);
+    grid->addWidget(radiusBox, 1, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
+}
+
+void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
+    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
+    box->setTitle("Cylinder Collider");
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    posBox->setStyle(fusion);
+    posBox->setFlat(true);
+    QHBoxLayout *position = new QHBoxLayout;
+    position->setMargin(1);
+    makeVectorBox(col.position, position);
+
+    posBox->setLayout(position);
+    grid->addWidget(posBox, 0, 0);
+
+    QGroupBox *radiusBox = new QGroupBox(tr("Radius"));
+    radiusBox->setStyle(fusion);
+    radiusBox->setFlat(true);
+
+    QHBoxLayout *radiusLayout = new QHBoxLayout;
+    radiusLayout->setMargin(1);
+    QDoubleSpinBox *radius = new QDoubleSpinBox;
+    radius->setDecimals(1);
+    radius->setRange(0.1f, 5000);
+    radius->setMaximumWidth(58);
+    radius->setStyle(fusion);
+    radius->setValue(col.radius);
+    radiusLayout->addWidget(radius);
+
+    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
+
+    radiusBox->setLayout(radiusLayout);
+    grid->addWidget(radiusBox, 1, 0);
+
+    QGroupBox *heightBox = new QGroupBox(tr("Height"));
+    heightBox->setStyle(fusion);
+    heightBox->setFlat(true);
+
+    QHBoxLayout *heightLayout = new QHBoxLayout;
+    heightLayout->setMargin(1);
+    QDoubleSpinBox *height = new QDoubleSpinBox;
+    height->setDecimals(1);
+    height->setRange(0.1f, 5000);
+    height->setMaximumWidth(58);
+    height->setStyle(fusion);
+    height->setValue(col.height);
+    heightLayout->addWidget(height);
+
+    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
+
+    heightBox->setLayout(heightLayout);
+    grid->addWidget(heightBox, 2, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
+}
+
+void ComponentList::setupPlaneColliderSettings(const Plane &col) {
+    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
+    box->setTitle("Sphere Collider");
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *normalBox = new QGroupBox(tr("Normal"));
+    normalBox->setStyle(fusion);
+    normalBox->setFlat(true);
+    QHBoxLayout *normal = new QHBoxLayout;
+    normal->setMargin(1);
+    makeVectorBox(col.normal, normal);
+
+    normalBox->setLayout(normal);
+    grid->addWidget(normalBox, 0, 0);
+
+    QGroupBox *distanceBox = new QGroupBox(tr("Distance"));
+    distanceBox->setStyle(fusion);
+    distanceBox->setFlat(true);
+
+    QHBoxLayout *distanceLayout = new QHBoxLayout;
+    distanceLayout->setMargin(1);
+    QDoubleSpinBox *distance = new QDoubleSpinBox;
+    distance->setDecimals(1);
+    distance->setRange(0.1f, 5000);
+    distance->setMaximumWidth(58);
+    distance->setStyle(fusion);
+    distance->setValue(col.distance);
+    distanceLayout->addWidget(distance);
+
+    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
+
+    distanceBox->setLayout(distanceLayout);
+    grid->addWidget(distanceBox, 1, 0);
 
     box->setLayout(grid);
     scrollArea->addGroupBox(box);

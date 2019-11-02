@@ -1,8 +1,5 @@
 #include "components.h"
-#include "constants.h"
-#include "mainwindow.h"
 #include "registry.h"
-#include "resourcemanager.h"
 #include "soundsystem.h"
 
 /**

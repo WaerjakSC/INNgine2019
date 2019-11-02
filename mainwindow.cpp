@@ -207,6 +207,27 @@ void MainWindow::createActions() {
     components->addAction(meshAction);
     connect(meshAction, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
+    QMenu *collisionMenu = components->addMenu(tr("&Colliders"));
+    QMenu *boxes = collisionMenu->addMenu("Box Colliders");
+
+    AABBAction = new QAction(tr("Axis Aligned"), this);
+    boxes->addAction(AABBAction);
+    connect(AABBAction, &QAction::triggered, mComponentList, &ComponentList::addAABBCollider);
+    OBBAction = new QAction(tr("Oriented"), this);
+    boxes->addAction(OBBAction);
+    connect(OBBAction, &QAction::triggered, mComponentList, &ComponentList::addOBBCollider);
+
+    PlaneAction = new QAction(tr("Plane"), this);
+    collisionMenu->addAction(PlaneAction);
+    connect(PlaneAction, &QAction::triggered, mComponentList, &ComponentList::addPlaneCollider);
+
+    SphereAction = new QAction(tr("Sphere"), this);
+    collisionMenu->addAction(SphereAction);
+    connect(SphereAction, &QAction::triggered, mComponentList, &ComponentList::addSphereCollider);
+    CylinderAction = new QAction(tr("Cylinder"), this);
+    collisionMenu->addAction(CylinderAction);
+    connect(CylinderAction, &QAction::triggered, mComponentList, &ComponentList::addCylinderCollider);
+
     lightAction = new QAction(tr("Light"), this);
     components->addAction(lightAction);
     connect(lightAction, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
@@ -222,10 +243,6 @@ void MainWindow::createActions() {
     soundAction = new QAction(tr("Sound"), this);
     components->addAction(soundAction);
     connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
-
-    collisionAction = new QAction(tr("Collision"), this);
-    components->addAction(collisionAction);
-    connect(collisionAction, &QAction::triggered, mComponentList, &ComponentList::addCollisionComponent);
 
     ui->mainToolBar->setMovable(false);
 

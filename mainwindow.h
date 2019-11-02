@@ -78,7 +78,8 @@ private:
     ComponentList *mComponentList;
     Ref<Entity> selectedEntity;
     quint32 unnamedEntityCount{0};
-    QAction *transAction, *matAction, *meshAction, *lightAction, *inputAction, *collisionAction, *soundAction, *physicsAction;
+    QAction *transAction, *matAction, *meshAction, *lightAction, *inputAction, *soundAction, *physicsAction;
+    QAction *AABBAction, *OBBAction, *SphereAction, *CylinderAction, *PlaneAction;
     Registry *registry;
 
     bool mShowingMsg{false};

@@ -16,8 +16,6 @@
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
 #endif
-class MainWindow;
-
 // must undefine for Frustum.
 #undef near
 #undef far
@@ -43,8 +41,6 @@ class Component {
 public:
     Component() = default;
     virtual ~Component() {}
-
-    virtual void update() = 0;
 
     CType type() const {
         return mType;
@@ -74,7 +70,6 @@ struct Transform : Component {
         localRotation = rot;
         localScale = newScale;
     }
-    virtual void update() {}
 
     bool matrixOutdated{true};
 
@@ -100,8 +95,6 @@ struct Material : public Component {
         mType = CType::Material;
     }
 
-    virtual void update() {}
-
     GLfloat mSpecularStrength;
     GLint mSpecularExponent;
     vec3 mObjectColor;
@@ -122,7 +115,6 @@ struct Mesh : public Component {
     Mesh(const Mesh &other) {
         *this = other;
     }
-    virtual void update() {}
 
     GLuint mVAO{0};
     GLuint mVBO{0};
@@ -159,7 +151,6 @@ struct Light : public Component {
           mLightColor(lightColor), mObjectColor(color) {
         mType = CType::Light;
     }
-    virtual void update() {}
 
     GLfloat mAmbientStrength;
     vec3 mAmbientColor;
@@ -172,7 +163,6 @@ struct Input : public Component {
     Input() {
         mType = CType::Input;
     }
-    virtual void update() {}
 
     bool W{false};
     bool A{false};
@@ -204,7 +194,7 @@ struct Input : public Component {
 struct Physics : public Component {
 public:
     Physics(float speed = 1.0f) : mSpeed(speed) {}
-    virtual void update() {}
+
     float mSpeed;
     vec3 mVelocity;
 };
@@ -212,8 +202,6 @@ struct Sound : public Component {
 public:
     Sound() {}
     Sound(std::string name, bool loop = false, float gain = 1.0);
-
-    virtual void update() {}
 
     bool mLooping{false};
     bool mPlaying{false}; // Might want to change this, but atm it will just be playing by default immediately
@@ -236,7 +224,7 @@ struct Collision : public Component {
 public:
     Collision() {}
     //    Collision(vec3 size) : colType(type) {}
-    virtual void update() {}
+
     bool mTrigger{false};
     GLuint mVAO{0}; // holds the VAO for the collider
 };
@@ -305,8 +293,6 @@ struct BSplineCurve : Component {
     int n;                // n number of knots
     int d;                // d degrees
     std::vector<float> t; // knots
-
-    virtual void update() {}
 
     // default constructor
     BSplineCurve() {}

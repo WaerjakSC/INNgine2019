@@ -31,7 +31,11 @@ public slots:
     void addMeshComponent();
     void addMaterialComponent();
     void addTransformComponent();
-    void addCollisionComponent();
+    void addAABBCollider();
+    void addOBBCollider();
+    void addSphereCollider();
+    void addPlaneCollider();
+    void addCylinderCollider();
 signals:
     void posX(GLfloat xIn);
     void posY(GLfloat yIn);
@@ -63,13 +67,18 @@ private slots:
     void setScaleZ(double zIn);
 
 private:
-    void setupTransformSettings(const Transform &component);
     void setColor();
     void setNewMesh();
     void setNewTextureFile();
+
+    void setupTransformSettings(const Transform &component);
     void setupMaterialSettings(const Material &component);
     void setupMeshSettings(const Mesh &mesh);
-
+    void setupAABBSettings(const AABB &col);
+    void setupOBBSettings(const OBB &col);
+    void setupSphereColliderSettings(const Sphere &col);
+    void setupCylinderColliderSettings(const Cylinder &col);
+    void setupPlaneColliderSettings(const Plane &col);
     Registry *registry;
     QColor rgb;
     QStyle *fusion;
@@ -80,10 +89,9 @@ private:
     VerticalScrollArea *scrollArea;
     MainWindow *mMainWindow;
     friend class MainWindow;
-    void setupAABBSettings(const AABB &col);
+
     std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
-    void setupOBBSettings(const OBB &col);
 };
 
 #endif // COMPONENTLIST_H
