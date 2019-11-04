@@ -170,11 +170,6 @@ private:
     void makeBillBoardMesh(int eID);
     friend class ComponentList;
     void changeMsg();
-<<<<<<< HEAD
-    void readLASFile(std::string filename);
-    void normalizePoints();
-=======
->>>>>>> parent of f9be9a4... møkk
 };
 
 #endif // RESOURCEMANAGER_H
