@@ -46,6 +46,31 @@ signals:
     void scaleX(GLfloat xIn);
     void scaleY(GLfloat yIn);
     void scaleZ(GLfloat zIn);
+    void originX(double xIn);
+    void originY(double xIn);
+    void originZ(double xIn);
+    void AABBSizeX(double xIn);
+    void AABBSizeY(double yIn);
+    void AABBSizeZ(double zIn);
+    void OBBPositionX(double xIn);
+    void OBBPositionY(double yIn);
+    void OBBPositionZ(double zIn);
+    void OBBSizeX(double xIn);
+    void OBBSizeY(double yIn);
+    void OBBSizeZ(double zIn);
+    void spherePositionX(double xIn);
+    void spherePositionY(double yIn);
+    void spherePositionZ(double zIn);
+    void sphereRadius(double radius);
+    void planeNormalX(double xIn);
+    void planeNormalY(double yIn);
+    void planeNormalZ(double zIn);
+    void planeDistance(double radius);
+    void cylinderPositionX(double xIn);
+    void cylinderPositionY(double yIn);
+    void cylinderPositionZ(double zIn);
+    void cylinderRadius(double radius);
+    void cylinderHeight(double height);
     void newShader(int entityID, std::string shader);
 
 private slots:
@@ -65,6 +90,32 @@ private slots:
     void setScaleX(double xIn);
     void setScaleY(double yIn);
     void setScaleZ(double zIn);
+
+    void setOriginX(double xIn);
+    void setOriginY(double xIn);
+    void setOriginZ(double xIn);
+    void setAABBSizeX(double xIn);
+    void setAABBSizeY(double yIn);
+    void setAABBSizeZ(double zIn);
+    void setOBBPositionX(double xIn);
+    void setOBBPositionY(double yIn);
+    void setOBBPositionZ(double zIn);
+    void setOBBSizeX(double xIn);
+    void setOBBSizeY(double yIn);
+    void setOBBSizeZ(double zIn);
+    void setSpherePositionX(double xIn);
+    void setSpherePositionY(double yIn);
+    void setSpherePositionZ(double zIn);
+    void setSphereRadius(double radius);
+    void setPlaneNormalX(double xIn);
+    void setPlaneNormalY(double yIn);
+    void setPlaneNormalZ(double zIn);
+    void setPlaneDistance(double radius);
+    void setCylinderPositionX(double xIn);
+    void setCylinderPositionY(double yIn);
+    void setCylinderPositionZ(double zIn);
+    void setCylinderRadius(double radius);
+    void setCylinderHeight(double height);
 
 private:
     void setColor();

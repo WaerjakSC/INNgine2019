@@ -176,11 +176,11 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     QHBoxLayout *origin = new QHBoxLayout;
     origin->setMargin(1);
     auto [originX, originY, originZ] = makeVectorBox(col.origin, origin); // Not sure yet if this is something that's supposed to be updated
-                                                                          //    connect(this, &ComponentList::/* some signal here */, originX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::originX, originX, &QDoubleSpinBox::setValue);
     connect(originX, SIGNAL(valueChanged(double)), this, SLOT(setOriginX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, originY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::originY, originY, &QDoubleSpinBox::setValue);
     connect(originY, SIGNAL(valueChanged(double)), this, SLOT(setOriginY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, originZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::originZ, originZ, &QDoubleSpinBox::setValue);
     connect(originZ, SIGNAL(valueChanged(double)), this, SLOT(setOriginZ(double)));
 
     originBox->setLayout(origin);
@@ -194,11 +194,11 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     hSize->setMargin(1);
 
     auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize);
-    //    connect(this, &ComponentList::/* some signal here */, sizeX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::AABBSizeX, sizeX, &QDoubleSpinBox::setValue);
     connect(sizeX, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, sizeY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::AABBSizeY, sizeY, &QDoubleSpinBox::setValue);
     connect(sizeY, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, sizeZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::AABBSizeZ, sizeZ, &QDoubleSpinBox::setValue);
     connect(sizeZ, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeZ(double)));
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
@@ -217,11 +217,11 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
     auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
-    //    connect(this, &ComponentList::/* some signal here */, positionX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::OBBPositionX, positionX, &QDoubleSpinBox::setValue);
     connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setOBBPositionX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, positionY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::OBBPositionY, positionY, &QDoubleSpinBox::setValue);
     connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setOBBPositionY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, positionZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::OBBPositionZ, positionZ, &QDoubleSpinBox::setValue);
     connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setOBBPositionZ(double)));
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
@@ -234,11 +234,11 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     hSize->setMargin(1);
 
     auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize);
-    //    connect(this, &ComponentList::/* some signal here */, sizeX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::OBBSizeX, sizeX, &QDoubleSpinBox::setValue);
     connect(sizeX, SIGNAL(valueChanged(double)), this, SLOT(setOBBSizeX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, sizeY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::OBBSizeY, sizeY, &QDoubleSpinBox::setValue);
     connect(sizeY, SIGNAL(valueChanged(double)), this, SLOT(setOBBSizeY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, sizeZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::OBBSizeZ, sizeZ, &QDoubleSpinBox::setValue);
     connect(sizeZ, SIGNAL(valueChanged(double)), this, SLOT(setOBBSizeZ(double)));
 
     // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
@@ -261,11 +261,11 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     position->setMargin(1);
 
     auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
-    //    connect(this, &ComponentList::/* some signal here */, positionX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::spherePositionX, positionX, &QDoubleSpinBox::setValue);
     connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setSpherePositionX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, positionY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::spherePositionY, positionY, &QDoubleSpinBox::setValue);
     connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setSpherePositionY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, positionZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::spherePositionZ, positionZ, &QDoubleSpinBox::setValue);
     connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setSpherePositionZ(double)));
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
@@ -283,9 +283,8 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     radius->setStyle(fusion);
     radius->setValue(col.radius);
     radiusLayout->addWidget(radius);
-    //    connect(this, &ComponentList::/* some signal here */, radius, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::sphereRadius, radius, &QDoubleSpinBox::setValue);
     connect(radius, SIGNAL(valueChanged(double)), this, SLOT(setSphereRadius(double)));
-    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     radiusBox->setLayout(radiusLayout);
     grid->addWidget(radiusBox, 1, 0);
@@ -305,11 +304,11 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
     auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
-    //    connect(this, &ComponentList::/* some signal here */, positionX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::cylinderPositionX, positionX, &QDoubleSpinBox::setValue);
     connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setCylinderPositionX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, positionY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::cylinderPositionY, positionY, &QDoubleSpinBox::setValue);
     connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setCylinderPositionY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, positionZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::cylinderPositionZ, positionZ, &QDoubleSpinBox::setValue);
     connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setCylinderPositionZ(double)));
 
     posBox->setLayout(position);
@@ -328,9 +327,8 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     radius->setStyle(fusion);
     radius->setValue(col.radius);
     radiusLayout->addWidget(radius);
-    //    connect(this, &ComponentList::/* some signal here */, radius, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::cylinderRadius, radius, &QDoubleSpinBox::setValue);
     connect(radius, SIGNAL(valueChanged(double)), this, SLOT(setCylinderRadius(double)));
-    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     radiusBox->setLayout(radiusLayout);
     grid->addWidget(radiusBox, 1, 0);
@@ -348,9 +346,8 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     height->setStyle(fusion);
     height->setValue(col.height);
     heightLayout->addWidget(height);
-    //    connect(this, &ComponentList::/* some signal here */, radius, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::cylinderHeight, radius, &QDoubleSpinBox::setValue);
     connect(height, SIGNAL(valueChanged(double)), this, SLOT(setCylinderHeight(double)));
-    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     heightBox->setLayout(heightLayout);
     grid->addWidget(heightBox, 2, 0);
@@ -370,11 +367,11 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     QHBoxLayout *normal = new QHBoxLayout;
     normal->setMargin(1);
     auto [normalX, normalY, normalZ] = makeVectorBox(col.normal, normal);
-    //    connect(this, &ComponentList::/* some signal here */, normalX, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::planeNormalX, normalX, &QDoubleSpinBox::setValue);
     connect(normalX, SIGNAL(valueChanged(double)), this, SLOT(setPlaneNormalX(double)));
-    //    connect(this, &ComponentList::/* some signal here */, normalY, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::planeNormalY, normalY, &QDoubleSpinBox::setValue);
     connect(normalY, SIGNAL(valueChanged(double)), this, SLOT(setPlaneNormalY(double)));
-    //    connect(this, &ComponentList::/* some signal here */, normalZ, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::planeNormalZ, normalZ, &QDoubleSpinBox::setValue);
     connect(normalZ, SIGNAL(valueChanged(double)), this, SLOT(setPlaneNormalZ(double)));
 
     normalBox->setLayout(normal);
@@ -393,9 +390,8 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     distance->setStyle(fusion);
     distance->setValue(col.distance);
     distanceLayout->addWidget(distance);
-    //    connect(this, &ComponentList::/* some signal here */, distance, &QDoubleSpinBox::setValue);
+    connect(this, &ComponentList::planeDistance, distance, &QDoubleSpinBox::setValue);
     connect(distance, SIGNAL(valueChanged(double)), this, SLOT(setPlaneDistance(double)));
-    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     distanceBox->setLayout(distanceLayout);
     grid->addWidget(distanceBox, 1, 0);
