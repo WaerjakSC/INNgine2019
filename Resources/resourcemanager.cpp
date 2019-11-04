@@ -4,6 +4,7 @@
 #include "colorshader.h"
 #include "innpch.h"
 #include "inputsystem.h"
+#include "lasmap.h"
 #include "lightsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
@@ -876,6 +877,226 @@ void ResourceManager::stop() {
         mMainWindow->play->setEnabled(true);
         mMainWindow->pause->setEnabled(false);
         mMainWindow->stop->setEnabled(false);
+    }
+}
+//=========================== Las Map Functions =========================== //
+void ResourceManager::constructSurface(unsigned int xGridSize, unsigned int zGridSize) {
+
+    mMeshData.mVertices.clear();
+    Vertex v{};
+    for (unsigned int z{0}, i{0}; z < zGridSize - 1; ++z, ++i) {
+        for (unsigned int x{0}; x < xGridSize - 1; ++x, ++i) {
+            v.set_xyz(terrain->planePoints[i]);
+            v.set_rgb(0, 1, 0);
+            v.set_st(0, 0);
+            mMeshData.mVertices.push_back(v);
+            v.set_xyz(terrain->planePoints[i + 1]);
+            v.set_rgb(1, 0, 0);
+            v.set_st(0, 0);
+            mMeshData.mVertices.push_back(v);
+            v.set_xyz(terrain->planePoints[i + xGridSize + 1]);
+            v.set_rgb(0, 0, 1);
+            v.set_st(0, 0);
+            mMeshData.mVertices.push_back(v);
+
+            v.set_xyz(terrain->planePoints[i]);
+            v.set_rgb(0, 1, 0);
+            v.set_st(0, 0);
+            mMeshData.mVertices.push_back(v);
+            v.set_xyz(terrain->planePoints[i + xGridSize + 1]);
+            v.set_rgb(0, 0, 1);
+            v.set_st(0, 0);
+            mMeshData.mVertices.push_back(v);
+            v.set_xyz(terrain->planePoints[i + xGridSize]);
+            v.set_rgb(1, 0, 0);
+            v.set_st(0, 0);
+            mMeshData.mVertices.push_back(v);
+        }
+    }
+}
+std::vector<gsl::Vector3D> LasMap::mapToGrid(const std::vector<gsl::Vector3D> &points, int xGrid, int zGrid, gsl::Vector3D min, gsl::Vector3D max) {
+    std::vector<std::pair<gsl::Vector3D, unsigned int>> grid;
+    grid.resize(xGrid * zGrid);
+
+    for (auto point : points) {
+        int closestIndex[2]{0, 0};
+        for (int z{0}; z < zGrid; ++z) {
+            for (int x{0}; x < xGrid; ++x) {
+                gsl::Vector3D gridPoint{
+                    x * ((max.x - min.x) / xGrid) + min.x,
+                    0,
+                    z * ((max.z - min.z) / zGrid) + min.z};
+
+                gsl::Vector3D lastClosestPoint{
+                    closestIndex[0] * ((max.x - min.x) / xGrid) + min.x,
+                    0,
+                    closestIndex[1] * ((max.z - min.z) / zGrid) + min.z};
+
+                if ((gsl::Vector3D{point.x, 0, point.z} - gridPoint).length() < (gsl::Vector3D{point.x, 0, point.z} - lastClosestPoint).length()) {
+                    closestIndex[0] = x;
+                    closestIndex[1] = z;
+                }
+            }
+        }
+
+        // std::cout << "point is: " << point << std::endl;
+
+        auto &p = grid.at(closestIndex[0] + closestIndex[1] * zGrid);
+        p.first += point;
+        ++p.second;
+    }
+
+    for (auto &p : grid)
+        std::cout << "p before: " << p.first << std::endl;
+
+    for (auto &p : grid)
+        p.first = (0 < p.second) ? p.first / static_cast<float>(p.second) : gsl::Vector3D{0, 0, 0};
+
+    for (auto &p : grid)
+        std::cout << "p after: " << p.first << std::endl;
+
+    for (int z{0}; z < zGrid; ++z) {
+        for (int x{0}; x < xGrid; ++x) {
+            auto &p = grid.at(x + z * zGrid);
+            p.first.x = x * ((max.x - min.x) / xGrid) + min.x;
+            p.first.z = z * ((max.z - min.z) / zGrid) + min.z;
+        }
+    }
+
+    // convert pair into only first of pair
+    std::vector<gsl::Vector3D> outputs{};
+    std::transform(grid.begin(), grid.end(), std::back_inserter(outputs), [](const std::pair<gsl::Vector3D, unsigned int> &p) {
+        return p.first;
+    });
+
+    return outputs;
+}
+void ResourceManager::makeLASMap() {
+    GLuint eID = registry->makeEntity("LASMap");
+    registry->addComponent<Transform>(eID);
+    registry->addComponent<Material>(eID);
+
+    readLASFile(gsl::assetFilePath + "/LASdata/fjell.txt");
+
+    normalizePoints();
+    addAllPointsToVertices();
+    constructSurface(10, 10);
+    Mesh las;
+    initVertexBuffers(&las);
+    registry->addComponent<Mesh>(eID, las);
+}
+void ResourceManager::normalizePoints() {
+    std::vector<float> xValues;
+    std::vector<float> zValues;
+    std::vector<float> yValues;
+
+    for (auto point : terrain->points) {
+        xValues.push_back(point.x);
+        yValues.push_back(point.y);
+        zValues.push_back(point.z);
+    }
+    std::sort(xValues.begin(), xValues.end());
+    std::sort(yValues.begin(), yValues.end());
+    std::sort(zValues.begin(), zValues.end());
+
+    terrain->xMin = xValues[0];
+    terrain->yMin = yValues[0];
+    terrain->zMin = zValues[0];
+
+    terrain->xMax = xValues[xValues.size() - 1];
+    terrain->yMax = yValues[yValues.size() - 1];
+    terrain->zMax = zValues[zValues.size() - 1];
+
+    for (auto &point : terrain->points) {
+        point.x = ((point.x - terrain->xMin) / (terrain->xMax - terrain->xMin) - 0.5) * terrain->scaleFactor;
+        point.y = ((point.y - terrain->yMin) / (terrain->yMax - terrain->yMin) - 0.5) * -terrain->scaleFactor;
+        point.z = ((point.z - terrain->zMin) / (terrain->zMax - terrain->zMin) - 0.5) * terrain->scaleFactor;
+
+        //        point.x += 2;
+        //        point.y += 1;
+        //        point.z += 4;
+
+        //        point.setX((point.x - xMin)/(xMax - xMin));
+        //        point.setY((point.y - yMin)/(yMax - yMin));
+        //        point.setZ((point.z - zMin)/(zMax - zMin));
+    }
+
+    xValues.clear();
+    yValues.clear();
+    zValues.clear();
+    for (auto point : terrain->points) {
+        xValues.push_back(point.x);
+        yValues.push_back(point.y);
+        zValues.push_back(point.z);
+    }
+    std::sort(xValues.begin(), xValues.end());
+    std::sort(yValues.begin(), yValues.end());
+    std::sort(zValues.begin(), zValues.end());
+
+    terrain->xMin = xValues[0];
+    terrain->yMin = yValues[0];
+    terrain->zMin = zValues[0];
+
+    terrain->xMax = xValues[xValues.size() - 1];
+    terrain->yMax = yValues[yValues.size() - 1];
+    terrain->zMax = zValues[zValues.size() - 1];
+
+    //    for (int i = 0; i < 5; ++i)
+    //    {
+    //        std::cout << points[i].getX() << " " << points[i].getY() << " " << points[i].getZ() << "\n";
+    //    }
+
+    //    double xTranslate = ((xValues[xValues.size() - 1]) - ((xValues[xValues.size() - 1] - xValues[0]) * 0.5));
+    //    double yTranslate = ((zValues[xValues.size() - 1]) - ((zValues[xValues.size() - 1] - zValues[0]) * 0.5));
+    //    double zTranslate = ((yValues[xValues.size() - 1]) - ((yValues[xValues.size() - 1] - yValues[0]) * 0.5));
+
+    //    double scaleNumber = 1;
+    //    scale(scaleNumber);
+    //    move(gsl::Vector3D(-xTranslate * scaleNumber, -zTranslate * scaleNumber, -yTranslate * scaleNumber));
+    //mMatrix.translate(-xTranslate, -yTranslate, -zTranslate);
+    //mMatrix.translate(2, 2, 2);
+}
+void ResourceManager::addAllPointsToVertices() {
+    mMeshData.mVertices.clear();
+
+    //    for (auto point : points)
+    //    {
+    //            Vertex v{};
+    //            v.set_xyz(point.x, point.y, point.z);
+    //            v.set_rgb(point.x/scaleFactor, point.z/scaleFactor, 0.5);
+    //            v.set_uv(0, 0);
+    //            mVertices.push_back(v);
+    //    }
+
+    //glPointSize(5);
+    terrain->planePoints = terrain->mapToGrid(terrain->points, 10, 10, gsl::Vector3D(terrain->xMin, terrain->yMin, terrain->zMin), gsl::Vector3D(terrain->xMax, terrain->yMax, terrain->zMax));
+    //    for (auto point : terrain->planePoints) {
+    //        Vertex v{};
+    //        v.set_xyz(point.x, point.y, point.z);
+    //        v.set_rgb(0, 1, 0);
+    //        v.set_st(0, 0);
+    //        mMeshData.mVertices.push_back(v);
+    //    }
+    std::cout << terrain->planePoints.size();
+}
+void ResourceManager::readLASFile(std::string filename) {
+    std::ifstream inn;
+    terrain = new LasMap;
+    inn.open(filename);
+
+    if (inn.is_open()) {
+        unsigned int n;
+        gsl::Vector3D vertex;
+        inn >> n;
+        terrain->points.reserve(n);
+        for (unsigned int i = 0; i < n; i++) {
+            inn >> vertex;
+            terrain->points.push_back(vertex);
+
+            std::string str;
+            std::getline(inn, str);
+        }
+        inn.close();
     }
 }
 //=========================== Octahedron Functions =========================== //
