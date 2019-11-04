@@ -1,6 +1,7 @@
 #include "scene.h"
-#include "core.h"
+#include "cameracontroller.h"
 #include "constants.h"
+#include "core.h"
 #include "inputsystem.h"
 #include "movementsystem.h"
 #include "phongshader.h"
@@ -25,12 +26,26 @@ void Scene::saveScene(const QString &fileName) {
 
     Registry *registry = Registry::instance();
     std::map<GLuint, cjk::Ref<Entity>> entities = registry->getEntities();
+    GameCameraController *gameCam = registry->getSystem<InputSystem>()->gameCameraController().get();
 
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer(buf);
 
     mName = fileName.chopped(5);
     writer.StartObject();
+    writer.String("gamecam");
+    writer.StartObject();
+    writer.Key("position");
+    writer.StartArray();
+    writer.Double(gameCam->cameraPosition().x);
+    writer.Double(gameCam->cameraPosition().y);
+    writer.Double(gameCam->cameraPosition().z);
+    writer.EndArray();
+    writer.Key("pitch");
+    writer.Int(gameCam->getPitch());
+    writer.Key("yaw");
+    writer.Int(gameCam->getYaw());
+    writer.EndObject();
 
     for (auto entity : entities) {
         GLuint eID = entity.first;
@@ -170,9 +185,22 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(sound.mGain);
                 writer.EndObject();
             }
-            if (registry->contains<Collision>(eID)) {
+            if (registry->contains<AABB>(eID)) {
                 // Write Collision data to json here.
             }
+            if (registry->contains<OBB>(eID)) {
+                // Write Collision data to json here.
+            }
+            if (registry->contains<Plane>(eID)) {
+                // Write Collision data to json here.
+            }
+            if (registry->contains<Sphere>(eID)) {
+                // Write Collision data to json here.
+            }
+            if (registry->contains<Cylinder>(eID)) {
+                // Write Collision data to json here.
+            }
+
             writer.EndObject();
             writer.EndObject();
         }
@@ -208,9 +236,19 @@ void Scene::populateScene(const Document &scene) {
     std::map<int, int> idPairs;
     Registry *registry = Registry::instance();
     ResourceManager *factory = ResourceManager::instance();
+    if (scene.HasMember("gamecam")) {
+        Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
+        gsl::Vector3D position(scene["gamecam"]["position"][0].GetDouble(), scene["gamecam"]["position"][1].GetDouble(), scene["gamecam"]["position"][2].GetDouble());
+        gameCam->setPosition(position);
+        gameCam->setPitch(scene["gamecam"]["pitch"].GetInt());
+        gameCam->setYaw(scene["gamecam"]["yaw"].GetInt());
+        registry->getSystem<InputSystem>()->setGameCameraController(gameCam);
+    }
     // Iterate through each gameobject in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
         // Iterate through each of the members in the gameobject (name, id, components)
+        if (itr->name == "gamecam")
+            itr++;
         GLuint id = registry->makeEntity(itr->value["name"].GetString());
         idPairs[itr->value["id"].GetInt()] = id;
         for (Value::ConstMemberIterator comp = itr->value["components"].MemberBegin(); comp != itr->value["components"].MemberEnd(); ++comp) {

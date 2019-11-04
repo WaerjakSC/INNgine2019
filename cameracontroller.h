@@ -29,9 +29,14 @@ public:
 
     Camera &getCamera() { return mCamera; }
     const Camera &getCamera() const { return mCamera; }
+
     void resize(float aspectRatio);
 
     void moveForward(float dt);
+
+    float getPitch() const;
+
+    float getYaw() const;
 
 private:
     float mNearPlane{0.5f};
@@ -55,7 +60,7 @@ protected:
 };
 class GameCameraController : public CameraController {
 public:
-    GameCameraController(float aspectRatio);
+    GameCameraController(float aspectRatio = 1.92f);
     void pitch(float degrees) override;
     void yaw(float degrees) override;
 };

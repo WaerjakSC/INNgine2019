@@ -19,7 +19,7 @@ void CameraController::setPitch(float newPitch) {
     updateForwardVector();
 }
 void CameraController::setYaw(float newYaw) {
-    mPitch = newYaw;
+    mYaw = newYaw;
     updateForwardVector();
 }
 vec3 CameraController::up() const {
@@ -77,6 +77,14 @@ void CameraController::goTo(vec3 target) {
 }
 void CameraController::moveForward(float delta) {
     mCameraPosition += mForward * mTranslationSpeed * delta;
+}
+
+float CameraController::getPitch() const {
+    return mPitch;
+}
+
+float CameraController::getYaw() const {
+    return mYaw;
 }
 void CameraController::moveUp(float deltaHeight) {
     mCameraPosition.y += mTranslationSpeed * deltaHeight;

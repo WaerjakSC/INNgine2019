@@ -94,8 +94,6 @@ void RenderWindow::init() {
 
     //********************** Set up camera **********************
     float aspectRatio = static_cast<float>(width()) / height();
-    Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>(aspectRatio);
-    gameCam->setPosition(vec3(0.f, 12.f, 10.0f));
     mEditorCameraController = std::make_shared<CameraController>(aspectRatio);
     mEditorCameraController->setPosition(vec3(0.f, 8.f, 15.0f));
     mFactory->setCurrentCameraController(mEditorCameraController);
@@ -124,7 +122,6 @@ void RenderWindow::init() {
     mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
     mInputSystem = mRegistry->registerSystem<InputSystem>(this);
     mInputSystem->setEditorCamController(mEditorCameraController);
-    mInputSystem->setGameCameraController(gameCam);
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mSoundSystem->createContext();
     //********************** Making the objects to be drawn **********************
