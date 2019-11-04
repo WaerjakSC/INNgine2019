@@ -172,10 +172,8 @@ private:
     void makeBillBoardMesh(int eID);
     friend class ComponentList;
     void changeMsg();
-    void constructSurface(unsigned int xGridSize, unsigned int zGridSize);
     void readLASFile(std::string filename);
     void normalizePoints();
-    void addAllPointsToVertices();
 };
 
 #endif // RESOURCEMANAGER_H

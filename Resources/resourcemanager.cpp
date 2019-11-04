@@ -914,63 +914,6 @@ void ResourceManager::constructSurface(unsigned int xGridSize, unsigned int zGri
         }
     }
 }
-std::vector<gsl::Vector3D> LasMap::mapToGrid(const std::vector<gsl::Vector3D> &points, int xGrid, int zGrid, gsl::Vector3D min, gsl::Vector3D max) {
-    std::vector<std::pair<gsl::Vector3D, unsigned int>> grid;
-    grid.resize(xGrid * zGrid);
-
-    for (auto point : points) {
-        int closestIndex[2]{0, 0};
-        for (int z{0}; z < zGrid; ++z) {
-            for (int x{0}; x < xGrid; ++x) {
-                gsl::Vector3D gridPoint{
-                    x * ((max.x - min.x) / xGrid) + min.x,
-                    0,
-                    z * ((max.z - min.z) / zGrid) + min.z};
-
-                gsl::Vector3D lastClosestPoint{
-                    closestIndex[0] * ((max.x - min.x) / xGrid) + min.x,
-                    0,
-                    closestIndex[1] * ((max.z - min.z) / zGrid) + min.z};
-
-                if ((gsl::Vector3D{point.x, 0, point.z} - gridPoint).length() < (gsl::Vector3D{point.x, 0, point.z} - lastClosestPoint).length()) {
-                    closestIndex[0] = x;
-                    closestIndex[1] = z;
-                }
-            }
-        }
-
-        // std::cout << "point is: " << point << std::endl;
-
-        auto &p = grid.at(closestIndex[0] + closestIndex[1] * zGrid);
-        p.first += point;
-        ++p.second;
-    }
-
-    for (auto &p : grid)
-        std::cout << "p before: " << p.first << std::endl;
-
-    for (auto &p : grid)
-        p.first = (0 < p.second) ? p.first / static_cast<float>(p.second) : gsl::Vector3D{0, 0, 0};
-
-    for (auto &p : grid)
-        std::cout << "p after: " << p.first << std::endl;
-
-    for (int z{0}; z < zGrid; ++z) {
-        for (int x{0}; x < xGrid; ++x) {
-            auto &p = grid.at(x + z * zGrid);
-            p.first.x = x * ((max.x - min.x) / xGrid) + min.x;
-            p.first.z = z * ((max.z - min.z) / zGrid) + min.z;
-        }
-    }
-
-    // convert pair into only first of pair
-    std::vector<gsl::Vector3D> outputs{};
-    std::transform(grid.begin(), grid.end(), std::back_inserter(outputs), [](const std::pair<gsl::Vector3D, unsigned int> &p) {
-        return p.first;
-    });
-
-    return outputs;
-}
 void ResourceManager::makeLASMap() {
     GLuint eID = registry->makeEntity("LASMap");
     registry->addComponent<Transform>(eID);
@@ -979,7 +922,6 @@ void ResourceManager::makeLASMap() {
     readLASFile(gsl::assetFilePath + "/LASdata/fjell.txt");
 
     normalizePoints();
-    addAllPointsToVertices();
     constructSurface(10, 10);
     Mesh las;
     initVertexBuffers(&las);
@@ -1055,29 +997,6 @@ void ResourceManager::normalizePoints() {
     //    move(gsl::Vector3D(-xTranslate * scaleNumber, -zTranslate * scaleNumber, -yTranslate * scaleNumber));
     //mMatrix.translate(-xTranslate, -yTranslate, -zTranslate);
     //mMatrix.translate(2, 2, 2);
-}
-void ResourceManager::addAllPointsToVertices() {
-    mMeshData.mVertices.clear();
-
-    //    for (auto point : points)
-    //    {
-    //            Vertex v{};
-    //            v.set_xyz(point.x, point.y, point.z);
-    //            v.set_rgb(point.x/scaleFactor, point.z/scaleFactor, 0.5);
-    //            v.set_uv(0, 0);
-    //            mVertices.push_back(v);
-    //    }
-
-    //glPointSize(5);
-    terrain->planePoints = terrain->mapToGrid(terrain->points, 10, 10, gsl::Vector3D(terrain->xMin, terrain->yMin, terrain->zMin), gsl::Vector3D(terrain->xMax, terrain->yMax, terrain->zMax));
-    //    for (auto point : terrain->planePoints) {
-    //        Vertex v{};
-    //        v.set_xyz(point.x, point.y, point.z);
-    //        v.set_rgb(0, 1, 0);
-    //        v.set_st(0, 0);
-    //        mMeshData.mVertices.push_back(v);
-    //    }
-    std::cout << terrain->planePoints.size();
 }
 void ResourceManager::readLASFile(std::string filename) {
     std::ifstream inn;
