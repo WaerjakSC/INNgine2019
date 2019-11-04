@@ -291,7 +291,7 @@ void RenderWindow::startOpenGLDebugger() {
  * @param f, the frustum
  */
 void RenderWindow::Cull(const Camera::Frustum &f) {
-    auto view = mRegistry->view<Mesh, Collision>();
+    auto view = mRegistry->view<Mesh, AABB>();
     Camera &cam = mInputSystem->editorCamController()->getCamera();
     for (auto entity : view) {
         auto &collider = view.get<AABB>(entity);

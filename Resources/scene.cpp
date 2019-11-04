@@ -318,6 +318,7 @@ void Scene::populateScene(const Document &scene) {
         mGameCamID = registry->makeEntity("Game Camera");
         registry->addComponent<Transform>(mGameCamID, position, vec3(0), vec3(0.33f, 0.33f, 0.33f));
         registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
+        // set the initial position and rotation
         gsl::Matrix4x4 temp(true);
         temp.lookAt(gameCam->cameraPosition(), gameCam->cameraPosition() - gameCam->forward(), gameCam->up());
         auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
