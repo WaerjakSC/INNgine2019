@@ -727,7 +727,7 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
 
         if (mp->diffuse_texname.length() > 0) {
             // Only load the texture if it is not already loaded
-            if (mTextures.find(mp->diffuse_texname) != mTextures.end()) {
+            if (mTextures.find(mp->diffuse_texname) == mTextures.end()) {
                 loadTexture(mp->diffuse_texname);
             }
         }

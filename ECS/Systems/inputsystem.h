@@ -56,7 +56,7 @@ private:
     ResourceManager *factory;
     Ref<CameraController> mEditorCamController;
     Ref<GameCameraController> mGameCameraController;
-    GLuint camMeshID;
+
     RenderWindow *mRenderWindow;
 
     GLuint mPlayerController;

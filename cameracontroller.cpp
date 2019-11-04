@@ -1,4 +1,5 @@
 #include "cameracontroller.h"
+#include "movementsystem.h"
 #include "registry.h"
 CameraController::CameraController(float aspectRatio)
     : mAspectRatio(aspectRatio),
@@ -61,12 +62,14 @@ void CameraController::setPosition(const vec3 &position) {
 }
 void CameraController::update() {
     if (mOutDated) {
-        //        gsl::Matrix4x4 temp(true);
-        //        temp.lookAt(cameraPosition(), cameraPosition() - forward(), up());
-        //        auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
-        //        auto trans = Registry::instance()->getSystem<MovementSystem>();
-        //        trans->setLocalPosition(camMeshID, cameraPosition() - forward());
-        //        trans->setRotation(camMeshID, rot);
+        if (meshID != 0) {
+            gsl::Matrix4x4 temp(true);
+            temp.lookAt(cameraPosition(), cameraPosition() - forward(), up());
+            auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
+            auto trans = Registry::instance()->getSystem<MovementSystem>();
+            trans->setLocalPosition(meshID, cameraPosition() - forward());
+            trans->setRotation(meshID, rot);
+        }
         mCamera.setRotation(mPitch, mYaw);
         mCamera.setPosition(mCameraPosition);
         mCamera.calculateViewMatrix();
@@ -106,6 +109,10 @@ float CameraController::getYaw() const {
 }
 const vec3 CameraController::getCameraRotation() const {
     return mCamera.getRotation();
+}
+
+void CameraController::setMeshID(const GLuint &value) {
+    meshID = value;
 }
 void CameraController::moveUp(float deltaHeight) {
     mOutDated = true;

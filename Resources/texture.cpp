@@ -42,8 +42,8 @@ Texture::Texture(GLuint textureUnit) : QOpenGLFunctions_4_1_Core() {
  */
 Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core() {
     initializeOpenGLFunctions();
-    readBitmap(filename);
-    setTexture(textureUnit);
+    if (readBitmap(filename))
+        setTexture(textureUnit);
 }
 
 /**
@@ -54,7 +54,7 @@ GLuint Texture::id() const {
     return mId;
 }
 
-void Texture::readBitmap(const std::string &filename) {
+bool Texture::readBitmap(const std::string &filename) {
     OBITMAPFILEHEADER bmFileHeader;
     OBITMAPINFOHEADER bmInfoHeader;
 
@@ -75,6 +75,7 @@ void Texture::readBitmap(const std::string &filename) {
         file.close();
     } else {
         qDebug() << "Can not read " << QString(fileWithPath.c_str());
+        return false;
     }
     unsigned char tmp;
     // switch red and blue
@@ -84,6 +85,7 @@ void Texture::readBitmap(const std::string &filename) {
         mBitmap[k + 2] = tmp;
     }
     qDebug() << "Texture read: " << QString(fileWithPath.c_str());
+    return true;
 }
 
 void Texture::setTexture(GLuint textureUnit) {

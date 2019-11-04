@@ -39,6 +39,8 @@ public:
     float getYaw() const;
     const vec3 getCameraRotation() const;
 
+    void setMeshID(const GLuint &value);
+
 private:
     float mNearPlane{0.5f};
     float mFarPlane{500.f};
@@ -51,6 +53,7 @@ private:
     vec3 mRight{1.f, 0.f, 0.f};
     vec3 mUp{0.f, 1.f, 0.f};
     vec3 mCameraPosition{0.f, 0.f, 0.f};
+    GLuint meshID{0};
 
     float mTranslationSpeed{0.02f}; //camera will move by this speed along the mForward vector
     float mRotationSpeed{180.f};

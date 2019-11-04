@@ -16,7 +16,7 @@ private:
     int mColumns;
     int mRows;
     int mnByte;
-    void readBitmap(const std::string &filename);
+    bool readBitmap(const std::string &filename);
     void setTexture(GLuint textureUnit);
 
 public:

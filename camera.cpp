@@ -27,6 +27,7 @@ void Camera::setPosition(const vec3 &position) {
 const vec3 Camera::getRotation() const {
     return std::get<2>(gsl::Matrix4x4::decomposed(mViewMatrix));
 }
+
 void Camera::setRotation(float pitch, float yaw) {
     mPitch = -pitch;
     mYaw = -yaw;
@@ -40,6 +41,7 @@ void Camera::setRotation(float pitch, float yaw) {
 void Camera::calculateViewMatrix() {
     mViewMatrix = mPitchMatrix * mYawMatrix;
     mViewMatrix.translate(mPosition);
+    makeFrustum();
 }
 vec3 Camera::position() const {
     return mPosition;
@@ -70,7 +72,7 @@ vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
     return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
 }
 
-Camera::Frustum Camera::getFrustum() {
+void Camera::makeFrustum() {
     Frustum result;
     mat4 vp = getViewMatrix() * getProjectionMatrix();
 
@@ -94,13 +96,11 @@ Camera::Frustum Camera::getFrustum() {
     result.planeType.far.distance = vp.getFloat(15) - vp.getFloat(11);
 
     for (int i = 0; i < 6; i++) {
-        float mag = 1.0f /
-                    result.planes[i].normal.length();
-        result.planes[i].normal =
-            result.planes[i].normal * mag;
+        float mag = 1.0f / result.planes[i].normal.length();
+        result.planes[i].normal = result.planes[i].normal * mag;
         result.planes[i].distance *= mag;
     }
-    return result;
+    mFrustum = result;
 }
 
 // Finds the corners where the planes p1, p2 and p3 intersect.
@@ -162,7 +162,7 @@ float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
     // maximum extent in direction of plane normal
     float r = fabsf(aabb.size.x * plane.normal.x) + fabsf(aabb.size.y * plane.normal.y) + fabsf(aabb.size.z * plane.normal.z);
     // signed distance between box center and plane
-    float d = plane.normal.dot(plane.normal, aabb.origin) + plane.distance;
+    float d = vec3::dot(plane.normal, aabb.origin) + plane.distance;
     if (fabsf(d) < r) {
         return 0.0f;
     } else if (d < 0.0f) {
@@ -179,7 +179,7 @@ float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
 //            + fabsf(obb.size.y * normal.y)
 //            + fabsf(obb.size.z * normal.z);
 //    // signed distance between box center and plane
-//    float d = plane.normal.dot(plane.normal, obb.position)
+//    float d = vec3::dot(plane.normal, obb.position)
 //            + plane.distance;
 //    // return signed distance
 //    if (fabsf(d) < r) {

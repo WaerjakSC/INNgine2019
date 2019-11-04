@@ -292,10 +292,10 @@ void RenderWindow::startOpenGLDebugger() {
  */
 void RenderWindow::Cull(const Camera::Frustum &f) {
     auto view = mRegistry->view<Mesh, Collision>();
+    Camera &cam = mInputSystem->editorCamController()->getCamera();
     for (auto entity : view) {
-        auto &collider = view.get<Collision>(entity);
-        const AABB &bounds = dynamic_cast<AABB &>(collider);
-        if (mInputSystem->editorCamController()->getCamera().getFrustum().Intersects(f, bounds)) {
+        auto &collider = view.get<AABB>(entity);
+        if (cam.getFrustum().Intersects(f, collider)) {
             view.get<Mesh>(entity).mRendered = true;
         } else
             view.get<Mesh>(entity).mRendered = false;

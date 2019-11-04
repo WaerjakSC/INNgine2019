@@ -55,8 +55,10 @@ public:
         bool Intersects(const Frustum &f, const OBB &obb);
 
     } Frustum;
-
-    Frustum getFrustum();
+    Frustum getFrustum() const {
+        return mFrustum;
+    }
+    void makeFrustum();
 
     void setProjectionMatrix(float fov, float aspect, float nearPlane = 0.5f, float farPlane = 200.f);
     void setProjectionMatrix();
@@ -71,6 +73,8 @@ private:
 
     gsl::Matrix4x4 mYawMatrix;
     gsl::Matrix4x4 mPitchMatrix;
+
+    Frustum mFrustum;
 
     friend class CameraController;
     void calculateViewMatrix();
