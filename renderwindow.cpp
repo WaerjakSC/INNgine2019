@@ -128,9 +128,8 @@ void RenderWindow::init() {
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
     mLight = mFactory->getSceneLoader()->mLight;
-    mRegistry->addComponent<AABB>(5);
 
-    mMainWindow->setWindowTitle(mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
+    mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     //    mMoveSystem->init();
     mSoundSystem->init();
     mLightSystem->init(mRegistry->getEntity(mLight));

@@ -277,13 +277,17 @@ struct Plane : public Collision {
     float distance;
 
     inline Plane() : normal(1, 0, 0) {}
-    inline Plane(const vec3 &n, float d) : normal(n), distance(d) {}
+    inline Plane(const vec3 &n, const float &d) : normal(n), distance(d) {}
 };
 
 struct Cylinder : public Collision {
     vec3 position;
     float radius;
     float height;
+    // default constructor
+    inline Cylinder() : radius(3.0f){};
+    // constructor with radius and position params
+    inline Cylinder(const vec3 &pos, const float &r, const float &h) : position(pos), radius(r), height(h) {}
 };
 /**
  * @brief The BSplineCurve struct

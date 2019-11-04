@@ -100,7 +100,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Material>(eID)) {
                 writer.Key("material");
                 writer.StartObject();
-                const Material mat = registry->getComponent<Material>(eID);
+                const Material &mat = registry->getComponent<Material>(eID);
 
                 writer.Key("color");
                 writer.StartArray();
@@ -125,7 +125,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Mesh>(eID)) {
                 writer.Key("mesh");
                 writer.StartObject();
-                const Mesh mesh = registry->getComponent<Mesh>(eID);
+                const Mesh &mesh = registry->getComponent<Mesh>(eID);
                 if (mesh.mName == "")
                     qDebug() << "No mesh name!";
                 writer.Key("name");
@@ -186,19 +186,90 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndObject();
             }
             if (registry->contains<AABB>(eID)) {
-                // Write Collision data to json here.
+                writer.Key("AABB");
+                writer.StartObject();
+                const AABB &aabb = registry->getComponent<AABB>(eID);
+
+                writer.Key("origin");
+                writer.StartArray();
+                writer.Double(aabb.origin.x);
+                writer.Double(aabb.origin.y);
+                writer.Double(aabb.origin.z);
+                writer.EndArray();
+                writer.Key("size");
+                writer.StartArray();
+                writer.Double(aabb.size.x);
+                writer.Double(aabb.size.y);
+                writer.Double(aabb.size.z);
+                writer.EndArray();
+                writer.EndObject();
             }
             if (registry->contains<OBB>(eID)) {
-                // Write Collision data to json here.
+                writer.Key("OBB");
+                writer.StartObject();
+                const OBB &obb = registry->getComponent<OBB>(eID);
+
+                writer.Key("position");
+                writer.StartArray();
+                writer.Double(obb.position.x);
+                writer.Double(obb.position.y);
+                writer.Double(obb.position.z);
+                writer.EndArray();
+                writer.Key("size");
+                writer.StartArray();
+                writer.Double(obb.size.x);
+                writer.Double(obb.size.y);
+                writer.Double(obb.size.z);
+                writer.EndArray();
+                // Need to do something with the rotation mat3
+                writer.EndObject();
             }
             if (registry->contains<Plane>(eID)) {
-                // Write Collision data to json here.
+                writer.Key("Plane");
+                writer.StartObject();
+                const Plane &plane = registry->getComponent<Plane>(eID);
+
+                writer.Key("normal");
+                writer.StartArray();
+                writer.Double(plane.normal.x);
+                writer.Double(plane.normal.y);
+                writer.Double(plane.normal.z);
+                writer.EndArray();
+                writer.Key("distance");
+                writer.Double(plane.distance);
+                writer.EndObject();
             }
             if (registry->contains<Sphere>(eID)) {
-                // Write Collision data to json here.
+                writer.Key("Sphere");
+                writer.StartObject();
+                const Sphere &sphere = registry->getComponent<Sphere>(eID);
+
+                writer.Key("position");
+                writer.StartArray();
+                writer.Double(sphere.position.x);
+                writer.Double(sphere.position.y);
+                writer.Double(sphere.position.z);
+                writer.EndArray();
+                writer.Key("radius");
+                writer.Double(sphere.radius);
+                writer.EndObject();
             }
             if (registry->contains<Cylinder>(eID)) {
-                // Write Collision data to json here.
+                writer.Key("Cylinder");
+                writer.StartObject();
+                const Cylinder &cylinder = registry->getComponent<Cylinder>(eID);
+
+                writer.Key("position");
+                writer.StartArray();
+                writer.Double(cylinder.position.x);
+                writer.Double(cylinder.position.y);
+                writer.Double(cylinder.position.z);
+                writer.EndArray();
+                writer.Key("radius");
+                writer.Double(cylinder.radius);
+                writer.Key("height");
+                writer.Double(cylinder.height);
+                writer.EndObject();
             }
 
             writer.EndObject();
@@ -296,8 +367,31 @@ void Scene::populateScene(const Document &scene) {
                 bool looping = comp->value["loop"].GetBool();
                 float gain = comp->value["gain"].GetDouble();
                 registry->addComponent<Sound>(id, filename, looping, gain);
-            } else if (comp->name == "collision") {
-                // Set collision variables here
+            } else if (comp->name == "AABB") {
+                vec3 origin(comp->value["origin"][0].GetDouble(), comp->value["origin"][1].GetDouble(), comp->value["origin"][2].GetDouble());
+                vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
+                registry->addComponent<AABB>(id, origin, size);
+            } else if (comp->name == "OBB") {
+                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
+                vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
+                // Need rotation matrix here
+                registry->addComponent<OBB>(id, position, size);
+            } else if (comp->name == "Plane") {
+                vec3 normal(comp->value["normal"][0].GetDouble(), comp->value["normal"][1].GetDouble(), comp->value["origin"][2].GetDouble());
+                float size = comp->value["distance"].GetDouble();
+                // Need rotation matrix here
+                registry->addComponent<Plane>(id, normal, size);
+            } else if (comp->name == "Sphere") {
+                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
+                float radius = comp->value["radius"].GetDouble();
+                // Need rotation matrix here
+                registry->addComponent<Sphere>(id, position, radius);
+            } else if (comp->name == "Cylinder") {
+                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
+                float radius = comp->value["radius"].GetDouble();
+                float height = comp->value["height"].GetDouble();
+                // Need rotation matrix here
+                registry->addComponent<Cylinder>(id, position, radius, height);
             }
         }
     }
