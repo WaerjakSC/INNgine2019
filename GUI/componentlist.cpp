@@ -70,76 +70,100 @@ void ComponentList::setupComponentList() {
     //    }
 }
 void ComponentList::addTransformComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Transform>(eID))
-        registry->addComponent<Transform>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Transform>(eID))
+            registry->addComponent<Transform>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addMaterialComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Material>(eID))
-        registry->addComponent<Material>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Material>(eID))
+            registry->addComponent<Material>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addMeshComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Mesh>(eID))
+            registry->addComponent<Mesh>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addLightComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Light>(eID))
-        registry->addComponent<Light>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Light>(eID))
+            registry->addComponent<Light>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addInputComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Input>(eID))
-        registry->addComponent<Input>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Input>(eID))
+            registry->addComponent<Input>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addPhysicsComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Physics>(eID))
-        registry->addComponent<Physics>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Physics>(eID))
+            registry->addComponent<Physics>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addSoundComponent() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Sound>(eID))
-        registry->addComponent<Sound>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Sound>(eID))
+            registry->addComponent<Sound>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addAABBCollider() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<AABB>(eID))
-        registry->addComponent<AABB>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<AABB>(eID))
+            registry->addComponent<AABB>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addOBBCollider() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<OBB>(eID))
-        registry->addComponent<OBB>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<OBB>(eID))
+            registry->addComponent<OBB>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addSphereCollider() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Sphere>(eID))
-        registry->addComponent<Sphere>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Sphere>(eID))
+            registry->addComponent<Sphere>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addPlaneCollider() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Plane>(eID))
-        registry->addComponent<Plane>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Plane>(eID))
+            registry->addComponent<Plane>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::addCylinderCollider() {
-    GLuint eID = mMainWindow->selectedEntity->id();
-    if (!registry->contains<Cylinder>(eID))
-        registry->addComponent<Cylinder>(eID);
-    setupComponentList();
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<Cylinder>(eID))
+            registry->addComponent<Cylinder>(eID);
+        setupComponentList();
+    }
 }
 void ComponentList::setupAABBSettings(const AABB &col) {
     ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
@@ -151,13 +175,13 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     originBox->setFlat(true);
     QHBoxLayout *origin = new QHBoxLayout;
     origin->setMargin(1);
-    /*auto [originX, originY, originZ] = */ makeVectorBox(col.origin, origin); // Not sure yet if this is something that's supposed to be updated
-    //    connect(this, &ComponentList::/* some signal here */, originX, &QDoubleSpinBox::setValue);
-    //    connect(originX, SIGNAL(valueChanged(double)), this, SLOT(setOriginX(double)));
+    auto [originX, originY, originZ] = makeVectorBox(col.origin, origin); // Not sure yet if this is something that's supposed to be updated
+                                                                          //    connect(this, &ComponentList::/* some signal here */, originX, &QDoubleSpinBox::setValue);
+    connect(originX, SIGNAL(valueChanged(double)), this, SLOT(setOriginX(double)));
     //    connect(this, &ComponentList::/* some signal here */, originY, &QDoubleSpinBox::setValue);
-    //    connect(originY, SIGNAL(valueChanged(double)), this, SLOT(setOriginY(double)));
+    connect(originY, SIGNAL(valueChanged(double)), this, SLOT(setOriginY(double)));
     //    connect(this, &ComponentList::/* some signal here */, originZ, &QDoubleSpinBox::setValue);
-    //    connect(originZ, SIGNAL(valueChanged(double)), this, SLOT(setOriginZ(double)));
+    connect(originZ, SIGNAL(valueChanged(double)), this, SLOT(setOriginZ(double)));
 
     originBox->setLayout(origin);
     grid->addWidget(originBox, 0, 0);
@@ -169,8 +193,13 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     QHBoxLayout *hSize = new QHBoxLayout;
     hSize->setMargin(1);
 
-    makeVectorBox(col.size, hSize);
-
+    auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize);
+    //    connect(this, &ComponentList::/* some signal here */, sizeX, &QDoubleSpinBox::setValue);
+    connect(sizeX, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, sizeY, &QDoubleSpinBox::setValue);
+    connect(sizeY, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, sizeZ, &QDoubleSpinBox::setValue);
+    connect(sizeZ, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeZ(double)));
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
 
@@ -187,8 +216,13 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     posBox->setFlat(true);
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    makeVectorBox(col.position, position);
-
+    auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
+    //    connect(this, &ComponentList::/* some signal here */, positionX, &QDoubleSpinBox::setValue);
+    connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setOBBPositionX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, positionY, &QDoubleSpinBox::setValue);
+    connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setOBBPositionY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, positionZ, &QDoubleSpinBox::setValue);
+    connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setOBBPositionZ(double)));
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
 
@@ -199,7 +233,13 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     QHBoxLayout *hSize = new QHBoxLayout;
     hSize->setMargin(1);
 
-    makeVectorBox(col.size, hSize);
+    auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize);
+    //    connect(this, &ComponentList::/* some signal here */, sizeX, &QDoubleSpinBox::setValue);
+    connect(sizeX, SIGNAL(valueChanged(double)), this, SLOT(setOBBSizeX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, sizeY, &QDoubleSpinBox::setValue);
+    connect(sizeY, SIGNAL(valueChanged(double)), this, SLOT(setOBBSizeY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, sizeZ, &QDoubleSpinBox::setValue);
+    connect(sizeZ, SIGNAL(valueChanged(double)), this, SLOT(setOBBSizeZ(double)));
 
     // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
@@ -219,8 +259,14 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     posBox->setFlat(true);
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    makeVectorBox(col.position, position);
 
+    auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
+    //    connect(this, &ComponentList::/* some signal here */, positionX, &QDoubleSpinBox::setValue);
+    connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setSpherePositionX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, positionY, &QDoubleSpinBox::setValue);
+    connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setSpherePositionY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, positionZ, &QDoubleSpinBox::setValue);
+    connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setSpherePositionZ(double)));
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
 
@@ -237,7 +283,8 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     radius->setStyle(fusion);
     radius->setValue(col.radius);
     radiusLayout->addWidget(radius);
-
+    //    connect(this, &ComponentList::/* some signal here */, radius, &QDoubleSpinBox::setValue);
+    connect(radius, SIGNAL(valueChanged(double)), this, SLOT(setSphereRadius(double)));
     // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     radiusBox->setLayout(radiusLayout);
@@ -257,7 +304,13 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     posBox->setFlat(true);
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    makeVectorBox(col.position, position);
+    auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
+    //    connect(this, &ComponentList::/* some signal here */, positionX, &QDoubleSpinBox::setValue);
+    connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setCylinderPositionX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, positionY, &QDoubleSpinBox::setValue);
+    connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setCylinderPositionY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, positionZ, &QDoubleSpinBox::setValue);
+    connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setCylinderPositionZ(double)));
 
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
@@ -275,7 +328,8 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     radius->setStyle(fusion);
     radius->setValue(col.radius);
     radiusLayout->addWidget(radius);
-
+    //    connect(this, &ComponentList::/* some signal here */, radius, &QDoubleSpinBox::setValue);
+    connect(radius, SIGNAL(valueChanged(double)), this, SLOT(setCylinderRadius(double)));
     // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     radiusBox->setLayout(radiusLayout);
@@ -294,7 +348,8 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     height->setStyle(fusion);
     height->setValue(col.height);
     heightLayout->addWidget(height);
-
+    //    connect(this, &ComponentList::/* some signal here */, radius, &QDoubleSpinBox::setValue);
+    connect(height, SIGNAL(valueChanged(double)), this, SLOT(setCylinderHeight(double)));
     // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     heightBox->setLayout(heightLayout);
@@ -314,7 +369,13 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     normalBox->setFlat(true);
     QHBoxLayout *normal = new QHBoxLayout;
     normal->setMargin(1);
-    makeVectorBox(col.normal, normal);
+    auto [normalX, normalY, normalZ] = makeVectorBox(col.normal, normal);
+    //    connect(this, &ComponentList::/* some signal here */, normalX, &QDoubleSpinBox::setValue);
+    connect(normalX, SIGNAL(valueChanged(double)), this, SLOT(setPlaneNormalX(double)));
+    //    connect(this, &ComponentList::/* some signal here */, normalY, &QDoubleSpinBox::setValue);
+    connect(normalY, SIGNAL(valueChanged(double)), this, SLOT(setPlaneNormalY(double)));
+    //    connect(this, &ComponentList::/* some signal here */, normalZ, &QDoubleSpinBox::setValue);
+    connect(normalZ, SIGNAL(valueChanged(double)), this, SLOT(setPlaneNormalZ(double)));
 
     normalBox->setLayout(normal);
     grid->addWidget(normalBox, 0, 0);
@@ -332,7 +393,8 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     distance->setStyle(fusion);
     distance->setValue(col.distance);
     distanceLayout->addWidget(distance);
-
+    //    connect(this, &ComponentList::/* some signal here */, distance, &QDoubleSpinBox::setValue);
+    connect(distance, SIGNAL(valueChanged(double)), this, SLOT(setPlaneDistance(double)));
     // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
 
     distanceBox->setLayout(distanceLayout);
@@ -626,6 +688,107 @@ void ComponentList::setScaleZ(double zIn) {
     movement->setScaleZ(mMainWindow->selectedEntity->id(), zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(mMainWindow->selectedEntity->id());
+}
+// ************* Collider update slots *************
+void ComponentList::setOriginX(double xIn) {
+    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    aabb.origin.x = xIn;
+}
+void ComponentList::setOriginY(double yIn) {
+    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    aabb.origin.y = yIn;
+}
+void ComponentList::setOriginZ(double zIn) {
+    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    aabb.origin.z = zIn;
+}
+void ComponentList::setAABBSizeX(double xIn) {
+    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    aabb.size.x = xIn;
+}
+void ComponentList::setAABBSizeY(double yIn) {
+    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    aabb.size.y = yIn;
+}
+void ComponentList::setAABBSizeZ(double zIn) {
+    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    aabb.size.z = zIn;
+}
+void ComponentList::setOBBPositionX(double xIn) {
+    auto aabb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    aabb.position.x = xIn;
+}
+void ComponentList::setOBBPositionY(double yIn) {
+    auto aabb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    aabb.position.y = yIn;
+}
+void ComponentList::setOBBPositionZ(double zIn) {
+    auto aabb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    aabb.position.z = zIn;
+}
+void ComponentList::setOBBSizeX(double xIn) {
+    auto obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    obb.size.x = xIn;
+}
+void ComponentList::setOBBSizeY(double yIn) {
+    auto obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    obb.size.y = yIn;
+}
+void ComponentList::setOBBSizeZ(double zIn) {
+    auto obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    obb.size.z = zIn;
+}
+void ComponentList::setSpherePositionX(double xIn) {
+    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    sphere.position.x = xIn;
+}
+void ComponentList::setSpherePositionY(double yIn) {
+    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    sphere.position.y = yIn;
+}
+void ComponentList::setSpherePositionZ(double zIn) {
+    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    sphere.position.z = zIn;
+}
+void ComponentList::setSphereRadius(double radius) {
+    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    sphere.radius = radius;
+}
+void ComponentList::setCylinderPositionX(double xIn) {
+    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    cylinder.position.x = xIn;
+}
+void ComponentList::setCylinderPositionY(double yIn) {
+    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    cylinder.position.y = yIn;
+}
+void ComponentList::setCylinderPositionZ(double zIn) {
+    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    cylinder.position.z = zIn;
+}
+void ComponentList::setCylinderRadius(double radius) {
+    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    cylinder.radius = radius;
+}
+void ComponentList::setCylinderHeight(double height) {
+    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    cylinder.radius = height;
+}
+void ComponentList::setPlaneNormalX(double xIn) {
+    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    plane.normal.x = xIn;
+}
+void ComponentList::setPlaneNormalY(double yIn) {
+    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    plane.normal.y = yIn;
+}
+void ComponentList::setPlaneNormalZ(double zIn) {
+    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    plane.normal.z = zIn;
+}
+void ComponentList::setPlaneDistance(double distance) {
+    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    plane.distance = distance;
 }
 /**
  * @brief Utility function for making an XYZ box layout from a given vector
