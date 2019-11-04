@@ -14,7 +14,8 @@ void AIsystem::update(float deltaTime) {
         move();
         break;
     case DEATH:
-        // Whatever happens when gnomes reach endpoint
+        // Whatever happens when gnomes die
+        death();
         break;
     case SLEEP:
         // NPC IDLE, do we need it? /doubt
@@ -64,4 +65,16 @@ vec3 AIsystem::evaluateBSpline(int degree, int startKnot, float x) {
 void AIsystem::move()
 {
 
+    // follow b-spline from start of path to end of path
+    // if end of path is reached,
+    // remove 1 LP (lifepoint) from player's base
+
+
 }
+
+void AIsystem::death(){
+
+    // death by tower, give score/gold and delete entity
+}
+
+

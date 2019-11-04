@@ -25,6 +25,7 @@ public:
 
     // FSM
     void move();
+    void death();
     NPCstates state;
     void notify(int notification);
     std::queue<int> notification_queue;
