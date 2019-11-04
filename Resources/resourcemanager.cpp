@@ -4,7 +4,6 @@
 #include "colorshader.h"
 #include "innpch.h"
 #include "inputsystem.h"
-#include "lasmap.h"
 #include "lightsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
@@ -879,6 +878,7 @@ void ResourceManager::stop() {
         mMainWindow->stop->setEnabled(false);
     }
 }
+<<<<<<< HEAD
 //=========================== Las Map Functions =========================== //
 void ResourceManager::constructSurface(unsigned int xGridSize, unsigned int zGridSize) {
 
@@ -1018,6 +1018,8 @@ void ResourceManager::readLASFile(std::string filename) {
         inn.close();
     }
 }
+=======
+>>>>>>> parent of f9be9a4... møkk
 //=========================== Octahedron Functions =========================== //
 void ResourceManager::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3) {
     mMeshData.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));

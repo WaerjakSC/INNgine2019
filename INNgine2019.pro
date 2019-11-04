@@ -97,8 +97,6 @@ HEADERS += \
     GUI/hierarchyview.h \
     GUI/verticalscrollarea.h \
 #    
-    Resources/LASLoader.h \
-    Resources/lasmap.h \
     Shaders/colorshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
@@ -153,7 +151,6 @@ SOURCES += main.cpp \
     GUI/hierarchyview.cpp \
     GUI/verticalscrollarea.cpp \
 #
-    Resources/lasmap.cpp \
     Shaders/colorshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \

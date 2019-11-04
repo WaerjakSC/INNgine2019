@@ -13,7 +13,6 @@
 #endif
 class LightSystem;
 class Entity;
-class LasMap;
 class Registry;
 class MainWindow;
 class Scene;
@@ -107,7 +106,6 @@ public:
         \param The file path relative to execution directory.
     **/
     bool loadWave(std::string filePath, Sound &sound);
-    void makeLASMap();
 public slots:
     void save();
     void load();
@@ -142,7 +140,7 @@ private:
 
     MainWindow *mMainWindow;
     //    std::vector<int> mGameObjectIndices;    // Holds the sparse array for gameobjects.
-    LasMap *terrain;
+
     // Systems
     Ref<LightSystem> mLightSystem;
     void showMessage(const QString &message);
@@ -172,8 +170,11 @@ private:
     void makeBillBoardMesh(int eID);
     friend class ComponentList;
     void changeMsg();
+<<<<<<< HEAD
     void readLASFile(std::string filename);
     void normalizePoints();
+=======
+>>>>>>> parent of f9be9a4... møkk
 };
 
 #endif // RESOURCEMANAGER_H
