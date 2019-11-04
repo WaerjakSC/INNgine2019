@@ -7,6 +7,7 @@
 #include <queue>
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
+typedef gsl::Vector2D vec2;
 
 class AIsystem : public ISystem {
 public:
@@ -23,12 +24,17 @@ public:
     int findKnotInterval(float x);
     vec3 evaluateBSpline(int degree, int startKnot, float x);
 
+    vec2 deBoor(float x);
+private:
     // FSM
     void move();
     void death();
+    void goalReached();
     NPCstates state;
     void notify(int notification);
     std::queue<int> notification_queue;
+
+    float elapsed_time;
 };
 
 #endif // AISYSTEM_H

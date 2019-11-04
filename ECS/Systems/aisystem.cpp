@@ -17,8 +17,8 @@ void AIsystem::update(float deltaTime) {
         // Whatever happens when gnomes die
         death();
         break;
-    case SLEEP:
-        // NPC IDLE, do we need it? /doubt
+    case GOAL_REACHED:
+        goalReached();
         break;
 
     }
@@ -62,6 +62,11 @@ int AIsystem::findKnotInterval(float x) {
 vec3 AIsystem::evaluateBSpline(int degree, int startKnot, float x) {
 }
 
+vec2 AIsystem::deBoor(float x)
+{
+    // return curve position calculated by deBoor's algorithm (evaluateBSpline)
+}
+
 void AIsystem::move()
 {
 
@@ -69,12 +74,33 @@ void AIsystem::move()
     // if end of path is reached,
     // remove 1 LP (lifepoint) from player's base
 
+    /* position = deBoor(t)
+     * draw NPC
+     * if(endpoint arrived)
+     *  notify(endpoint_arrived)
+     *  state(GOAL_REACHED);
+     * if(AIcomponent.hp >= 0)
+     *  state(DEATH)
+     *
+     *
+     */
+
 
 }
 
 void AIsystem::death(){
 
-    // death by tower, give score/gold and delete entity
+    // hp >= 0
+    // gold++
+    // delete entity
+
+}
+
+void AIsystem::goalReached()
+{
+    // endpoint reached
+    // remove 1LP from player
+    // delete entity
 }
 
 

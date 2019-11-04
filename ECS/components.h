@@ -309,18 +309,23 @@ struct BSplineCurve : Component {
 // de kan bevege seg, ta skade, dø
 enum NPCstates { MOVE,
                  SLEEP,
-                 DEATH };
+                 DEATH,
+                 GOAL_REACHED};
 
 enum NPCevents { ENDPOINT_ARRIVED,
                  DAMAGE_TAKEN };
 
-/**
- * @brief The StateMachineComponent struct
- */
-struct StateMachineComponent : Component {
-    NPCstates currentState;
-    float enterTime;
-    float exitTime;
+struct AIcomponent : public Component {
+    AIcomponent() {}
+    int hp;
+
 };
+
+struct PlayerComponent : public Component {
+    PlayerComponent() {}
+    int hp;
+};
+
+
 
 #endif // COMPONENT_H
