@@ -127,12 +127,12 @@ void RenderWindow::init() {
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
-    mLight = mFactory->getSceneLoader()->mLight;
 
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    //    mMoveSystem->init();
     mSoundSystem->init();
-    mLightSystem->init(mRegistry->getEntity(mLight));
+    mMoveSystem->init();
+
+    mLightSystem->init(mRegistry->getEntity(mFactory->getSceneLoader()->mLight));
     mRenderer->init();
 
     connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);

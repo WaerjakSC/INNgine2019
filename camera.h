@@ -21,9 +21,6 @@ public:
     void moveRight(float delta);
 
     vec3 position() const;
-    vec3 up() const;
-
-    vec3 forward() const;
 
     vec3 getNormalizedDeviceCoords(const vec3 &viewportPoint, int height, int width);
     vec3 calculateMouseRay(const vec3 &viewportPoint, int height, int width);
@@ -37,17 +34,16 @@ public:
 
     typedef struct Frustum {
 
-            struct {
-                Plane top;
-                Plane bottom;
-                Plane left;
-                Plane right;
-                Plane near;
-                Plane far;
-            } planeType;
+        struct {
+            Plane top;
+            Plane bottom;
+            Plane left;
+            Plane right;
+            Plane near;
+            Plane far;
+        } planeType;
 
-            Plane planes[6];
-
+        Plane planes[6];
 
         inline Frustum() {}
         vec3 Intersection(Plane p1, Plane p2, Plane p3);
@@ -66,6 +62,8 @@ public:
     void setProjectionMatrix();
 
     void setRotation(float pitch, float yaw);
+
+    const vec3 getRotation() const;
 
 private:
     vec3 mPosition{0.f, 0.f, 0.f};

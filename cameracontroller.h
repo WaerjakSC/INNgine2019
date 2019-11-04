@@ -37,6 +37,7 @@ public:
     float getPitch() const;
 
     float getYaw() const;
+    const vec3 getCameraRotation() const;
 
 private:
     float mNearPlane{0.5f};
@@ -45,7 +46,7 @@ private:
     float mAspectRatio{1.7778f};
 
     Camera mCamera;
-
+    bool mOutDated{true};
     vec3 mForward{0.f, 0.f, -1.f};
     vec3 mRight{1.f, 0.f, 0.f};
     vec3 mUp{0.f, 1.f, 0.f};

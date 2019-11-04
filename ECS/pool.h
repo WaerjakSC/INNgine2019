@@ -1,8 +1,8 @@
 #ifndef POOL_H
 #define POOL_H
 
-#include "core.h"
 #include "components.h"
+#include "core.h"
 #include "entity.h"
 #include <QObject>
 #include <memory>
@@ -163,7 +163,10 @@ public:
                 mIndex.push_back(-1);
             }
         }
-        mIndex.push_back(mList.size()); // entity list size is location of new entityID
+        if (entityID < (int)mIndex.size())
+            mIndex[entityID] = mList.size();
+        else
+            mIndex.push_back(mList.size()); // entity list size is location of new entityID
         mList.push_back(entityID);
         mComponents.push_back(Type(args...));
         if (isSorted) { // Swap the latest entity with the entity pointed at by the group marker, then increment the marker so it points one step right of the newest entity
@@ -178,8 +181,10 @@ public:
                 mIndex.push_back(-1);
             }
         }
-        mIndex.push_back(mList.size()); // entity list size is location of new entityID
-        mList.push_back(cloneTo);
+        if (cloneTo < mIndex.size())
+            mIndex[cloneTo] = mList.size();
+        else
+            mIndex.push_back(mList.size()); // entity list size is location of new entityID        mList.push_back(cloneTo);
         Type component = get(cloneFrom);
         mComponents.push_back(component);
     }

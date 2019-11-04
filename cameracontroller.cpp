@@ -1,24 +1,30 @@
 #include "cameracontroller.h"
-
+#include "registry.h"
 CameraController::CameraController(float aspectRatio)
     : mAspectRatio(aspectRatio),
       mCamera(Camera(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane)) {
 }
 void CameraController::pitch(float degrees) {
+    mOutDated = true;
+
     //  rotate around mRight
     mPitch -= degrees;
     updateForwardVector();
 }
 void CameraController::yaw(float degrees) {
+    mOutDated = true;
+
     // rotate around mUp
     mYaw -= degrees;
     updateForwardVector();
 }
 void CameraController::setPitch(float newPitch) {
+    mOutDated = true;
     mPitch = newPitch;
     updateForwardVector();
 }
 void CameraController::setYaw(float newYaw) {
+    mOutDated = true;
     mYaw = newYaw;
     updateForwardVector();
 }
@@ -50,12 +56,22 @@ void CameraController::updateForwardVector() {
     updateRightVector();
 }
 void CameraController::setPosition(const vec3 &position) {
+    mOutDated = true;
     mCameraPosition = position;
 }
 void CameraController::update() {
-    mCamera.setRotation(mPitch, mYaw);
-    mCamera.setPosition(mCameraPosition);
-    mCamera.calculateViewMatrix();
+    if (mOutDated) {
+        //        gsl::Matrix4x4 temp(true);
+        //        temp.lookAt(cameraPosition(), cameraPosition() - forward(), up());
+        //        auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
+        //        auto trans = Registry::instance()->getSystem<MovementSystem>();
+        //        trans->setLocalPosition(camMeshID, cameraPosition() - forward());
+        //        trans->setRotation(camMeshID, rot);
+        mCamera.setRotation(mPitch, mYaw);
+        mCamera.setPosition(mCameraPosition);
+        mCamera.calculateViewMatrix();
+        mOutDated = false;
+    }
 }
 void CameraController::setSpeed(float speed) {
     mTranslationSpeed = speed;
@@ -66,6 +82,8 @@ void CameraController::setSpeed(float speed) {
  * @param target
  */
 void CameraController::goTo(vec3 target) {
+    mOutDated = true;
+
     vec3 targetDistance{0, 0, 5};
     const vec3 position = target + targetDistance;
     const vec3 direction = (position - target).normalized();
@@ -76,9 +94,9 @@ void CameraController::goTo(vec3 target) {
     updateForwardVector();
 }
 void CameraController::moveForward(float delta) {
+    mOutDated = true;
     mCameraPosition += mForward * mTranslationSpeed * delta;
 }
-
 float CameraController::getPitch() const {
     return mPitch;
 }
@@ -86,10 +104,15 @@ float CameraController::getPitch() const {
 float CameraController::getYaw() const {
     return mYaw;
 }
+const vec3 CameraController::getCameraRotation() const {
+    return mCamera.getRotation();
+}
 void CameraController::moveUp(float deltaHeight) {
+    mOutDated = true;
     mCameraPosition.y += mTranslationSpeed * deltaHeight;
 }
 void CameraController::moveRight(float delta) {
+    mOutDated = true;
     //This fixes a bug in the up and right calculations
     //so camera always holds its height when strafing
     //should be fixed through correct right calculations!
@@ -98,6 +121,7 @@ void CameraController::moveRight(float delta) {
     mCameraPosition += right * mTranslationSpeed * delta;
 }
 void CameraController::resize(float aspectRatio) {
+    mOutDated = true;
     mAspectRatio = aspectRatio;
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }

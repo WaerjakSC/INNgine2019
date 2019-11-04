@@ -13,8 +13,7 @@ public:
     GLuint id() const { return eID; }
     QString name() const { return mName; }
     void setName(const QString &name);
-    CType &types() { return mTypes; }
-    CType getTypes() const { return mTypes; }
+
     void setEntityData(const Entity &value);
     bool operator==(const Entity &other) {
         return eID == other.eID;
@@ -32,6 +31,5 @@ private:
     QString mName;
     GLuint mGeneration{0};
     bool mIsDestroyed{false};
-    CType mTypes{CType::None};
 };
 #endif // ENTITY_H

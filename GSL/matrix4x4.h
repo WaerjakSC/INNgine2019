@@ -34,7 +34,7 @@ public:
     void rotateX(GLfloat degrees = 0.f);
     void rotateY(GLfloat degrees = 0.f);
     void rotateZ(GLfloat degrees = 0.f);
-    //    void rotate(GLfloat angle, Vector3D vector);
+    void rotate(Vector3D vector);
     //    void rotate(GLfloat angle, GLfloat xIn, GLfloat yIn, GLfloat zIn);
 
     void scale(Vector3D s);

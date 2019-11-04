@@ -12,7 +12,7 @@ void MovementSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime) // remember to remove this once we implement deltaTime
     auto view = registry->view<Transform>();
     for (auto entity : view) {
-        auto &comp = view.data()[entity];
+        auto &comp = view.get(entity);
         updateModelMatrix(comp);
     }
     for (auto billBoard : registry->billBoards()) {

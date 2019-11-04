@@ -49,7 +49,9 @@ void Scene::saveScene(const QString &fileName) {
 
     for (auto entity : entities) {
         GLuint eID = entity.first;
-        if (eID != 0 && !entity.second->isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
+        if (eID == mGameCamID)
+            continue;
+        if (eID != 0) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("GameObject");
             writer.StartObject();
             writer.Key("name");
@@ -313,7 +315,17 @@ void Scene::populateScene(const Document &scene) {
         gameCam->setPosition(position);
         gameCam->setPitch(scene["gamecam"]["pitch"].GetInt());
         gameCam->setYaw(scene["gamecam"]["yaw"].GetInt());
-        registry->getSystem<InputSystem>()->setGameCameraController(gameCam);
+        mGameCamID = registry->makeEntity("Game Camera");
+        registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
+        registry->addComponent<Transform>(mGameCamID, position, vec3(0), vec3(0.33f, 0.33f, 0.33f));
+        gsl::Matrix4x4 temp(true);
+        temp.lookAt(gameCam->cameraPosition(), gameCam->cameraPosition() - gameCam->forward(), gameCam->up());
+        auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
+        auto trans = registry->getSystem<MovementSystem>();
+        trans->setLocalPosition(mGameCamID, gameCam->cameraPosition() - gameCam->forward());
+        trans->setRotation(mGameCamID, rot);
+        registry->addComponent<Material>(mGameCamID, factory->getShader<ColorShader>());
+        factory->addMeshComponent("camera.obj", mGameCamID);
     }
     // Iterate through each gameobject in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {

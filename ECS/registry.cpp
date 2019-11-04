@@ -55,12 +55,19 @@ void Registry::removeEntity(GLuint eID) {
     emit entityRemoved(eID);
 }
 
+GLuint Registry::nextAvailable() {
+    for (auto entity : mEntities)
+        if (entity.second->isDestroyed())
+            return entity.first;
+    return numEntities();
+}
+
 void Registry::clearScene() {
     mBillBoards.clear();
     for (auto entity : mEntities) {
         if (entity.first != 0) {
             entityDestroyed(entity.first); // Pass the message on to the registry
-            mEntities.erase(entity.first);
+            entity.second->destroy();
         }
     }
 }
@@ -70,12 +77,10 @@ void Registry::clearScene() {
  * @return Returns the entity ID for use in adding components or other tasks.
  */
 GLuint Registry::makeEntity(const QString &name, bool signal) {
-    GLuint eID = numEntities();
+    GLuint eID = nextAvailable();
     auto search = mEntities.find(eID);
     if (search != mEntities.end()) {
-        Ref<Entity> entt = search->second;
-        if (entt->isDestroyed())
-            entt->newGeneration(eID, name);
+        search->second->newGeneration(eID, name);
     } else {
         if (name == "BillBoard")
             mEntities[eID] = std::make_shared<BillBoard>(eID, "BillBoard");

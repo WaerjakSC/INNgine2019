@@ -166,8 +166,7 @@ void ComponentList::addCylinderCollider() {
     }
 }
 void ComponentList::setupAABBSettings(const AABB &col) {
-    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
-    box->setTitle("AABB Collider");
+    ComponentGroupBox *box = new ComponentGroupBox("AABB Collider", mMainWindow);
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
     QGroupBox *originBox = new QGroupBox(tr("Origin"));
@@ -207,8 +206,7 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupOBBSettings(const OBB &col) {
-    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
-    box->setTitle("OBB Collider");
+    ComponentGroupBox *box = new ComponentGroupBox("OBB Collider", mMainWindow);
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
     QGroupBox *posBox = new QGroupBox(tr("Position"));
@@ -250,8 +248,7 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupSphereColliderSettings(const Sphere &col) {
-    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
-    box->setTitle("Sphere Collider");
+    ComponentGroupBox *box = new ComponentGroupBox("Sphere Collider", mMainWindow);
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
     QGroupBox *posBox = new QGroupBox(tr("Position"));
@@ -294,8 +291,7 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
 }
 
 void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
-    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
-    box->setTitle("Cylinder Collider");
+    ComponentGroupBox *box = new ComponentGroupBox("Cylinder Collider", mMainWindow);
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
     QGroupBox *posBox = new QGroupBox(tr("Position"));
@@ -357,7 +353,7 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
 }
 
 void ComponentList::setupPlaneColliderSettings(const Plane &col) {
-    ComponentGroupBox *box = new ComponentGroupBox(col.type(), mMainWindow);
+    ComponentGroupBox *box = new ComponentGroupBox("Plane Collider", mMainWindow);
     box->setTitle("Sphere Collider");
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
@@ -400,7 +396,7 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupMeshSettings(const Mesh &mesh) {
-    ComponentGroupBox *box = new ComponentGroupBox(mesh.type(), mMainWindow);
+    ComponentGroupBox *box = new ComponentGroupBox("Mesh", mMainWindow);
 
     objFileLabel = new QLabel(box);
     objFileLabel->setText(ResourceManager::instance()->getMeshName(mesh));
@@ -415,7 +411,7 @@ void ComponentList::setupMeshSettings(const Mesh &mesh) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupMaterialSettings(const Material &mat) {
-    ComponentGroupBox *box = new ComponentGroupBox(mat.type(), mMainWindow);
+    ComponentGroupBox *box = new ComponentGroupBox("Material", mMainWindow);
 
     QVBoxLayout *shader = new QVBoxLayout;
     shader->setMargin(1);
@@ -464,7 +460,7 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupTransformSettings(const Transform &trans) {
-    ComponentGroupBox *box = new ComponentGroupBox(trans.type(), mMainWindow);
+    ComponentGroupBox *box = new ComponentGroupBox("Transform", mMainWindow);
 
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);

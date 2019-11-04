@@ -18,3 +18,10 @@ Sound::Sound(std::string name, bool loop, float gain)
     alSourcef(mSource, AL_PITCH, 1.0f);
     alSourcef(mSource, AL_GAIN, gain);
 }
+
+Material::Material(Ref<Shader> shader, GLuint texture, vec3 color, GLfloat specStr, GLint specExp)
+    : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
+      mTextureUnit(texture), mShader(shader) {
+    if (!mShader)
+        mShader = ResourceManager::instance()->getShader<ColorShader>();
+}

@@ -47,10 +47,9 @@ void RenderSystem::changeShader(int entityID, std::string nShader) {
     Ref<Shader> shader{nullptr};
     ResourceManager *factory = ResourceManager::instance();
     if (nShader == "PlainShader")
-        shader = factory->getShader<ColorShader>();
+        registry->view<Material>().get(entityID).mShader = factory->getShader<ColorShader>();
     else if (nShader == "TextureShader")
-        shader = factory->getShader<TextureShader>();
+        registry->view<Material>().get(entityID).mShader = factory->getShader<TextureShader>();
     else if (nShader == "PhongShader")
-        shader = factory->getShader<PhongShader>();
-    registry->view<Material>().get(entityID).mShader = shader;
+        registry->view<Material>().get(entityID).mShader = factory->getShader<PhongShader>();
 }

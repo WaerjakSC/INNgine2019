@@ -13,7 +13,6 @@ void Entity::setName(const QString &name) {
 
 void Entity::setEntityData(const Entity &value) {
     eID = value.eID;
-    mTypes = value.getTypes();
 }
 void Entity::newGeneration(GLuint id, const QString &text) {
     eID = id;
@@ -25,11 +24,10 @@ bool Entity::isDestroyed() const {
     return mIsDestroyed;
 }
 
-bool Entity::isEmpty() {
-    return types() == CType::None;
-}
+//bool Entity::isEmpty() {
+//    return types() == CType::None;
+//}
 void Entity::destroy() {
-    mTypes = CType::None;
     mIsDestroyed = true;
     mName.clear();
     mGeneration++;

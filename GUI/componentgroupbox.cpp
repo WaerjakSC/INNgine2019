@@ -6,8 +6,8 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QStyleFactory>
-ComponentGroupBox::ComponentGroupBox(CType type, QMainWindow *parent) : QGroupBox(parent), mComponentType(type) {
-    setTitleFromType();
+ComponentGroupBox::ComponentGroupBox(const QString &name, QMainWindow *parent) : QGroupBox(parent) {
+    setTitle(name);
     mMainWindow = static_cast<MainWindow *>(parent);
     QStyle *fusion = QStyleFactory::create("fusion");
     setAlignment(Qt::AlignCenter);
@@ -19,75 +19,31 @@ ComponentGroupBox::ComponentGroupBox(CType type, QMainWindow *parent) : QGroupBo
 void ComponentGroupBox::removeComponent() {
     Registry *registry = Registry::instance();
     GLuint entityID = mMainWindow->selectedEntity->id();
-    switch (mComponentType) {
-    case CType::Transform:
+    if (registry->contains<Transform>(entityID))
         registry->removeComponent<Transform>(entityID);
-        break;
-    case CType::Material:
+    if (registry->contains<Material>(entityID))
         registry->removeComponent<Material>(entityID);
-        break;
-    case CType::Mesh:
+    if (registry->contains<Mesh>(entityID))
         registry->removeComponent<Mesh>(entityID);
-        break;
-    case CType::Light:
+    if (registry->contains<Light>(entityID))
         registry->removeComponent<Light>(entityID);
-        break;
-    case CType::Input:
+    if (registry->contains<Input>(entityID))
         registry->removeComponent<Input>(entityID);
-        break;
-    case CType::Physics:
+    if (registry->contains<Physics>(entityID))
         registry->removeComponent<Physics>(entityID);
-        break;
-    case CType::Sound:
+    if (registry->contains<Sound>(entityID))
         registry->removeComponent<Sound>(entityID);
-        break;
-    case CType::Collision:
-        if (registry->contains<AABB>(entityID))
-            registry->removeComponent<AABB>(entityID);
-        else if (registry->contains<OBB>(entityID))
-            registry->removeComponent<OBB>(entityID);
-        else if (registry->contains<Plane>(entityID))
-            registry->removeComponent<Plane>(entityID);
-        else if (registry->contains<Sphere>(entityID))
-            registry->removeComponent<Sphere>(entityID);
-        else if (registry->contains<Cylinder>(entityID))
-            registry->removeComponent<Cylinder>(entityID);
-        break;
-    default:
-        break;
-    }
+    if (registry->contains<AABB>(entityID))
+        registry->removeComponent<AABB>(entityID);
+    if (registry->contains<OBB>(entityID))
+        registry->removeComponent<OBB>(entityID);
+    if (registry->contains<Plane>(entityID))
+        registry->removeComponent<Plane>(entityID);
+    if (registry->contains<Sphere>(entityID))
+        registry->removeComponent<Sphere>(entityID);
+    if (registry->contains<Cylinder>(entityID))
+        registry->removeComponent<Cylinder>(entityID);
     deleteLater();
-}
-
-void ComponentGroupBox::setTitleFromType() {
-    switch (mComponentType) {
-    case CType::Transform:
-        setTitle("Transform");
-        break;
-    case CType::Material:
-        setTitle("Material");
-        break;
-    case CType::Mesh:
-        setTitle("Mesh");
-        break;
-    case CType::Light:
-        setTitle("Light");
-        break;
-    case CType::Input:
-        setTitle("Input");
-        break;
-    case CType::Physics:
-        setTitle("Physics");
-        break;
-    case CType::Sound:
-        setTitle("Sound");
-        break;
-    case CType::Collision:
-        setTitle("Collision");
-        break;
-    default:
-        break;
-    }
 }
 
 void ComponentGroupBox::createActions() {

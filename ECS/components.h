@@ -41,17 +41,9 @@ class Component {
 public:
     Component() = default;
     virtual ~Component() {}
-
-    CType type() const {
-        return mType;
-    }
-
-protected:
-    CType mType;
 };
 struct Transform : Component {
     Transform() {
-        mType = CType::Transform;
         modelMatrix.setToIdentity();
         //calculate matrix from position, scale, rotation
         translationMatrix.setToIdentity();
@@ -89,11 +81,7 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(Ref<Shader> type = std::make_shared<ColorShader>(), GLuint texture = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4)
-        : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
-          mTextureUnit(texture), mShader(type) {
-        mType = CType::Material;
-    }
+    Material(Ref<Shader> shader = nullptr, GLuint texture = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4);
 
     GLfloat mSpecularStrength;
     GLint mSpecularExponent;
@@ -104,11 +92,9 @@ struct Material : public Component {
 
 struct Mesh : public Component {
     Mesh() {
-        mType = CType::Mesh;
     }
     Mesh(GLenum drawType, std::string name, GLuint verticeCount = 0, GLuint indiceCount = 0)
         : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name) {
-        mType = CType::Mesh;
     }
     Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
     }
@@ -149,7 +135,6 @@ struct Light : public Component {
           vec3 color = vec3(1.f, 1.f, 1.f))
         : mAmbientStrength(ambStr), mAmbientColor(ambColor), mLightStrength(lightStr),
           mLightColor(lightColor), mObjectColor(color) {
-        mType = CType::Light;
     }
 
     GLfloat mAmbientStrength;
@@ -161,7 +146,6 @@ struct Light : public Component {
 };
 struct Input : public Component {
     Input() {
-        mType = CType::Input;
     }
 
     bool W{false};

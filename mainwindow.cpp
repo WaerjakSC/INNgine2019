@@ -376,6 +376,8 @@ void MainWindow::insertEntities() {
     hierarchy->clear();
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     for (auto entity : registry->getEntities()) {
+        if (entity.second->isDestroyed())
+            continue;
         QStandardItem *item = new QStandardItem;
         if (entity.second->name() == "")
             item->setText(QString("GameObject" + QString::number(unnamedEntityCount)));

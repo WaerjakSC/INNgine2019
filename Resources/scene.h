@@ -17,6 +17,7 @@ public:
     QString name() const;
 
     GLuint mLight;
+    GLuint mGameCamID;
 
 private:
     std::map<QString, std::string> mScenes;

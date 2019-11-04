@@ -292,6 +292,12 @@ void Matrix4x4::rotateZ(GLfloat degrees) {
     *this = (*this) * temp;
 }
 
+void Matrix4x4::rotate(Vector3D vector) {
+    rotateX(vector.x);
+    rotateY(vector.y);
+    rotateZ(vector.z);
+}
+
 // Rotate around a given vector
 //void Matrix4x4::rotate(GLfloat angle, Vector3D vector)
 //{

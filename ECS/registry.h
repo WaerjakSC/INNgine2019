@@ -75,14 +75,12 @@ public:
     void addComponent(int entityID, Args... args) {
         // Add a component to the array for an entity
         getPool<Type>()->add(entityID, args...);
-        getEntity(entityID)->types() |= getPool<Type>()->get(entityID).type();
     }
     /**
      * @brief Remove a component of type Type from the entity/gameobject with entityID.
      */
     template <typename Type>
     void removeComponent(int entityID) {
-        getEntity(entityID)->types() &= ~getPool<Type>()->get(entityID).type();
         // Remove a component from the array for an entity
         getPool<Type>()->remove(entityID);
     }
@@ -136,6 +134,7 @@ public:
 
     void removeEntity(GLuint eID);
     GLuint numEntities() { return mEntities.size(); }
+    GLuint nextAvailable();
 
     void clearScene();
 

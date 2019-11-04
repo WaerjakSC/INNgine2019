@@ -31,7 +31,7 @@ public:
     void setEditorCamController(const Ref<CameraController> &editorCamController);
 
     Ref<GameCameraController> gameCameraController() const;
-    void setGameCameraController(const Ref<GameCameraController> &gameCameraController);
+    void setGameCameraController(const Ref<GameCameraController> &gameCameraController, GLuint gameCamMeshID);
 
     void onResize(float aspectRatio);
 signals:
@@ -56,6 +56,7 @@ private:
     ResourceManager *factory;
     Ref<CameraController> mEditorCamController;
     Ref<GameCameraController> mGameCameraController;
+    GLuint camMeshID;
     RenderWindow *mRenderWindow;
 
     GLuint mPlayerController;

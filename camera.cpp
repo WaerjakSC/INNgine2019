@@ -24,6 +24,9 @@ void Camera::setProjectionMatrix(float fov, float aspect, float nearPlane, float
 void Camera::setPosition(const vec3 &position) {
     mPosition = -position;
 }
+const vec3 Camera::getRotation() const {
+    return std::get<2>(gsl::Matrix4x4::decomposed(mViewMatrix));
+}
 void Camera::setRotation(float pitch, float yaw) {
     mPitch = -pitch;
     mYaw = -yaw;

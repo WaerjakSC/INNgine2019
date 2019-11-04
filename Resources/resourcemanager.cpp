@@ -687,11 +687,12 @@ QString ResourceManager::getMeshName(const Mesh &mesh) {
 bool ResourceManager::readFile(std::string fileName, GLuint eID) {
     //Open File
     std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
+    std::string mtlPath = gsl::assetFilePath + "Meshes/";
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, fileWithPath.c_str());
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, fileWithPath.c_str(), mtlPath.c_str());
     if (!err.empty()) {
         std::cerr << err << std::endl;
     }
@@ -707,9 +708,10 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
             vertex.set_xyz(attrib.vertices[3 * index.vertex_index],
                            attrib.vertices[3 * index.vertex_index + 1],
                            attrib.vertices[3 * index.vertex_index + 2]);
-            vertex.set_normal(attrib.normals[3 * index.normal_index],
-                              attrib.normals[3 * index.normal_index + 1],
-                              attrib.normals[3 * index.normal_index + 2]);
+            if (attrib.normals.size() != 0)
+                vertex.set_normal(attrib.normals[3 * index.normal_index],
+                                  attrib.normals[3 * index.normal_index + 1],
+                                  attrib.normals[3 * index.normal_index + 2]);
             if (attrib.texcoords.size() != 0)
                 vertex.set_st(attrib.texcoords[2 * index.texcoord_index],
                               attrib.texcoords[2 * index.texcoord_index + 1]);

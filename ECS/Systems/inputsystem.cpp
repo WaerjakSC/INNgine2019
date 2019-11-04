@@ -11,9 +11,10 @@ InputSystem::InputSystem(RenderWindow *window)
 }
 
 void InputSystem::update(float deltaTime) {
-    if (factory->isPlaying())
-        gameCameraController()->update();
-    else
+    if (factory->isPlaying()) {
+        auto gameCam = gameCameraController();
+        gameCam->update();
+    } else
         editorCamController()->update();
     handlePlayerController(deltaTime);
     handleKeyInput();
@@ -79,8 +80,11 @@ Ref<GameCameraController> InputSystem::gameCameraController() const {
     return mGameCameraController;
 }
 
-void InputSystem::setGameCameraController(const Ref<GameCameraController> &gameCameraController) {
+void InputSystem::setGameCameraController(const Ref<GameCameraController> &gameCameraController, GLuint gameCamMeshID) {
     mGameCameraController = gameCameraController;
+    camMeshID = gameCamMeshID;
+
+    mGameCameraController->update();
 }
 
 void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController) {

@@ -4,9 +4,10 @@
 #include "components.h"
 #include <QGroupBox>
 class QMainWindow;
+class MainWindow;
 class ComponentGroupBox : public QGroupBox {
 public:
-    ComponentGroupBox(CType type, QMainWindow *parent = nullptr);
+    ComponentGroupBox(const QString &name, QMainWindow *parent = nullptr);
 private slots:
     void removeComponent();
 

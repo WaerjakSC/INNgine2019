@@ -1,0 +1,147 @@
+{
+    "gamecam": {
+        "position": [
+            0.0,
+            12.0,
+            10.0
+        ],
+        "pitch": -45,
+        "yaw": 0
+    },
+    "GameObject": {
+        "name": "Skybox",
+        "id": 2,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    15.0,
+                    15.0,
+                    15.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 2,
+                "shader": "TextureShader"
+            },
+            "mesh": {
+                "name": "Skybox"
+            }
+        }
+    },
+    "GameObject": {
+        "name": "Light",
+        "id": 4,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    6.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    180.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.800000011920929
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "TextureShader"
+            },
+            "mesh": {
+                "name": "Pyramid"
+            },
+            "light": {
+                "ambstr": 0.30000001192092898,
+                "ambcolor": [
+                    0.30000001192092898,
+                    0.30000001192092898,
+                    0.30000001192092898
+                ],
+                "lightstr": 0.699999988079071,
+                "lightcolor": [
+                    0.30000001192092898,
+                    0.30000001192092898,
+                    0.30000001192092898
+                ],
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        }
+    },
+    "GameObject": {
+        "name": "Player",
+        "id": 12,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": "Ball"
+            },
+            "input": {
+                "isController": true
+            }
+        }
+    }
+}

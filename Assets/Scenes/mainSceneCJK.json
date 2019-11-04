@@ -10,7 +10,7 @@
     },
     "GameObject": {
         "name": "Skybox",
-        "id": 1,
+        "id": 2,
         "components": {
             "transform": {
                 "position": [
@@ -48,7 +48,7 @@
     },
     "GameObject": {
         "name": "BillBoard",
-        "id": 2,
+        "id": 3,
         "components": {
             "transform": {
                 "position": [
@@ -57,7 +57,7 @@
                     -3.5
                 ],
                 "rotation": [
-                    -25.000001907348634,
+                    0.0,
                     -0.0,
                     -0.0
                 ],
@@ -91,7 +91,7 @@
     },
     "GameObject": {
         "name": "Light",
-        "id": 3,
+        "id": 4,
         "components": {
             "transform": {
                 "position": [
@@ -148,7 +148,7 @@
     },
     "GameObject": {
         "name": "box2.txt",
-        "id": 4,
+        "id": 5,
         "components": {
             "transform": {
                 "position": [
@@ -168,7 +168,7 @@
                 ],
                 "parent": -1,
                 "children": [
-                    5
+                    6
                 ]
             },
             "material": {
@@ -189,7 +189,7 @@
     },
     "GameObject": {
         "name": "monkey.obj",
-        "id": 5,
+        "id": 6,
         "components": {
             "transform": {
                 "position": [
@@ -207,7 +207,7 @@
                     0.5,
                     0.5
                 ],
-                "parent": 4
+                "parent": 5
             },
             "material": {
                 "color": [
@@ -239,7 +239,7 @@
     },
     "GameObject": {
         "name": "Floor",
-        "id": 6,
+        "id": 7,
         "components": {
             "transform": {
                 "position": [
@@ -277,13 +277,13 @@
     },
     "GameObject": {
         "name": "Wall 1",
-        "id": 7,
+        "id": 8,
         "components": {
             "transform": {
                 "position": [
                     0.0,
-                    0.0,
-                    7.5
+                    0.5,
+                    7.699999809265137
                 ],
                 "rotation": [
                     0.0,
@@ -291,7 +291,7 @@
                     0.0
                 ],
                 "scale": [
-                    7.5,
+                    16.0,
                     1.0,
                     0.5
                 ],
@@ -315,13 +315,13 @@
     },
     "GameObject": {
         "name": "Wall 2",
-        "id": 8,
+        "id": 9,
         "components": {
             "transform": {
                 "position": [
                     0.0,
-                    0.0,
-                    -7.5
+                    0.5,
+                    -7.699999809265137
                 ],
                 "rotation": [
                     0.0,
@@ -329,7 +329,7 @@
                     0.0
                 ],
                 "scale": [
-                    7.5,
+                    16.0,
                     1.0,
                     0.5
                 ],
@@ -353,12 +353,12 @@
     },
     "GameObject": {
         "name": "Wall 3",
-        "id": 9,
+        "id": 10,
         "components": {
             "transform": {
                 "position": [
-                    -7.5,
-                    0.0,
+                    -7.699999809265137,
+                    0.5,
                     0.0
                 ],
                 "rotation": [
@@ -369,7 +369,7 @@
                 "scale": [
                     0.5,
                     1.0,
-                    8.0
+                    15.0
                 ],
                 "parent": -1
             },
@@ -391,12 +391,12 @@
     },
     "GameObject": {
         "name": "Wall 4",
-        "id": 10,
+        "id": 11,
         "components": {
             "transform": {
                 "position": [
-                    8.0,
-                    0.0,
+                    7.699999809265137,
+                    0.5,
                     0.0
                 ],
                 "rotation": [
@@ -407,7 +407,7 @@
                 "scale": [
                     0.5,
                     1.0,
-                    8.0
+                    15.0
                 ],
                 "parent": -1
             },
@@ -429,7 +429,7 @@
     },
     "GameObject": {
         "name": "Player",
-        "id": 11,
+        "id": 12,
         "components": {
             "transform": {
                 "position": [
