@@ -12,7 +12,6 @@ private slots:
     void removeComponent();
 
 private:
-    void setTitleFromType();
     MainWindow *mMainWindow;
     void createActions();
 };

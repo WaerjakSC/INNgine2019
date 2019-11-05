@@ -19,31 +19,31 @@ ComponentGroupBox::ComponentGroupBox(const QString &name, QMainWindow *parent) :
 void ComponentGroupBox::removeComponent() {
     Registry *registry = Registry::instance();
     GLuint entityID = mMainWindow->selectedEntity->id();
-    if (registry->contains<Transform>(entityID))
+    if (title() == "Transform")
         registry->removeComponent<Transform>(entityID);
-    if (registry->contains<Material>(entityID))
+    if (title() == "Material")
         registry->removeComponent<Material>(entityID);
-    if (registry->contains<Mesh>(entityID))
+    if (title() == "Mesh")
         registry->removeComponent<Mesh>(entityID);
-    if (registry->contains<Light>(entityID))
+    if (title() == "Light")
         registry->removeComponent<Light>(entityID);
-    if (registry->contains<Input>(entityID))
+    if (title() == "Input")
         registry->removeComponent<Input>(entityID);
-    if (registry->contains<Physics>(entityID))
+    if (title() == "Physics")
         registry->removeComponent<Physics>(entityID);
-    if (registry->contains<Sound>(entityID))
+    if (title() == "Sound")
         registry->removeComponent<Sound>(entityID);
-    if (registry->contains<AIcomponent>(entityID))
+    if (title() == "AI")
         registry->removeComponent<AIcomponent>(entityID);
-    if (registry->contains<AABB>(entityID))
+    if (title() == "AABB Collider")
         registry->removeComponent<AABB>(entityID);
-    if (registry->contains<OBB>(entityID))
+    if (title() == "OBB Collider")
         registry->removeComponent<OBB>(entityID);
-    if (registry->contains<Plane>(entityID))
+    if (title() == "Plane Collider")
         registry->removeComponent<Plane>(entityID);
-    if (registry->contains<Sphere>(entityID))
+    if (title() == "Sphere Collider")
         registry->removeComponent<Sphere>(entityID);
-    if (registry->contains<Cylinder>(entityID))
+    if (title() == "Cylinder Collider")
         registry->removeComponent<Cylinder>(entityID);
     deleteLater();
 }
