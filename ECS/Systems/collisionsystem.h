@@ -37,6 +37,8 @@ public:
     bool SphereOBB(const Sphere &sphere, const OBB &obb);
 
     void DrawColliders();
+    void updateAABB(GLuint eID);
+    void updateSphere(GLuint eID);
 };
 
 #endif // COLLISIONSYSTEM_H

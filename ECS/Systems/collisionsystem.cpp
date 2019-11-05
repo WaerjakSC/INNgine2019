@@ -12,10 +12,10 @@ void CollisionSystem::update(float deltaTime) {
     auto otherView = reg->view<Transform, Sphere, AIcomponent>();
     for (auto entity : view) {
         auto [transform, aabb, aabbAIcomponent] = view.get<Transform, AABB, AIcomponent>(entity);
-        aabb.origin = transform.localPosition;
+        updateAABB(entity);
         for (auto otherEntity : otherView) {
             auto [otherTransform, sphere, sphereAIcomponent] = otherView.get<Transform, Sphere, AIcomponent>(otherEntity);
-            sphere.position = transform.localPosition;
+            updateSphere(otherEntity);
             if (SphereAABB(sphere, aabb)) {
                 aabbAIcomponent.hp -= sphereAIcomponent.damage;
                 qDebug() << "Collision";
@@ -23,6 +23,18 @@ void CollisionSystem::update(float deltaTime) {
             }
         }
     }
+}
+
+void CollisionSystem::updateAABB(GLuint eID){
+    auto view = reg->view<Transform, AABB>();
+    auto [transform, aabb] = view.get<Transform, AABB>(eID);
+    aabb.origin = transform.localPosition;
+}
+
+void CollisionSystem::updateSphere(GLuint eID){
+    auto view = reg->view<Transform, Sphere>();
+    auto [transform, sphere] = view.get<Transform, Sphere>(eID);
+    sphere.position = transform.localPosition;
 }
 
 /**

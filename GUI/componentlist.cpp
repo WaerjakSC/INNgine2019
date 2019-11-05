@@ -9,6 +9,7 @@
 #include "registry.h"
 #include "rendersystem.h"
 #include "renderwindow.h"
+#include "collisionsystem.h"
 #include "verticalscrollarea.h"
 #include <QCheckBox>
 #include <QColorDialog>
@@ -140,8 +141,10 @@ void ComponentList::addSoundComponent() {
 void ComponentList::addAABBCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<AABB>(eID))
+        if (!registry->contains<AABB>(eID)){
             registry->addComponent<AABB>(eID);
+            registry->getSystem<CollisionSystem>()->updateAABB(eID);
+        }
         setupComponentList();
     }
 }
