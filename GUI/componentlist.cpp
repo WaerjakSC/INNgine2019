@@ -1,4 +1,5 @@
 #include "componentlist.h"
+#include "collisionsystem.h"
 #include "componentgroupbox.h"
 #include "components.h"
 #include "constants.h"
@@ -140,40 +141,51 @@ void ComponentList::addSoundComponent() {
 void ComponentList::addAABBCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<AABB>(eID))
+        if (!registry->contains<AABB>(eID)) {
             registry->addComponent<AABB>(eID);
+            registry->getSystem<CollisionSystem>()->update();
+        }
         setupComponentList();
     }
 }
 void ComponentList::addOBBCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<OBB>(eID))
+        if (!registry->contains<OBB>(eID)) {
             registry->addComponent<OBB>(eID);
+            registry->getSystem<CollisionSystem>()->update();
+        }
         setupComponentList();
     }
 }
 void ComponentList::addSphereCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<Sphere>(eID))
+        if (!registry->contains<Sphere>(eID)) {
             registry->addComponent<Sphere>(eID);
+            registry->getSystem<CollisionSystem>()->update();
+        }
         setupComponentList();
     }
 }
 void ComponentList::addPlaneCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<Plane>(eID))
+        if (!registry->contains<Plane>(eID)) {
             registry->addComponent<Plane>(eID);
+            registry->getSystem<CollisionSystem>()->update();
+        }
+
         setupComponentList();
     }
 }
 void ComponentList::addCylinderCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<Cylinder>(eID))
+        if (!registry->contains<Cylinder>(eID)) {
             registry->addComponent<Cylinder>(eID);
+            registry->getSystem<CollisionSystem>()->update();
+        }
         setupComponentList();
     }
 }

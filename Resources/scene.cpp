@@ -273,6 +273,17 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(cylinder.height);
                 writer.EndObject();
             }
+            if (registry->contains<AIcomponent>(eID)) {
+                writer.Key("AI");
+                writer.StartObject();
+                const AIcomponent &ai = registry->getComponent<AIcomponent>(eID);
+
+                writer.Key("health");
+                writer.Double(ai.hp);
+                writer.Key("damage");
+                writer.Double(ai.damage);
+                writer.EndObject();
+            }
 
             writer.EndObject();
             writer.EndObject();
@@ -405,6 +416,11 @@ void Scene::populateScene(const Document &scene) {
                 float height = comp->value["height"].GetDouble();
                 // Need rotation matrix here
                 registry->addComponent<Cylinder>(id, position, radius, height);
+            } else if (comp->name == "AI") {
+                int health = comp->value["health"].GetInt();
+                int damage = comp->value["damage"].GetInt();
+                // Need rotation matrix here
+                registry->addComponent<AIcomponent>(id, health, damage);
             }
         }
     }
