@@ -13,7 +13,6 @@ private slots:
 
 private:
     void setTitleFromType();
-    CType mComponentType;
     MainWindow *mMainWindow;
     void createActions();
 };

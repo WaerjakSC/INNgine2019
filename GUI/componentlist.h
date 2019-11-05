@@ -127,6 +127,7 @@ private:
 
     void setupTransformSettings(const Transform &component);
     void setupMaterialSettings(const Material &component);
+    void setupAISettings(const AIcomponent &ai);
     void setupMeshSettings(const Mesh &mesh);
     void setupAABBSettings(const AABB &col);
     void setupOBBSettings(const OBB &col);
@@ -146,7 +147,6 @@ private:
 
     std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
-    void setupAISettings(const AIcomponent &ai);
 };
 
 #endif // COMPONENTLIST_H

@@ -33,6 +33,8 @@ void ComponentGroupBox::removeComponent() {
         registry->removeComponent<Physics>(entityID);
     if (registry->contains<Sound>(entityID))
         registry->removeComponent<Sound>(entityID);
+    if (registry->contains<AIcomponent>(entityID))
+        registry->removeComponent<AIcomponent>(entityID);
     if (registry->contains<AABB>(entityID))
         registry->removeComponent<AABB>(entityID);
     if (registry->contains<OBB>(entityID))

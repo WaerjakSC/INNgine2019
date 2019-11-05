@@ -10,14 +10,14 @@ CollisionSystem::CollisionSystem() {
 void CollisionSystem::update(float deltaTime) {
     auto view = reg->view<Transform, AABB, AIcomponent>();
     auto otherView = reg->view<Transform, Sphere, AIcomponent>();
-    for (auto entity : view){
+    for (auto entity : view) {
         auto [transform, aabb, aabbAIcomponent] = view.get<Transform, AABB, AIcomponent>(entity);
         aabb.origin = transform.localPosition;
-        for ( auto otherEntity : otherView){
+        for (auto otherEntity : otherView) {
             auto [otherTransform, sphere, sphereAIcomponent] = otherView.get<Transform, Sphere, AIcomponent>(otherEntity);
             sphere.position = transform.localPosition;
-            if(SphereAABB(sphere, aabb)){
-                aabbAIcomponent.AIhp -= sphereAIcomponent.damage;
+            if (SphereAABB(sphere, aabb)) {
+                aabbAIcomponent.hp -= sphereAIcomponent.damage;
 
                 // notify FSM if needed
             }
@@ -70,12 +70,11 @@ bool CollisionSystem::SphereOBB(const Sphere &sphere, const OBB &obb) {
     return dist < radiusSq;
 }
 
-void CollisionSystem::DrawColliders()
-{
+void CollisionSystem::DrawColliders() {
     initializeOpenGLFunctions();
     auto view = reg->view<Transform, Collision>();
-    for(auto entityID : view){
-        if(reg->contains<Collision>(entityID)){
+    for (auto entityID : view) {
+        if (reg->contains<Collision>(entityID)) {
             auto &collider = view.get<Collision>(entityID);
             glBindVertexArray(0);
             glBindVertexArray(collider.mVAO);

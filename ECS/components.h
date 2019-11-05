@@ -293,7 +293,7 @@ struct BSplineCurve : Component {
 // de kan bevege seg, ta skade, dø
 enum NPCstates { MOVE,
                  DEATH,
-                 GOAL_REACHED};
+                 GOAL_REACHED };
 
 enum NPCevents { ENDPOINT_ARRIVED,
                  DAMAGE_TAKEN };
@@ -301,9 +301,8 @@ enum NPCevents { ENDPOINT_ARRIVED,
 // GNOMER
 struct AIcomponent : public Component {
     AIcomponent() {}
-    int AIhp = 100;
+    int hp = 100;
     int damage;
-
 };
 
 // BASEN
@@ -311,7 +310,5 @@ struct PlayerComponent : public Component {
     PlayerComponent() {}
     int playerHP = 100;
 };
-
-
 
 #endif // COMPONENT_H
