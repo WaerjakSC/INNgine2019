@@ -60,6 +60,7 @@ int AIsystem::findKnotInterval(float x) {
 }
 
 vec3 AIsystem::evaluateBSpline(int degree, int startKnot, float x) {
+
 }
 
 vec2 AIsystem::deBoor(float x)
@@ -84,8 +85,6 @@ void AIsystem::move()
      *
      *
      */
-
-
 }
 
 void AIsystem::death(){

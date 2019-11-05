@@ -8,13 +8,28 @@ CollisionSystem::CollisionSystem() {
 }
 
 void CollisionSystem::update(float deltaTime) {
+    auto view = reg->view<Transform, AABB, AIcomponent>();
+    auto otherView = reg->view<Transform, Sphere, AIcomponent>();
+    for (auto entity : view){
+        auto [transform, aabb, aabbAIcomponent] = view.get<Transform, AABB, AIcomponent>(entity);
+        aabb.origin = transform.localPosition;
+        for ( auto otherEntity : otherView){
+            auto [otherTransform, sphere, sphereAIcomponent] = otherView.get<Transform, Sphere, AIcomponent>(otherEntity);
+            sphere.position = transform.localPosition;
+            if(SphereAABB(sphere, aabb)){
+                aabbAIcomponent.AIhp -= sphereAIcomponent.damage;
+
+                // notify FSM if needed
+            }
+        }
+    }
 }
 
 /**
- * @brief Helper function CollisionSystem::getMin finds minimum point in an AABB
- * @param aabb
- * @return a vector minimum point found in the AABB
- */
+* @brief Helper function CollisionSystem::getMin finds minimum point in an AABB
+* @param aabb
+* @return a vector minimum point found in the AABB
+*/
 vec3 CollisionSystem::getMin(const AABB &aabb) {
     vec3 p1 = aabb.origin + aabb.size;
     vec3 p2 = aabb.origin - aabb.size;
@@ -92,8 +107,8 @@ bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2)
  */
 bool CollisionSystem::AABBPlane(const AABB &aabb, const Plane &plane) { // WIP - not sure if this works
     float mHalfExtent = aabb.size.x * fabsf(plane.normal.x) +
-            aabb.size.y * fabsf(plane.normal.y) +
-            aabb.size.z * fabsf(plane.normal.z);
+                        aabb.size.y * fabsf(plane.normal.y) +
+                        aabb.size.z * fabsf(plane.normal.z);
 
     // Distance from center of AABB to plane
     float dotProduct = vec3::dot(plane.normal, aabb.origin);
@@ -131,8 +146,8 @@ bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
     vec3 bMax = getMax(AABB2);
 
     return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-            (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-            (aMin.z <= bMax.z && aMax.z >= bMin.z);
+           (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
+           (aMin.z <= bMax.z && aMax.z >= bMin.z);
 }
 
 /**
@@ -176,8 +191,8 @@ vec3 CollisionSystem::ClosestPoint(const OBB &obb, const vec3 &point) {
         const float *orientation = &obb.orientation.matrix[i * 3];
         // vector that holds the different axis
         vec3 axis(orientation[0],
-                orientation[1],
-                orientation[2]);
+                  orientation[1],
+                  orientation[2]);
         // projects the point onto that axis and stores the distance
         float dist = vec3::dot(dir, axis);
 
