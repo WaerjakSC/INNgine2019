@@ -30,6 +30,7 @@ private:
     void move();
     void death();
     void goalReached();
+
     NPCstates state;
     void notify(int notification);
     std::queue<int> notification_queue;

@@ -292,22 +292,24 @@ struct BSplineCurve : Component {
 // TD enemies følger en path fra A til B
 // de kan bevege seg, ta skade, dø
 enum NPCstates { MOVE,
-                 SLEEP,
                  DEATH,
                  GOAL_REACHED};
 
 enum NPCevents { ENDPOINT_ARRIVED,
                  DAMAGE_TAKEN };
 
+// GNOMER
 struct AIcomponent : public Component {
     AIcomponent() {}
-    int hp;
+    int AIhp = 100;
+    int damage;
 
 };
 
+// BASEN
 struct PlayerComponent : public Component {
     PlayerComponent() {}
-    int hp;
+    int playerHP = 100;
 };
 
 
