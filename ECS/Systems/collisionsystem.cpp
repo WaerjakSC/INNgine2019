@@ -18,7 +18,7 @@ void CollisionSystem::update(float deltaTime) {
             sphere.position = transform.localPosition;
             if (SphereAABB(sphere, aabb)) {
                 aabbAIcomponent.hp -= sphereAIcomponent.damage;
-
+                qDebug() << "Collision";
                 // notify FSM if needed
             }
         }

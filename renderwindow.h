@@ -20,6 +20,8 @@ class MovementSystem;
 class LightSystem;
 class SoundSystem;
 class InputSystem;
+class CollisionSystem;
+class AIsystem;
 class ResourceManager;
 class Registry;
 class Raycast;
@@ -69,6 +71,8 @@ private:
     Ref<LightSystem> mLightSystem;
     Ref<SoundSystem> mSoundSystem;
     Ref<InputSystem> mInputSystem;
+    Ref<CollisionSystem> mCollisionSystem;
+    Ref<AIsystem> mAIsystem;
 
     ResourceManager *mFactory;
     Registry *mRegistry;

@@ -17,6 +17,8 @@
 #include "movementsystem.h"
 #include "rendersystem.h"
 #include "soundsystem.h"
+#include "collisionsystem.h"
+#include "aisystem.h"
 
 #include "colorshader.h"
 #include "phongshader.h"
@@ -124,6 +126,8 @@ void RenderWindow::init() {
     mInputSystem->setEditorCamController(mEditorCameraController);
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mSoundSystem->createContext();
+    mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
+    mAIsystem = mRegistry->registerSystem<AIsystem>();
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
@@ -159,6 +163,7 @@ void RenderWindow::render() {
         if (mFactory->isPlaying()) {
             mMoveSystem->update(dt);
         }
+        mCollisionSystem->update(dt);
         mLightSystem->update(dt);
         mRenderer->update(dt);
     }
