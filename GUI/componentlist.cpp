@@ -33,6 +33,9 @@ void ComponentList::setupComponentList() {
     if (registry->contains<Transform>(eID)) {
         setupTransformSettings(registry->getComponent<Transform>(eID));
     }
+    if (registry->contains<AIcomponent>(eID)) {
+        setupAISettings(registry->getComponent<AIcomponent>(eID));
+    }
     if (registry->contains<AABB>(eID)) {
         setupAABBSettings(registry->getComponent<AABB>(eID));
     }
@@ -74,6 +77,15 @@ void ComponentList::addTransformComponent() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Transform>(eID))
             registry->addComponent<Transform>(eID);
+        setupComponentList();
+    }
+}
+
+void ComponentList::addAIComponent() {
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<AIcomponent>(eID))
+            registry->addComponent<AIcomponent>(eID);
         setupComponentList();
     }
 }
@@ -351,10 +363,34 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
+void ComponentList::setupAISettings(const AIcomponent &ai) {
+    ComponentGroupBox *box = new ComponentGroupBox("AI", mMainWindow);
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
 
+    QGroupBox *hpBox = new QGroupBox(tr("Health"));
+    hpBox->setStyle(fusion);
+    hpBox->setFlat(true);
+
+    QHBoxLayout *hpLayout = new QHBoxLayout;
+    hpLayout->setMargin(1);
+    QSpinBox *health = new QSpinBox;
+    health->setRange(0, 5000);
+    health->setMaximumWidth(58);
+    health->setStyle(fusion);
+    health->setValue(ai.hp);
+    hpLayout->addWidget(health);
+    connect(this, &ComponentList::changeHealth, health, &QSpinBox::setValue);
+    connect(health, SIGNAL(valueChanged(int)), this, SLOT(setHealth(int)));
+
+    hpBox->setLayout(hpLayout);
+    grid->addWidget(hpBox, 0, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
+}
 void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     ComponentGroupBox *box = new ComponentGroupBox("Plane Collider", mMainWindow);
-    box->setTitle("Sphere Collider");
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
     QGroupBox *normalBox = new QGroupBox(tr("Normal"));
@@ -532,6 +568,11 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
 void ComponentList::setNewShader(const QString &text) {
     GLuint eID = mMainWindow->selectedEntity->id();
     emit newShader(eID, text.toStdString());
+}
+
+void ComponentList::setHealth(int health) {
+    auto ai = registry->getComponent<AIcomponent>(mMainWindow->selectedEntity->id());
+    ai.hp = health;
 }
 void ComponentList::setNewTextureFile() {
     QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";

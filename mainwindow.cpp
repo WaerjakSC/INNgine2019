@@ -244,6 +244,10 @@ void MainWindow::createActions() {
     components->addAction(soundAction);
     connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
 
+    aiAction = new QAction(tr("AI"), this);
+    components->addAction(aiAction);
+    connect(aiAction, &QAction::triggered, mComponentList, &ComponentList::addAIComponent);
+
     ui->mainToolBar->setMovable(false);
 
     // Set up the prefab actions

@@ -31,6 +31,7 @@ public slots:
     void addMeshComponent();
     void addMaterialComponent();
     void addTransformComponent();
+    void addAIComponent();
     void addAABBCollider();
     void addOBBCollider();
     void addSphereCollider();
@@ -72,6 +73,7 @@ signals:
     void cylinderRadius(double radius);
     void cylinderHeight(double height);
     void newShader(int entityID, std::string shader);
+    void changeHealth(int health);
 
 private slots:
     void updatePosSpinBoxes(int state);
@@ -80,6 +82,7 @@ private slots:
     void updateScaleVals(GLuint eID, vec3 newScale);
 
     void setNewShader(const QString &text);
+    void setHealth(int health);
 
     void setPositionX(double xIn);
     void setPositionY(double yIn);
@@ -143,6 +146,7 @@ private:
 
     std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    void setupAISettings(const AIcomponent &ai);
 };
 
 #endif // COMPONENTLIST_H
