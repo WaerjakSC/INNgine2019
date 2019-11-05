@@ -300,7 +300,7 @@ enum NPCevents { ENDPOINT_ARRIVED,
 
 // GNOMER
 struct AIcomponent : public Component {
-    AIcomponent() {}
+    AIcomponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}
     int hp = 100;
     int damage;
 };
