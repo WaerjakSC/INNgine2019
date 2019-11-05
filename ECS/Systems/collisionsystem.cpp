@@ -4,7 +4,6 @@
 #include <cmath>
 
 CollisionSystem::CollisionSystem() {
-    Registry::instance()->registerComponent<Collision>();
 }
 
 void CollisionSystem::update(float deltaTime) {
@@ -18,20 +17,21 @@ void CollisionSystem::update(float deltaTime) {
             updateSphere(otherEntity);
             if (SphereAABB(sphere, aabb)) {
                 aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                qDebug() << "Collision";
+                qDebug() << "Collision" + QString::number(collisions);
+                collisions++;
                 // notify FSM if needed
             }
         }
     }
 }
 
-void CollisionSystem::updateAABB(GLuint eID){
+void CollisionSystem::updateAABB(GLuint eID) {
     auto view = reg->view<Transform, AABB>();
     auto [transform, aabb] = view.get<Transform, AABB>(eID);
     aabb.origin = transform.localPosition;
 }
 
-void CollisionSystem::updateSphere(GLuint eID){
+void CollisionSystem::updateSphere(GLuint eID) {
     auto view = reg->view<Transform, Sphere>();
     auto [transform, sphere] = view.get<Transform, Sphere>(eID);
     sphere.position = transform.localPosition;
