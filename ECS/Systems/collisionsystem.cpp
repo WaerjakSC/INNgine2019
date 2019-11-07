@@ -78,17 +78,6 @@ bool CollisionSystem::SphereOBB(const Sphere &sphere, const OBB &obb) {
     return dist < radiusSq;
 }
 
-void CollisionSystem::DrawColliders() {
-    initializeOpenGLFunctions();
-    auto view = reg->view<Transform, AABB>();
-    for (auto entityID : view) {
-        auto &collider = view.get<AABB>(entityID);
-        glBindVertexArray(0);
-        glBindVertexArray(collider.colliderMesh.mVAO);
-        glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_SHORT, nullptr); // Might use GL_STRIP instead, not sure yet
-    }
-}
-
 /**
  * @brief CollisionSystem::SphereSphere
  * @param sphere1
@@ -96,10 +85,12 @@ void CollisionSystem::DrawColliders() {
  * @return true if distance is less than radius^2 (intersection)
  */
 bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2) {
+    vec3 sphere1Pos = sphere1.transform.modelMatrix.getPosition();
+    vec3 sphere2Pos = sphere2.transform.modelMatrix.getPosition();
     // sum of radius
     float rs = sphere1.radius + sphere2.radius;
     // dist squared
-    float dist = (sphere1.position + sphere2.position).length();
+    float dist = (sphere1Pos + sphere2Pos).length();
     // compare
     return dist < (rs * rs);
 }
@@ -129,9 +120,14 @@ bool CollisionSystem::AABBPlane(const AABB &aabb, const Plane &plane) { // WIP -
  * @return true if distance is less than radius (we have an intersection)
  */
 bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
-    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
+    // Get the actual position of the sphere - sphere.position only holds the offset from the entity it belongs to
+    vec3 spherePos = sphere.transform.modelMatrix.getPosition();
+    // Not sure what ClosestPoint aims to achieve, previously I think it was sending a vec3(sphere.radius, 0,0) due to how vector3d works
+    //    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
+    // Now sends the center position of the sphere
+    vec3 closestPoint = ClosestPoint(aabb, spherePos);
     // not 100% sure about this one
-    float dist = (sphere.position - closestPoint).length();
+    float dist = (spherePos - closestPoint).length();
     float radiusSq = sphere.radius * sphere.radius;
 
     return dist < radiusSq;
@@ -143,7 +139,6 @@ bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
  * @return true if all axis overlap (we have an intersection)
  */
 bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
-
     vec3 aMin = getMin(AABB1);
     vec3 aMax = getMax(AABB1);
 
@@ -221,9 +216,10 @@ vec3 CollisionSystem::ClosestPoint(const OBB &obb, const vec3 &point) {
  * @return resized vector, offset by sphere.position
  */
 vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
-    vec3 sphereCenterToPoint = point - sphere.position;
+    vec3 spherePos = sphere.transform.modelMatrix.getPosition();
+    vec3 sphereCenterToPoint = point - spherePos;
     sphereCenterToPoint.normalize();
     sphereCenterToPoint = sphereCenterToPoint * sphere.radius;
 
-    return sphereCenterToPoint + sphere.position;
+    return sphereCenterToPoint + spherePos;
 }

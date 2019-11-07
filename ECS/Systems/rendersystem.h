@@ -23,10 +23,11 @@ public slots:
 private:
     Registry *registry{nullptr};
 
-    void iterateEntities();
+    void drawEntities();
     void updateEntities();
 
     std::map<std::string, Ref<Shader>> mShaders;
+    void drawColliders();
 };
 
 #endif // RENDERSYSTEM_H
