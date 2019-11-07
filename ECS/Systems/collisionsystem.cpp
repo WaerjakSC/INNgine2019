@@ -14,15 +14,48 @@ void CollisionSystem::update(DeltaTime dt) {
     }
 }
 void CollisionSystem::runSimulations() {
-    auto view = reg->view<Transform, AABB>();
-    auto otherView = reg->view<Transform, AABB>();
+    runAABBSimulations();
+    runSphereSimulations();
+}
+void CollisionSystem::runAABBSimulations() {
+    auto view = reg->view<AABB>();
+    auto sphereView = reg->view<Sphere>();
     for (auto entity : view) {
-        auto [transform, aabb] = view.get<Transform, AABB>(entity);
-        for (auto otherEntity : otherView) {
+        auto &aabb = view.get(entity);
+        // Check for AABB-AABB intersections
+        for (auto otherEntity : view) {
             if (entity != otherEntity) {
-                auto [otherTransform, sphere] = otherView.get<Transform, AABB>(otherEntity);
-                if (AABBAABB(sphere, aabb)) {
+                auto &otherAABB = view.get(otherEntity);
+                if (AABBAABB(aabb, otherAABB)) {
                     //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
+                    qDebug() << "Collision" + QString::number(collisions);
+                    collisions++;
+                    // notify FSM if needed
+                }
+            }
+        }
+        for (auto otherEntity : sphereView) {
+            if (entity != otherEntity) {
+                auto &sphere = sphereView.get(otherEntity);
+                if (SphereAABB(sphere, aabb)) {
+                    //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
+                    qDebug() << "Collision" + QString::number(collisions);
+                    collisions++;
+                    // notify FSM if needed
+                }
+            }
+        }
+    }
+}
+void CollisionSystem::runSphereSimulations() {
+    auto view = reg->view<Sphere>();
+    for (auto entity : view) {
+        auto &sphere = view.get(entity);
+        for (auto otherEntity : view) {
+            if (entity != otherEntity) {
+                auto &otherSphere = view.get(otherEntity);
+                if (SphereSphere(sphere, otherSphere)) {
+                    //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
                     qDebug() << "Collision" + QString::number(collisions);
                     collisions++;
                     // notify FSM if needed
@@ -105,9 +138,9 @@ bool CollisionSystem::AABBPlane(const AABB &aabb, const Plane &plane) { // WIP -
     float mHalfExtent = aabb.size.x * fabsf(plane.normal.x) +
                         aabb.size.y * fabsf(plane.normal.y) +
                         aabb.size.z * fabsf(plane.normal.z);
-
+    vec3 aabbPos = aabb.transform.modelMatrix.getPosition();
     // Distance from center of AABB to plane
-    float dotProduct = vec3::dot(plane.normal, aabb.origin);
+    float dotProduct = vec3::dot(plane.normal, aabbPos);
     float dist = dotProduct - plane.distance;
 
     return fabsf(dist) <= mHalfExtent;

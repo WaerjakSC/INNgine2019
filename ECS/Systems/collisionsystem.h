@@ -13,6 +13,13 @@ public:
     Registry *reg = Registry::instance();
     void update(DeltaTime dt = 0.016) override;
 
+private:
+    float fixedDelta{0.02f};
+    float delta{0};
+    int collisions{0};
+
+    void runSimulations();
+
     vec3 getMin(const AABB &aabb);
     vec3 getMax(const AABB &aabb);
 
@@ -36,13 +43,8 @@ public:
     vec3 ClosestPoint(const OBB &obb, const vec3 &point);
     vec3 ClosestPoint(const Sphere &sphere, const vec3 &point);
     bool SphereOBB(const Sphere &sphere, const OBB &obb);
-    int collisions{0};
-    void DrawColliders();
-
-private:
-    float fixedDelta{0.2f};
-    float delta{0};
-    void runSimulations();
+    void runAABBSimulations();
+    void runSphereSimulations();
 };
 
 #endif // COLLISIONSYSTEM_H
