@@ -12,7 +12,7 @@ class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1
 public:
     RenderSystem(std::map<std::string, Ref<Shader>> shaders);
 
-    void update(float deltaTime = 0.016) override;
+    void update(DeltaTime dt = 0.016) override;
 
     void init();
 public slots:

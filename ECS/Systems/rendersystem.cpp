@@ -46,8 +46,8 @@ void RenderSystem::iterateEntities() {
 void RenderSystem::init() {
     iterateEntities();
 }
-void RenderSystem::update(float deltaTime) {
-    Q_UNUSED(deltaTime);
+void RenderSystem::update(DeltaTime dt) {
+    Q_UNUSED(dt);
     iterateEntities();
 }
 void RenderSystem::toggleRendered(GLuint entityID) {

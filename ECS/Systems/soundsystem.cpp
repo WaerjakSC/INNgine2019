@@ -64,8 +64,8 @@ void SoundSystem::init() {
     //ALboolean bReturn = AL_FALSE;
 }
 
-void SoundSystem::update(float deltaTime) {
-    Q_UNUSED(deltaTime);
+void SoundSystem::update(DeltaTime dt) {
+    Q_UNUSED(dt);
     updateListener();
     auto view = reg->view<Transform, Sound>();
     for (auto entity : view) {

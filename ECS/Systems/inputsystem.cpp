@@ -10,12 +10,12 @@ InputSystem::InputSystem(RenderWindow *window)
       mRenderWindow(window) {
 }
 
-void InputSystem::update(float deltaTime) {
+void InputSystem::update(DeltaTime dt) {
     if (factory->isPlaying()) {
         gameCameraController()->update();
     } else
         editorCamController()->update();
-    handlePlayerController(deltaTime);
+    handlePlayerController(dt);
     handleKeyInput();
     handleMouseInput();
 }

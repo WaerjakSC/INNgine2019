@@ -14,7 +14,7 @@ public:
     AIsystem();
     Registry *reg;
 
-    virtual void update(float deltaTime = 0.016);
+    virtual void update(DeltaTime dt = 0.016) override;
 
     // BSplineCurve
     void initVertexBufferObjects();
@@ -25,6 +25,7 @@ public:
     vec3 evaluateBSpline(int degree, int startKnot, float x);
 
     vec2 deBoor(float x);
+
 private:
     // FSM
     void move();

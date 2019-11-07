@@ -5,8 +5,8 @@
 LightSystem::LightSystem(Ref<PhongShader> shader)
     : registry(Registry::instance()), mPhong(shader) {
 }
-void LightSystem::update(float deltaTime) {
-    Q_UNUSED(deltaTime);
+void LightSystem::update(DeltaTime dt) {
+    Q_UNUSED(dt);
     //    auto view = registry->view<Transform, Light>();
     //    for (auto entityID : view) {
     //        auto [transform, light] = view.get<Transform, Light>(entityID);

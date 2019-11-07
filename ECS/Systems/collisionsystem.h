@@ -2,6 +2,7 @@
 #define COLLISIONSYSTEM_H
 
 #include "components.h"
+#include "deltaTime.h"
 #include "isystem.h"
 #include "registry.h"
 #include <QOpenGLFunctions_4_1_Core>
@@ -10,7 +11,7 @@ public:
     CollisionSystem();
 
     Registry *reg = Registry::instance();
-    void update(float deltaTime = 0.016) override;
+    void update(DeltaTime dt = 0.016) override;
 
     vec3 getMin(const AABB &aabb);
     vec3 getMax(const AABB &aabb);
@@ -37,6 +38,11 @@ public:
     bool SphereOBB(const Sphere &sphere, const OBB &obb);
     int collisions{0};
     void DrawColliders();
+
+private:
+    float fixedDelta{0.2f};
+    float delta{0};
+    void runSimulations();
 };
 
 #endif // COLLISIONSYSTEM_H

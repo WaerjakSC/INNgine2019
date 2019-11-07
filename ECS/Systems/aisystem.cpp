@@ -6,7 +6,7 @@ AIsystem::AIsystem() {
     Registry::instance()->registerComponent<BSplineCurve>();
 }
 
-void AIsystem::update(float deltaTime) {
+void AIsystem::update(DeltaTime dt) {
     // RUN FSM HERE?
     switch (state) {
 
@@ -20,7 +20,6 @@ void AIsystem::update(float deltaTime) {
     case GOAL_REACHED:
         goalReached();
         break;
-
     }
 }
 
@@ -60,16 +59,13 @@ int AIsystem::findKnotInterval(float x) {
 }
 
 vec3 AIsystem::evaluateBSpline(int degree, int startKnot, float x) {
-
 }
 
-vec2 AIsystem::deBoor(float x)
-{
+vec2 AIsystem::deBoor(float x) {
     // return curve position calculated by deBoor's algorithm (evaluateBSpline)
 }
 
-void AIsystem::move()
-{
+void AIsystem::move() {
 
     // follow b-spline from start of path to end of path
     // if end of path is reached,
@@ -87,19 +83,15 @@ void AIsystem::move()
      */
 }
 
-void AIsystem::death(){
+void AIsystem::death() {
 
     // hp >= 0
     // gold++
     // delete entity
-
 }
 
-void AIsystem::goalReached()
-{
+void AIsystem::goalReached() {
     // endpoint reached
     // remove 1LP from player
     // delete entity
 }
-
-

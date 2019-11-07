@@ -9,7 +9,7 @@ class LightSystem : public ISystem {
 public:
     LightSystem(Ref<PhongShader> shader);
 
-    void update(float deltaTime = 0.016) override;
+    void update(DeltaTime deltaTime = 0.016) override;
 
     void init(Ref<Entity> light);
 

@@ -15,7 +15,7 @@ class InputSystem : public QObject, public ISystem {
     Q_OBJECT
 public:
     InputSystem(RenderWindow *window);
-    void update(float deltaTime = 0.016) override;
+    void update(DeltaTime dt = 0.016) override;
     void keyPressEvent(QKeyEvent *event);
 
     void keyReleaseEvent(QKeyEvent *event);

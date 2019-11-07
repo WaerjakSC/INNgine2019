@@ -23,7 +23,7 @@ private:
 public:
     MovementSystem();
 
-    void update(float deltaTime = 0.016) override;
+    void update(DeltaTime dt = 0.016) override;
     void init();
 
     void updateEntity(GLuint eID);
@@ -74,7 +74,7 @@ public:
     vec3 getAbsoluteRotation(GLuint eID);
     vec3 getRelativeRotation(GLuint eID);
 
-    void updateCollider(GLuint entity);
+    void updateColliderTransform(GLuint entity);
 signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);

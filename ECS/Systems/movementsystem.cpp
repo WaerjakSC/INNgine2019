@@ -8,15 +8,15 @@ MovementSystem::MovementSystem() {
 void MovementSystem::init() {
     update();
 }
-void MovementSystem::update(float deltaTime) {
-    Q_UNUSED(deltaTime) // remember to remove this once we implement deltaTime
+void MovementSystem::update(DeltaTime dt) {
+    Q_UNUSED(dt) // remember to remove this once we implement deltaTime
     auto view = registry->view<Transform>();
     for (auto entity : view) {
         updateModelMatrix(entity);
     }
     auto aabbview = registry->view<Transform, AABB>();
     for (auto entity : aabbview) {
-        updateCollider(entity);
+        updateColliderTransform(entity);
     }
     for (auto billBoard : registry->billBoards()) {
         if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(registry->getEntity(billBoard)))
@@ -24,7 +24,7 @@ void MovementSystem::update(float deltaTime) {
     }
 }
 
-void MovementSystem::updateCollider(GLuint entity) {
+void MovementSystem::updateColliderTransform(GLuint entity) {
     auto view = registry->view<Transform, AABB>();
     auto [trans, col] = view.get<Transform, AABB>(entity);
     if (col.transform.matrixOutdated) {
@@ -44,7 +44,7 @@ void MovementSystem::updateEntity(GLuint eID) {
     for (auto child : comp.children)
         updateEntity(child);
     if (registry->contains<AABB>(eID))
-        updateCollider(eID);
+        updateColliderTransform(eID);
 }
 
 void MovementSystem::updateModelMatrix(GLuint eID) {

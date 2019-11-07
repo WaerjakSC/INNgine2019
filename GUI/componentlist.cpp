@@ -143,7 +143,7 @@ void ComponentList::addAABBCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<AABB>(eID)) {
             registry->addComponent<AABB>(eID);
-            registry->getSystem<MovementSystem>()->updateCollider(eID);
+            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
     }
@@ -153,7 +153,7 @@ void ComponentList::addOBBCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<OBB>(eID)) {
             registry->addComponent<OBB>(eID);
-            registry->getSystem<MovementSystem>()->updateCollider(eID);
+            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
     }
@@ -163,7 +163,7 @@ void ComponentList::addSphereCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Sphere>(eID)) {
             registry->addComponent<Sphere>(eID);
-            registry->getSystem<MovementSystem>()->updateCollider(eID);
+            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
     }
@@ -173,7 +173,7 @@ void ComponentList::addPlaneCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Plane>(eID)) {
             registry->addComponent<Plane>(eID);
-            registry->getSystem<MovementSystem>()->updateCollider(eID);
+            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
 
         setupComponentList();
@@ -184,7 +184,7 @@ void ComponentList::addCylinderCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Cylinder>(eID)) {
             registry->addComponent<Cylinder>(eID);
-            registry->getSystem<MovementSystem>()->updateCollider(eID);
+            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
     }
@@ -738,7 +738,7 @@ void ComponentList::setScaleZ(double zIn) {
 void ComponentList::updateCollider(GLuint eID) {
     if (!ResourceManager::instance()->isPlaying()) {
         auto movement = registry->getSystem<MovementSystem>();
-        movement->updateCollider(eID);
+        movement->updateColliderTransform(eID);
     }
 }
 void ComponentList::setOriginX(double xIn) {

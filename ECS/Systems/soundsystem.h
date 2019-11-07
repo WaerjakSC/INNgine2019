@@ -19,7 +19,7 @@ public:
     SoundSystem();
     void cleanUp();
     void init();
-    void update(float deltaTime = 0.016) override;
+    void update(DeltaTime dt = 0.016) override;
 
     void setPosition(GLuint eID, vec3 newPos);
     void setVelocity(GLuint eID, vec3 newVel);

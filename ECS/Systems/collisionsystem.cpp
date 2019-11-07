@@ -6,7 +6,14 @@
 CollisionSystem::CollisionSystem() {
 }
 
-void CollisionSystem::update(float deltaTime) {
+void CollisionSystem::update(DeltaTime dt) {
+    delta += dt;
+    if (delta >= fixedDelta) {
+        delta = 0.f;
+        runSimulations();
+    }
+}
+void CollisionSystem::runSimulations() {
     auto view = reg->view<Transform, AABB>();
     auto otherView = reg->view<Transform, AABB>();
     for (auto entity : view) {
@@ -24,7 +31,6 @@ void CollisionSystem::update(float deltaTime) {
         }
     }
 }
-
 /**
 * @brief Helper function CollisionSystem::getMin finds minimum point in an AABB
 * @param aabb
