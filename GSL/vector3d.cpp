@@ -67,6 +67,14 @@ Vector3D Vector3D::operator^(const Vector3D &rhs) const {
 bool Vector3D::operator==(const Vector3D &compared) const {
     return x == compared.x && y == compared.y && z == compared.z;
 }
+
+bool Vector3D::operator<=(const Vector3D &compared) const {
+    return x <= compared.x && y <= compared.y && z <= compared.z;
+}
+
+bool Vector3D::operator>=(const Vector3D &compared) const {
+    return x >= compared.x && y >= compared.y && z >= compared.z;
+}
 bool Vector3D::operator!=(const Vector3D &compared) const {
     return x != compared.x || y != compared.y || z != compared.z;
 }

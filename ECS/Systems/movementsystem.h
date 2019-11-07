@@ -18,7 +18,7 @@ private:
     gsl::Matrix4x4 getTRMatrix(Transform &comp);
 
     void updateTRS(Transform &comp);
-    void updateTRS(AABB &comp);
+    void updateTS(AABB &comp);
 
 public:
     MovementSystem();

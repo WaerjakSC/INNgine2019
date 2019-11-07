@@ -238,7 +238,7 @@ void Matrix4x4::setPosition(GLfloat x, GLfloat y, GLfloat z) {
     matrix[11] = z;
 }
 
-Vector3D Matrix4x4::getPosition() {
+Vector3D Matrix4x4::getPosition() const {
     return gsl::Vector3D(matrix[3], matrix[7], matrix[11]);
 }
 Vector3D Matrix4x4::getScale() {

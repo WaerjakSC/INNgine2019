@@ -7,17 +7,19 @@ CollisionSystem::CollisionSystem() {
 }
 
 void CollisionSystem::update(float deltaTime) {
-    auto view = reg->view<Transform, AABB, AIcomponent>();
-    auto otherView = reg->view<Transform, Sphere, AIcomponent>();
+    auto view = reg->view<Transform, AABB>();
+    auto otherView = reg->view<Transform, AABB>();
     for (auto entity : view) {
-        auto [transform, aabb, aabbAIcomponent] = view.get<Transform, AABB, AIcomponent>(entity);
+        auto [transform, aabb] = view.get<Transform, AABB>(entity);
         for (auto otherEntity : otherView) {
-            auto [otherTransform, sphere, sphereAIcomponent] = otherView.get<Transform, Sphere, AIcomponent>(otherEntity);
-            if (SphereAABB(sphere, aabb)) {
-                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                qDebug() << "Collision" + QString::number(collisions);
-                collisions++;
-                // notify FSM if needed
+            if (entity != otherEntity) {
+                auto [otherTransform, sphere] = otherView.get<Transform, AABB>(otherEntity);
+                if (AABBAABB(sphere, aabb)) {
+                    //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
+                    qDebug() << "Collision" + QString::number(collisions);
+                    collisions++;
+                    // notify FSM if needed
+                }
             }
         }
     }
@@ -29,8 +31,9 @@ void CollisionSystem::update(float deltaTime) {
 * @return a vector minimum point found in the AABB
 */
 vec3 CollisionSystem::getMin(const AABB &aabb) {
-    vec3 p1 = aabb.origin + aabb.size;
-    vec3 p2 = aabb.origin - aabb.size;
+    vec3 origin = aabb.transform.modelMatrix.getPosition();
+    vec3 p1 = origin + aabb.size;
+    vec3 p2 = origin - aabb.size;
 
     return vec3(fminf(p1.x, p2.x),
                 fminf(p1.y, p2.y),
@@ -43,8 +46,9 @@ vec3 CollisionSystem::getMin(const AABB &aabb) {
  * @return a vector maximum point found in the AABB
  */
 vec3 CollisionSystem::getMax(const AABB &aabb) {
-    vec3 p1 = aabb.origin + aabb.size;
-    vec3 p2 = aabb.origin - aabb.size;
+    vec3 origin = aabb.transform.modelMatrix.getPosition();
+    vec3 p1 = origin + aabb.size;
+    vec3 p2 = origin - aabb.size;
 
     return vec3(fmaxf(p1.x, p2.x),
                 fmaxf(p1.y, p2.y),
@@ -140,9 +144,7 @@ bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
     vec3 bMin = getMin(AABB2);
     vec3 bMax = getMax(AABB2);
 
-    return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-           (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-           (aMin.z <= bMax.z && aMax.z >= bMin.z);
+    return aMin <= bMax && aMax >= bMin;
 }
 
 /**

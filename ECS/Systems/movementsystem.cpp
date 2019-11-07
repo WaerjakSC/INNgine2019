@@ -28,7 +28,7 @@ void MovementSystem::updateCollider(GLuint entity) {
     auto view = registry->view<Transform, AABB>();
     auto [trans, col] = view.get<Transform, AABB>(entity);
     if (col.transform.matrixOutdated) {
-        updateTRS(col);
+        updateTS(col);
         col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
         col.transform.matrixOutdated = false;
     }
@@ -95,7 +95,7 @@ void MovementSystem::updateTRS(Transform &comp) {
     comp.scaleMatrix.setToIdentity();
     comp.scaleMatrix.scale(comp.localScale);
 }
-void MovementSystem::updateTRS(AABB &comp) {
+void MovementSystem::updateTS(AABB &comp) {
     auto &trans = comp.transform;
     //calculate matrix from position, scale, rotation
     trans.translationMatrix.setToIdentity();

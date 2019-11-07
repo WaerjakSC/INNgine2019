@@ -30,17 +30,17 @@ void RenderSystem::iterateEntities() {
                 glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
         }
     }
-    auto colliderView = registry->view<AABB>();
-    ColorShader *shader = ResourceManager::instance()->getShader<ColorShader>().get();
-    for (auto entity : colliderView) {
-        auto &aabb = colliderView.get(entity);
-        glUseProgram(shader->getProgram());
-        // For AABB you could possibly alter the modelMatrix by a desired position or scale(half-size) before sending it to the shader.
-        shader->transmitUniformData(aabb.transform.modelMatrix, nullptr); // no need to send a material since the box collider is just lines
-        glBindVertexArray(aabb.colliderMesh.mVAO);
-        //        if (mesh.mIndiceCount > 0)
-        //            glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
-        glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
+    if (!ResourceManager::instance()->isPlaying()) {
+        auto colliderView = registry->view<AABB>();
+        ColorShader *shader = ResourceManager::instance()->getShader<ColorShader>().get();
+        for (auto entity : colliderView) {
+            auto &aabb = colliderView.get(entity);
+            glUseProgram(shader->getProgram());
+            // For AABB you could possibly alter the modelMatrix by a desired position or scale(half-size) before sending it to the shader.
+            shader->transmitUniformData(aabb.transform.modelMatrix, nullptr); // no need to send a material since the box collider is just lines
+            glBindVertexArray(aabb.colliderMesh.mVAO);
+            glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
+        }
     }
 }
 void RenderSystem::init() {
