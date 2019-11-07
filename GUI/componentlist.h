@@ -147,6 +147,7 @@ private:
 
     std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    void updateCollider(GLuint eID);
 };
 
 #endif // COMPONENTLIST_H

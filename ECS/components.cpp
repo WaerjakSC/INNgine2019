@@ -26,6 +26,6 @@ Material::Material(Ref<Shader> shader, GLuint texture, vec3 color, GLfloat specS
         mShader = ResourceManager::instance()->getShader<ColorShader>();
 }
 
-AABB::AABB() : size(vec3(1)) {
+AABB::AABB() : size(vec3(1.0f, 1.0f, 1.0f)) {
     ResourceManager::instance()->setColliderMesh(colliderMesh);
 }

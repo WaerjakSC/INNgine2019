@@ -210,6 +210,7 @@ public:
 
     bool mTrigger{false};
     Mesh colliderMesh;
+    Transform transform;
 };
 
 /**

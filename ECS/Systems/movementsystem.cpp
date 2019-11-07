@@ -12,12 +12,25 @@ void MovementSystem::update(float deltaTime) {
     Q_UNUSED(deltaTime) // remember to remove this once we implement deltaTime
     auto view = registry->view<Transform>();
     for (auto entity : view) {
-        auto &comp = view.get(entity);
-        updateModelMatrix(comp);
+        updateModelMatrix(entity);
+    }
+    auto aabbview = registry->view<Transform, AABB>();
+    for (auto entity : aabbview) {
+        updateCollider(entity);
     }
     for (auto billBoard : registry->billBoards()) {
         if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(registry->getEntity(billBoard)))
             board->update();
+    }
+}
+
+void MovementSystem::updateCollider(GLuint entity) {
+    auto view = registry->view<Transform, AABB>();
+    auto [trans, col] = view.get<Transform, AABB>(entity);
+    if (col.transform.matrixOutdated) {
+        updateTRS(col);
+        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
+        col.transform.matrixOutdated = false;
     }
 }
 /**
@@ -27,12 +40,16 @@ void MovementSystem::update(float deltaTime) {
 void MovementSystem::updateEntity(GLuint eID) {
     auto &comp = registry->view<Transform>().get(eID);
     comp.matrixOutdated = true;
-    updateModelMatrix(comp);
+    updateModelMatrix(eID);
     for (auto child : comp.children)
         updateEntity(child);
+    if (registry->contains<AABB>(eID))
+        updateCollider(eID);
 }
 
-void MovementSystem::updateModelMatrix(Transform &comp) {
+void MovementSystem::updateModelMatrix(GLuint eID) {
+    auto view = registry->view<Transform>();
+    Transform &comp = view.get(eID);
     if (comp.matrixOutdated) {
         //calculate matrix from position, scale, rotation
         updateTRS(comp);
@@ -52,6 +69,8 @@ void MovementSystem::updateModelMatrix(Transform &comp) {
             Transform &childComp = view.get(child);
             childComp.matrixOutdated = true;
         }
+        if (registry->contains<AABB>(eID))
+            registry->getComponent<AABB>(eID).transform.matrixOutdated = true;
     }
 }
 gsl::Matrix4x4 MovementSystem::getTRMatrix(Transform &comp) {
@@ -75,6 +94,15 @@ void MovementSystem::updateTRS(Transform &comp) {
 
     comp.scaleMatrix.setToIdentity();
     comp.scaleMatrix.scale(comp.localScale);
+}
+void MovementSystem::updateTRS(AABB &comp) {
+    auto &trans = comp.transform;
+    //calculate matrix from position, scale, rotation
+    trans.translationMatrix.setToIdentity();
+    trans.translationMatrix.translate(comp.origin);
+
+    trans.scaleMatrix.setToIdentity();
+    trans.scaleMatrix.scale(comp.size); // This might need to be half of size
 }
 /**
  * @brief Get global position of object

@@ -14,8 +14,11 @@ class MovementSystem : public QObject, public ISystem {
 private:
     Registry *registry;
 
-    void updateModelMatrix(Transform &comp);
+    void updateModelMatrix(GLuint eID);
     gsl::Matrix4x4 getTRMatrix(Transform &comp);
+
+    void updateTRS(Transform &comp);
+    void updateTRS(AABB &comp);
 
 public:
     MovementSystem();
@@ -23,7 +26,6 @@ public:
     void update(float deltaTime = 0.016) override;
     void init();
 
-    void updateTRS(Transform &comp);
     void updateEntity(GLuint eID);
 
     vec3 getAbsolutePosition(GLuint eID);
@@ -72,6 +74,7 @@ public:
     vec3 getAbsoluteRotation(GLuint eID);
     vec3 getRelativeRotation(GLuint eID);
 
+    void updateCollider(GLuint entity);
 signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);

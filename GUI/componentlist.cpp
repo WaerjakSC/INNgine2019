@@ -10,7 +10,6 @@
 #include "registry.h"
 #include "rendersystem.h"
 #include "renderwindow.h"
-#include "collisionsystem.h"
 #include "verticalscrollarea.h"
 #include <QCheckBox>
 #include <QColorDialog>
@@ -142,9 +141,8 @@ void ComponentList::addSoundComponent() {
 void ComponentList::addAABBCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<AABB>(eID)){
+        if (!registry->contains<AABB>(eID)) {
             registry->addComponent<AABB>(eID);
-            registry->getSystem<CollisionSystem>()->updateAABB(eID);
         }
         setupComponentList();
     }
@@ -217,7 +215,7 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     QHBoxLayout *hSize = new QHBoxLayout;
     hSize->setMargin(1);
 
-    auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize);
+    auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize, 0.1f, 5000);
     connect(this, &ComponentList::AABBSizeX, sizeX, &QDoubleSpinBox::setValue);
     connect(sizeX, SIGNAL(valueChanged(double)), this, SLOT(setAABBSizeX(double)));
     connect(this, &ComponentList::AABBSizeY, sizeY, &QDoubleSpinBox::setValue);
@@ -736,104 +734,122 @@ void ComponentList::setScaleZ(double zIn) {
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 // ************* Collider update slots *************
+void ComponentList::updateCollider(GLuint eID) {
+    if (!ResourceManager::instance()->isPlaying()) {
+        auto movement = registry->getSystem<MovementSystem>();
+        movement->updateCollider(eID);
+    }
+}
 void ComponentList::setOriginX(double xIn) {
-    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.origin.x = xIn;
+    aabb.transform.matrixOutdated = true;
+    updateCollider(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setOriginY(double yIn) {
-    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.origin.y = yIn;
+    aabb.transform.matrixOutdated = true;
+    updateCollider(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setOriginZ(double zIn) {
-    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.origin.z = zIn;
+    aabb.transform.matrixOutdated = true;
+    updateCollider(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setAABBSizeX(double xIn) {
-    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.size.x = xIn;
+    aabb.transform.matrixOutdated = true;
+    updateCollider(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setAABBSizeY(double yIn) {
-    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.size.y = yIn;
+    aabb.transform.matrixOutdated = true;
+    updateCollider(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setAABBSizeZ(double zIn) {
-    auto aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.size.z = zIn;
+    aabb.transform.matrixOutdated = true;
+    updateCollider(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setOBBPositionX(double xIn) {
-    auto aabb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
-    aabb.position.x = xIn;
+    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    obb.position.x = xIn;
 }
 void ComponentList::setOBBPositionY(double yIn) {
-    auto aabb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
-    aabb.position.y = yIn;
+    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    obb.position.y = yIn;
 }
 void ComponentList::setOBBPositionZ(double zIn) {
-    auto aabb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
-    aabb.position.z = zIn;
+    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    obb.position.z = zIn;
 }
 void ComponentList::setOBBSizeX(double xIn) {
-    auto obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
     obb.size.x = xIn;
 }
 void ComponentList::setOBBSizeY(double yIn) {
-    auto obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
     obb.size.y = yIn;
 }
 void ComponentList::setOBBSizeZ(double zIn) {
-    auto obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
     obb.size.z = zIn;
 }
 void ComponentList::setSpherePositionX(double xIn) {
-    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     sphere.position.x = xIn;
 }
 void ComponentList::setSpherePositionY(double yIn) {
-    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     sphere.position.y = yIn;
 }
 void ComponentList::setSpherePositionZ(double zIn) {
-    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     sphere.position.z = zIn;
 }
 void ComponentList::setSphereRadius(double radius) {
-    auto sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     sphere.radius = radius;
 }
 void ComponentList::setCylinderPositionX(double xIn) {
-    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.position.x = xIn;
 }
 void ComponentList::setCylinderPositionY(double yIn) {
-    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.position.y = yIn;
 }
 void ComponentList::setCylinderPositionZ(double zIn) {
-    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.position.z = zIn;
 }
 void ComponentList::setCylinderRadius(double radius) {
-    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.radius = radius;
 }
 void ComponentList::setCylinderHeight(double height) {
-    auto cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.radius = height;
 }
 void ComponentList::setPlaneNormalX(double xIn) {
-    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.x = xIn;
 }
 void ComponentList::setPlaneNormalY(double yIn) {
-    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.y = yIn;
 }
 void ComponentList::setPlaneNormalZ(double zIn) {
-    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.z = zIn;
 }
 void ComponentList::setPlaneDistance(double distance) {
-    auto plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
     plane.distance = distance;
 }
 /**

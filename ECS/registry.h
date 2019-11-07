@@ -119,9 +119,14 @@ public:
             }
         }
     }
-    template <typename Type>
+    template <typename... Type>
     bool contains(GLuint eID) {
-        return getPool<Type>()->has(eID);
+        [[maybe_unused]] const auto cpools = std::make_tuple(getPool<Type>()...);
+        return ((std::get<Ref<Pool<Type>>>(cpools) ? std::get<Ref<Pool<Type>>>(cpools)->has(eID) : false) && ...);
+    }
+    template <typename Type>
+    std::string type() {
+        return typeid(Type).name();
     }
     void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
     void removeBillBoardID(GLuint entityID);

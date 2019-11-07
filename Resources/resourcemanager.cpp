@@ -500,6 +500,7 @@ void ResourceManager::setColliderMesh(Mesh &mesh) {
                                    Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(1.f, 0.f)},  //Right low
                                    Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
                                    Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   // 0,
                                    // Front face
                                    Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Top
                                    Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
