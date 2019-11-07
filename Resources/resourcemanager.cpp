@@ -490,6 +490,46 @@ void ResourceManager::makeLightMesh(int eID) {
 
     glBindVertexArray(0);
 }
+void ResourceManager::setColliderMesh(Mesh &mesh) {
+    mMeshData.Clear();
+
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
+                               {
+                                   // Right face
+                                   Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.f, 0.f)},   //Left low
+                                   Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(1.f, 0.f)},  //Right low
+                                   Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
+                                   Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   // Front face
+                                   Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Top
+                                   Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   // Left face
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Top
+                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   // Back face
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Top
+                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Back low
+                                   Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Top
+                                   Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Back low
+                                                                                                                                        // Top face
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Top
+                                   Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Back low
+                                   Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},    //Top
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Back low
+                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}   //Back low
+                               });
+    mesh.mName = "BoxCollider";
+    mesh.mVerticeCount = mMeshData.mVertices.size();
+    mesh.mIndiceCount = mMeshData.mIndices.size();
+    mesh.mDrawType = GL_LINE_STRIP;
+
+    initVertexBuffers(&mesh);
+    initIndexBuffers(&mesh);
+}
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */

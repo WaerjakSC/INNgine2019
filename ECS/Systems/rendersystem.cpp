@@ -21,7 +21,6 @@ void RenderSystem::iterateEntities() {
     for (auto entity : view) {
         auto [transform, material, mesh] = view.get<Transform, Material, Mesh>(entity); // Structured bindings (c++17), creates and assigns from tuple
         if (mesh.mRendered) {
-
             glUseProgram(material.mShader->getProgram());
             material.mShader->transmitUniformData(transform.modelMatrix, &material);
             glBindVertexArray(mesh.mVAO);
@@ -30,6 +29,18 @@ void RenderSystem::iterateEntities() {
             else
                 glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
         }
+    }
+    auto colliderView = registry->view<Transform, AABB>();
+    ColorShader *shader = ResourceManager::instance()->getShader<ColorShader>().get();
+    for (auto entity : colliderView) {
+        auto [transform, aabb] = colliderView.get<Transform, AABB>(entity);
+        glUseProgram(shader->getProgram());
+        // For AABB you could possibly alter the modelMatrix by a desired position or scale(half-size) before sending it to the shader.
+        shader->transmitUniformData(transform.modelMatrix, nullptr);
+        glBindVertexArray(aabb.colliderMesh.mVAO);
+        //        if (mesh.mIndiceCount > 0)
+        //            glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
+        glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
     }
 }
 void RenderSystem::init() {

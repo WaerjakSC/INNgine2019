@@ -106,6 +106,7 @@ public:
         \param The file path relative to execution directory.
     **/
     bool loadWave(std::string filePath, Sound &sound);
+    void setColliderMesh(Mesh &mesh);
 public slots:
     void save();
     void load();

@@ -84,14 +84,12 @@ bool CollisionSystem::SphereOBB(const Sphere &sphere, const OBB &obb) {
 
 void CollisionSystem::DrawColliders() {
     initializeOpenGLFunctions();
-    auto view = reg->view<Transform, Collision>();
+    auto view = reg->view<Transform, AABB>();
     for (auto entityID : view) {
-        if (reg->contains<Collision>(entityID)) {
-            auto &collider = view.get<Collision>(entityID);
-            glBindVertexArray(0);
-            glBindVertexArray(collider.mVAO);
-            glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_SHORT, nullptr); // Might use GL_STRIP instead, not sure yet
-        }
+        auto &collider = view.get<AABB>(entityID);
+        glBindVertexArray(0);
+        glBindVertexArray(collider.colliderMesh.mVAO);
+        glDrawElements(GL_LINE_LOOP, 16, GL_UNSIGNED_SHORT, nullptr); // Might use GL_STRIP instead, not sure yet
     }
 }
 

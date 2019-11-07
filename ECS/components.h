@@ -104,8 +104,7 @@ struct Mesh : public Component {
 
     GLuint mVAO{0};
     GLuint mVBO{0};
-    GLuint mEAB{0};      //holds the indices (Element Array Buffer - EAB)
-    GLuint mAABB_VAO{0}; // holds the VAO for the Axis Aligned Bounding Box
+    GLuint mEAB{0}; //holds the indices (Element Array Buffer - EAB)
 
     GLuint mVerticeCount{0};
     GLuint mIndiceCount{0};
@@ -210,7 +209,7 @@ public:
     //    Collision(vec3 size) : colType(type) {}
 
     bool mTrigger{false};
-    GLuint mVAO{0}; // holds the VAO for the collider
+    Mesh colliderMesh;
 };
 
 /**
@@ -220,7 +219,7 @@ struct AABB : public Collision {
     vec3 origin{0};
     vec3 size; // Half size
 
-    inline AABB() : size(vec3(2)) {}
+    AABB();
     inline AABB(const vec3 &o, const vec3 &s) : origin(o), size(s) {}
 };
 
