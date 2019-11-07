@@ -5,8 +5,17 @@
 #include <QPoint>
 typedef gsl::Vector3D vec3;
 struct Ray {
+    Ray() {}
+    Ray(const vec3 &orig, const vec3 &dir) : origin(orig), direction(dir) {
+        invDir = direction.divide(1.f);
+        sign[0] = (invDir.x < 0);
+        sign[1] = (invDir.y < 0);
+        sign[2] = (invDir.z < 0);
+    }
     vec3 origin;
     vec3 direction;
+    vec3 invDir;
+    int sign[3];
 };
 class CameraController;
 class RenderWindow;
@@ -21,8 +30,6 @@ private:
     Ray ray;
     vec3 getPointOnRay(const Ray &ray, float distance);
     Ray getRayFromMouse(const QPoint &mousePos, const QRect &rect);
-    bool RayToSphere(const Ray &ray, const vec3 &center, double sphereRadius, double &intersectionDistance);
-    //    bool RayToPlane(Entity *entt, float start, float finish, const Ray &ray);
     float rayRange{250};
 };
 

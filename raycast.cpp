@@ -1,5 +1,6 @@
 #include "raycast.h"
 #include "camera.h"
+#include "collisionsystem.h"
 #include "movementsystem.h"
 #include "registry.h"
 #include "renderwindow.h"
@@ -18,17 +19,30 @@ int Raycast::mousePick(const QPoint &mousePos, const QRect &rect) {
     //    vec3 rayPoint = getPointOnRay(ray, 5);
     int entityID{-1};
     double closestTarget{rayRange};
-    for (auto entity : registry->getEntities()) {
-        if (entity.second->name() != "Skybox" && entity.second->name() != "XYZ" && registry->contains<Transform>(entity.first)) {
-            double intersectionPoint;
-            if (RayToSphere(ray, registry->getSystem<MovementSystem>()->getAbsolutePosition(entity.first), 1, intersectionPoint)) { // Setting radius to 1 just for testing
-                if (intersectionPoint < closestTarget) {
-                    closestTarget = intersectionPoint;
-                    entityID = entity.second->id();
-                }
+    Ref<CollisionSystem> collisionSystem = registry->getSystem<CollisionSystem>();
+    auto view = registry->view<AABB>();
+    for (auto entity : view) {
+        auto &aabb = view.get(entity);
+        double intersectionPoint;
+        if (collisionSystem->RayToAABB(ray, aabb, intersectionPoint)) { // Setting radius to 1 just for testing
+            if (intersectionPoint < closestTarget) {
+                closestTarget = intersectionPoint;
+                entityID = entity;
             }
         }
     }
+    auto sphereView = registry->view<Sphere>();
+    for (auto entity : sphereView) {
+        auto &sphere = view.get(entity);
+        double intersectionPoint;
+        if (collisionSystem->RayToSphere(ray, sphere, intersectionPoint)) { // Setting radius to 1 just for testing
+            if (intersectionPoint < closestTarget) {
+                closestTarget = intersectionPoint;
+                entityID = entity;
+            }
+        }
+    }
+
     return entityID;
 }
 
@@ -43,39 +57,6 @@ Ray Raycast::getRayFromMouse(const QPoint &mousePos, const QRect &rect) {
     return Ray{origin, direction};
 }
 
-bool Raycast::RayToSphere(const Ray &ray, const vec3 &center, double radius, double &intersectionDistance) {
-    vec3 originToCenter = ray.origin - center;
-
-    float a = vec3::dot(ray.direction, ray.direction);
-    float b = 2.0 * vec3::dot(originToCenter, ray.direction);
-    float c = vec3::dot(originToCenter, originToCenter) - (radius * radius);
-    float discriminant = (b * b) - (4 * a * c);
-    if (discriminant < 0)
-        return false;
-    if (discriminant > 0.0f) {
-        // get the 2 intersection distances along ray
-        double t_a = (-b + sqrt(discriminant) / (2.0 * a));
-        double t_b = (-b - sqrt(discriminant) / (2.0 * a));
-        intersectionDistance = t_b;
-        // if behind viewer, throw one or both away
-        if (t_a < 0.0f) {
-            if (t_b < 0.0f)
-                return false;
-        } else if (t_b < 0.0f)
-            intersectionDistance = t_a;
-        return true;
-    }
-    // check for ray hitting once (skimming the surface)
-    if (0.0f == discriminant) {
-        // if behind viewer, throw away
-        double t = (-b + sqrt(discriminant) / (2.0 * a));
-        if (t < 0.0f)
-            return false;
-        intersectionDistance = t;
-        return true;
-    }
-    return false;
-}
 // Remove this?
 //bool Raycast::RayToPlane(Entity *entt, float start, float finish, const Ray &ray) {
 //    vec3 startPoint = getPointOnRay(ray, start);

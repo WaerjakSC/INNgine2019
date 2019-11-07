@@ -6,6 +6,7 @@
 #include "isystem.h"
 #include "registry.h"
 #include <QOpenGLFunctions_4_1_Core>
+struct Ray;
 class CollisionSystem : public ISystem, public QOpenGLFunctions_4_1_Core {
 public:
     CollisionSystem();
@@ -29,6 +30,7 @@ private:
     // bool SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb);
     bool SphereSphere(const Sphere &sphere1, const Sphere &sphere2);
     bool AABBPlane(const AABB &aabb, const Plane &plane);
+    bool RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance);
 
     // Work in progress this guy
     bool CylinderCylinder(const Cylinder &cylinder1, const Cylinder &cylinder2);
@@ -45,6 +47,7 @@ private:
     bool SphereOBB(const Sphere &sphere, const OBB &obb);
     void runAABBSimulations();
     void runSphereSimulations();
+    friend class Raycast;
 };
 
 #endif // COLLISIONSYSTEM_H

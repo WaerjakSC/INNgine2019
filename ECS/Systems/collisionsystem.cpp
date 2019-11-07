@@ -1,8 +1,8 @@
 #include "collisionsystem.h"
 #include "components.h"
+#include "raycast.h"
 #include "registry.h"
 #include <cmath>
-
 CollisionSystem::CollisionSystem() {
 }
 
@@ -255,4 +255,61 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
     sphereCenterToPoint = sphereCenterToPoint * sphere.radius;
 
     return sphereCenterToPoint + spherePos;
+}
+bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance) {
+    vec3 center = sphere.transform.modelMatrix.getPosition();
+    vec3 originToCenter = ray.origin - center;
+
+    float a = vec3::dot(ray.direction, ray.direction);
+    float b = 2.0 * vec3::dot(originToCenter, ray.direction);
+    float c = vec3::dot(originToCenter, originToCenter) - (sphere.radius * sphere.radius);
+    float discriminant = (b * b) - (4 * a * c);
+    if (discriminant < 0)
+        return false;
+    if (discriminant > 0.0f) {
+        // get the 2 intersection distances along ray
+        double t_a = (-b + sqrt(discriminant) / (2.0 * a));
+        double t_b = (-b - sqrt(discriminant) / (2.0 * a));
+        intersectionDistance = t_b;
+        // if behind viewer, throw one or both away
+        if (t_a < 0.0f) {
+            if (t_b < 0.0f)
+                return false;
+        } else if (t_b < 0.0f)
+            intersectionDistance = t_a;
+        return true;
+    }
+    // check for ray hitting once (skimming the surface)
+    if (0.0f == discriminant) {
+        // if behind viewer, throw away
+        double t = (-b + sqrt(discriminant) / (2.0 * a));
+        if (t < 0.0f)
+            return false;
+        intersectionDistance = t;
+        return true;
+    }
+    return false;
+}
+
+bool CollisionSystem::RayToAABB(const Ray &r, const AABB &aabb, double &intersectionDistance) {
+    vec3 AABBmin = getMin(aabb);
+    vec3 AABBmax = getMax(aabb);
+    double t1 = (AABBmin[0] - r.origin[0]) * r.invDir[0];
+    double t2 = (AABBmax[0] - r.origin[0]) * r.invDir[0];
+
+    double tmin = std::min(t1, t2);
+    double tmax = std::max(t1, t2);
+
+    for (int i = 1; i < 3; ++i) {
+        t1 = (AABBmin[i] - r.origin[i]) * r.invDir[i];
+        t2 = (AABBmin[i] - r.origin[i]) * r.invDir[i];
+
+        tmin = std::max(tmin, std::min(std::min(t1, t2), tmax));
+        tmax = std::min(tmax, std::max(std::max(t1, t2), tmin));
+    }
+    if (tmax > std::max(tmin, 0.0)) {
+        intersectionDistance = tmax;
+        return true;
+    }
+    return false;
 }
