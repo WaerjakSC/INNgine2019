@@ -204,6 +204,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(aabb.size.y);
                 writer.Double(aabb.size.z);
                 writer.EndArray();
+                writer.Key("static");
+                writer.Bool(aabb.isStatic);
                 writer.EndObject();
             }
             if (registry->contains<OBB>(eID)) {
@@ -223,6 +225,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(obb.size.y);
                 writer.Double(obb.size.z);
                 writer.EndArray();
+                writer.Key("static");
+                writer.Bool(obb.isStatic);
                 // Need to do something with the rotation mat3
                 writer.EndObject();
             }
@@ -239,6 +243,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndArray();
                 writer.Key("distance");
                 writer.Double(plane.distance);
+                writer.Key("static");
+                writer.Bool(plane.isStatic);
                 writer.EndObject();
             }
             if (registry->contains<Sphere>(eID)) {
@@ -254,6 +260,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndArray();
                 writer.Key("radius");
                 writer.Double(sphere.radius);
+                writer.Key("static");
+                writer.Bool(sphere.isStatic);
                 writer.EndObject();
             }
             if (registry->contains<Cylinder>(eID)) {
@@ -271,6 +279,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(cylinder.radius);
                 writer.Key("height");
                 writer.Double(cylinder.height);
+                writer.Key("static");
+                writer.Bool(cylinder.isStatic);
                 writer.EndObject();
             }
             if (registry->contains<AIcomponent>(eID)) {
@@ -394,28 +404,33 @@ void Scene::populateScene(const Document &scene) {
             } else if (comp->name == "AABB") {
                 vec3 origin(comp->value["origin"][0].GetDouble(), comp->value["origin"][1].GetDouble(), comp->value["origin"][2].GetDouble());
                 vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
-                registry->addComponent<AABB>(id, origin, size);
+                bool isStatic = comp->value["static"].GetBool();
+                registry->addComponent<AABB>(id, origin, size, isStatic);
             } else if (comp->name == "OBB") {
                 vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                 vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
                 // Need rotation matrix here
-                registry->addComponent<OBB>(id, position, size);
+                bool isStatic = comp->value["static"].GetBool();
+                registry->addComponent<OBB>(id, position, size, isStatic);
             } else if (comp->name == "Plane") {
                 vec3 normal(comp->value["normal"][0].GetDouble(), comp->value["normal"][1].GetDouble(), comp->value["origin"][2].GetDouble());
                 float size = comp->value["distance"].GetDouble();
                 // Need rotation matrix here
-                registry->addComponent<Plane>(id, normal, size);
+                bool isStatic = comp->value["static"].GetBool();
+                registry->addComponent<Plane>(id, normal, size, isStatic);
             } else if (comp->name == "Sphere") {
                 vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                 float radius = comp->value["radius"].GetDouble();
                 // Need rotation matrix here
-                registry->addComponent<Sphere>(id, position, radius);
+                bool isStatic = comp->value["static"].GetBool();
+                registry->addComponent<Sphere>(id, position, radius, isStatic);
             } else if (comp->name == "Cylinder") {
                 vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                 float radius = comp->value["radius"].GetDouble();
                 float height = comp->value["height"].GetDouble();
                 // Need rotation matrix here
-                registry->addComponent<Cylinder>(id, position, radius, height);
+                bool isStatic = comp->value["static"].GetBool();
+                registry->addComponent<Cylinder>(id, position, radius, height, isStatic);
             } else if (comp->name == "AI") {
                 int health = comp->value["health"].GetInt();
                 int damage = comp->value["damage"].GetInt();

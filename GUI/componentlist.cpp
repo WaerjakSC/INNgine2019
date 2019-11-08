@@ -231,6 +231,10 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
 
+    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    makeObjectTypeBox(objectTypeBox, col);
+    grid->addWidget(objectTypeBox, 2, 0);
+
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
@@ -273,6 +277,10 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
 
+    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    makeObjectTypeBox(objectTypeBox, col);
+    grid->addWidget(objectTypeBox, 2, 0);
+
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
@@ -314,6 +322,10 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
 
     radiusBox->setLayout(radiusLayout);
     grid->addWidget(radiusBox, 1, 0);
+
+    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    makeObjectTypeBox(objectTypeBox, col);
+    grid->addWidget(objectTypeBox, 2, 0);
 
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
@@ -376,6 +388,10 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
 
     heightBox->setLayout(heightLayout);
     grid->addWidget(heightBox, 2, 0);
+
+    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    makeObjectTypeBox(objectTypeBox, col);
+    grid->addWidget(objectTypeBox, 3, 0);
 
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
@@ -877,6 +893,32 @@ void ComponentList::setCylinderHeight(double height) {
     auto &cylinder = registry->get<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.radius = height;
 }
+// To-do: Either prohibit more than one type of collider or improve this function
+void ComponentList::setObjectType(int index) {
+    bool isStatic;
+    if (index == 0)
+        isStatic = true;
+    else
+        isStatic = false;
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    if (registry->contains<AABB>(entityID)) {
+        auto &aabb = registry->get<AABB>(entityID);
+        aabb.isStatic = isStatic;
+        return;
+    }
+    if (registry->contains<Sphere>(entityID)) {
+        auto &sphere = registry->get<Sphere>(entityID);
+        sphere.isStatic = isStatic;
+    }
+    if (registry->contains<Cylinder>(entityID)) {
+        auto &cylinder = registry->get<Cylinder>(entityID);
+        cylinder.isStatic = isStatic;
+    }
+    if (registry->contains<Plane>(entityID)) {
+        auto &plane = registry->get<Plane>(entityID);
+        plane.isStatic = isStatic;
+    }
+}
 void ComponentList::setPlaneNormalX(double xIn) {
     auto &plane = registry->get<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.x = xIn;
@@ -892,6 +934,22 @@ void ComponentList::setPlaneNormalZ(double zIn) {
 void ComponentList::setPlaneDistance(double distance) {
     auto &plane = registry->get<Plane>(mMainWindow->selectedEntity->id());
     plane.distance = distance;
+}
+QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col) {
+    QHBoxLayout *objectType = new QHBoxLayout;
+    objectType->setMargin(1);
+    QComboBox *staticBox = new QComboBox;
+    staticBox->addItem("Static");
+    staticBox->addItem("Dynamic");
+    if (col.isStatic)
+        staticBox->setCurrentIndex(0);
+    else
+        staticBox->setCurrentIndex(1);
+
+    connect(staticBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setObjectType(int)));
+    objectType->addWidget(staticBox);
+    objectTypeBox->setLayout(objectType);
+    return staticBox;
 }
 /**
  * @brief Utility function for making an XYZ box layout from a given vector

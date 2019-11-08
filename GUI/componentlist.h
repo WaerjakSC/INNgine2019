@@ -14,7 +14,9 @@ class QCheckBox;
 class QHBoxLayout;
 class QDoubleSpinBox;
 class HierarchyModel;
+class QComboBox;
 class HierarchyView;
+class QGroupBox;
 class VerticalScrollArea;
 class MainWindow;
 class ComponentList : public QWidget {
@@ -120,6 +122,8 @@ private slots:
     void setCylinderRadius(double radius);
     void setCylinderHeight(double height);
 
+    void setObjectType(int index);
+
 private:
     void setColor();
     void setNewMesh();
@@ -149,6 +153,7 @@ private:
                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
     void updateAABB(GLuint eID);
     void updateSphere(GLuint eID);
+    QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
 };
 
 #endif // COMPONENTLIST_H

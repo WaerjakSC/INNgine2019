@@ -97,7 +97,8 @@
                     2.0,
                     2.0,
                     0.10000000149011612
-                ]
+                ],
+                "static": true
             }
         }
     },
@@ -166,7 +167,8 @@
                     0.5,
                     0.5,
                     0.5
-                ]
+                ],
+                "static": true
             }
         }
     },
@@ -216,13 +218,14 @@
                     5.0,
                     0.5,
                     0.5
-                ]
+                ],
+                "static": true
             }
         }
     },
     "GameObject": {
         "name": "Floor",
-        "id": 7,
+        "id": 6,
         "components": {
             "transform": {
                 "position": [
@@ -266,13 +269,14 @@
                     8.0,
                     0.10000000149011612,
                     7.5
-                ]
+                ],
+                "static": true
             }
         }
     },
     "GameObject": {
         "name": "Wall 1",
-        "id": 8,
+        "id": 7,
         "components": {
             "transform": {
                 "position": [
@@ -316,13 +320,14 @@
                     8.0,
                     0.5,
                     0.25
-                ]
+                ],
+                "static": true
             }
         }
     },
     "GameObject": {
         "name": "Wall 2",
-        "id": 9,
+        "id": 8,
         "components": {
             "transform": {
                 "position": [
@@ -366,13 +371,14 @@
                     8.0,
                     0.5,
                     0.25
-                ]
+                ],
+                "static": true
             }
         }
     },
     "GameObject": {
         "name": "Wall 3",
-        "id": 10,
+        "id": 9,
         "components": {
             "transform": {
                 "position": [
@@ -416,13 +422,14 @@
                     0.25,
                     0.5,
                     7.5
-                ]
+                ],
+                "static": true
             }
         }
     },
     "GameObject": {
         "name": "Wall 4",
-        "id": 11,
+        "id": 10,
         "components": {
             "transform": {
                 "position": [
@@ -466,18 +473,19 @@
                     0.25,
                     0.5,
                     7.5
-                ]
+                ],
+                "static": true
             }
         }
     },
     "GameObject": {
         "name": "Player",
-        "id": 12,
+        "id": 11,
         "components": {
             "transform": {
                 "position": [
                     0.0,
-                    1.0,
+                    1.100000023841858,
                     0.0
                 ],
                 "rotation": [
@@ -515,7 +523,8 @@
                     0.0,
                     0.0
                 ],
-                "radius": 1.0
+                "radius": 1.0,
+                "static": false
             }
         }
     }

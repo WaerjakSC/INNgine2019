@@ -58,6 +58,8 @@ void MovementSystem::updateEntity(GLuint eID) {
         updateEntity(child);
     if (registry->contains<AABB>(eID))
         updateAABBTransform(eID);
+    if (registry->contains<Sphere>(eID))
+        updateSphereTransform(eID);
 }
 
 void MovementSystem::updateModelMatrix(GLuint eID) {
@@ -84,6 +86,14 @@ void MovementSystem::updateModelMatrix(GLuint eID) {
         }
         if (registry->contains<AABB>(eID))
             registry->get<AABB>(eID).transform.matrixOutdated = true;
+        else if (registry->contains<Sphere>(eID))
+            registry->get<Sphere>(eID).transform.matrixOutdated = true;
+        if (registry->contains<OBB>(eID))
+            registry->get<OBB>(eID).transform.matrixOutdated = true;
+        else if (registry->contains<Cylinder>(eID))
+            registry->get<Cylinder>(eID).transform.matrixOutdated = true;
+        else if (registry->contains<Plane>(eID))
+            registry->get<Plane>(eID).transform.matrixOutdated = true;
     }
 }
 gsl::Matrix4x4 MovementSystem::getTRMatrix(Transform &comp) {

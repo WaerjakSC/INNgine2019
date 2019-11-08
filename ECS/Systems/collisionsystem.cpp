@@ -29,7 +29,9 @@ void CollisionSystem::runAABBSimulations() {
                 if (!bothStatic(aabb, otherAABB))
                     if (AABBAABB(aabb, otherAABB)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        qDebug() << "Collision" + QString::number(collisions);
+                        QString entity1 = reg->getEntity(entity)->name();
+                        QString entity2 = reg->getEntity(otherEntity)->name();
+                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
@@ -41,7 +43,9 @@ void CollisionSystem::runAABBSimulations() {
                 if (!bothStatic(aabb, sphere))
                     if (SphereAABB(sphere, aabb)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        qDebug() << "Collision" + QString::number(collisions);
+                        QString entity1 = reg->getEntity(entity)->name();
+                        QString entity2 = reg->getEntity(otherEntity)->name();
+                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
@@ -59,7 +63,9 @@ void CollisionSystem::runSphereSimulations() {
                 if (!bothStatic(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
                         //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
-                        qDebug() << "Collision" + QString::number(collisions);
+                        QString entity1 = reg->getEntity(entity)->name();
+                        QString entity2 = reg->getEntity(otherEntity)->name();
+                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
