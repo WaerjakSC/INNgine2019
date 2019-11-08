@@ -62,7 +62,6 @@ struct Transform : Component {
         localRotation = rot;
         localScale = newScale;
     }
-
     bool matrixOutdated{true};
 
     vec3 localPosition{0};

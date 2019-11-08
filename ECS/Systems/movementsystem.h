@@ -20,6 +20,8 @@ private:
     void updateTRS(Transform &comp);
     void updateTS(AABB &comp);
 
+    void updateTS(Sphere &comp);
+
 public:
     MovementSystem();
 
@@ -74,7 +76,8 @@ public:
     vec3 getAbsoluteRotation(GLuint eID);
     vec3 getRelativeRotation(GLuint eID);
 
-    void updateColliderTransform(GLuint entity);
+    void updateAABBTransform(GLuint entity);
+    void updateSphereTransform(GLuint entity);
 signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);

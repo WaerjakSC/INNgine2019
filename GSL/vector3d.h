@@ -36,6 +36,7 @@ public:
     GLfloat length() const;
     void normalize();
     Vector3D normalized();
+    Vector3D divide(float divisor);
     static Vector3D multiply(const Vector3D &lhs, const Vector3D &rhs);
     static Vector3D cross(const Vector3D &v1, const Vector3D &v2);
     static GLfloat dot(const Vector3D &v1, const Vector3D &v2);
@@ -59,7 +60,6 @@ public:
     GLfloat *yP();
     GLfloat *zP();
 
-    //    float vecArray[3];
     GLfloat operator[](int i) const {
         switch (i) {
         case 0:

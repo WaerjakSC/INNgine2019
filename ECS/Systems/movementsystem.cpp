@@ -16,7 +16,11 @@ void MovementSystem::update(DeltaTime dt) {
     }
     auto aabbview = registry->view<Transform, AABB>();
     for (auto entity : aabbview) {
-        updateColliderTransform(entity);
+        updateAABBTransform(entity);
+    }
+    auto sphereview = registry->view<Transform, Sphere>();
+    for (auto entity : sphereview) {
+        updateSphereTransform(entity);
     }
     for (auto billBoard : registry->billBoards()) {
         if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(registry->getEntity(billBoard)))
@@ -24,9 +28,18 @@ void MovementSystem::update(DeltaTime dt) {
     }
 }
 
-void MovementSystem::updateColliderTransform(GLuint entity) {
+void MovementSystem::updateAABBTransform(GLuint entity) {
     auto view = registry->view<Transform, AABB>();
     auto [trans, col] = view.get<Transform, AABB>(entity);
+    if (col.transform.matrixOutdated) {
+        updateTS(col);
+        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
+        col.transform.matrixOutdated = false;
+    }
+}
+void MovementSystem::updateSphereTransform(GLuint entity) {
+    auto view = registry->view<Transform, Sphere>();
+    auto [trans, col] = view.get<Transform, Sphere>(entity);
     if (col.transform.matrixOutdated) {
         updateTS(col);
         col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
@@ -44,7 +57,7 @@ void MovementSystem::updateEntity(GLuint eID) {
     for (auto child : comp.children)
         updateEntity(child);
     if (registry->contains<AABB>(eID))
-        updateColliderTransform(eID);
+        updateAABBTransform(eID);
 }
 
 void MovementSystem::updateModelMatrix(GLuint eID) {
@@ -103,6 +116,15 @@ void MovementSystem::updateTS(AABB &comp) {
 
     trans.scaleMatrix.setToIdentity();
     trans.scaleMatrix.scale(comp.size); // This might need to be half of size
+}
+void MovementSystem::updateTS(Sphere &comp) {
+    auto &trans = comp.transform;
+    //calculate matrix from position, scale, rotation
+    trans.translationMatrix.setToIdentity();
+    trans.translationMatrix.translate(comp.position);
+
+    trans.scaleMatrix.setToIdentity();
+    trans.scaleMatrix.scale(comp.radius);
 }
 /**
  * @brief Get global position of object

@@ -143,7 +143,7 @@ void ComponentList::addAABBCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<AABB>(eID)) {
             registry->addComponent<AABB>(eID);
-            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+            registry->getSystem<MovementSystem>()->updateAABBTransform(eID);
         }
         setupComponentList();
     }
@@ -153,7 +153,7 @@ void ComponentList::addOBBCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<OBB>(eID)) {
             registry->addComponent<OBB>(eID);
-            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+            //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
     }
@@ -163,7 +163,7 @@ void ComponentList::addSphereCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Sphere>(eID)) {
             registry->addComponent<Sphere>(eID);
-            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+            registry->getSystem<MovementSystem>()->updateSphereTransform(eID);
         }
         setupComponentList();
     }
@@ -173,7 +173,7 @@ void ComponentList::addPlaneCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Plane>(eID)) {
             registry->addComponent<Plane>(eID);
-            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+            //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
 
         setupComponentList();
@@ -184,7 +184,7 @@ void ComponentList::addCylinderCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Cylinder>(eID)) {
             registry->addComponent<Cylinder>(eID);
-            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+            //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
     }
@@ -735,47 +735,47 @@ void ComponentList::setScaleZ(double zIn) {
         movement->updateEntity(mMainWindow->selectedEntity->id());
 }
 // ************* Collider update slots *************
-void ComponentList::updateCollider(GLuint eID) {
+void ComponentList::updateAABB(GLuint eID) {
     if (!ResourceManager::instance()->isPlaying()) {
         auto movement = registry->getSystem<MovementSystem>();
-        movement->updateColliderTransform(eID);
+        movement->updateAABBTransform(eID);
     }
 }
 void ComponentList::setOriginX(double xIn) {
     auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.origin.x = xIn;
     aabb.transform.matrixOutdated = true;
-    updateCollider(mMainWindow->selectedEntity->id());
+    updateAABB(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setOriginY(double yIn) {
     auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.origin.y = yIn;
     aabb.transform.matrixOutdated = true;
-    updateCollider(mMainWindow->selectedEntity->id());
+    updateAABB(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setOriginZ(double zIn) {
     auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.origin.z = zIn;
     aabb.transform.matrixOutdated = true;
-    updateCollider(mMainWindow->selectedEntity->id());
+    updateAABB(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setAABBSizeX(double xIn) {
     auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.size.x = xIn;
     aabb.transform.matrixOutdated = true;
-    updateCollider(mMainWindow->selectedEntity->id());
+    updateAABB(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setAABBSizeY(double yIn) {
     auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.size.y = yIn;
     aabb.transform.matrixOutdated = true;
-    updateCollider(mMainWindow->selectedEntity->id());
+    updateAABB(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setAABBSizeZ(double zIn) {
     auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
     aabb.size.z = zIn;
     aabb.transform.matrixOutdated = true;
-    updateCollider(mMainWindow->selectedEntity->id());
+    updateAABB(mMainWindow->selectedEntity->id());
 }
 void ComponentList::setOBBPositionX(double xIn) {
     auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());

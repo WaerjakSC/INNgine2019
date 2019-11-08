@@ -31,7 +31,7 @@ private:
     bool SphereSphere(const Sphere &sphere1, const Sphere &sphere2);
     bool AABBPlane(const AABB &aabb, const Plane &plane);
     bool RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance);
-
+    bool RayToAABB(const Ray &r, const AABB &aabb, double &intersectionDistance);
     // Work in progress this guy
     bool CylinderCylinder(const Cylinder &cylinder1, const Cylinder &cylinder2);
 

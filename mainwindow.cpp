@@ -292,15 +292,14 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     int data = hierarchy->data(newParent, 257).toInt();
-    Entity *entt = registry->getEntity(data).get();
-    if (newParent.isValid()) {
-        // Undefined behavior if the dragged-to item doesn't have transform component (remember to add a parentChanged signal when transform component is removed from something I guess?)
-        // Really not sure about this whole "Transform component governs parent/child relationship thing"
-        if (registry->contains<Transform>(entt->id()) && selectedEntity) {
-            int parentID = entt->id();
-            // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-            registry->setParent(selectedEntity->id(), parentID, true);
-            registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
+    if (data != 0) {
+        Entity *parent = registry->getEntity(data).get();
+        if (newParent.isValid()) {
+            if (registry->contains<Transform>(parent->id()) && selectedEntity) {
+                // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
+                registry->setParent(selectedEntity->id(), parent->id(), true);
+                registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
+            }
         }
     } else if (selectedEntity)
         if (registry->contains<Transform>(selectedEntity->id())) {

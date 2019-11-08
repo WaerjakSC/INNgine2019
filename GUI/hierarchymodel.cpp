@@ -20,8 +20,16 @@ void HierarchyModel::removeEntity(GLuint eID) {
     for (int i = 0; i < rowCount(); i++) {
         QModelIndex idx = this->index(i, 0);
         QStandardItem *item = itemFromIndex(idx);
+        if (item->hasChildren()) {
+            for (int j = 0; j < item->rowCount(); j++) {
+                QStandardItem *child = item->child(j);
+                if (child->data() == eID) {
+                    item->removeRow(j);
+                    return;
+                }
+            }
+        }
         if (item->data() == eID) {
-            emit parentChanged(idx.parent()); // Emit parentChanged with the removed Entity's parent as the new parent of all its children
             removeRow(i);
             return;
         }

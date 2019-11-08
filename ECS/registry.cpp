@@ -49,6 +49,9 @@ void Registry::removeEntity(GLuint eID) {
     if (isBillBoard(eID)) {
         removeBillBoardID(eID);
     }
+    if (contains<Transform>(eID)) {
+        setParent(eID, -1);
+    }
     entityDestroyed(eID);                   // Pass the message on to the registry
     mEntities.find(eID)->second->destroy(); // doesn't actually destroy the entity object, simply clears the data and increments the generation variable
 
