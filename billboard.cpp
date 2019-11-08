@@ -10,8 +10,8 @@ BillBoard::BillBoard(GLuint eID, const QString &name) : Entity(eID, name) {
 }
 
 void BillBoard::update() {
-    Transform &transform = registry->getComponent<Transform>(id());
-    Material &mat = registry->getComponent<Material>(id());
+    Transform &transform = registry->get<Transform>(id());
+    Material &mat = registry->get<Material>(id());
     // find direction between this and camera
     vec3 direction{};
     if (mNormalVersion) {

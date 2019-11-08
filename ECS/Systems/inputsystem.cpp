@@ -20,7 +20,7 @@ void InputSystem::update(DeltaTime dt) {
     handleMouseInput();
 }
 void InputSystem::handleKeyInput() {
-    if (editorInput.ESCAPE || registry->getComponent<Input>(mPlayerController).ESCAPE) //Shuts down whole program
+    if (editorInput.ESCAPE || registry->get<Input>(mPlayerController).ESCAPE) //Shuts down whole program
     {
         emit closeEngine();
         editorInput.ESCAPE = false;
@@ -32,7 +32,7 @@ void InputSystem::handleKeyInput() {
 }
 void InputSystem::handlePlayerController(float deltaTime) {
     if (factory->isPlaying()) { // No point going through this if you won't use it anyway
-        Input &player = registry->getComponent<Input>(mPlayerController);
+        Input &player = registry->get<Input>(mPlayerController);
         gsl::Vector3D desiredVelocity(0);
 
         if (player.W)
@@ -113,7 +113,7 @@ void InputSystem::keyPressEvent(QKeyEvent *event) {
         return;
     }
     if (factory->isPlaying())
-        inputKeyPress(event, registry->getComponent<Input>(mPlayerController));
+        inputKeyPress(event, registry->get<Input>(mPlayerController));
     else {
         inputKeyPress(event, editorInput);
     }
@@ -121,7 +121,7 @@ void InputSystem::keyPressEvent(QKeyEvent *event) {
 
 void InputSystem::keyReleaseEvent(QKeyEvent *event) {
     if (factory->isPlaying())
-        inputKeyRelease(event, registry->getComponent<Input>(mPlayerController));
+        inputKeyRelease(event, registry->get<Input>(mPlayerController));
     else
         inputKeyRelease(event, editorInput);
 }
@@ -284,13 +284,13 @@ void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input) {
 }
 void InputSystem::mouseReleaseEvent(QMouseEvent *event) {
     if (factory->isPlaying())
-        inputMouseRelease(event, registry->getComponent<Input>(mPlayerController));
+        inputMouseRelease(event, registry->get<Input>(mPlayerController));
     else
         inputMouseRelease(event, editorInput);
 }
 void InputSystem::mousePressEvent(QMouseEvent *event) {
     if (factory->isPlaying())
-        inputMousePress(event, registry->getComponent<Input>(mPlayerController));
+        inputMousePress(event, registry->get<Input>(mPlayerController));
     else
         inputMousePress(event, editorInput);
 }

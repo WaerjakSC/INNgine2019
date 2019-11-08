@@ -88,7 +88,7 @@ public:
      * @brief Get a reference to the Type component owned by entityID
      */
     template <typename Type>
-    Type &getComponent(int entityID) {
+    Type &get(int entityID) {
         // Get a reference to a component from the array for an entity
         return getPool<Type>()->get(entityID);
     }

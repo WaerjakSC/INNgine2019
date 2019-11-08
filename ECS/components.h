@@ -210,6 +210,7 @@ public:
     bool mTrigger{false};
     Mesh colliderMesh;
     Transform transform;
+    bool isStatic{true};
 };
 
 /**
@@ -219,8 +220,11 @@ struct AABB : public Collision {
     vec3 origin{0};
     vec3 size; // Half size
 
-    AABB();
-    inline AABB(const vec3 &o, const vec3 &s) : origin(o), size(s) {}
+    AABB(bool stat = true);
+    inline AABB(const vec3 &o, const vec3 &s, bool stat = true) : AABB(stat) {
+        origin = o;
+        size = s;
+    }
 };
 
 /**
@@ -247,9 +251,13 @@ struct Sphere : public Collision {
     float radius;
 
     // default constructor
-    inline Sphere() : radius(3.0f){};
+    inline Sphere(bool stat = true) : radius(1.0f) {
+        isStatic = stat;
+    };
     // constructor with radius and position params
-    inline Sphere(const vec3 &pos, const float &r) : position(pos), radius(r) {}
+    inline Sphere(const vec3 &pos, const float &r, bool stat = true) : position(pos), radius(r) {
+        isStatic = stat;
+    }
 };
 
 /**
@@ -259,8 +267,12 @@ struct Plane : public Collision {
     vec3 normal;
     float distance;
 
-    inline Plane() : normal(1, 0, 0) {}
-    inline Plane(const vec3 &n, const float &d) : normal(n), distance(d) {}
+    inline Plane(bool stat = true) : normal(1, 0, 0) {
+        isStatic = stat;
+    }
+    inline Plane(const vec3 &n, const float &d, bool stat = true) : normal(n), distance(d) {
+        isStatic = stat;
+    }
 };
 
 struct Cylinder : public Collision {
@@ -268,9 +280,13 @@ struct Cylinder : public Collision {
     float radius;
     float height;
     // default constructor
-    inline Cylinder() : radius(3.0f){};
+    inline Cylinder(bool stat = true) : radius(3.0f) {
+        isStatic = stat;
+    };
     // constructor with radius and position params
-    inline Cylinder(const vec3 &pos, const float &r, const float &h) : position(pos), radius(r), height(h) {}
+    inline Cylinder(const vec3 &pos, const float &r, const float &h, bool stat = true) : position(pos), radius(r), height(h) {
+        isStatic = stat;
+    }
 };
 /**
  * @brief The BSplineCurve struct

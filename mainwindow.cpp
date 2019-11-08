@@ -317,7 +317,7 @@ void MainWindow::parentChanged(GLuint eID) {
         item = new QStandardItem;
         item->setText(entt->name());
         item->setData(entt->id());
-        int parentID = registry->getComponent<Transform>(entt->id()).parentID;
+        int parentID = registry->get<Transform>(entt->id()).parentID;
         if (registry->hasParent(eID)) {
             QStandardItem *parent = hierarchy->itemFromEntityID(parentID);
             parent->insertRow(parent->rowCount(), item);
@@ -387,7 +387,7 @@ void MainWindow::insertEntities() {
         else
             item->setText(entity.second->name());
         item->setData(entity.second->id());
-        int parentID = registry->getComponent<Transform>(entity.second->id()).parentID;
+        int parentID = registry->get<Transform>(entity.second->id()).parentID;
         if (parentID != -1) {
             forEach(parentID, item);
         } else

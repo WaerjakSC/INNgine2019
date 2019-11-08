@@ -29,8 +29,8 @@ PhongShader::~PhongShader() {
 }
 void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
     Shader::transmitUniformData(modelMatrix);
-    Light &light = Registry::instance()->getComponent<Light>(mLight->id());
-    Transform &lightTrans = Registry::instance()->getComponent<Transform>(mLight->id());
+    Light &light = Registry::instance()->get<Light>(mLight->id());
+    Transform &lightTrans = Registry::instance()->get<Transform>(mLight->id());
 
     glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);
     glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);

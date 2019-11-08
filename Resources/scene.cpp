@@ -51,7 +51,7 @@ void Scene::saveScene(const QString &fileName) {
         GLuint eID = entity.first;
         if (eID == mGameCamID)
             continue;
-        if (eID != 0) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
+        if (eID != 0 && !entity.second->name().isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("GameObject");
             writer.StartObject();
             writer.Key("name");
@@ -61,7 +61,7 @@ void Scene::saveScene(const QString &fileName) {
             writer.Key("components");
             writer.StartObject();
             if (registry->contains<Transform>(eID)) {
-                const Transform trans = registry->getComponent<Transform>(eID);
+                const Transform trans = registry->get<Transform>(eID);
                 writer.Key("transform");
                 writer.StartObject();
 
@@ -102,7 +102,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Material>(eID)) {
                 writer.Key("material");
                 writer.StartObject();
-                const Material &mat = registry->getComponent<Material>(eID);
+                const Material &mat = registry->get<Material>(eID);
 
                 writer.Key("color");
                 writer.StartArray();
@@ -127,7 +127,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Mesh>(eID)) {
                 writer.Key("mesh");
                 writer.StartObject();
-                const Mesh &mesh = registry->getComponent<Mesh>(eID);
+                const Mesh &mesh = registry->get<Mesh>(eID);
                 if (mesh.mName == "")
                     qDebug() << "No mesh name!";
                 writer.Key("name");
@@ -137,7 +137,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Light>(eID)) {
                 writer.Key("light");
                 writer.StartObject();
-                const Light &light = registry->getComponent<Light>(eID);
+                const Light &light = registry->get<Light>(eID);
 
                 writer.Key("ambstr");
                 writer.Double(light.mAmbientStrength);
@@ -176,7 +176,7 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndObject();
             }
             if (registry->contains<Sound>(eID)) {
-                const Sound &sound = registry->getComponent<Sound>(eID);
+                const Sound &sound = registry->get<Sound>(eID);
                 writer.Key("sound");
                 writer.StartObject();
                 writer.Key("filename");
@@ -190,7 +190,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<AABB>(eID)) {
                 writer.Key("AABB");
                 writer.StartObject();
-                const AABB &aabb = registry->getComponent<AABB>(eID);
+                const AABB &aabb = registry->get<AABB>(eID);
 
                 writer.Key("origin");
                 writer.StartArray();
@@ -209,7 +209,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<OBB>(eID)) {
                 writer.Key("OBB");
                 writer.StartObject();
-                const OBB &obb = registry->getComponent<OBB>(eID);
+                const OBB &obb = registry->get<OBB>(eID);
 
                 writer.Key("position");
                 writer.StartArray();
@@ -229,7 +229,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Plane>(eID)) {
                 writer.Key("Plane");
                 writer.StartObject();
-                const Plane &plane = registry->getComponent<Plane>(eID);
+                const Plane &plane = registry->get<Plane>(eID);
 
                 writer.Key("normal");
                 writer.StartArray();
@@ -244,7 +244,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Sphere>(eID)) {
                 writer.Key("Sphere");
                 writer.StartObject();
-                const Sphere &sphere = registry->getComponent<Sphere>(eID);
+                const Sphere &sphere = registry->get<Sphere>(eID);
 
                 writer.Key("position");
                 writer.StartArray();
@@ -259,7 +259,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Cylinder>(eID)) {
                 writer.Key("Cylinder");
                 writer.StartObject();
-                const Cylinder &cylinder = registry->getComponent<Cylinder>(eID);
+                const Cylinder &cylinder = registry->get<Cylinder>(eID);
 
                 writer.Key("position");
                 writer.StartArray();
@@ -276,7 +276,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<AIcomponent>(eID)) {
                 writer.Key("AI");
                 writer.StartObject();
-                const AIcomponent &ai = registry->getComponent<AIcomponent>(eID);
+                const AIcomponent &ai = registry->get<AIcomponent>(eID);
 
                 writer.Key("health");
                 writer.Double(ai.hp);
@@ -353,8 +353,8 @@ void Scene::populateScene(const Document &scene) {
                 gsl::Vector3D scale(comp->value["scale"][0].GetDouble(), comp->value["scale"][1].GetDouble(), comp->value["scale"][2].GetDouble());
                 registry->addComponent<Transform>(id, position, rotation, scale);
                 if (comp->value["parent"].GetInt() != -1) {
-                    if (idPairs.find(comp->value["parent"].GetInt()) != idPairs.end())                            // if the parent has been parsed already
-                        registry->getComponent<Transform>(id).parentID = idPairs[comp->value["parent"].GetInt()]; // use the old parentID to set the new parentID
+                    if (idPairs.find(comp->value["parent"].GetInt()) != idPairs.end())                   // if the parent has been parsed already
+                        registry->get<Transform>(id).parentID = idPairs[comp->value["parent"].GetInt()]; // use the old parentID to set the new parentID
                     else
                         parentID[id] = comp->value["parent"].GetInt(); // if not, add it to the list of parent/child pairs that must be updated after the loop
                 }
@@ -427,7 +427,7 @@ void Scene::populateScene(const Document &scene) {
     for (auto &pair : parentID) {
         // Pair key is the actual id of the child object. Pair value is the old id of the parent object.
         //We can find the new id of that object by searching idPairs using Pair value as the key.
-        registry->getComponent<Transform>(pair.first).parentID = idPairs[pair.second];
+        registry->get<Transform>(pair.first).parentID = idPairs[pair.second];
     }
 }
 void Scene::loadSceneFromFile(const QString &fileName) {

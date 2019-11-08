@@ -111,30 +111,30 @@ void SoundSystem::stopAll() {
     }
 }
 void SoundSystem::play(GLuint eID) {
-    Sound &sound = reg->getComponent<Sound>(eID);
+    Sound &sound = reg->get<Sound>(eID);
     sound.mPlaying = true;
     sound.mPaused = false;
     sound.mOutDated = true;
 }
 void SoundSystem::pause(GLuint eID) {
-    Sound &sound = reg->getComponent<Sound>(eID);
+    Sound &sound = reg->get<Sound>(eID);
     sound.mPlaying = false;
     sound.mPaused = true;
     sound.mOutDated = true;
 }
 void SoundSystem::stop(GLuint eID) {
-    Sound &sound = reg->getComponent<Sound>(eID);
+    Sound &sound = reg->get<Sound>(eID);
     sound.mPlaying = false;
     sound.mPaused = false;
     sound.mOutDated = true;
 }
 void SoundSystem::setPosition(GLuint eID, vec3 newPos) {
-    Sound &sound = reg->getComponent<Sound>(eID);
+    Sound &sound = reg->get<Sound>(eID);
     ALfloat temp[3] = {newPos.x, newPos.y, newPos.z};
     alSourcefv(sound.mSource, AL_POSITION, temp);
 }
 void SoundSystem::setVelocity(GLuint eID, vec3 newVel) {
-    Sound &sound = reg->getComponent<Sound>(eID);
+    Sound &sound = reg->get<Sound>(eID);
     sound.mVelocity = newVel;
     ALfloat temp[3] = {newVel.x, newVel.y, newVel.z};
     alSourcefv(sound.mSource, AL_VELOCITY, temp);

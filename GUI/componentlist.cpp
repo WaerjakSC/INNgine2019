@@ -32,31 +32,31 @@ void ComponentList::setupComponentList() {
     scrollArea->clearLayout();
     GLuint eID = mMainWindow->selectedEntity->id();
     if (registry->contains<Transform>(eID)) {
-        setupTransformSettings(registry->getComponent<Transform>(eID));
+        setupTransformSettings(registry->get<Transform>(eID));
     }
     if (registry->contains<AIcomponent>(eID)) {
-        setupAISettings(registry->getComponent<AIcomponent>(eID));
+        setupAISettings(registry->get<AIcomponent>(eID));
     }
     if (registry->contains<AABB>(eID)) {
-        setupAABBSettings(registry->getComponent<AABB>(eID));
+        setupAABBSettings(registry->get<AABB>(eID));
     }
     if (registry->contains<OBB>(eID)) {
-        setupOBBSettings(registry->getComponent<OBB>(eID));
+        setupOBBSettings(registry->get<OBB>(eID));
     }
     if (registry->contains<Sphere>(eID)) {
-        setupSphereColliderSettings(registry->getComponent<Sphere>(eID));
+        setupSphereColliderSettings(registry->get<Sphere>(eID));
     }
     if (registry->contains<Cylinder>(eID)) {
-        setupCylinderColliderSettings(registry->getComponent<Cylinder>(eID));
+        setupCylinderColliderSettings(registry->get<Cylinder>(eID));
     }
     if (registry->contains<Plane>(eID)) {
-        setupPlaneColliderSettings(registry->getComponent<Plane>(eID));
+        setupPlaneColliderSettings(registry->get<Plane>(eID));
     }
     if (registry->contains<Material>(eID)) {
-        setupMaterialSettings(registry->getComponent<Material>(eID));
+        setupMaterialSettings(registry->get<Material>(eID));
     }
     if (registry->contains<Mesh>(eID)) {
-        setupMeshSettings(registry->getComponent<Mesh>(eID));
+        setupMeshSettings(registry->get<Mesh>(eID));
     }
 
     //    if (registry->contains<Light>(eID)) {
@@ -143,6 +143,11 @@ void ComponentList::addAABBCollider() {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<AABB>(eID)) {
             registry->addComponent<AABB>(eID);
+            if (registry->contains<Transform>(eID)) {
+                auto &trans = registry->get<Transform>(eID);
+                auto &aabb = registry->get<AABB>(eID);
+                aabb.size = vec3(trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2);
+            }
             registry->getSystem<MovementSystem>()->updateAABBTransform(eID);
         }
         setupComponentList();
@@ -583,7 +588,7 @@ void ComponentList::setNewShader(const QString &text) {
 }
 
 void ComponentList::setHealth(int health) {
-    auto ai = registry->getComponent<AIcomponent>(mMainWindow->selectedEntity->id());
+    auto ai = registry->get<AIcomponent>(mMainWindow->selectedEntity->id());
     ai.hp = health;
 }
 void ComponentList::setNewTextureFile() {
@@ -595,7 +600,7 @@ void ComponentList::setNewTextureFile() {
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
         factory->loadTexture(fileName.toStdString());
-        registry->getComponent<Material>(mMainWindow->selectedEntity->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
+        registry->get<Material>(mMainWindow->selectedEntity->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
         texFileLabel->setText(fileName);
     }
 }
@@ -621,13 +626,14 @@ void ComponentList::setColor() {
         newRgb.fill(color);
         colorLabel->setPixmap(newRgb);
     }
-    registry->getComponent<Material>(mMainWindow->selectedEntity->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
+    registry->get<Material>(mMainWindow->selectedEntity->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
 }
 void ComponentList::updatePosSpinBoxes(int state) {
     disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
     disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
     disconnect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
-    auto &trans = registry->getComponent<Transform>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &trans = registry->get<Transform>(entityID);
     switch (state) {
     case 0:
         xVal->setValue(trans.localPosition.x);
@@ -635,7 +641,7 @@ void ComponentList::updatePosSpinBoxes(int state) {
         zVal->setValue(trans.localPosition.z);
         break;
     case 2:
-        registry->getSystem<MovementSystem>()->getAbsolutePosition(mMainWindow->selectedEntity->id()); // have to call this function once to update the global pos variable if it hasn't been cached yet
+        registry->getSystem<MovementSystem>()->getAbsolutePosition(entityID); // have to call this function once to update the global pos variable if it hasn't been cached yet
         xVal->setValue(trans.position.x);
         yVal->setValue(trans.position.y);
         zVal->setValue(trans.position.z);
@@ -672,67 +678,76 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
 }
 void ComponentList::setPositionX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
+    GLuint entityID = mMainWindow->selectedEntity->id();
     if (abs->isChecked())
-        movement->setAbsolutePositionX(mMainWindow->selectedEntity->id(), xIn, false);
+        movement->setAbsolutePositionX(entityID, xIn, false);
     else
-        movement->setLocalPositionX(mMainWindow->selectedEntity->id(), xIn, false);
+        movement->setLocalPositionX(entityID, xIn, false);
 
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setPositionY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
+    GLuint entityID = mMainWindow->selectedEntity->id();
     if (abs->isChecked())
-        movement->setAbsolutePositionY(mMainWindow->selectedEntity->id(), yIn, false);
+        movement->setAbsolutePositionY(entityID, yIn, false);
     else
-        movement->setLocalPositionY(mMainWindow->selectedEntity->id(), yIn, false);
+        movement->setLocalPositionY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setPositionZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
+    GLuint entityID = mMainWindow->selectedEntity->id();
     if (abs->isChecked())
-        movement->setAbsolutePositionZ(mMainWindow->selectedEntity->id(), zIn, false);
+        movement->setAbsolutePositionZ(entityID, zIn, false);
     else
-        movement->setLocalPositionZ(mMainWindow->selectedEntity->id(), zIn, false);
+        movement->setLocalPositionZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setRotationX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    movement->setRotationX(mMainWindow->selectedEntity->id(), xIn, false);
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    movement->setRotationX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setRotationY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    movement->setRotationY(mMainWindow->selectedEntity->id(), yIn, false);
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    movement->setRotationY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setRotationZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    movement->setRotationZ(mMainWindow->selectedEntity->id(), zIn, false);
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    movement->setRotationZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setScaleX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    movement->setScaleX(mMainWindow->selectedEntity->id(), xIn, false);
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    movement->setScaleX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setScaleY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    movement->setScaleY(mMainWindow->selectedEntity->id(), yIn, false);
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    movement->setScaleY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 void ComponentList::setScaleZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    movement->setScaleZ(mMainWindow->selectedEntity->id(), zIn, false);
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    movement->setScaleZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(mMainWindow->selectedEntity->id());
+        movement->updateEntity(entityID);
 }
 // ************* Collider update slots *************
 void ComponentList::updateAABB(GLuint eID) {
@@ -741,116 +756,141 @@ void ComponentList::updateAABB(GLuint eID) {
         movement->updateAABBTransform(eID);
     }
 }
+
+void ComponentList::updateSphere(GLuint eID) {
+    if (!ResourceManager::instance()->isPlaying()) {
+        auto movement = registry->getSystem<MovementSystem>();
+        movement->updateSphereTransform(eID);
+    }
+}
 void ComponentList::setOriginX(double xIn) {
-    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &aabb = registry->get<AABB>(entityID);
     aabb.origin.x = xIn;
     aabb.transform.matrixOutdated = true;
-    updateAABB(mMainWindow->selectedEntity->id());
+    updateAABB(entityID);
 }
 void ComponentList::setOriginY(double yIn) {
-    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &aabb = registry->get<AABB>(entityID);
     aabb.origin.y = yIn;
     aabb.transform.matrixOutdated = true;
-    updateAABB(mMainWindow->selectedEntity->id());
+    updateAABB(entityID);
 }
 void ComponentList::setOriginZ(double zIn) {
-    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &aabb = registry->get<AABB>(entityID);
     aabb.origin.z = zIn;
     aabb.transform.matrixOutdated = true;
-    updateAABB(mMainWindow->selectedEntity->id());
+    updateAABB(entityID);
 }
 void ComponentList::setAABBSizeX(double xIn) {
-    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &aabb = registry->get<AABB>(entityID);
     aabb.size.x = xIn;
     aabb.transform.matrixOutdated = true;
-    updateAABB(mMainWindow->selectedEntity->id());
+    updateAABB(entityID);
 }
 void ComponentList::setAABBSizeY(double yIn) {
-    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &aabb = registry->get<AABB>(entityID);
     aabb.size.y = yIn;
     aabb.transform.matrixOutdated = true;
-    updateAABB(mMainWindow->selectedEntity->id());
+    updateAABB(entityID);
 }
 void ComponentList::setAABBSizeZ(double zIn) {
-    auto &aabb = registry->getComponent<AABB>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &aabb = registry->get<AABB>(entityID);
     aabb.size.z = zIn;
     aabb.transform.matrixOutdated = true;
-    updateAABB(mMainWindow->selectedEntity->id());
+    updateAABB(entityID);
 }
 void ComponentList::setOBBPositionX(double xIn) {
-    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->get<OBB>(mMainWindow->selectedEntity->id());
     obb.position.x = xIn;
 }
 void ComponentList::setOBBPositionY(double yIn) {
-    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->get<OBB>(mMainWindow->selectedEntity->id());
     obb.position.y = yIn;
 }
 void ComponentList::setOBBPositionZ(double zIn) {
-    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->get<OBB>(mMainWindow->selectedEntity->id());
     obb.position.z = zIn;
 }
 void ComponentList::setOBBSizeX(double xIn) {
-    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->get<OBB>(mMainWindow->selectedEntity->id());
     obb.size.x = xIn;
 }
 void ComponentList::setOBBSizeY(double yIn) {
-    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->get<OBB>(mMainWindow->selectedEntity->id());
     obb.size.y = yIn;
 }
 void ComponentList::setOBBSizeZ(double zIn) {
-    auto &obb = registry->getComponent<OBB>(mMainWindow->selectedEntity->id());
+    auto &obb = registry->get<OBB>(mMainWindow->selectedEntity->id());
     obb.size.z = zIn;
 }
 void ComponentList::setSpherePositionX(double xIn) {
-    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &sphere = registry->get<Sphere>(entityID);
     sphere.position.x = xIn;
+    sphere.transform.matrixOutdated = true;
+    updateSphere(entityID);
 }
 void ComponentList::setSpherePositionY(double yIn) {
-    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &sphere = registry->get<Sphere>(entityID);
     sphere.position.y = yIn;
+    sphere.transform.matrixOutdated = true;
+    updateSphere(entityID);
 }
 void ComponentList::setSpherePositionZ(double zIn) {
-    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &sphere = registry->get<Sphere>(entityID);
     sphere.position.z = zIn;
+    sphere.transform.matrixOutdated = true;
+    updateSphere(entityID);
 }
 void ComponentList::setSphereRadius(double radius) {
-    auto &sphere = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &sphere = registry->get<Sphere>(entityID);
     sphere.radius = radius;
+    sphere.transform.matrixOutdated = true;
+    updateSphere(entityID);
 }
 void ComponentList::setCylinderPositionX(double xIn) {
-    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->get<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.position.x = xIn;
 }
 void ComponentList::setCylinderPositionY(double yIn) {
-    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->get<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.position.y = yIn;
 }
 void ComponentList::setCylinderPositionZ(double zIn) {
-    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->get<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.position.z = zIn;
 }
 void ComponentList::setCylinderRadius(double radius) {
-    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->get<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.radius = radius;
 }
 void ComponentList::setCylinderHeight(double height) {
-    auto &cylinder = registry->getComponent<Sphere>(mMainWindow->selectedEntity->id());
+    auto &cylinder = registry->get<Sphere>(mMainWindow->selectedEntity->id());
     cylinder.radius = height;
 }
 void ComponentList::setPlaneNormalX(double xIn) {
-    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->get<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.x = xIn;
 }
 void ComponentList::setPlaneNormalY(double yIn) {
-    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->get<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.y = yIn;
 }
 void ComponentList::setPlaneNormalZ(double zIn) {
-    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->get<Plane>(mMainWindow->selectedEntity->id());
     plane.normal.z = zIn;
 }
 void ComponentList::setPlaneDistance(double distance) {
-    auto &plane = registry->getComponent<Plane>(mMainWindow->selectedEntity->id());
+    auto &plane = registry->get<Plane>(mMainWindow->selectedEntity->id());
     plane.distance = distance;
 }
 /**

@@ -26,23 +26,25 @@ void CollisionSystem::runAABBSimulations() {
         for (auto otherEntity : view) {
             if (entity != otherEntity) {
                 auto &otherAABB = view.get(otherEntity);
-                if (AABBAABB(aabb, otherAABB)) {
-                    //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                    qDebug() << "Collision" + QString::number(collisions);
-                    collisions++;
-                    // notify FSM if needed
-                }
+                if (!bothStatic(aabb, otherAABB))
+                    if (AABBAABB(aabb, otherAABB)) {
+                        //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
+                        qDebug() << "Collision" + QString::number(collisions);
+                        collisions++;
+                        // notify FSM if needed
+                    }
             }
         }
         for (auto otherEntity : sphereView) {
             if (entity != otherEntity) {
                 auto &sphere = sphereView.get(otherEntity);
-                if (SphereAABB(sphere, aabb)) {
-                    //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                    qDebug() << "Collision" + QString::number(collisions);
-                    collisions++;
-                    // notify FSM if needed
-                }
+                if (!bothStatic(aabb, sphere))
+                    if (SphereAABB(sphere, aabb)) {
+                        //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
+                        qDebug() << "Collision" + QString::number(collisions);
+                        collisions++;
+                        // notify FSM if needed
+                    }
             }
         }
     }
@@ -54,15 +56,19 @@ void CollisionSystem::runSphereSimulations() {
         for (auto otherEntity : view) {
             if (entity != otherEntity) {
                 auto &otherSphere = view.get(otherEntity);
-                if (SphereSphere(sphere, otherSphere)) {
-                    //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
-                    qDebug() << "Collision" + QString::number(collisions);
-                    collisions++;
-                    // notify FSM if needed
-                }
+                if (!bothStatic(sphere, otherSphere))
+                    if (SphereSphere(sphere, otherSphere)) {
+                        //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
+                        qDebug() << "Collision" + QString::number(collisions);
+                        collisions++;
+                        // notify FSM if needed
+                    }
             }
         }
     }
+}
+bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs) {
+    return lhs.isStatic == rhs.isStatic == true;
 }
 /**
 * @brief Helper function CollisionSystem::getMin finds minimum point in an AABB

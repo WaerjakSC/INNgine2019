@@ -48,6 +48,7 @@ private:
     void runAABBSimulations();
     void runSphereSimulations();
     friend class Raycast;
+    bool bothStatic(const Collision &lhs, const Collision &rhs);
 };
 
 #endif // COLLISIONSYSTEM_H

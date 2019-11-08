@@ -211,8 +211,8 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
     if (!registry->contains<Mesh>(eID))
         registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
-        registry->getComponent<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
-    auto &mesh = registry->getComponent<Mesh>(eID);
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
+    auto &mesh = registry->get<Mesh>(eID);
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -257,8 +257,8 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
     if (!registry->contains<Mesh>(eID))
         registry->addComponent<Mesh>(eID, GL_LINES, mMeshData);
     else
-        registry->getComponent<Mesh>(eID) = Mesh(GL_LINES, mMeshData);
-    auto &mesh = registry->getComponent<Mesh>(eID);
+        registry->get<Mesh>(eID) = Mesh(GL_LINES, mMeshData);
+    auto &mesh = registry->get<Mesh>(eID);
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -336,9 +336,9 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
     if (!registry->contains<Mesh>(eID))
         registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
-        registry->getComponent<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
-    auto &skyMesh = registry->getComponent<Mesh>(eID);
+    auto &skyMesh = registry->get<Mesh>(eID);
 
     initVertexBuffers(&skyMesh);
     initIndexBuffers(&skyMesh);
@@ -395,8 +395,8 @@ void ResourceManager::makeBillBoardMesh(int eID) {
     if (!registry->contains<Mesh>(eID))
         registry->addComponent<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
     else
-        registry->getComponent<Mesh>(eID) = Mesh(GL_TRIANGLE_STRIP, mMeshData);
-    auto &billBoardMesh = registry->getComponent<Mesh>(eID);
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLE_STRIP, mMeshData);
+    auto &billBoardMesh = registry->get<Mesh>(eID);
 
     initVertexBuffers(&billBoardMesh);
 
@@ -434,9 +434,9 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
     if (!registry->contains<Mesh>(eID))
         registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
-        registry->getComponent<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
-    auto &octMesh = registry->getComponent<Mesh>(eID);
+    auto &octMesh = registry->get<Mesh>(eID);
 
     initVertexBuffers(&octMesh);
     initIndexBuffers(&octMesh);
@@ -482,8 +482,8 @@ void ResourceManager::makeLightMesh(int eID) {
     if (!registry->contains<Mesh>(eID))
         registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
-        registry->getComponent<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
-    auto &lightMesh = registry->getComponent<Mesh>(eID);
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
+    auto &lightMesh = registry->get<Mesh>(eID);
 
     initVertexBuffers(&lightMesh);
     initIndexBuffers(&lightMesh);
@@ -581,7 +581,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 void ResourceManager::setMesh(std::string name, GLuint eID) {
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
-        registry->getComponent<Mesh>(eID) = search->second;
+        registry->get<Mesh>(eID) = search->second;
         return;
     } else if (name == "Skybox")
         makeSkyBoxMesh(eID);
@@ -775,7 +775,7 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
         }
     }
 
-    auto &mesh = registry->getComponent<Mesh>(eID);
+    auto &mesh = registry->get<Mesh>(eID);
     mesh.mName = fileName;
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mIndiceCount = mMeshData.mIndices.size();
@@ -807,7 +807,7 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        auto &mesh = registry->getComponent<Mesh>(eID);
+        auto &mesh = registry->get<Mesh>(eID);
         mesh.mVerticeCount = mMeshData.mVertices.size();
         mesh.mName = fileName;
         mesh.mDrawType = GL_TRIANGLES;

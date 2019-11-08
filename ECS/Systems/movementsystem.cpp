@@ -83,7 +83,7 @@ void MovementSystem::updateModelMatrix(GLuint eID) {
             childComp.matrixOutdated = true;
         }
         if (registry->contains<AABB>(eID))
-            registry->getComponent<AABB>(eID).transform.matrixOutdated = true;
+            registry->get<AABB>(eID).transform.matrixOutdated = true;
     }
 }
 gsl::Matrix4x4 MovementSystem::getTRMatrix(Transform &comp) {

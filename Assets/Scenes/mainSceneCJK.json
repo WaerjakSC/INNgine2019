@@ -86,6 +86,18 @@
                 "filename": "gnomed.wav",
                 "loop": true,
                 "gain": 1.0
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    2.0,
+                    0.10000000149011612
+                ]
             }
         }
     },
@@ -143,6 +155,18 @@
                     1.0,
                     1.0
                 ]
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
             }
         }
     },
@@ -166,10 +190,7 @@
                     1.0,
                     1.0
                 ],
-                "parent": -1,
-                "children": [
-                    6
-                ]
+                "parent": -1
             },
             "material": {
                 "color": [
@@ -184,44 +205,18 @@
             },
             "mesh": {
                 "name": "box2.txt"
-            }
-        }
-    },
-    "GameObject": {
-        "name": "monkey.obj",
-        "id": 6,
-        "components": {
-            "transform": {
-                "position": [
-                    2.5,
-                    3.5,
-                    3.5
-                ],
-                "rotation": [
+            },
+            "AABB": {
+                "origin": [
                     0.0,
                     0.0,
                     0.0
                 ],
-                "scale": [
-                    0.5,
+                "size": [
+                    5.0,
                     0.5,
                     0.5
-                ],
-                "parent": 5
-            },
-            "material": {
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PhongShader"
-            },
-            "mesh": {
-                "name": "monkey.obj"
+                ]
             }
         }
     },
@@ -256,10 +251,22 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PlainShader"
+                "shader": "PhongShader"
             },
             "mesh": {
                 "name": "Plane"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    8.0,
+                    0.10000000149011612,
+                    7.5
+                ]
             }
         }
     },
@@ -298,6 +305,18 @@
             },
             "mesh": {
                 "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    8.0,
+                    0.5,
+                    0.25
+                ]
             }
         }
     },
@@ -336,6 +355,18 @@
             },
             "mesh": {
                 "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    8.0,
+                    0.5,
+                    0.25
+                ]
             }
         }
     },
@@ -374,6 +405,18 @@
             },
             "mesh": {
                 "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.25,
+                    0.5,
+                    7.5
+                ]
             }
         }
     },
@@ -412,6 +455,18 @@
             },
             "mesh": {
                 "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.25,
+                    0.5,
+                    7.5
+                ]
             }
         }
     },
@@ -453,6 +508,14 @@
             },
             "input": {
                 "isController": true
+            },
+            "Sphere": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 1.0
             }
         }
     }

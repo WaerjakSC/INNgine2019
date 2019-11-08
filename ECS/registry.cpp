@@ -122,7 +122,7 @@ GLuint Registry::duplicateEntity(GLuint dupedEntity) {
  * @param parentID
  */
 void Registry::setParent(GLuint childID, int newParentID, bool fromEditor) {
-    Transform &trans = getComponent<Transform>(childID);
+    Transform &trans = get<Transform>(childID);
     if (hasParent(childID)) // Make sure to remove the child from its old parent if it had one
         removeChild(trans.parentID, childID);
     trans.parentID = newParentID; // Set the new parent ID. Can be set to -1 if you want it to be independent again.
@@ -133,26 +133,26 @@ void Registry::setParent(GLuint childID, int newParentID, bool fromEditor) {
 }
 
 Transform &Registry::getParent(GLuint eID) {
-    GLuint parentID = getComponent<Transform>(eID).parentID;
-    return getComponent<Transform>(parentID);
+    GLuint parentID = get<Transform>(eID).parentID;
+    return get<Transform>(parentID);
 }
 bool Registry::hasParent(GLuint eID) {
-    return getComponent<Transform>(eID).parentID != -1;
+    return get<Transform>(eID).parentID != -1;
 }
 std::vector<GLuint> Registry::getChildren(GLuint eID) {
-    return getComponent<Transform>(eID).children;
+    return get<Transform>(eID).children;
 }
 
 void Registry::addChild(const GLuint parentID, const GLuint childID) {
-    auto &parent = getComponent<Transform>(parentID);
+    auto &parent = get<Transform>(parentID);
     parent.children.emplace_back(childID);
-    getComponent<Transform>(childID).matrixOutdated = true;
+    get<Transform>(childID).matrixOutdated = true;
 }
 void Registry::removeChild(const GLuint eID, const GLuint childID) {
-    std::vector<GLuint> &children = getComponent<Transform>(eID).children;
+    std::vector<GLuint> &children = get<Transform>(eID).children;
     for (auto &child : children) {
         if (child == childID) {
-            getComponent<Transform>(childID).matrixOutdated = true;
+            get<Transform>(childID).matrixOutdated = true;
             std::swap(child, children.back());
             children.pop_back();
         }
@@ -165,7 +165,7 @@ void Registry::updateChildParent() {
     for (auto entity : getEntities()) // For every gameobject
     {
         if (contains<Transform>(entity.second->id())) {
-            Transform &comp = getComponent<Transform>(entity.second->id());
+            Transform &comp = get<Transform>(entity.second->id());
             if (comp.parentID != -1) {                         // If this entity has a parent then,
                 setParent(entity.second->id(), comp.parentID); // add this entity's ID to the parent's list of children.
             }
