@@ -26,13 +26,15 @@ void Scene::saveScene(const QString &fileName) {
 
     Registry *registry = Registry::instance();
     std::map<GLuint, cjk::Ref<Entity>> entities = registry->getEntities();
-    GameCameraController *gameCam = registry->getSystem<InputSystem>()->gameCameraController().get();
+    auto inputSys = registry->getSystem<InputSystem>();
+    GameCameraController *gameCam = inputSys->gameCameraController().get();
 
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer(buf);
 
-    mName = fileName.chopped(5);
+    mName = fileName;
     writer.StartObject();
+
     writer.String("gamecam");
     writer.StartObject();
     writer.Key("position");
@@ -42,9 +44,15 @@ void Scene::saveScene(const QString &fileName) {
     writer.Double(gameCam->cameraPosition().z);
     writer.EndArray();
     writer.Key("pitch");
-    writer.Int(gameCam->getPitch());
+    writer.Double(gameCam->getPitch());
     writer.Key("yaw");
-    writer.Int(gameCam->getYaw());
+    writer.Double(gameCam->getYaw());
+    writer.EndObject();
+
+    writer.String("controller");
+    writer.StartObject();
+    writer.Key("id");
+    writer.Uint(inputSys->player());
     writer.EndObject();
 
     for (auto entity : entities) {
@@ -299,6 +307,7 @@ void Scene::saveScene(const QString &fileName) {
             writer.EndObject();
         }
     }
+
     writer.EndObject();
     std::ofstream of(gsl::sceneFilePath + fileName.toStdString() + ".json");
     of << buf.GetString();
@@ -343,17 +352,25 @@ void Scene::populateScene(const Document &scene) {
         gsl::Matrix4x4 temp(true);
         temp.lookAt(gameCam->cameraPosition(), gameCam->cameraPosition() - gameCam->forward(), gameCam->up());
         auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
-        auto trans = registry->getSystem<MovementSystem>();
-        trans->setLocalPosition(mGameCamID, gameCam->cameraPosition() - gameCam->forward());
-        trans->setRotation(mGameCamID, rot);
+        auto moveSys = registry->getSystem<MovementSystem>();
+        moveSys->setLocalPosition(mGameCamID, gameCam->cameraPosition() - gameCam->forward());
+        moveSys->setRotation(mGameCamID, rot);
         registry->addComponent<Material>(mGameCamID, factory->getShader<ColorShader>());
         factory->addMeshComponent("camera.obj", mGameCamID);
+        moveSys->init();
     }
+    if (scene.HasMember("controller")) {
+        GLuint controllerID = scene["controller"]["id"].GetUint();
+        registry->getSystem<InputSystem>()->setPlayer(controllerID);
+    } else
+        registry->getSystem<InputSystem>()->setPlayer(0);
+    if (!scene.HasMember("GameObject"))
+        return;
     // Iterate through each gameobject in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
         // Iterate through each of the members in the gameobject (name, id, components)
-        if (itr->name == "gamecam")
-            itr++;
+        if (itr->name == "gamecam" || itr->name == "controller")
+            continue;
         GLuint id = registry->makeEntity(itr->value["name"].GetString());
         idPairs[itr->value["id"].GetInt()] = id;
         for (Value::ConstMemberIterator comp = itr->value["components"].MemberBegin(); comp != itr->value["components"].MemberEnd(); ++comp) {
@@ -393,9 +410,6 @@ void Scene::populateScene(const Document &scene) {
                 gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                 registry->addComponent<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
                 mLight = id;
-            } else if (comp->name == "input") { // Atm just going to assume we only ever have one inputcomponent
-                registry->addComponent<Input>(id);
-                registry->getSystem<InputSystem>()->setPlayerController(id);
             } else if (comp->name == "sound") {
                 std::string filename = comp->value["filename"].GetString();
                 bool looping = comp->value["loop"].GetBool();

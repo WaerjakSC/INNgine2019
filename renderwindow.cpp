@@ -11,14 +11,14 @@
 #include <iostream>
 #include <thread> //for sleep_for
 
+#include "aisystem.h"
+#include "collisionsystem.h"
 #include "deltaTime.h"
 #include "inputsystem.h"
 #include "lightsystem.h"
 #include "movementsystem.h"
 #include "rendersystem.h"
 #include "soundsystem.h"
-#include "collisionsystem.h"
-#include "aisystem.h"
 
 #include "colorshader.h"
 #include "phongshader.h"
@@ -151,14 +151,13 @@ void RenderWindow::render() {
     DeltaTime dt = time - mLastFrameTime;
     mLastFrameTime = time;
 
-    mInputSystem->update(dt);
-
     mTimeStart.restart();        //restart FPS clock
     mContext->makeCurrent(this); //must be called every frame (every time mContext->swapBuffers is called)
 
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
+        mInputSystem->update(dt);
         mSoundSystem->update(dt);
         if (mFactory->isPlaying()) {
             mMoveSystem->update(dt);

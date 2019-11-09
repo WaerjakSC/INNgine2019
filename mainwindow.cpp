@@ -9,6 +9,7 @@
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QScreen>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
@@ -150,9 +151,12 @@ void MainWindow::snapToObject() {
 }
 void MainWindow::createActions() {
     QMenu *projectActions = ui->menuBar->addMenu(tr("&File"));
+    ResourceManager *factory = ResourceManager::instance();
+    QAction *newScene = new QAction(tr("New Scene"));
+    projectActions->addAction(newScene);
+    connect(newScene, SIGNAL(triggered()), factory, SLOT(newScene()));
     QAction *saveScene = new QAction(tr("&Save"));
     projectActions->addAction(saveScene);
-    ResourceManager *factory = ResourceManager::instance();
     connect(saveScene, &QAction::triggered, factory, &ResourceManager::save);
     QAction *saveAs = new QAction(tr("Save &As"));
     projectActions->addAction(saveAs);
@@ -160,13 +164,15 @@ void MainWindow::createActions() {
     QAction *loadScene = new QAction(tr("&Load"));
     projectActions->addAction(loadScene);
     connect(loadScene, &QAction::triggered, factory, &ResourceManager::load);
-
+    QAction *newProject = new QAction(tr("&New Project"));
+    projectActions->addAction(newProject);
+    connect(newProject, &QAction::triggered, factory, &ResourceManager::newProject);
     QAction *saveProject = new QAction(tr("Save &Project"));
     projectActions->addAction(saveProject);
     connect(saveProject, &QAction::triggered, factory, &ResourceManager::saveProject);
     QAction *loadProject = new QAction(tr("&Open Project"));
     projectActions->addAction(loadProject);
-    connect(loadProject, &QAction::triggered, factory, &ResourceManager::loadProj);
+    connect(loadProject, SIGNAL(triggered()), factory, SLOT(loadProject()));
 
     QAction *exit = new QAction(tr("&Exit"));
     projectActions->addAction(exit);
@@ -195,56 +201,53 @@ void MainWindow::createActions() {
     make3D->addAction(plane);
 
     QMenu *components = ui->menuBar->addMenu(tr("Add &Components")); // Maybe disable specific component if selected entity has that component already
-    transAction = new QAction(tr("Transform"), this);
+    QAction *transAction = new QAction(tr("Transform"), this);
     components->addAction(transAction);
     connect(transAction, &QAction::triggered, mComponentList, &ComponentList::addTransformComponent);
 
-    matAction = new QAction(tr("Material"), this);
+    QAction *matAction = new QAction(tr("Material"), this);
     components->addAction(matAction);
     connect(matAction, &QAction::triggered, mComponentList, &ComponentList::addMaterialComponent);
 
-    meshAction = new QAction(tr("Mesh"), this);
+    QAction *meshAction = new QAction(tr("Mesh"), this);
     components->addAction(meshAction);
     connect(meshAction, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
     QMenu *collisionMenu = components->addMenu(tr("&Colliders"));
     QMenu *boxes = collisionMenu->addMenu("Box Colliders");
 
-    AABBAction = new QAction(tr("Axis Aligned"), this);
+    QAction *AABBAction = new QAction(tr("Axis Aligned"), this);
     boxes->addAction(AABBAction);
     connect(AABBAction, &QAction::triggered, mComponentList, &ComponentList::addAABBCollider);
-    OBBAction = new QAction(tr("Oriented"), this);
+    QAction *OBBAction = new QAction(tr("Oriented"), this);
     boxes->addAction(OBBAction);
     connect(OBBAction, &QAction::triggered, mComponentList, &ComponentList::addOBBCollider);
 
-    PlaneAction = new QAction(tr("Plane"), this);
+    QAction *PlaneAction = new QAction(tr("Plane"), this);
     collisionMenu->addAction(PlaneAction);
     connect(PlaneAction, &QAction::triggered, mComponentList, &ComponentList::addPlaneCollider);
 
-    SphereAction = new QAction(tr("Sphere"), this);
+    QAction *SphereAction = new QAction(tr("Sphere"), this);
     collisionMenu->addAction(SphereAction);
     connect(SphereAction, &QAction::triggered, mComponentList, &ComponentList::addSphereCollider);
-    CylinderAction = new QAction(tr("Cylinder"), this);
+
+    QAction *CylinderAction = new QAction(tr("Cylinder"), this);
     collisionMenu->addAction(CylinderAction);
     connect(CylinderAction, &QAction::triggered, mComponentList, &ComponentList::addCylinderCollider);
 
-    lightAction = new QAction(tr("Light"), this);
+    QAction *lightAction = new QAction(tr("Light"), this);
     components->addAction(lightAction);
     connect(lightAction, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
 
-    inputAction = new QAction(tr("Input"), this);
-    components->addAction(inputAction);
-    connect(inputAction, &QAction::triggered, mComponentList, &ComponentList::addInputComponent);
-
-    physicsAction = new QAction(tr("Physics"), this);
+    QAction *physicsAction = new QAction(tr("Physics"), this);
     components->addAction(physicsAction);
     connect(physicsAction, &QAction::triggered, mComponentList, &ComponentList::addPhysicsComponent);
 
-    soundAction = new QAction(tr("Sound"), this);
+    QAction *soundAction = new QAction(tr("Sound"), this);
     components->addAction(soundAction);
     connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
 
-    aiAction = new QAction(tr("AI"), this);
+    QAction *aiAction = new QAction(tr("AI"), this);
     components->addAction(aiAction);
     connect(aiAction, &QAction::triggered, mComponentList, &ComponentList::addAIComponent);
 
@@ -272,6 +275,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
 void MainWindow::clearEditor() {
     hierarchy->clear();
     scrollArea->clearLayout();
+    insertEntities();
 }
 
 void MainWindow::closeEngine() {

@@ -107,6 +107,7 @@ public:
     **/
     bool loadWave(std::string filePath, Sound &sound);
     void setColliderMesh(Mesh &mesh);
+    void newScene(const QString &text);
 public slots:
     void save();
     void load();
@@ -115,7 +116,11 @@ public slots:
     void stop();
     void saveAs();
     void saveProject();
-    void loadProj();
+    void loadProject();
+
+    void newProject();
+
+    void newScene();
 
 private:
     // Private constructor

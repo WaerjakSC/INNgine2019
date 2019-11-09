@@ -46,14 +46,17 @@ Ref<Entity> Registry::getEntity(GLuint eID) {
  * @param eID - entityID
  */
 void Registry::removeEntity(GLuint eID) {
+    Entity *entt = mEntities.find(eID)->second.get();
+    if (entt->isDestroyed())
+        return;
     if (isBillBoard(eID)) {
         removeBillBoardID(eID);
     }
     if (contains<Transform>(eID)) {
         setParent(eID, -1);
     }
-    entityDestroyed(eID);                   // Pass the message on to the registry
-    mEntities.find(eID)->second->destroy(); // doesn't actually destroy the entity object, simply clears the data and increments the generation variable
+    entityDestroyed(eID); // Pass the message on to the registry
+    entt->destroy();      // doesn't actually destroy the entity object, simply clears the data and increments the generation variable
 
     emit entityRemoved(eID);
 }
@@ -66,11 +69,9 @@ GLuint Registry::nextAvailable() {
 }
 
 void Registry::clearScene() {
-    mBillBoards.clear();
     for (auto entity : mEntities) {
         if (entity.first != 0) {
-            entityDestroyed(entity.first); // Pass the message on to the registry
-            entity.second->destroy();
+            removeEntity(entity.first);
         }
     }
 }

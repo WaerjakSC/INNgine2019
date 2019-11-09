@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QInputDialog>
 #include <QStatusBar>
 #include <QTimer>
 #include <QToolButton>
@@ -839,6 +840,21 @@ void ResourceManager::changeMsg() {
     bool &msg = mMainWindow->mShowingMsg;
     msg = !msg;
 }
+void ResourceManager::newScene(const QString &text) {
+    setCurrentScene(text);
+    stop(); // Stop the editor if it's in play
+    mMainWindow->clearEditor();
+    registry->clearScene();
+    save();
+    getSceneLoader()->loadScene(getCurrentScene() + ".json");
+}
+void ResourceManager::newScene() {
+    QString text = QInputDialog::getText(mMainWindow, tr("New Scene"), tr("Scene name:"), QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint);
+    if (text.isEmpty()) {
+        return;
+    }
+    newScene(text);
+}
 void ResourceManager::save() {
     getSceneLoader()->saveScene(getCurrentScene());
     showMessage("Saved Scene!");
@@ -847,9 +863,9 @@ void ResourceManager::saveAs() {
     QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
     if (file.fileName().isEmpty())
         return;
-    getSceneLoader()->saveScene(file.fileName());
+    mCurrentScene = file.fileName().chopped(5);
+    save();
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
-    showMessage("Saved Scene!");
 }
 void ResourceManager::load() {
     QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
@@ -863,7 +879,7 @@ void ResourceManager::load() {
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
     showMessage("Loaded Scene!");
 }
-void ResourceManager::loadProj() {
+void ResourceManager::loadProject() {
     QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"), QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)")));
     if (file.fileName().isEmpty())
         return;
@@ -877,6 +893,19 @@ void ResourceManager::loadProj() {
 void ResourceManager::saveProject() {
     saveProjectSettings(QString::fromStdString(gsl::settingsFilePath + getProjectName().toStdString()));
     showMessage("Saved Project!");
+}
+
+void ResourceManager::newProject() {
+    QString text = QInputDialog::getText(mMainWindow, tr("New Project"), tr("Project name:"), QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint);
+    if (text.isEmpty()) {
+        return;
+    }
+    mCurrentProject = text;
+    mDefaultScene = "Untitled";
+    newScene(mDefaultScene);
+    Registry::instance()->getSystem<MovementSystem>()->init();
+    mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
+    saveProject();
 }
 void ResourceManager::play() {
     if (!mIsPlaying) {
