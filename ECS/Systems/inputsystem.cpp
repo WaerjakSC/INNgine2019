@@ -20,34 +20,36 @@ void InputSystem::update(DeltaTime dt) {
     handleMouseInput();
 }
 void InputSystem::handleKeyInput() {
-    if (editorInput.ESCAPE || registry->get<Input>(mPlayerController).ESCAPE) //Shuts down whole program
+    if (editorInput.ESCAPE || mPlayerController.ESCAPE) //Shuts down whole program
     {
         emit closeEngine();
         editorInput.ESCAPE = false;
+        mPlayerController.ESCAPE = false;
     }
     if (editorInput.F) {
         emit snapSignal();
         return;
     }
 }
-void InputSystem::handlePlayerController(float deltaTime) {
+void InputSystem::handlePlayerController(DeltaTime dt) {
     if (factory->isPlaying()) { // No point going through this if you won't use it anyway
-        Input &player = registry->get<Input>(mPlayerController);
         gsl::Vector3D desiredVelocity(0);
-
-        if (player.W)
+        if (mPlayerController.W)
             desiredVelocity.z -= mCameraSpeed;
-        if (player.S)
+        if (mPlayerController.S)
             desiredVelocity.z += mCameraSpeed;
-        if (player.D)
+        if (mPlayerController.D)
             desiredVelocity.x += mCameraSpeed;
-        if (player.A)
+        if (mPlayerController.A)
             desiredVelocity.x -= mCameraSpeed;
-        if (player.Q)
+        if (mPlayerController.Q)
             desiredVelocity.y += mCameraSpeed;
-        if (player.E)
+        if (mPlayerController.E)
             desiredVelocity.y -= mCameraSpeed;
-        registry->getSystem<MovementSystem>()->move(mPlayerController, desiredVelocity.normalized() * mMoveSpeed * deltaTime);
+        mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
+        if (mPlayer != 0) {
+            registry->getSystem<MovementSystem>()->move(mPlayer, mDesiredVelocity);
+        }
     }
 }
 void InputSystem::handleMouseInput() {
@@ -71,6 +73,14 @@ void InputSystem::handleMouseInput() {
     }
 }
 
+void InputSystem::setPlayer(const GLuint &player) {
+    mPlayer = player;
+}
+
+GLuint InputSystem::player() const {
+    return mPlayer;
+}
+
 Ref<CameraController> InputSystem::editorCamController() const {
     return mEditorCamController;
 }
@@ -91,12 +101,11 @@ void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamC
     ray = new Raycast(mEditorCamController);
 }
 
-GLuint InputSystem::playerController() const {
+Input &InputSystem::playerController() {
     return mPlayerController;
 }
-
-void InputSystem::setPlayerController(const GLuint &playerController) {
-    mPlayerController = playerController;
+Input InputSystem::playerController() const {
+    return mPlayerController;
 }
 
 void InputSystem::setCameraSpeed(float value) {
@@ -113,7 +122,7 @@ void InputSystem::keyPressEvent(QKeyEvent *event) {
         return;
     }
     if (factory->isPlaying())
-        inputKeyPress(event, registry->get<Input>(mPlayerController));
+        inputKeyPress(event, mPlayerController);
     else {
         inputKeyPress(event, editorInput);
     }
@@ -121,7 +130,7 @@ void InputSystem::keyPressEvent(QKeyEvent *event) {
 
 void InputSystem::keyReleaseEvent(QKeyEvent *event) {
     if (factory->isPlaying())
-        inputKeyRelease(event, registry->get<Input>(mPlayerController));
+        inputKeyRelease(event, mPlayerController);
     else
         inputKeyRelease(event, editorInput);
 }
@@ -284,13 +293,13 @@ void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input) {
 }
 void InputSystem::mouseReleaseEvent(QMouseEvent *event) {
     if (factory->isPlaying())
-        inputMouseRelease(event, registry->get<Input>(mPlayerController));
+        inputMouseRelease(event, mPlayerController);
     else
         inputMouseRelease(event, editorInput);
 }
 void InputSystem::mousePressEvent(QMouseEvent *event) {
     if (factory->isPlaying())
-        inputMousePress(event, registry->get<Input>(mPlayerController));
+        inputMousePress(event, mPlayerController);
     else
         inputMousePress(event, editorInput);
 }

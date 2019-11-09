@@ -8,6 +8,9 @@
         "pitch": -45,
         "yaw": 0
     },
+    "controller": {
+        "id": 11
+    },
     "GameObject": {
         "name": "Skybox",
         "id": 2,
@@ -513,9 +516,6 @@
             },
             "mesh": {
                 "name": "Ball"
-            },
-            "input": {
-                "isController": true
             },
             "Sphere": {
                 "position": [

@@ -28,7 +28,6 @@ public:
 public slots:
     void addSoundComponent();
     void addPhysicsComponent();
-    void addInputComponent();
     void addLightComponent();
     void addMeshComponent();
     void addMaterialComponent();

@@ -23,9 +23,9 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void setPlayerController(const GLuint &playerController);
 
-    GLuint playerController() const;
+    Input playerController() const;
+    Input &playerController();
 
     Ref<CameraController> editorCamController() const;
     void setEditorCamController(const Ref<CameraController> &editorCamController);
@@ -34,12 +34,14 @@ public:
     void setGameCameraController(const Ref<GameCameraController> &gameCameraController, GLuint gameCamMeshID);
 
     void onResize(float aspectRatio);
+    GLuint player() const;
+
+    void setPlayer(const GLuint &player);
+
 signals:
     void snapSignal();
     void rayHitEntity(GLuint entityID);
     void closeEngine();
-private slots:
-    //    void changeMsg();
 
 private:
     void handleKeyInput();
@@ -59,10 +61,12 @@ private:
 
     RenderWindow *mRenderWindow;
 
-    GLuint mPlayerController;
+    GLuint mPlayer{0};
+    Input mPlayerController;
+    vec3 mDesiredVelocity;
     Input editorInput;
 
-    void handlePlayerController(float deltaTime);
+    void handlePlayerController(DeltaTime dt);
     void setCameraSpeed(float value);
     void inputKeyRelease(QKeyEvent *event, Input &input);
     void inputKeyPress(QKeyEvent *event, Input &input);

@@ -114,14 +114,6 @@ void ComponentList::addLightComponent() {
         setupComponentList();
     }
 }
-void ComponentList::addInputComponent() {
-    if (mMainWindow->selectedEntity) {
-        GLuint eID = mMainWindow->selectedEntity->id();
-        if (!registry->contains<Input>(eID))
-            registry->addComponent<Input>(eID);
-        setupComponentList();
-    }
-}
 void ComponentList::addPhysicsComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();

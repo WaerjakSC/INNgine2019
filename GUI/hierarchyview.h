@@ -27,6 +27,7 @@ private:
     void mousePressEvent(QMouseEvent *event) override;
     void createContextActions();
     GLuint rightClickEntity;
+    void setController();
 };
 
 #endif // HIERARCHYVIEW_H
