@@ -9,7 +9,7 @@
  * Less performant than groups because it doesn't modify/sort the underlying pool,
  * but for that same reason it's probably also safer/easier to use for simple tasks.
  * A run-time assert will be called if trying to get an entity that doesn't belong to the view.
- *  * Only Registry is allowed to create Views.
+ * Only Registry is allowed to create Views.
  */
 template <typename... Component>
 class View {
@@ -27,7 +27,9 @@ private:
             return lhs->size() < rhs->size();
         });
     }
-
+    /**
+     * @brief The iterator class is a custom iterator for use with views to allow the use of for-loops
+     */
     class iterator {
         friend class View<Component...>;
 
@@ -118,6 +120,12 @@ public:
     bool contains(const int &entt) const {
         return find(entt) != -1;
     }
+    /**
+     * @brief Retrieves the desired components from an entity
+     * If multiple component types entered, the returned value will be a tuple of each component.
+     * Retrieving these components is easiest done using structured bindings.
+     * @example auto [trans, mat, msh] = view.get<Transform, Material, Mesh>(entity);
+     */
     template <typename... Comp>
     decltype(auto) get(const int &entt) const {
         assert(contains(entt));
@@ -171,6 +179,9 @@ public:
     bool contains(const int &entt) const {
         return find(entt) != -1;
     }
+    /**
+    * @brief same as the multi-component view, but here you don't need to enter a component type since it's implicitly discovered
+    */
     decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         return pool->get(entt);

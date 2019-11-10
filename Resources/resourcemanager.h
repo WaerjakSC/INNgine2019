@@ -145,7 +145,6 @@ private:
     meshData mMeshData;
 
     MainWindow *mMainWindow;
-    //    std::vector<int> mGameObjectIndices;    // Holds the sparse array for gameobjects.
 
     // Systems
     Ref<LightSystem> mLightSystem;

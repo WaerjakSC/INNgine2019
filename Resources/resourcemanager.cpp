@@ -168,15 +168,15 @@ void ResourceManager::onExit() {
  * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
  * @param name
  * @param type
- * @return The entity ID of the gameobject.
+ * @return The entity ID of the entity.
  */
 GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
         GLuint eID = registry->makeEntity(QString::fromStdString(name));
-        registry->addComponent<Transform>(eID);
-        registry->addComponent<Material>(eID, type);
+        registry->add<Transform>(eID);
+        registry->add<Material>(eID, type);
         addMeshComponent(name, eID);
         return eID;
     }
@@ -187,11 +187,11 @@ GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
  */
 GLuint ResourceManager::makePlane(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, getShader<ColorShader>());
+    registry->add<Transform>(eID);
+    registry->add<Material>(eID, getShader<ColorShader>());
     auto search = mMeshMap.find("Plane");
     if (search != mMeshMap.end()) {
-        registry->addComponent<Mesh>(eID, search->second);
+        registry->add<Mesh>(eID, search->second);
     } else
         makePlaneMesh(eID);
 
@@ -210,7 +210,7 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
 
     // Once VAO and VBO have been generated, mMeshData can be discarded.
     if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
+        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
     auto &mesh = registry->get<Mesh>(eID);
@@ -225,9 +225,9 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
  */
 GLuint ResourceManager::makeCube(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, getShader<ColorShader>());
-    registry->addComponent<Mesh>(eID);
+    registry->add<Transform>(eID);
+    registry->add<Material>(eID, getShader<ColorShader>());
+    registry->add<Mesh>(eID);
     setMesh("Cube.obj", eID);
 
     return eID;
@@ -237,8 +237,8 @@ GLuint ResourceManager::makeCube(const QString &name) {
  */
 GLuint ResourceManager::makeXYZ(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, getShader<ColorShader>());
+    registry->add<Transform>(eID);
+    registry->add<Material>(eID, getShader<ColorShader>());
     makeXYZMesh(eID);
 
     return eID;
@@ -256,7 +256,7 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
     if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID, GL_LINES, mMeshData);
+        registry->add<Mesh>(eID, GL_LINES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_LINES, mMeshData);
     auto &mesh = registry->get<Mesh>(eID);
@@ -271,11 +271,11 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
  */
 GLuint ResourceManager::makeSkyBox(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->addComponent<Transform>(eID, 0, 0, gsl::Vector3D(15));
-    registry->addComponent<Material>(eID, getShader<TextureShader>(), mTextures["skybox.bmp"]->id() - 1);
+    registry->add<Transform>(eID, 0, 0, gsl::Vector3D(15));
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["skybox.bmp"]->id() - 1);
     auto search = mMeshMap.find("Skybox");
     if (search != mMeshMap.end()) {
-        registry->addComponent<Mesh>(eID, search->second);
+        registry->add<Mesh>(eID, search->second);
     } else
         makeSkyBoxMesh(eID);
     return eID;
@@ -335,7 +335,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
 
     //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
     if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
+        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
@@ -357,9 +357,9 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
 
     initializeOpenGLFunctions();
 
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, type);
-    registry->addComponent<Mesh>(eID);
+    registry->add<Transform>(eID);
+    registry->add<Material>(eID, type);
+    registry->add<Mesh>(eID);
     setMesh(fileName, eID);
     glBindVertexArray(0);
 
@@ -371,11 +371,11 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
  */
 GLuint ResourceManager::makeBillBoard(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->addComponent<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
-    registry->addComponent<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->id() - 1);
+    registry->add<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->id() - 1);
     auto search = mMeshMap.find("BillBoard");
     if (search != mMeshMap.end()) {
-        registry->addComponent<Mesh>(eID, search->second);
+        registry->add<Mesh>(eID, search->second);
     } else
         makeBillBoardMesh(eID);
 
@@ -394,7 +394,7 @@ void ResourceManager::makeBillBoardMesh(int eID) {
                                                               Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                                           });
     if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
+        registry->add<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLE_STRIP, mMeshData);
     auto &billBoardMesh = registry->get<Mesh>(eID);
@@ -411,11 +411,11 @@ void ResourceManager::makeBillBoardMesh(int eID) {
 GLuint ResourceManager::makeOctBall(const QString &name, int n) {
     GLuint eID = registry->makeEntity(name);
 
-    registry->addComponent<Transform>(eID);
-    registry->addComponent<Material>(eID, getShader<ColorShader>());
+    registry->add<Transform>(eID);
+    registry->add<Material>(eID, getShader<ColorShader>());
     auto search = mMeshMap.find("Ball");
     if (search != mMeshMap.end()) {
-        registry->addComponent<Mesh>(eID, search->second);
+        registry->add<Mesh>(eID, search->second);
     } else
         makeBallMesh(eID, n);
 
@@ -433,7 +433,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
     makeUnitOctahedron(mRecursions); // This fills mMeshData
 
     if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
+        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
@@ -450,12 +450,12 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
  */
 GLuint ResourceManager::makeLightObject(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->addComponent<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
-    registry->addComponent<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
-    registry->addComponent<Light>(eID);
+    registry->add<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
+    registry->add<Light>(eID);
     auto search = mMeshMap.find("Pyramid");
     if (search != mMeshMap.end()) {
-        registry->addComponent<Mesh>(eID, search->second);
+        registry->add<Mesh>(eID, search->second);
     } else
         makeLightMesh(eID);
     return eID;
@@ -481,7 +481,7 @@ void ResourceManager::makeLightMesh(int eID) {
                                3, 0, 2,
                                0, 3, 1});
     if (!registry->contains<Mesh>(eID))
-        registry->addComponent<Mesh>(eID, GL_TRIANGLES, mMeshData);
+        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
     auto &lightMesh = registry->get<Mesh>(eID);
@@ -576,7 +576,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
     if (eID <= -1 || (size_t)eID > registry->numEntities() - 1) {
         eID = registry->numEntities() - 1;
     }
-    registry->addComponent<Mesh>(eID);
+    registry->add<Mesh>(eID);
     setMesh(name, eID);
 }
 void ResourceManager::setMesh(std::string name, GLuint eID) {

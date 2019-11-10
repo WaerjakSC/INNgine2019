@@ -17,39 +17,34 @@ public:
     static Registry *instance();
     virtual ~Registry() {}
 
+    /**
+     * @brief Creates a view guaranteed to contain the entities containing all the components given in the template argument.
+     * Essentially free to create, lifetime should be very low to ensure a view is up to date.
+     * Simply create to get the entities you want, and discard immediately after use.
+     * @tparam List of the component types you want the view to contain.
+     */
     template <typename... Comp>
     View<Comp...> view() {
         return {getPool<Comp>()...};
     }
-
     /**
-     * Register component type. For systems that own the component type
+     * @brief Register component type. A component must be registered before it can be used by the ECS.
      */
     template <typename Type>
-    void registerComponent(Ref<Pool<Type>> pool) {
+    void registerComponent() {
         std::string typeName = typeid(Type).name();
-
-        // Create a ComponentArray pointer and add it to the component arrays map
-        mPools.insert({typeName, pool});
-    }
-    /**
-     * For partially owned component types, systems only want a shared ptr to the pool
-     * Will register the component type if it exists, otherwise just returns the pool type
-     */
-    template <typename Type>
-    Ref<Pool<Type>> registerComponent() {
-        std::string typeName = typeid(Type).name();
-        Ref<Pool<Type>> pool;
 
         if (mPools.find(typeName) != mPools.end()) {
-            pool = getPool<Type>();
+            return;
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            pool = std::make_shared<Pool<Type>>();
+            Ref<Pool<Type>> pool = std::make_shared<Pool<Type>>();
             mPools.insert({typeName, pool});
         }
-        return pool;
     }
+    /**
+     * @brief Register a system with the ECS. Not strictly required, but will allow you to use the registry to get a reference to the system.
+     */
     template <typename Type, class... Args>
     Ref<Type> registerSystem(Args... args) {
         std::string typeName = typeid(Type).name();
@@ -72,15 +67,15 @@ public:
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      */
     template <typename Type, class... Args>
-    void addComponent(int entityID, Args... args) {
+    void add(GLuint entityID, Args... args) {
         // Add a component to the array for an entity
         getPool<Type>()->add(entityID, args...);
     }
     /**
-     * @brief Remove a component of type Type from the entity/gameobject with entityID.
+     * @brief Remove a component of type Type from the entity with entityID.
      */
     template <typename Type>
-    void removeComponent(int entityID) {
+    void remove(GLuint entityID) {
         // Remove a component from the array for an entity
         getPool<Type>()->remove(entityID);
     }
@@ -88,7 +83,7 @@ public:
      * @brief Get a reference to the Type component owned by entityID
      */
     template <typename Type>
-    Type &get(int entityID) {
+    Type &get(GLuint entityID) {
         // Get a reference to a component from the array for an entity
         return getPool<Type>()->get(entityID);
     }
@@ -110,7 +105,7 @@ public:
      * Iterates through all the Pools, and if they contain a component owned by entityID, delete and re-arrange the Pool.
      * @param entityID
      */
-    void entityDestroyed(int entityID) {
+    void entityDestroyed(GLuint entityID) {
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
         for (auto &pool : mPools) {
@@ -119,11 +114,17 @@ public:
             }
         }
     }
+    /**
+     * @brief Checks if an entity owns the given component types.
+     */
     template <typename... Type>
     bool contains(GLuint eID) {
         [[maybe_unused]] const auto cpools = std::make_tuple(getPool<Type>()...);
         return ((std::get<Ref<Pool<Type>>>(cpools) ? std::get<Ref<Pool<Type>>>(cpools)->has(eID) : false) && ...);
     }
+    /**
+     * @brief Simple getter for a type's typeid name
+     */
     template <typename Type>
     std::string type() {
         return typeid(Type).name();
@@ -131,23 +132,68 @@ public:
     void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
     void removeBillBoardID(GLuint entityID);
     std::vector<GLuint> billBoards() { return mBillBoards; }
-
+    /**
+    * @brief Make a generic entity with no components attached.
+    * @param name Name of the entity. Leave blank if no name desired.
+    * @return Returns the entity ID for use in adding components or other tasks.
+    */
     GLuint makeEntity(const QString &name = "", bool signal = true);
+    /**
+     * @brief duplicateEntity Creates an entity with the exact same name and components as the duped entity.
+     * @param dupedEntity
+     * @return
+     */
     GLuint duplicateEntity(GLuint dupedEntity);
     std::map<GLuint, Ref<Entity>> getEntities() const { return mEntities; }
+    /**
+    * @brief Get a pointer to the entity with the specified ID.
+    * @param eID
+    * @return
+    */
     Ref<Entity> getEntity(GLuint eID);
-
+    /**
+    * @brief Destroy an entity - Clears all components from an entity ID and readies that ID for use with the next created entity
+    * @param eID - entityID
+    */
     void removeEntity(GLuint eID);
+    /**
+     * @brief numEntities size of the mEntities map
+     * @return
+     */
     GLuint numEntities() { return mEntities.size(); }
+    /**
+     * @brief nextAvailable get the next available ID. In a scenario with no destroyed IDs, this will simply return the size of the mEntities map.
+     * Destroyed entities give up their ID for use with a new entity. This avoids unnecessary bloating.
+     * @return
+     */
     GLuint nextAvailable();
-
+    /**
+     * @brief clearScene Simply calls removeEntity() on every entity in the scene.
+     */
     void clearScene();
-
+    /**
+    * @brief Updates the child parent hierarchy in case it's out of date
+    */
     void updateChildParent();
-
+    /**
+     * @brief makeSnapshot takes a snapshot of the current entities etc.
+     */
     void makeSnapshot();
+    /**
+     * @brief loadSnapshot loads the snapshot taken by makeSnapshot()
+     */
     void loadSnapshot();
+    /**
+     * @brief removeChild remove a child from an entity
+     * @param eID
+     * @param childID
+     */
     void removeChild(const GLuint eID, const GLuint childID);
+    /**
+     * @brief addChild Make an entity the child of another entity.
+     * @param eID
+     * @param childID
+     */
     void addChild(const GLuint eID, const GLuint childID);
     /**
      * @brief Check if Transform component (or rather its entity) has a parent object
@@ -161,7 +207,17 @@ public:
      * @param parentID
      */
     void setParent(GLuint eID, int parentID, bool fromEditor = false);
+    /**
+     * @brief getParent get the parent of the given entity. Undefined behaviour of the entity has no parent.
+     * @param eID
+     * @return
+     */
     Transform &getParent(GLuint eID);
+    /**
+     * @brief getChildren get a list of an entity's children.
+     * @param eID
+     * @return
+     */
     std::vector<GLuint> getChildren(GLuint eID);
 
 signals:
@@ -175,7 +231,7 @@ private:
     std::map<std::string, Ref<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
 
-    std::map<GLuint, Ref<Entity>> mEntities; // Save GameObjects as pointers to avoid clipping of derived classes
+    std::map<GLuint, Ref<Entity>> mEntities; // Save Entities as pointers to avoid clipping of derived classes
     std::vector<GLuint> mAvailableSlots;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);

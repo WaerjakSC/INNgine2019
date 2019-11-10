@@ -25,7 +25,7 @@ ComponentList::ComponentList(MainWindow *window, VerticalScrollArea *inScrollAre
     fusion = QStyleFactory::create("fusion");
 }
 /**
- * @brief When a gameobject is selected, show all its components in separate groupboxes in the rightmost panel.
+ * @brief When an entity is selected, show all its components in separate groupboxes in the rightmost panel.
  * Order of if-statements is the order the component list will show each component
  */
 void ComponentList::setupComponentList() {
@@ -77,7 +77,7 @@ void ComponentList::addTransformComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Transform>(eID))
-            registry->addComponent<Transform>(eID);
+            registry->add<Transform>(eID);
         setupComponentList();
     }
 }
@@ -86,7 +86,7 @@ void ComponentList::addAIComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<AIcomponent>(eID))
-            registry->addComponent<AIcomponent>(eID);
+            registry->add<AIcomponent>(eID);
         setupComponentList();
     }
 }
@@ -94,7 +94,7 @@ void ComponentList::addMaterialComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Material>(eID))
-            registry->addComponent<Material>(eID);
+            registry->add<Material>(eID);
         setupComponentList();
     }
 }
@@ -102,7 +102,7 @@ void ComponentList::addMeshComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Mesh>(eID))
-            registry->addComponent<Mesh>(eID);
+            registry->add<Mesh>(eID);
         setupComponentList();
     }
 }
@@ -110,7 +110,7 @@ void ComponentList::addLightComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Light>(eID))
-            registry->addComponent<Light>(eID);
+            registry->add<Light>(eID);
         setupComponentList();
     }
 }
@@ -118,7 +118,7 @@ void ComponentList::addPhysicsComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Physics>(eID))
-            registry->addComponent<Physics>(eID);
+            registry->add<Physics>(eID);
         setupComponentList();
     }
 }
@@ -126,7 +126,7 @@ void ComponentList::addSoundComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Sound>(eID))
-            registry->addComponent<Sound>(eID);
+            registry->add<Sound>(eID);
         setupComponentList();
     }
 }
@@ -134,7 +134,7 @@ void ComponentList::addAABBCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<AABB>(eID)) {
-            registry->addComponent<AABB>(eID);
+            registry->add<AABB>(eID);
             if (registry->contains<Transform>(eID)) {
                 auto &trans = registry->get<Transform>(eID);
                 auto &aabb = registry->get<AABB>(eID);
@@ -149,7 +149,7 @@ void ComponentList::addOBBCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<OBB>(eID)) {
-            registry->addComponent<OBB>(eID);
+            registry->add<OBB>(eID);
             //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();
@@ -159,7 +159,7 @@ void ComponentList::addSphereCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Sphere>(eID)) {
-            registry->addComponent<Sphere>(eID);
+            registry->add<Sphere>(eID);
             registry->getSystem<MovementSystem>()->updateSphereTransform(eID);
         }
         setupComponentList();
@@ -169,7 +169,7 @@ void ComponentList::addPlaneCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Plane>(eID)) {
-            registry->addComponent<Plane>(eID);
+            registry->add<Plane>(eID);
             //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
 
@@ -180,7 +180,7 @@ void ComponentList::addCylinderCollider() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();
         if (!registry->contains<Cylinder>(eID)) {
-            registry->addComponent<Cylinder>(eID);
+            registry->add<Cylinder>(eID);
             //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
         }
         setupComponentList();

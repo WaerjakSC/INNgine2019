@@ -189,10 +189,10 @@ void MainWindow::createActions() {
     connect(xyz, &QAction::triggered, mRenderWindow, &RenderWindow::toggleXYZ);
     editor->addAction(xyz);
 
-    QMenu *gameObject = ui->menuBar->addMenu(tr("&GameObject"));
-    QAction *empty = new QAction(tr("Empty &GameObject"), this);
-    gameObject->addAction(empty);
-    QMenu *make3D = gameObject->addMenu(tr("3D &Object"));
+    QMenu *entity = ui->menuBar->addMenu(tr("&Entity"));
+    QAction *empty = new QAction(tr("Empty &Entity"), this);
+    entity->addAction(empty);
+    QMenu *make3D = entity->addMenu(tr("3D &Object"));
     QAction *cube = new QAction(tr("&Cube"), this);
     make3D->addAction(cube);
     QAction *sphere = new QAction(tr("&Sphere"), this);
@@ -283,7 +283,7 @@ void MainWindow::closeEngine() {
     close();
 }
 void MainWindow::makeEntity() {
-    emit made3DObject(registry->makeEntity("GameObject", false));
+    emit made3DObject(registry->makeEntity("Entity", false));
 }
 void MainWindow::makePlane() {
     emit made3DObject(ResourceManager::instance()->makePlane());
@@ -376,7 +376,7 @@ void MainWindow::changeEntityName(const Entity &entt) {
     item->setText(entt.name());
 }
 /**
- * @brief Initial insertion of gameobjects, such as those made in an init function or read from a level file.
+ * @brief Initial insertion of entities, such as those made in an init function or read from a level file.
  * @param entities
  */
 void MainWindow::insertEntities() {
@@ -387,7 +387,7 @@ void MainWindow::insertEntities() {
             continue;
         QStandardItem *item = new QStandardItem;
         if (entity.second->name() == "")
-            item->setText(QString("GameObject" + QString::number(unnamedEntityCount)));
+            item->setText(QString("Entity" + QString::number(unnamedEntityCount)));
         else
             item->setText(entity.second->name());
         item->setData(entity.second->id());

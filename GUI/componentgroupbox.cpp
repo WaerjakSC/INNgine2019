@@ -20,31 +20,31 @@ void ComponentGroupBox::removeComponent() {
     Registry *registry = Registry::instance();
     GLuint entityID = mMainWindow->selectedEntity->id();
     if (title() == "Transform")
-        registry->removeComponent<Transform>(entityID);
+        registry->remove<Transform>(entityID);
     if (title() == "Material")
-        registry->removeComponent<Material>(entityID);
+        registry->remove<Material>(entityID);
     if (title() == "Mesh")
-        registry->removeComponent<Mesh>(entityID);
+        registry->remove<Mesh>(entityID);
     if (title() == "Light")
-        registry->removeComponent<Light>(entityID);
+        registry->remove<Light>(entityID);
     if (title() == "Input")
-        registry->removeComponent<Input>(entityID);
+        registry->remove<Input>(entityID);
     if (title() == "Physics")
-        registry->removeComponent<Physics>(entityID);
+        registry->remove<Physics>(entityID);
     if (title() == "Sound")
-        registry->removeComponent<Sound>(entityID);
+        registry->remove<Sound>(entityID);
     if (title() == "AI")
-        registry->removeComponent<AIcomponent>(entityID);
+        registry->remove<AIcomponent>(entityID);
     if (title() == "AABB Collider")
-        registry->removeComponent<AABB>(entityID);
+        registry->remove<AABB>(entityID);
     if (title() == "OBB Collider")
-        registry->removeComponent<OBB>(entityID);
+        registry->remove<OBB>(entityID);
     if (title() == "Plane Collider")
-        registry->removeComponent<Plane>(entityID);
+        registry->remove<Plane>(entityID);
     if (title() == "Sphere Collider")
-        registry->removeComponent<Sphere>(entityID);
+        registry->remove<Sphere>(entityID);
     if (title() == "Cylinder Collider")
-        registry->removeComponent<Cylinder>(entityID);
+        registry->remove<Cylinder>(entityID);
     deleteLater();
 }
 

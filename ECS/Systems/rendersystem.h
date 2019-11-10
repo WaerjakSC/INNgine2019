@@ -10,23 +10,34 @@ class Registry;
 class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
-    RenderSystem(std::map<std::string, Ref<Shader>> shaders);
+    RenderSystem();
 
     void update(DeltaTime dt = 0.016) override;
 
     void init();
 public slots:
+    /**
+     * @brief changeShader Replace the entity's current shader with a new shader given by the editor GUI.
+     * @param entityID
+     * @param nShader String corresponding to the name of the new shader.
+     */
     void changeShader(int entityID, std::string nShader);
-
+    /**
+     * @brief toggleRendered Toggle an entity's Mesh.IsRendered state.
+     * @param entityID
+     */
     void toggleRendered(GLuint entityID);
 
 private:
-    Registry *registry{nullptr};
-
+    Registry *registry;
+    /**
+    * @brief drawEntities Render entities that want to be rendered (Mesh.isRendered).
+    */
     void drawEntities();
-    void updateEntities();
-
-    std::map<std::string, Ref<Shader>> mShaders;
+    /**
+     * @brief drawColliders Colliders have their own meshes, these are drawn with a plain shader and lines.
+     * @todo Update to include Sphere colliders and other types.
+     */
     void drawColliders();
 };
 

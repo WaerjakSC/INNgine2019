@@ -20,10 +20,13 @@ void InputSystem::update(DeltaTime dt) {
     handleMouseInput();
 }
 void InputSystem::handleKeyInput() {
-    if (editorInput.ESCAPE || mPlayerController.ESCAPE) //Shuts down whole program
+    if (editorInput.ESCAPE) //Shuts down whole program
     {
         emit closeEngine();
         editorInput.ESCAPE = false;
+    }
+    if (mPlayerController.ESCAPE) {
+        factory->stop();
         mPlayerController.ESCAPE = false;
     }
     if (editorInput.F) {

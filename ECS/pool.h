@@ -131,8 +131,6 @@ public:
         mList = other->mList;
         mIndex = other->mIndex;
         mComponents = other->mComponents;
-        mGroupEnd = other->mGroupEnd;
-        isSorted = other->isSorted;
     }
     ~Pool() {}
     virtual Ref<IPool> clone() override {
@@ -143,20 +141,17 @@ public:
         mList = swapped->mList;
         mIndex = swapped->mIndex;
         mComponents = swapped->mComponents;
-        mGroupEnd = swapped->mGroupEnd;
-        isSorted = swapped->isSorted;
     }
 
     /**
      * @brief Adds an entity and its new component to this pool.
      * Entity is equivalent to Component in this case, since pool won't contain the entity if the entity doesn't have the component.
-     * Could maybe have template<...Args> here for component initialization?
      * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      * @param entityID
      */
     template <class... Args>
-    void add(int entityID, Args... args) {
+    void add(GLuint entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
         if ((size_t)entityID > mIndex.size()) {
             for (size_t i = mIndex.size(); i < (size_t)entityID; i++) {
@@ -169,10 +164,12 @@ public:
             mIndex.push_back(mList.size()); // entity list size is location of new entityID
         mList.push_back(entityID);
         mComponents.push_back(Type(args...));
-        if (isSorted) { // Swap the latest entity with the entity pointed at by the group marker, then increment the marker so it points one step right of the newest entity
-            swap(mList[mIndex.back()], mList[mIndex[mGroupEnd++]]);
-        }
     }
+    /**
+     * @brief cloneComponent creates a new component with the exact same parameters as the old component.
+     * @param cloneFrom Entity being cloned
+     * @param cloneTo Entity receiving the new component
+     */
     void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override {
         assert(!has(cloneTo));
         assert(has(cloneFrom));
@@ -196,15 +193,8 @@ public:
      */
     void remove(int removedEntityID) {
         if (has(removedEntityID)) {
-            bool groupMember = (mIndex[removedEntityID] < (int)mGroupEnd);
             GLuint swappedEntity = mList.back();
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
-            if (isSorted && groupMember) {
-                if (mGroupEnd != mList.size()) {
-                    swap(swappedEntity, mList.back()); // Do a final swap to re-position the group marker
-                }
-                mGroupEnd--;
-            }
             mList.pop_back();
             mComponents.pop_back();
             mIndex[removedEntityID] = -1; // Set entity location to an invalid value.
@@ -224,8 +214,6 @@ public:
      * @param otherIndex
      */
     void sort(std::vector<int> otherIndex) {
-        mGroupEnd = mList.size();
-        isSorted = true;
         for (size_t i = 0; i < mList.size(); i++) {
             if (has(i)) {
                 swap(mList[mIndex[i]], mList[otherIndex[i]]);
@@ -249,7 +237,8 @@ public:
     const std::vector<int> &entities() { return mList; }
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
-     * The index location is equal to the entityID. @example The location of Entity 5 in the packed arrays can be found at mEntities.mIndices[5].
+     * The index location is equal to the entityID.
+     * @example The location of Entity 5 in the packed arrays can be found at mEntities.mIndices[5].
      * Both IDs and arrays begin at 0.
      * @return
      */
@@ -266,7 +255,7 @@ public:
         return mComponents[mIndex[eID]];
     }
     /**
-     * @brief get the last component in the pool, aka the latest creation
+     * @brief back get the last component in the pool, aka the latest creation
      * @return
      */
     Type &back() {
@@ -279,6 +268,11 @@ public:
     iterator end() const {
         return iterator{&mList, {}};
     }
+    /**
+     * @brief find an entity in the index
+     * @param eID
+     * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
+     */
     int find(GLuint eID) const override {
         if (eID < mIndex.size())
             return mIndex[eID];
@@ -292,6 +286,11 @@ public:
     bool has(GLuint eID) const override {
         return find(eID) != -1;
     }
+    /**
+     * @brief has - alternate function taking Entity reference instead of entityID
+     * @param entity actual entity object
+     * @return
+     */
     bool has(const Entity &entity) const override {
         return find(entity.id()) != -1;
     }
@@ -333,21 +332,11 @@ public:
         return size() <= other.size();
     }
 
-    void incMarker() { mGroupEnd++; }
-    GLuint groupEnd() const { return mGroupEnd; }
-    void setSorted() {
-        isSorted = true;
-        if (mGroupEnd == 0)
-            mGroupEnd = mList.size();
-    }
-
 private:
     // index vector is in IPool
     // Dense Arrays --  n points to Entity in list[n] and component data in mComponentList[n]
     // Both should be the same length.
     std::vector<Type> mComponents;
-    GLuint mGroupEnd{0};
-    bool isSorted{false};
 };
 
 #endif // POOL_H

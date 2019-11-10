@@ -119,7 +119,7 @@ void RenderWindow::init() {
     glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("skybox.bmp")->id());
 
     // Set up the systems.
-    mRenderer = mRegistry->registerSystem<RenderSystem>(mFactory->getShaders());
+    mRenderer = mRegistry->registerSystem<RenderSystem>();
     mMoveSystem = mRegistry->registerSystem<MovementSystem>();
     mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
     mInputSystem = mRegistry->registerSystem<InputSystem>(this);

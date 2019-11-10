@@ -18,7 +18,7 @@ void HierarchyView::dragEnterEvent(QDragEnterEvent *event) {
     QStandardItem *item = static_cast<HierarchyModel *>(model())->itemFromIndex(QTreeView::currentIndex());
     Entity *entity = Registry::instance()->getEntity(item->data().toInt()).get(); // One further cast to get the Entity, an overloaded QStandardItem that also contains an entity ID.
     if (entity)
-        emit dragSelection(entity->id()); // When you start dragging an item, make sure you save that item in MainWindow's selectedEntity gameobject.
+        emit dragSelection(entity->id()); // When you start dragging an item, make sure you save that item in MainWindow's selectedEntity.
 }
 void HierarchyView::createContextActions() {
     QAction *rename = new QAction(tr("Rename"), this);

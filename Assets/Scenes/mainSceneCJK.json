@@ -11,7 +11,7 @@
     "controller": {
         "id": 11
     },
-    "GameObject": {
+    "Entity": {
         "name": "Skybox",
         "id": 2,
         "components": {
@@ -49,7 +49,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "BillBoard",
         "id": 3,
         "components": {
@@ -105,7 +105,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Light",
         "id": 4,
         "components": {
@@ -175,7 +175,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "box2.txt",
         "id": 5,
         "components": {
@@ -226,7 +226,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Floor",
         "id": 6,
         "components": {
@@ -277,7 +277,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Wall 1",
         "id": 7,
         "components": {
@@ -328,7 +328,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Wall 2",
         "id": 8,
         "components": {
@@ -379,7 +379,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Wall 3",
         "id": 9,
         "components": {
@@ -430,7 +430,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Wall 4",
         "id": 10,
         "components": {
@@ -481,7 +481,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Player",
         "id": 11,
         "components": {

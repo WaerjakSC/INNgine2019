@@ -60,7 +60,7 @@ void Scene::saveScene(const QString &fileName) {
         if (eID == mGameCamID)
             continue;
         if (eID != 0 && !entity.second->name().isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
-            writer.String("GameObject");
+            writer.String("Entity");
             writer.StartObject();
             writer.Key("name");
             writer.String(entity.second->name().toStdString().c_str());
@@ -341,12 +341,12 @@ void Scene::populateScene(const Document &scene) {
     ResourceManager *factory = ResourceManager::instance();
     if (scene.HasMember("gamecam")) {
         Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
-        gsl::Vector3D position(scene["gamecam"]["position"][0].GetDouble(), scene["gamecam"]["position"][1].GetDouble(), scene["gamecam"]["position"][2].GetDouble());
+        vec3 position(scene["gamecam"]["position"][0].GetDouble(), scene["gamecam"]["position"][1].GetDouble(), scene["gamecam"]["position"][2].GetDouble());
         gameCam->setPosition(position);
         gameCam->setPitch(scene["gamecam"]["pitch"].GetDouble());
         gameCam->setYaw(scene["gamecam"]["yaw"].GetDouble());
         mGameCamID = registry->makeEntity("Game Camera");
-        registry->addComponent<Transform>(mGameCamID, position, vec3(0), vec3(0.33f, 0.33f, 0.33f));
+        registry->add<Transform>(mGameCamID, position, vec3(0), vec3(0.33f, 0.33f, 0.33f));
         registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
         // set the initial position and rotation
         gsl::Matrix4x4 temp(true);
@@ -355,7 +355,7 @@ void Scene::populateScene(const Document &scene) {
         auto moveSys = registry->getSystem<MovementSystem>();
         moveSys->setLocalPosition(mGameCamID, gameCam->cameraPosition() - gameCam->forward());
         moveSys->setRotation(mGameCamID, rot);
-        registry->addComponent<Material>(mGameCamID, factory->getShader<ColorShader>());
+        registry->add<Material>(mGameCamID, factory->getShader<ColorShader>());
         factory->addMeshComponent("camera.obj", mGameCamID);
         moveSys->init();
     }
@@ -364,21 +364,21 @@ void Scene::populateScene(const Document &scene) {
         registry->getSystem<InputSystem>()->setPlayer(controllerID);
     } else
         registry->getSystem<InputSystem>()->setPlayer(0);
-    if (!scene.HasMember("GameObject"))
+    if (!scene.HasMember("Entity"))
         return;
-    // Iterate through each gameobject in the scene
+    // Iterate through each entity in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
-        // Iterate through each of the members in the gameobject (name, id, components)
+        // Iterate through each of the members in the entity (name, id, components)
         if (itr->name == "gamecam" || itr->name == "controller")
             continue;
         GLuint id = registry->makeEntity(itr->value["name"].GetString());
         idPairs[itr->value["id"].GetInt()] = id;
         for (Value::ConstMemberIterator comp = itr->value["components"].MemberBegin(); comp != itr->value["components"].MemberEnd(); ++comp) {
             if (comp->name == "transform") {
-                gsl::Vector3D position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
-                gsl::Vector3D rotation(comp->value["rotation"][0].GetDouble(), comp->value["rotation"][1].GetDouble(), comp->value["rotation"][2].GetDouble());
-                gsl::Vector3D scale(comp->value["scale"][0].GetDouble(), comp->value["scale"][1].GetDouble(), comp->value["scale"][2].GetDouble());
-                registry->addComponent<Transform>(id, position, rotation, scale);
+                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
+                vec3 rotation(comp->value["rotation"][0].GetDouble(), comp->value["rotation"][1].GetDouble(), comp->value["rotation"][2].GetDouble());
+                vec3 scale(comp->value["scale"][0].GetDouble(), comp->value["scale"][1].GetDouble(), comp->value["scale"][2].GetDouble());
+                registry->add<Transform>(id, position, rotation, scale);
                 if (comp->value["parent"].GetInt() != -1) {
                     if (idPairs.find(comp->value["parent"].GetInt()) != idPairs.end())                   // if the parent has been parsed already
                         registry->get<Transform>(id).parentID = idPairs[comp->value["parent"].GetInt()]; // use the old parentID to set the new parentID
@@ -387,7 +387,7 @@ void Scene::populateScene(const Document &scene) {
                 }
                 registry->getSystem<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
             } else if (comp->name == "material") {
-                gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
+                vec3 color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                 GLfloat specStr = comp->value["specstr"].GetFloat();
                 GLint specExp = comp->value["specexp"].GetInt();
                 QString shaderName = comp->value["shader"].GetString();
@@ -399,58 +399,58 @@ void Scene::populateScene(const Document &scene) {
                     shader = factory->getShader<TextureShader>();
                 else if (shaderName == "PhongShader")
                     shader = factory->getShader<PhongShader>();
-                registry->addComponent<Material>(id, shader, comp->value["textureid"].GetInt(), color, specStr, specExp);
+                registry->add<Material>(id, shader, comp->value["textureid"].GetInt(), color, specStr, specExp);
             } else if (comp->name == "mesh") {
                 factory->addMeshComponent(comp->value["name"].GetString(), id);
             } else if (comp->name == "light") { // Again, temporary, very static functionality atm
                 GLfloat ambStr = comp->value["ambstr"].GetFloat();
-                gsl::Vector3D ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());
+                vec3 ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());
                 GLfloat lightStr = comp->value["lightstr"].GetFloat();
-                gsl::Vector3D lightColor(comp->value["lightcolor"][0].GetDouble(), comp->value["lightcolor"][1].GetDouble(), comp->value["lightcolor"][2].GetDouble());
-                gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
-                registry->addComponent<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
+                vec3 lightColor(comp->value["lightcolor"][0].GetDouble(), comp->value["lightcolor"][1].GetDouble(), comp->value["lightcolor"][2].GetDouble());
+                vec3 color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
+                registry->add<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
                 mLight = id;
                 factory->getShader<PhongShader>()->setLight(registry->getEntity(mLight));
             } else if (comp->name == "sound") {
                 std::string filename = comp->value["filename"].GetString();
                 bool looping = comp->value["loop"].GetBool();
                 float gain = comp->value["gain"].GetDouble();
-                registry->addComponent<Sound>(id, filename, looping, gain);
+                registry->add<Sound>(id, filename, looping, gain);
             } else if (comp->name == "AABB") {
                 vec3 origin(comp->value["origin"][0].GetDouble(), comp->value["origin"][1].GetDouble(), comp->value["origin"][2].GetDouble());
                 vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
                 bool isStatic = comp->value["static"].GetBool();
-                registry->addComponent<AABB>(id, origin, size, isStatic);
+                registry->add<AABB>(id, origin, size, isStatic);
             } else if (comp->name == "OBB") {
                 vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                 vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
                 // Need rotation matrix here
                 bool isStatic = comp->value["static"].GetBool();
-                registry->addComponent<OBB>(id, position, size, isStatic);
+                registry->add<OBB>(id, position, size, isStatic);
             } else if (comp->name == "Plane") {
                 vec3 normal(comp->value["normal"][0].GetDouble(), comp->value["normal"][1].GetDouble(), comp->value["origin"][2].GetDouble());
                 float size = comp->value["distance"].GetDouble();
                 // Need rotation matrix here
                 bool isStatic = comp->value["static"].GetBool();
-                registry->addComponent<Plane>(id, normal, size, isStatic);
+                registry->add<Plane>(id, normal, size, isStatic);
             } else if (comp->name == "Sphere") {
                 vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                 float radius = comp->value["radius"].GetDouble();
                 // Need rotation matrix here
                 bool isStatic = comp->value["static"].GetBool();
-                registry->addComponent<Sphere>(id, position, radius, isStatic);
+                registry->add<Sphere>(id, position, radius, isStatic);
             } else if (comp->name == "Cylinder") {
                 vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
                 float radius = comp->value["radius"].GetDouble();
                 float height = comp->value["height"].GetDouble();
                 // Need rotation matrix here
                 bool isStatic = comp->value["static"].GetBool();
-                registry->addComponent<Cylinder>(id, position, radius, height, isStatic);
+                registry->add<Cylinder>(id, position, radius, height, isStatic);
             } else if (comp->name == "AI") {
                 int health = comp->value["health"].GetInt();
                 int damage = comp->value["damage"].GetInt();
                 // Need rotation matrix here
-                registry->addComponent<AIcomponent>(id, health, damage);
+                registry->add<AIcomponent>(id, health, damage);
             }
         }
     }

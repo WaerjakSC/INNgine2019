@@ -44,14 +44,20 @@ signals:
     void closeEngine();
 
 private:
+    /**
+     * @brief handleKeyInput takes care of certain hard-coded key inputs
+     */
     void handleKeyInput();
+    /**
+     * @brief handleMouseInput mainly handles editor camera movement
+     */
     void handleMouseInput();
 
     float mCameraSpeed{1.f};
     float mMoveSpeed{10.f};
     float mCameraRotateSpeed{30.f};
     bool firstRMB{true};
-    QPoint lastPos;
+    QPoint lastPos; // last position of the mouse in editor, for calculating deltas to move the camera with
     Raycast *ray;
 
     Registry *registry{};
@@ -65,11 +71,25 @@ private:
     Input mPlayerController;
     vec3 mDesiredVelocity;
     Input editorInput;
-
+    /**
+     * @brief handlePlayerController mainly deals with WASD and other player control type events
+     * @param dt
+     */
     void handlePlayerController(DeltaTime dt);
     void setCameraSpeed(float value);
-    void inputKeyRelease(QKeyEvent *event, Input &input);
+    /**
+     * @brief inputKeyPress takes an Input variable based on whether the editor is in play mode or not
+     * @param event
+     * @param input
+     */
     void inputKeyPress(QKeyEvent *event, Input &input);
+    /**
+     * @brief inputKeyRelease takes an Input variable based on whether the editor is in play mode or not
+     * @param event
+     * @param input
+     */
+    void inputKeyRelease(QKeyEvent *event, Input &input);
+
     void inputMousePress(QMouseEvent *event, Input &input);
     void inputMouseRelease(QMouseEvent *event, Input &input);
 };

@@ -6,14 +6,10 @@
 #include "registry.h"
 #include "textureshader.h"
 #include "view.h"
-RenderSystem::RenderSystem(std::map<std::string, Ref<Shader>> shaders) : mShaders(shaders) {
+RenderSystem::RenderSystem() {
     registry = Registry::instance();
 }
-/**
- * @brief RenderSystem::iterateEntities
- * @todo Render only entities that want to be rendered.
- * addendum - sort mesh and material pool by whether they are visible or not - hold an iterator that denotes the end of the "watched" group
- */
+
 void RenderSystem::drawEntities() {
     initializeOpenGLFunctions();
     // Iterate entities. View returns only the entities that own all the given types so it should be safe to iterate all of them equally.

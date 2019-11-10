@@ -29,11 +29,7 @@ bool Registry::isBillBoard(GLuint entityID) {
     }
     return false;
 }
-/**
- * @brief Get a pointer to the entity with the specified ID.
- * @param eID
- * @return
- */
+
 Ref<Entity> Registry::getEntity(GLuint eID) {
     auto search = mEntities.find(eID);
     if (search != mEntities.end())
@@ -41,10 +37,6 @@ Ref<Entity> Registry::getEntity(GLuint eID) {
     return nullptr;
 }
 
-/**
- * @brief Destroy gameobject
- * @param eID - entityID
- */
 void Registry::removeEntity(GLuint eID) {
     Entity *entt = mEntities.find(eID)->second.get();
     if (entt->isDestroyed())
@@ -75,11 +67,7 @@ void Registry::clearScene() {
         }
     }
 }
-/**
- * @brief Make a generic game object with no components attached.
- * @param name Name of the gameobject. Leave blank if no name desired.
- * @return Returns the entity ID for use in adding components or other tasks.
- */
+
 GLuint Registry::makeEntity(const QString &name, bool signal) {
     GLuint eID = nextAvailable();
     auto search = mEntities.find(eID);
@@ -115,13 +103,7 @@ GLuint Registry::duplicateEntity(GLuint dupedEntity) {
     }
     return entityID;
 }
-/**
- * @brief Set the parent of a gameobject (or rather its transform component).
- * Note: Currently no support for setting an item to be a child of a previously created item, due to how we're currently inserting into items into the view.
- * For now, make sure you create items in the order you want them to be parented, i.e. Parent first, then Children.
- * @param eID
- * @param parentID
- */
+
 void Registry::setParent(GLuint childID, int newParentID, bool fromEditor) {
     Transform &trans = get<Transform>(childID);
     if (hasParent(childID)) // Make sure to remove the child from its old parent if it had one
@@ -159,11 +141,9 @@ void Registry::removeChild(const GLuint eID, const GLuint childID) {
         }
     }
 }
-/**
- * @brief Updates the child parent hierarchy in case it's out of date
- */
+
 void Registry::updateChildParent() {
-    for (auto entity : getEntities()) // For every gameobject
+    for (auto entity : getEntities()) // For every entity
     {
         if (contains<Transform>(entity.second->id())) {
             Transform &comp = get<Transform>(entity.second->id());

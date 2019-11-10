@@ -2,14 +2,13 @@
 #include "billboard.h"
 #include "pool.h"
 #include "registry.h"
-MovementSystem::MovementSystem() {
-    registry = Registry::instance();
+MovementSystem::MovementSystem() : registry(Registry::instance()) {
 }
 void MovementSystem::init() {
     update();
 }
 void MovementSystem::update(DeltaTime dt) {
-    Q_UNUSED(dt) // remember to remove this once we implement deltaTime
+    Q_UNUSED(dt)
     auto view = registry->view<Transform>();
     for (auto entity : view) {
         updateModelMatrix(entity);
@@ -46,10 +45,7 @@ void MovementSystem::updateSphereTransform(GLuint entity) {
         col.transform.matrixOutdated = false;
     }
 }
-/**
- * @brief Force update of matrix to an entity
- * @param eID
- */
+
 void MovementSystem::updateEntity(GLuint eID) {
     auto &comp = registry->view<Transform>().get(eID);
     comp.matrixOutdated = true;
@@ -136,12 +132,8 @@ void MovementSystem::updateTS(Sphere &comp) {
     trans.scaleMatrix.setToIdentity();
     trans.scaleMatrix.scale(comp.radius);
 }
-/**
- * @brief Get global position of object
- * @param eID
- * @return
- */
-gsl::Vector3D MovementSystem::getAbsolutePosition(GLuint eID) {
+
+vec3 MovementSystem::getAbsolutePosition(GLuint eID) {
     if (Registry::instance()->hasParent(eID)) {
         auto view = registry->view<Transform>();
         auto &trans = view.get(eID);
@@ -150,15 +142,11 @@ gsl::Vector3D MovementSystem::getAbsolutePosition(GLuint eID) {
     }
     return getLocalPosition(eID);
 }
-/**
- * @brief Get relative position of object (null-vector if no parent)
- * @param eID
- * @return
- */
-gsl::Vector3D MovementSystem::getLocalPosition(GLuint eID) {
+
+vec3 MovementSystem::getLocalPosition(GLuint eID) {
     return registry->view<Transform>().get(eID).localPosition;
 }
-gsl::Vector3D MovementSystem::getAbsoluteRotation(GLuint eID) {
+vec3 MovementSystem::getAbsoluteRotation(GLuint eID) {
     if (Registry::instance()->hasParent(eID)) {
         auto &trans = registry->view<Transform>().get(eID);
         trans.rotation = std::get<2>(gsl::Matrix4x4::decomposed(trans.modelMatrix));
@@ -166,7 +154,7 @@ gsl::Vector3D MovementSystem::getAbsoluteRotation(GLuint eID) {
     }
     return getRelativeRotation(eID);
 }
-gsl::Vector3D MovementSystem::getRelativeRotation(GLuint eID) {
+vec3 MovementSystem::getRelativeRotation(GLuint eID) {
     return registry->view<Transform>().get(eID).localRotation;
 }
 /**
@@ -176,7 +164,7 @@ gsl::Vector3D MovementSystem::getRelativeRotation(GLuint eID) {
  * @param position
  * @param signal
  */
-void MovementSystem::setAbsolutePosition(GLuint eID, gsl::Vector3D position, bool signal) {
+void MovementSystem::setAbsolutePosition(GLuint eID, vec3 position, bool signal) {
     Transform &trans = registry->view<Transform>().get(eID);
     if (trans.parentID != -1) {
         const vec3 diff = position - getAbsolutePosition(eID);
@@ -193,7 +181,7 @@ void MovementSystem::setAbsolutePosition(GLuint eID, gsl::Vector3D position, boo
  * @param eID
  * @param position
  */
-void MovementSystem::setLocalPosition(GLuint eID, gsl::Vector3D position, bool signal) {
+void MovementSystem::setLocalPosition(GLuint eID, vec3 position, bool signal) {
     auto view = registry->view<Transform>();
     view.get(eID).localPosition = position;
     view.get(eID).matrixOutdated = true;
@@ -206,45 +194,45 @@ void MovementSystem::setLocalPosition(GLuint eID, gsl::Vector3D position, bool s
  * @param position
  */
 void MovementSystem::setLocalPosition(int eID, float xIn, float yIn, float zIn, bool signal) {
-    setLocalPosition(eID, gsl::Vector3D{xIn, yIn, zIn}, signal);
+    setLocalPosition(eID, vec3{xIn, yIn, zIn}, signal);
 }
 
 void MovementSystem::setLocalPositionX(int eID, float xIn, bool signal) {
-    gsl::Vector3D newPos = getLocalPosition(eID);
+    vec3 newPos = getLocalPosition(eID);
     newPos.x = xIn;
 
     setLocalPosition(eID, newPos, signal);
 }
 
 void MovementSystem::setLocalPositionY(int eID, float yIn, bool signal) {
-    gsl::Vector3D newPos = getLocalPosition(eID);
+    vec3 newPos = getLocalPosition(eID);
     newPos.y = yIn;
 
     setLocalPosition(eID, newPos, signal);
 }
 
 void MovementSystem::setLocalPositionZ(int eID, float zIn, bool signal) {
-    gsl::Vector3D newPos = getLocalPosition(eID);
+    vec3 newPos = getLocalPosition(eID);
     newPos.z = zIn;
 
     setLocalPosition(eID, newPos, signal);
 }
 void MovementSystem::setAbsolutePositionX(int eID, float xIn, bool signal) {
-    gsl::Vector3D newPos = getAbsolutePosition(eID);
+    vec3 newPos = getAbsolutePosition(eID);
     newPos.x = xIn;
 
     setAbsolutePosition(eID, newPos, signal);
 }
 
 void MovementSystem::setAbsolutePositionY(int eID, float yIn, bool signal) {
-    gsl::Vector3D newPos = getAbsolutePosition(eID);
+    vec3 newPos = getAbsolutePosition(eID);
     newPos.y = yIn;
 
     setAbsolutePosition(eID, newPos, signal);
 }
 
 void MovementSystem::setAbsolutePositionZ(int eID, float zIn, bool signal) {
-    gsl::Vector3D newPos = getAbsolutePosition(eID);
+    vec3 newPos = getAbsolutePosition(eID);
     newPos.z = zIn;
 
     setAbsolutePosition(eID, newPos, signal);
@@ -263,7 +251,7 @@ void MovementSystem::move(GLuint eID, const vec3 &moveDelta, bool signal) {
     position += moveDelta;
     setLocalPosition(eID, position, signal);
 }
-void MovementSystem::setRotation(GLuint eID, gsl::Vector3D rotation, bool signal) {
+void MovementSystem::setRotation(GLuint eID, vec3 rotation, bool signal) {
     auto view = registry->view<Transform>();
     view.get(eID).matrixOutdated = true;
     view.get(eID).localRotation = rotation;
@@ -271,17 +259,17 @@ void MovementSystem::setRotation(GLuint eID, gsl::Vector3D rotation, bool signal
         emit rotationChanged(eID, rotation);
 }
 void MovementSystem::setRotationX(int eID, float xIn, bool signal) {
-    gsl::Vector3D newRot = registry->view<Transform>().get(eID).localRotation;
+    vec3 newRot = registry->view<Transform>().get(eID).localRotation;
     newRot.x = xIn;
     setRotation(eID, newRot, signal);
 }
 void MovementSystem::setRotationY(int eID, float yIn, bool signal) {
-    gsl::Vector3D newRot = registry->view<Transform>().get(eID).localRotation;
+    vec3 newRot = registry->view<Transform>().get(eID).localRotation;
     newRot.y = yIn;
     setRotation(eID, newRot, signal);
 }
 void MovementSystem::setRotationZ(int eID, float zIn, bool signal) {
-    gsl::Vector3D newRot = registry->view<Transform>().get(eID).localRotation;
+    vec3 newRot = registry->view<Transform>().get(eID).localRotation;
     newRot.z = zIn;
     setRotation(eID, newRot, signal);
 }
@@ -295,10 +283,10 @@ void MovementSystem::rotateZ(GLuint eID, float zIn, bool signal) {
     rotate(eID, vec3(0, 0, zIn), signal);
 }
 void MovementSystem::rotate(GLuint eID, const vec3 &rotDelta, bool signal) {
-    gsl::Vector3D rotation = registry->view<Transform>().get(eID).localRotation + rotDelta;
+    vec3 rotation = registry->view<Transform>().get(eID).localRotation + rotDelta;
     setRotation(eID, rotation, signal);
 }
-void MovementSystem::setScale(int eID, gsl::Vector3D scale, bool signal) {
+void MovementSystem::setScale(int eID, vec3 scale, bool signal) {
     auto &trans = registry->view<Transform>().get(eID);
     trans.localScale = scale;
     trans.matrixOutdated = true;
@@ -306,22 +294,22 @@ void MovementSystem::setScale(int eID, gsl::Vector3D scale, bool signal) {
         emit scaleChanged(eID, scale);
 }
 void MovementSystem::setScaleX(int eID, float xIn, bool signal) {
-    gsl::Vector3D newScale = registry->view<Transform>().get(eID).localScale;
+    vec3 newScale = registry->view<Transform>().get(eID).localScale;
     newScale.x = xIn;
     setScale(eID, newScale, signal);
 }
 void MovementSystem::setScaleY(int eID, float yIn, bool signal) {
-    gsl::Vector3D newScale = registry->view<Transform>().get(eID).localScale;
+    vec3 newScale = registry->view<Transform>().get(eID).localScale;
     newScale.y = yIn;
     setScale(eID, newScale, signal);
 }
 void MovementSystem::setScaleZ(int eID, float zIn, bool signal) {
-    gsl::Vector3D newScale = registry->view<Transform>().get(eID).localScale;
+    vec3 newScale = registry->view<Transform>().get(eID).localScale;
     newScale.z = zIn;
     setScale(eID, newScale, signal);
 }
 void MovementSystem::scale(GLuint eID, const vec3 &scaleDelta, bool signal) {
-    gsl::Vector3D scale = registry->view<Transform>().get(eID).localScale + scaleDelta;
+    vec3 scale = registry->view<Transform>().get(eID).localScale + scaleDelta;
     setScale(eID, scale, signal);
 }
 void MovementSystem::scaleX(GLuint eID, float xIn, bool signal) {
