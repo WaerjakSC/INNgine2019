@@ -28,7 +28,9 @@ void InputSystem::handleKeyInput() {
     }
     if (editorInput.F) {
         emit snapSignal();
-        return;
+    }
+    if (editorInput.CTRL && editorInput.S) {
+        factory->save();
     }
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
@@ -117,10 +119,6 @@ void InputSystem::setCameraSpeed(float value) {
         mCameraSpeed = 0.3f;
 }
 void InputSystem::keyPressEvent(QKeyEvent *event) {
-    if (event->modifiers() == Qt::Key_Control && event->key() == Qt::Key_S) {
-        factory->save();
-        return;
-    }
     if (factory->isPlaying())
         inputKeyPress(event, mPlayerController);
     else {
@@ -174,6 +172,9 @@ void InputSystem::inputKeyPress(QKeyEvent *event, Input &input) {
         break;
     case Qt::Key_Escape:
         input.ESCAPE = true;
+        break;
+    case Qt::Key_Control:
+        input.CTRL = true;
         break;
     default:
         break;

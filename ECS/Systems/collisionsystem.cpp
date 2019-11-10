@@ -306,20 +306,19 @@ bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &
 bool CollisionSystem::RayToAABB(const Ray &r, const AABB &aabb, double &intersectionDistance) {
     vec3 AABBmin = getMin(aabb);
     vec3 AABBmax = getMax(aabb);
-    double t1 = (AABBmin[0] - r.origin[0]) * r.invDir[0];
-    double t2 = (AABBmax[0] - r.origin[0]) * r.invDir[0];
+    double tx1 = (AABBmin.x - r.origin.x) * r.invDir.x;
+    double tx2 = (AABBmax.x - r.origin.x) * r.invDir.x;
 
-    double tmin = std::min(t1, t2);
-    double tmax = std::max(t1, t2);
+    double tmin = std::min(tx1, tx2);
+    double tmax = std::max(tx1, tx2);
 
-    for (int i = 1; i < 3; ++i) {
-        t1 = (AABBmin[i] - r.origin[i]) * r.invDir[i];
-        t2 = (AABBmin[i] - r.origin[i]) * r.invDir[i];
+    double ty1 = (AABBmin.y - r.origin.y) * r.invDir.y;
+    double ty2 = (AABBmax.y - r.origin.y) * r.invDir.y;
 
-        tmin = std::max(tmin, std::min(std::min(t1, t2), tmax));
-        tmax = std::min(tmax, std::max(std::max(t1, t2), tmin));
-    }
-    if (tmax > std::max(tmin, 0.0)) {
+    tmin = std::max(tmin, std::min(ty1, ty2));
+    tmax = std::min(tmax, std::max(ty1, ty2));
+
+    if (tmax >= tmin) {
         intersectionDistance = tmax;
         return true;
     }

@@ -11,7 +11,7 @@ public:
 
     void update(DeltaTime deltaTime = 0.016) override;
 
-    void init(Ref<Entity> light);
+    void init();
 
 private:
     Registry *registry;

@@ -136,7 +136,7 @@ void RenderWindow::init() {
     mSoundSystem->init();
     mMoveSystem->init();
 
-    mLightSystem->init(mRegistry->getEntity(mFactory->getSceneLoader()->mLight));
+    mLightSystem->init();
     mRenderer->init();
 
     connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);

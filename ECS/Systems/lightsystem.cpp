@@ -14,7 +14,6 @@ void LightSystem::update(DeltaTime dt) {
     //        mPhong->updateLightUniforms(transform.modelMatrix, light.mLight);
     //    }
 }
-void LightSystem::init(Ref<Entity> light) {
-    mPhong->setLight(light);
+void LightSystem::init() {
     update();
 }

@@ -343,8 +343,8 @@ void Scene::populateScene(const Document &scene) {
         Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
         gsl::Vector3D position(scene["gamecam"]["position"][0].GetDouble(), scene["gamecam"]["position"][1].GetDouble(), scene["gamecam"]["position"][2].GetDouble());
         gameCam->setPosition(position);
-        gameCam->setPitch(scene["gamecam"]["pitch"].GetInt());
-        gameCam->setYaw(scene["gamecam"]["yaw"].GetInt());
+        gameCam->setPitch(scene["gamecam"]["pitch"].GetDouble());
+        gameCam->setYaw(scene["gamecam"]["yaw"].GetDouble());
         mGameCamID = registry->makeEntity("Game Camera");
         registry->addComponent<Transform>(mGameCamID, position, vec3(0), vec3(0.33f, 0.33f, 0.33f));
         registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
@@ -410,6 +410,7 @@ void Scene::populateScene(const Document &scene) {
                 gsl::Vector3D color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                 registry->addComponent<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
                 mLight = id;
+                factory->getShader<PhongShader>()->setLight(registry->getEntity(mLight));
             } else if (comp->name == "sound") {
                 std::string filename = comp->value["filename"].GetString();
                 bool looping = comp->value["loop"].GetBool();
