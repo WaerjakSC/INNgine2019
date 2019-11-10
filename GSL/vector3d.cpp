@@ -126,7 +126,7 @@ Vector3D Vector3D::normalized() {
 }
 
 Vector3D Vector3D::divide(float divisor) {
-    return Vector3D(x / divisor, y / divisor, z / divisor);
+    return Vector3D(divisor / x, divisor / y, divisor / z);
 }
 
 Vector3D Vector3D::cross(const Vector3D &v1, const Vector3D &v2) {
