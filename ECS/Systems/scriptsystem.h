@@ -17,6 +17,8 @@ class ResourceManager;
 class ScriptSystem : public ISystem {
 public:
     ScriptSystem();
+    void update(DeltaTime deltaTime = 0.016) override;
+    void init();
 
     void call(Script &script, const QString &func);
 
@@ -25,6 +27,7 @@ public:
 
 private:
     ResourceManager *factory;
+    Script script;
 };
 
 #endif // SCRIPTSYSTEM_H

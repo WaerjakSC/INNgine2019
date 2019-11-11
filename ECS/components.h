@@ -290,8 +290,7 @@ struct Cylinder : public Collision {
 /**
  * @brief The BSplineCurve struct
  */
-struct BSplineCurve : Component {
-
+struct BSplinePoint : Component {
 };
 
 // TD enemies følger en path fra A til B

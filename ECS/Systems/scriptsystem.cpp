@@ -4,6 +4,14 @@
 ScriptSystem::ScriptSystem() : factory(ResourceManager::instance()) {
 }
 
+void ScriptSystem::update(DeltaTime deltaTime) {
+    Q_UNUSED(deltaTime);
+}
+
+void ScriptSystem::init() {
+    call(script, "beginPlay");
+}
+
 void ScriptSystem::call(Script &script, const QString &func) {
     QJSValue value = script.engine->evaluate(func, script.filePath);
     if (value.isError()) {

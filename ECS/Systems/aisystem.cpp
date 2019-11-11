@@ -3,7 +3,6 @@
 #include "registry.h"
 
 AIsystem::AIsystem() {
-    Registry::instance()->registerComponent<BSplineCurve>();
 }
 
 void AIsystem::update(DeltaTime dt) {
@@ -36,8 +35,7 @@ void AIsystem::setKnotsAndControlPoints(std::vector<float> knots, std::vector<ve
  * @param x paramterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
-vec3 AIsystem::evaluateBSpline(const BSplineCurve &bspline, int my, float x) {
-
+vec3 AIsystem::evaluateBSpline(const BSplinePoint &bspline, int my, float x) {
 }
 
 int AIsystem::findKnotInterval(float x) {

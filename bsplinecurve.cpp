@@ -1,6 +1,8 @@
 #include "bsplinecurve.h"
-
-
+#include "registry.h"
+BSplineCurve::BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree) : b(controlpoints), d(degree), t(knots) {
+    n = knots.size();
+}
 /**
  * @brief BSplineCurve::evaluateBSpline
  * @param bspline
@@ -8,32 +10,27 @@
  * @param x
  * @return
  */
-vec3 BSplineCurve::evaluateBSpline(const BSplineCurve &bspline, int my, float x)
-{
-
+vec3 BSplineCurve::evaluateBSpline(const BSplineCurve &bspline, int my, float x) {
 }
 
 /**
  * @brief BSplineCurve::setControlPoints
  * @param cp
  */
-void BSplineCurve::setControlPoints(const std::vector<vec3> &cp)
-{
+void BSplineCurve::setControlPoints(const std::vector<vec3> &cp) {
     std::size_t oldSize{b.size()};
 
     b = cp;
 
     if (cp.size() != oldSize)
         t = findKnots();
-
 }
 
 /**
  * @brief BSplineCurve::findKnots
  * @return
  */
-std::vector<float> BSplineCurve::findKnots() const
-{
+std::vector<float> BSplineCurve::findKnots() const {
 
     auto startEndSize = static_cast<unsigned int>(d + 1);
     auto n = b.size() + startEndSize;
@@ -46,8 +43,7 @@ std::vector<float> BSplineCurve::findKnots() const
     std::vector<float> t;
     t.reserve(n);
 
-    for (unsigned int i{0}; i < n; ++i)
-    {
+    for (unsigned int i{0}; i < n; ++i) {
         if (i < startEndSize)
             t.push_back(0.f);
         else if (n - startEndSize <= i)
@@ -57,7 +53,6 @@ std::vector<float> BSplineCurve::findKnots() const
     }
 
     return t;
-
 }
 
 /**
@@ -65,13 +60,22 @@ std::vector<float> BSplineCurve::findKnots() const
  * @param x
  * @return
  */
-int BSplineCurve::getMy(float x) const
-{
+int BSplineCurve::getMy(float x) const {
     for (unsigned int i{0}; i < t.size() - 1; ++i)
         if (t[i] <= x && x < t[i + 1])
             return static_cast<int>(i);
 
     return -1;
+}
+
+void BSplineCurve::registerTrophies() {
+    std::vector<vec3> controlPoints;
+    auto view = Registry::instance()->view<Transform, BSplinePoint>();
+    for (auto entity : view) {
+        auto [trans, bspline] = view.get<Transform, BSplinePoint>(entity);
+        controlPoints.push_back(trans.localPosition);
+    }
+    setControlPoints(controlPoints);
 }
 
 /**
@@ -80,8 +84,7 @@ int BSplineCurve::getMy(float x) const
  * @param x
  * @return
  */
-vec3 BSplineCurve::evaluateBSpline(int my, float x)
-{
+vec3 BSplineCurve::evaluateBSpline(int my, float x) {
     std::vector<vec3> a;
     a.resize(t.size() + d + 1);
 
