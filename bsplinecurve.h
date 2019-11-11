@@ -26,6 +26,8 @@ public:
 
     void registerTrophies();
 
+    BSplineCurve rememberedCurve;
+
     //vec2 deBoor(float x);
 };
 

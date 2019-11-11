@@ -4,6 +4,7 @@
 #include "components.h"
 #include "isystem.h"
 #include "registry.h"
+#include "bsplinecurve.h"
 #include <queue>
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
@@ -36,6 +37,11 @@ private:
     void move();
     void death();
     void goalReached();
+
+
+    BSplineCurve rememberedCurve;
+
+    GLuint eID;
 
     NPCstates state;
     void notify(int notification);
