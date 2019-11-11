@@ -110,6 +110,7 @@ HEADERS += \
     Resources/triangle.h \
     Resources/tiny_obj_loader.h \
 #
+    bsplinecurve.h \
     cameracontroller.h \
     constants.h \
     billboard.h \
@@ -165,6 +166,7 @@ SOURCES += main.cpp \
     Resources/scene.cpp \
 #
     billboard.cpp \
+    bsplinecurve.cpp \
     cameracontroller.cpp \
     raycast.cpp \
     renderwindow.cpp \
