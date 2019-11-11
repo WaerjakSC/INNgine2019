@@ -30,7 +30,7 @@ public:
      std::optional<NPCevents> move(float deltaTime);
      float t{0};
      int dir{1};
-
+     void init(GLuint eID);
      void eventHandler();
 private:
     // FSM
@@ -38,10 +38,10 @@ private:
     void death();
     void goalReached();
 
+    bool updatePath = false;
+    BSplineCurve mCurve;
 
-    BSplineCurve rememberedCurve;
-
-    GLuint eID;
+    GLuint NPC;
 
     NPCstates state;
     void notify(int notification);

@@ -19,6 +19,14 @@ void AIsystem::update(DeltaTime dt) {
             notification_queue.push(event.value());
         }
         break;
+    case LEARN:
+        dir = -dir;
+        if(updatePath){
+            mCurve.updatePath();
+            updatePath = false;
+        }
+        state = MOVE;
+        break;
     case DEATH:
         // Whatever happens when gnomes die
         death();
@@ -32,7 +40,7 @@ void AIsystem::update(DeltaTime dt) {
 void AIsystem::eventHandler(){
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
-    auto [ transform, ai ] = view.get<Transform, AIcomponent>(eID);
+    auto [ transform, ai ] = view.get<Transform, AIcomponent>(NPC);
 
     while(!notification_queue.empty()){
         auto event = notification_queue.front();
@@ -42,7 +50,7 @@ void AIsystem::eventHandler(){
             break;
         case ITEM_TAKEN:
             // state = CRY
-            // update path
+            mCurve.updatePath();
             break;
         case DAMAGE_TAKEN:
             // something
@@ -57,19 +65,7 @@ void AIsystem::eventHandler(){
 }
 
 void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute) {
-}
-
-
-/**
- * @brief AIsystem::evaluateBSpline, deBoor's algorithm for b-splines
- * @param bspline referanse til en bsplinecurve
- * @param my et tall slik at bspline.t[my] <= x < bspline.t[my+1]
- * @param x paramterverdi på skjøtvektor
- * @return et punkt på splinekurven
- */
-
-vec2 AIsystem::deBoor(float x) {
-    // return curve position calculated by deBoor's algorithm (evaluateBSpline)
+    mCurve.draw();
 }
 
 // follow b-spline from start of path to end of path
@@ -90,14 +86,14 @@ std::optional<NPCevents> AIsystem::move(float deltaT)
 {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
-    auto [ transform, ai ] = view.get<Transform, AIcomponent>(eID);
+    auto [ transform, ai ] = view.get<Transform, AIcomponent>(NPC);
     t += deltaT * dir;
     bool endPoint = 0.98f <= t || t < 0.f;
 
     if (endPoint)
         t = gsl::clamp(t, 0.f, 1.f);
 
-    auto p = rememberedCurve.eval(t);
+    auto p = mCurve.eval(t);
     transform.localPosition = p;
     transform.matrixOutdated = true;
 
@@ -107,6 +103,13 @@ std::optional<NPCevents> AIsystem::move(float deltaT)
     }
 
     return std::nullopt;
+}
+
+void AIsystem::init(GLuint eID)
+{
+    NPC = eID;
+    mCurve.init();
+
 }
 
 

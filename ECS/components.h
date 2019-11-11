@@ -300,6 +300,7 @@ struct BSplinePoint : Component {
 // de kan bevege seg, ta skade, dø
 enum NPCstates { MOVE,
                  DEATH,
+                 LEARN,
                  GOAL_REACHED };
 
 enum NPCevents { ENDPOINT_ARRIVED,

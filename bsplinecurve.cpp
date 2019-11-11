@@ -1,8 +1,8 @@
 #include "bsplinecurve.h"
 #include "registry.h"
 
-BSplineCurve::BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree) : b(controlpoints), d(degree), t(knots) {
-    n = knots.size();
+BSplineCurve::BSplineCurve(int degree) : d(degree) {
+
 }
 
 /**
@@ -98,10 +98,10 @@ void BSplineCurve::updatePath()
 
 
 /**
- * @brief BSplineCurve::evaluateBSpline
- * @param my
- * @param x
- * @return
+ * @brief BSplineCurve::evaluateBSpline, deBoor's algorithm for bsplines
+ * @param my et tall slik at bspline.t[my] <= x < bspline.t[my+1]
+ * @param x paramterverdi på skjøtvektor
+ * @return et punkt på splinekurven
  */
 vec3 BSplineCurve::evaluateBSpline(int my, float x) const
 {

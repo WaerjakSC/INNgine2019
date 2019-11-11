@@ -5,8 +5,7 @@ typedef gsl::Vector3D vec3;
 class BSplineCurve: protected QOpenGLFunctions_4_1_Core  {
 public:
     // default constructor
-    BSplineCurve();
-    BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree = 2);
+    BSplineCurve(int degree = 2);
     std::vector<vec3> b;  // control points
     int n;                // n number of knots
     int d;                // d degrees
