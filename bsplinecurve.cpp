@@ -114,7 +114,7 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
         for (int i = 0; i < k; i++) {
             j++;
             float w = (x - t[j]) / (t[j + k] - t[j]);
-            a[i] = a[i] * (i - w) + a[i + 1] * w;
+            a[i] = a[i] * (1 - w) + a[i + 1] * w;
         }
     }
     return a[0];
