@@ -20,6 +20,7 @@ public:
     virtual bool has(uint eID) const = 0;
     virtual bool has(const Entity &entity) const = 0;
     virtual size_t size() const = 0;
+    virtual bool empty() const = 0;
     virtual iterator begin() const = 0;
     virtual iterator end() const = 0;
 
@@ -301,6 +302,7 @@ public:
      * @return
      */
     size_t size() const override { return mList.size(); }
+    bool empty() const override { return mList.empty(); }
     /**
      * @brief Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.

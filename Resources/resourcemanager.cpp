@@ -23,6 +23,7 @@
 #include <QStatusBar>
 #include <QTimer>
 #include <QToolButton>
+#include <aisystem.h>
 #include <fstream>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -948,6 +949,7 @@ void ResourceManager::stop() {
         for (auto shader : mShaders) {
             shader.second->setCameraController(inputsys->editorCamController());
         }
+        registry->getSystem<AIsystem>();
         mIsPlaying = false;
         mMainWindow->insertEntities();
         mMainWindow->play->setEnabled(true);

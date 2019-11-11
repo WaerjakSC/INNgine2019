@@ -2,8 +2,8 @@
     "gamecam": {
         "position": [
             0.0,
-            12.0,
-            10.0
+            14.0,
+            15.0
         ],
         "pitch": -45.0,
         "yaw": 0.0
@@ -177,7 +177,7 @@
     },
     "Entity": {
         "name": "Floor",
-        "id": 6,
+        "id": 5,
         "components": {
             "transform": {
                 "position": [
@@ -228,7 +228,7 @@
     },
     "Entity": {
         "name": "Wall 1",
-        "id": 7,
+        "id": 6,
         "components": {
             "transform": {
                 "position": [
@@ -279,7 +279,7 @@
     },
     "Entity": {
         "name": "Wall 2",
-        "id": 8,
+        "id": 7,
         "components": {
             "transform": {
                 "position": [
@@ -330,7 +330,7 @@
     },
     "Entity": {
         "name": "Wall 3",
-        "id": 9,
+        "id": 8,
         "components": {
             "transform": {
                 "position": [
@@ -381,7 +381,7 @@
     },
     "Entity": {
         "name": "Wall 4",
-        "id": 10,
+        "id": 9,
         "components": {
             "transform": {
                 "position": [
@@ -432,12 +432,12 @@
     },
     "Entity": {
         "name": "Player",
-        "id": 11,
+        "id": 10,
         "components": {
             "transform": {
                 "position": [
                     0.0,
-                    1.100000023841858,
+                    0.5,
                     0.0
                 ],
                 "rotation": [
@@ -446,9 +446,9 @@
                     0.0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    0.5,
+                    0.5,
+                    0.5
                 ],
                 "parent": -1
             },
@@ -472,14 +472,14 @@
                     0.0,
                     0.0
                 ],
-                "radius": 1.0,
+                "radius": 0.5,
                 "static": false
             }
         }
     },
     "Entity": {
         "name": "Trophy 1",
-        "id": 12,
+        "id": 11,
         "components": {
             "transform": {
                 "position": [
@@ -533,61 +533,7 @@
     },
     "Entity": {
         "name": "Trophy 2",
-        "id": 13,
-        "components": {
-            "transform": {
-                "position": [
-                    6.0,
-                    1.0,
-                    -5.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": ""
-            },
-            "AABB": {
-                "origin": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "static": true
-            },
-            "BSplinePoint": {
-                "isPoint": true
-            }
-        }
-    },
-    "Entity": {
-        "name": "Trophy 3",
-        "id": 14,
+        "id": 12,
         "components": {
             "transform": {
                 "position": [
@@ -640,8 +586,8 @@
         }
     },
     "Entity": {
-        "name": "Trophy 4",
-        "id": 15,
+        "name": "Trophy 3",
+        "id": 13,
         "components": {
             "transform": {
                 "position": [
@@ -690,6 +636,111 @@
             },
             "BSplinePoint": {
                 "isPoint": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Trophy 4",
+        "id": 14,
+        "components": {
+            "transform": {
+                "position": [
+                    6.0,
+                    1.0,
+                    -5.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": ""
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "static": true
+            },
+            "BSplinePoint": {
+                "isPoint": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Enemy",
+        "id": 15,
+        "components": {
+            "transform": {
+                "position": [
+                    -3.0,
+                    0.5,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    0.6666666865348816,
+                    0.0,
+                    0.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PhongShader"
+            },
+            "mesh": {
+                "name": "Ball"
+            },
+            "Sphere": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5,
+                "static": false
+            },
+            "AI": {
+                "health": 100,
+                "damage": 10
             }
         }
     }

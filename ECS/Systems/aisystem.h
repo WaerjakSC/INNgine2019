@@ -1,10 +1,10 @@
 #ifndef AISYSTEM_H
 #define AISYSTEM_H
 
+#include "bsplinecurve.h"
 #include "components.h"
 #include "isystem.h"
 #include "registry.h"
-#include "bsplinecurve.h"
 #include <queue>
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
@@ -16,22 +16,15 @@ public:
     Registry *reg;
 
     virtual void update(DeltaTime dt = 0.016) override;
+    void setControlPoints(std::vector<vec3> cps);
+    std::optional<NPCevents> move(float deltaTime);
+    float t{0};
+    int dir{1};
+    void init(GLuint eID);
+    void eventHandler();
 
-    // BSplineCurve
-    void initVertexBufferObjects();
-    void draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute = -1);
-    void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
-    vec3 evaluateBSpline(const BSplinePoint &bspline, int my, float x);
-    int findKnotInterval(float x);
-    vec3 evaluateBSpline(int degree, int startKnot, float x);
+    void draw();
 
-    vec2 deBoor(float x);
-
-     std::optional<NPCevents> move(float deltaTime);
-     float t{0};
-     int dir{1};
-     void init(GLuint eID);
-     void eventHandler();
 private:
     // FSM
     void move();

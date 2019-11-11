@@ -2,7 +2,6 @@
 #include "registry.h"
 
 BSplineCurve::BSplineCurve(int degree) : d(degree) {
-
 }
 
 /**
@@ -60,31 +59,31 @@ int BSplineCurve::getMy(float x) const {
     return -1;
 }
 
-void BSplineCurve::registerTrophies() {
-    std::vector<vec3> controlPoints;
-    auto view = Registry::instance()->view<Transform, BSplinePoint>();
-    for (auto entity : view) {
-        auto [trans, bspline] = view.get<Transform, BSplinePoint>(entity);
-        controlPoints.push_back(trans.localPosition);
-    }
-    setControlPoints(controlPoints);
-}
+/**
+ * @brief updateTrophies call this when a trophy is taken
+ */
+void BSplineCurve::updateTrophies() {
+    //    std::vector<vec3> controlPoints;
+    //    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
+    //    for (auto entity : view) {
+    //        auto &trans = view.get<Transform>(entity);
+    //        controlPoints.push_back(trans.localPosition);
+    //    }
 
-void BSplineCurve::updatePath()
-{
+    //    setControlPoints(controlPoints);
+}
+void BSplineCurve::updatePath() {
     std::vector<Vertex> vertices;
 
     vertices.reserve(splineResolution + b.size());
 
-    for (int i{0}; i < splineResolution; ++i)
-    {
+    for (int i{0}; i < splineResolution; ++i) {
         auto p = eval(i * 1.f / splineResolution);
         vertices.emplace_back(p.x, p.y, p.z, 0.f, 1.f, 0.f);
     }
 
     // Control points
-    for (int i{0}; i < b.size(); ++i)
-    {
+    for (size_t i{0}; i < b.size(); ++i) {
         auto p = b.at(i);
         vertices.emplace_back(p.x, p.y, p.z, 1.f, 0.f, 0.f);
     }
@@ -96,15 +95,13 @@ void BSplineCurve::updatePath()
     glBindVertexArray(0);
 }
 
-
 /**
  * @brief BSplineCurve::evaluateBSpline, deBoor's algorithm for bsplines
  * @param my et tall slik at bspline.t[my] <= x < bspline.t[my+1]
  * @param x paramterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
-vec3 BSplineCurve::evaluateBSpline(int my, float x) const
-{
+vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
     std::vector<vec3> a;
     a.resize(t.size() + d + 1);
 
@@ -123,11 +120,9 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const
     return a[0];
 }
 
-void BSplineCurve::draw()
-{
+void BSplineCurve::draw() {
 
-    if (debugLine)
-    {
+    if (debugLine) {
         glPointSize(3.f);
         glBindVertexArray(mVAO);
         glDrawArrays(GL_LINE_STRIP, 0, splineResolution);
@@ -135,9 +130,9 @@ void BSplineCurve::draw()
     }
 }
 
-void BSplineCurve::init()
-{
+void BSplineCurve::init() {
     initializeOpenGLFunctions();
+    updateTrophies();
 
     // Spline curve
     glGenVertexArrays(1, &mVAO);
@@ -146,18 +141,15 @@ void BSplineCurve::init()
     glGenBuffers(1, &mVBO);
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid*)(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid *)(0));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Send the actual vertex data
     updatePath();
-
 }
 
-vec3 BSplineCurve::eval(float x) const
-{
+vec3 BSplineCurve::eval(float x) const {
     auto my = getMy(x);
     if (my > -1)
         return evaluateBSpline(my, x);
