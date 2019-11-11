@@ -32,7 +32,18 @@ void AIsystem::eventHandler(){
 
 
     while(!notification_queue.empty()){
+        auto event = notification_queue.front();
+        switch(event){
+        case ENDPOINT_ARRIVED:
+            state = GOAL_REACHED;
+            break;
+        case ITEM_TAKEN:
+            // state = CRY
+            break;
+        case DAMAGE_TAKEN:
+            break;
 
+        }
     }
 }
 
