@@ -31,11 +31,13 @@ public:
     int getMy(float x) const;
     vec3 eval(float x) const;
 
-    void registerTrophies();
+    void updateTrophies();
 
     void updatePath();
 
     //vec2 deBoor(float x);
+private:
+    std::vector<vec3> getTrophyCPs();
 };
 
 #endif // BSPLINECURVE_H

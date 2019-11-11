@@ -16,22 +16,14 @@ public:
     Registry *reg;
 
     virtual void update(DeltaTime dt = 0.016) override;
-
-    // BSplineCurve
-    void initVertexBufferObjects();
-    void draw();
-    void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
-    vec3 evaluateBSpline(const BSplinePoint &bspline, int my, float x);
-    int findKnotInterval(float x);
-    vec3 evaluateBSpline(int degree, int startKnot, float x);
-
-    vec2 deBoor(float x);
-
+    void setControlPoints(std::vector<vec3> cps);
     std::optional<NPCevents> move(float deltaTime);
     float t{0};
     int dir{1};
     void init(GLuint eID);
     void eventHandler();
+
+    void draw();
 
 private:
     // FSM

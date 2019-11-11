@@ -24,6 +24,7 @@ void AIsystem::update(DeltaTime dt) {
     case LEARN:
         dir = -dir;
         if (updatePath) {
+            mCurve.updatePath();
             mCurve.updateTrophies();
             updatePath = false;
         }
@@ -37,6 +38,10 @@ void AIsystem::update(DeltaTime dt) {
         goalReached();
         break;
     }
+}
+
+void AIsystem::setControlPoints(std::vector<vec3> cps) {
+    mCurve.setControlPoints(cps);
 }
 
 void AIsystem::eventHandler() {

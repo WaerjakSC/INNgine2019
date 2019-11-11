@@ -140,6 +140,8 @@ void RenderWindow::init() {
     auto view = mRegistry->view<AIcomponent>();
     if (!view.empty()) {
         GLuint enemy = mRegistry->view<AIcomponent>().entities()[0];
+        std::vector<vec3> points{{-10, 1, 6}, {10, 1, 3}, {-10, 1, 0}, {10, 1, -10}};
+        mAIsystem->setControlPoints(points);
         mAIsystem->init(enemy);
     }
 
