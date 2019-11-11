@@ -24,7 +24,7 @@ void AIsystem::update(DeltaTime dt) {
     case LEARN:
         dir = -dir;
         if (updatePath) {
-            mCurve.updatePath();
+            mCurve.updateTrophies();
             updatePath = false;
         }
         state = MOVE;
@@ -52,7 +52,7 @@ void AIsystem::eventHandler() {
             break;
         case ITEM_TAKEN:
             // state = CRY
-            mCurve.updatePath();
+            updatePath = true;
             break;
         case DAMAGE_TAKEN:
             // something

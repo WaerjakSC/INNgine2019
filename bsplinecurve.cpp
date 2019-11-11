@@ -58,17 +58,22 @@ int BSplineCurve::getMy(float x) const {
 
     return -1;
 }
-
-void BSplineCurve::registerTrophies() {
+/**
+ * @brief updateTrophies call this when a trophy is taken
+ */
+void BSplineCurve::updateTrophies() {
+    setControlPoints(getTrophyCPs());
+    updatePath();
+}
+std::vector<vec3> BSplineCurve::getTrophyCPs() {
     std::vector<vec3> controlPoints;
-    auto view = Registry::instance()->view<Transform, BSplinePoint>();
+    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
     for (auto entity : view) {
-        auto [trans, bspline] = view.get<Transform, BSplinePoint>(entity);
+        auto &trans = view.get<Transform>(entity);
         controlPoints.push_back(trans.localPosition);
     }
-    setControlPoints(controlPoints);
+    return controlPoints;
 }
-
 void BSplineCurve::updatePath() {
     std::vector<Vertex> vertices;
 
@@ -128,7 +133,7 @@ void BSplineCurve::draw() {
 }
 
 void BSplineCurve::init() {
-    registerTrophies();
+    updateTrophies();
     initializeOpenGLFunctions();
 
     // Spline curve
@@ -142,9 +147,6 @@ void BSplineCurve::init() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    // Send the actual vertex data
-    updatePath();
 }
 
 vec3 BSplineCurve::eval(float x) const {
