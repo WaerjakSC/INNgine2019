@@ -1,5 +1,6 @@
 #include "bsplinecurve.h"
 #include "registry.h"
+
 BSplineCurve::BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree) : b(controlpoints), d(degree), t(knots) {
     n = knots.size();
 }
@@ -69,6 +70,33 @@ void BSplineCurve::registerTrophies() {
     setControlPoints(controlPoints);
 }
 
+void BSplineCurve::updatePath()
+{
+    std::vector<Vertex> vertices;
+
+    vertices.reserve(splineResolution + b.size());
+
+    for (int i{0}; i < splineResolution; ++i)
+    {
+        auto p = eval(i * 1.f / splineResolution);
+        vertices.emplace_back(p.x, p.y, p.z, 0.f, 1.f, 0.f);
+    }
+
+    // Control points
+    for (int i{0}; i < b.size(); ++i)
+    {
+        auto p = b.at(i);
+        vertices.emplace_back(p.x, p.y, p.z, 1.f, 0.f, 0.f);
+    }
+
+    glBindVertexArray(mVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+}
+
+
 /**
  * @brief BSplineCurve::evaluateBSpline
  * @param my
@@ -93,6 +121,39 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const
         }
     }
     return a[0];
+}
+
+void BSplineCurve::draw()
+{
+
+    if (debugLine)
+    {
+        glPointSize(3.f);
+        glBindVertexArray(mVAO);
+        glDrawArrays(GL_LINE_STRIP, 0, splineResolution);
+        glDrawArrays(GL_POINTS, splineResolution, b.size());
+    }
+}
+
+void BSplineCurve::init()
+{
+    initializeOpenGLFunctions();
+
+    // Spline curve
+    glGenVertexArrays(1, &mVAO);
+    glBindVertexArray(mVAO);
+
+    glGenBuffers(1, &mVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid*)(0));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Send the actual vertex data
+    updatePath();
+
 }
 
 vec3 BSplineCurve::eval(float x) const

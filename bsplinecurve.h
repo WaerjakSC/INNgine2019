@@ -2,7 +2,7 @@
 #define BSPLINECURVE_H
 #include "vector3d.h"
 typedef gsl::Vector3D vec3;
-class BSplineCurve {
+class BSplineCurve: protected QOpenGLFunctions_4_1_Core  {
 public:
     // default constructor
     BSplineCurve();
@@ -16,6 +16,13 @@ public:
 
     vec3 evaluateBSpline(int my, float x) const;
 
+    int splineResolution = 50.f;
+    bool debugLine = true;
+    void draw();
+    void init();
+
+    GLuint mVAO;
+    GLuint mVBO;
 
     int findKnotInterval(float x);
     std::vector<float> findKnots() const;
@@ -26,7 +33,7 @@ public:
 
     void registerTrophies();
 
-    BSplineCurve rememberedCurve;
+    void updatePath();
 
     //vec2 deBoor(float x);
 };

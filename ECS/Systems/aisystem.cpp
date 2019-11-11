@@ -98,7 +98,6 @@ std::optional<NPCevents> AIsystem::move(float deltaT)
         t = gsl::clamp(t, 0.f, 1.f);
 
     auto p = rememberedCurve.eval(t);
-    // Flytt til movementsystem senere
     transform.localPosition = p;
     transform.matrixOutdated = true;
 
@@ -107,17 +106,11 @@ std::optional<NPCevents> AIsystem::move(float deltaT)
         return ENDPOINT_ARRIVED;
     }
 
-
-    // move NPC
-
     return std::nullopt;
-
-
 }
 
 
 void AIsystem::death() {
-
     // hp >= 0
     // gold++
     // delete entity
