@@ -3,15 +3,6 @@
 BSplineCurve::BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree) : b(controlpoints), d(degree), t(knots) {
     n = knots.size();
 }
-/**
- * @brief BSplineCurve::evaluateBSpline
- * @param bspline
- * @param my
- * @param x
- * @return
- */
-vec3 BSplineCurve::evaluateBSpline(const BSplineCurve &bspline, int my, float x) {
-}
 
 /**
  * @brief BSplineCurve::setControlPoints

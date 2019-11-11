@@ -98,9 +98,9 @@ struct Mesh : public Component {
     }
     Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
     }
-    Mesh(const Mesh &other) {
-        *this = other;
-    }
+    //    Mesh(const Mesh &other) {
+    //        *this = other;
+    //    }
 
     GLuint mVAO{0};
     GLuint mVBO{0};
@@ -113,17 +113,17 @@ struct Mesh : public Component {
 
     std::string mName;
 
-    Mesh &operator=(const Mesh &other) {
-        mVAO = other.mVAO;
-        mVBO = other.mVBO;
-        mEAB = other.mEAB; //holds the indices (Element Array Buffer - EAB)
-        mName = other.mName;
+    //    Mesh &operator=(const Mesh &other) {
+    //        mVAO = other.mVAO;
+    //        mVBO = other.mVBO;
+    //        mEAB = other.mEAB; //holds the indices (Element Array Buffer - EAB)
+    //        mName = other.mName;
 
-        mVerticeCount = other.mVerticeCount;
-        mIndiceCount = other.mIndiceCount;
-        mDrawType = other.mDrawType;
-        return *this;
-    }
+    //        mVerticeCount = other.mVerticeCount;
+    //        mIndiceCount = other.mIndiceCount;
+    //        mDrawType = other.mDrawType;
+    //        return *this;
+    //    }
     bool operator==(const Mesh &other) {
         return mName == other.mName; // name of the obj/txt file should be enough to verify if they're the same.
     }

@@ -182,7 +182,8 @@ public:
             mIndex[cloneTo] = mList.size();
         else
             mIndex.push_back(mList.size()); // entity list size is location of new entityID        mList.push_back(cloneTo);
-        Type component = get(cloneFrom);
+        Type component(get(cloneFrom));
+        mList.push_back(cloneTo);
         mComponents.push_back(component);
     }
     /**

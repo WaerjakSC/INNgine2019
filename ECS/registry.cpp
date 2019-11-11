@@ -93,7 +93,7 @@ GLuint Registry::duplicateEntity(GLuint dupedEntity) {
             pool.second->cloneComponent(dupedEntity, entityID);
         }
     }
-    if (contains<Transform>(entityID)) {
+    if (contains<Transform>(dupedEntity) && hasParent(dupedEntity)) {
         Transform &trans = getPool<Transform>()->get(entityID);
         setParent(entityID, trans.parentID);
         for (auto &child : trans.children) {

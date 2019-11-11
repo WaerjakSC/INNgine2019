@@ -13,7 +13,6 @@ public:
     std::vector<float> t; // knots
 
     // void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
-    vec3 evaluateBSpline(const BSplineCurve &bspline, int my, float x);
     vec3 evaluateBSpline(int my, float x);
 
     int findKnotInterval(float x);
