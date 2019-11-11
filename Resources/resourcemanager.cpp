@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QInputDialog>
+#include <QJSEngine> //The script engine itself!
 #include <QStatusBar>
 #include <QTimer>
 #include <QToolButton>
@@ -566,6 +567,51 @@ void ResourceManager::initIndexBuffers(Mesh *mesh) {
     glGenBuffers(1, &mesh->mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
+}
+
+bool ResourceManager::readScript(Script &comp, const QString &fileName) {
+    //Make the Script engine itself
+    QJSEngine engine;
+
+    if (!fileName.size())
+        return false;
+
+    //Make a QFile for it
+    QFile scriptFile(fileName);
+    if (scriptFile.exists()) {
+        qDebug() << "Script file (" + fileName + ") does not exist!";
+        return false;
+    }
+    if (!scriptFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Failed to open script: " << fileName;
+    }
+    //Try to open file and give error if something is wrong
+    if (!scriptFile.open(QIODevice::ReadOnly))
+        qDebug() << "Error - NO FILE HERE: " << fileName;
+
+    //    //reads the file
+    QTextStream stream(&scriptFile);
+    QString contents = stream.readAll();
+    //close the file, because we don't need it anymore
+    scriptFile.close();
+
+    //Loads the whole script into script engine:
+    //The important part! fileName is used to report bugs in the file
+    auto value = engine.evaluate(contents, fileName);
+    if (value.isError()) {
+        checkError(value);
+        return false;
+    }
+    QFileInfo info(fileName);
+    comp.filePath = info.filePath();
+    return true;
+}
+QString ResourceManager::checkError(QJSValue value) {
+    QString lineNumber = QString::number(value.property("lineNumber").toInt());
+    QString valueString = value.toString();
+    QString error("Uncaught exception at line" + lineNumber + ":" + valueString);
+    qDebug() << error;
+    return error;
 }
 /**
  * @brief If you know the mesh you want at construction i.e. for prefabs and similar

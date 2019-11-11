@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "tiny_obj_loader.h"
 #include "vertex.h"
+#include <QJSEngine>
 #include <QKeyEvent>
 #ifdef _WIN32
 #include <al.h>
@@ -174,14 +175,12 @@ struct Input : public Component {
     int MOUSEY{0};
 };
 struct Physics : public Component {
-public:
     Physics(float speed = 1.0f) : mSpeed(speed) {}
 
     float mSpeed;
     vec3 mVelocity;
 };
 struct Sound : public Component {
-public:
     Sound() {}
     Sound(std::string name, bool loop = false, float gain = 1.0);
 
@@ -196,6 +195,15 @@ public:
     float mGain;
     vec3 mPosition;    ///< Vector containing source position.
     vec3 mVelocity{0}; ///< Vector containing source velocity.
+};
+struct Script : public Component {
+    Script() {
+        engine = new QJSEngine;
+        engine->installExtensions(QJSEngine::ConsoleExtension);
+    }
+
+    QJSEngine *engine;
+    QString filePath;
 };
 
 /**

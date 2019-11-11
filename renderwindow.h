@@ -23,6 +23,7 @@ class InputSystem;
 class CollisionSystem;
 class AIsystem;
 class ResourceManager;
+class ScriptSystem;
 class Registry;
 class Raycast;
 /// This inherits from QWindow to get access to the Qt functionality and
@@ -72,6 +73,7 @@ private:
     Ref<SoundSystem> mSoundSystem;
     Ref<InputSystem> mInputSystem;
     Ref<CollisionSystem> mCollisionSystem;
+    Ref<ScriptSystem> mScriptSystem;
     Ref<AIsystem> mAIsystem;
 
     ResourceManager *mFactory;

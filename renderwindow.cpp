@@ -18,6 +18,7 @@
 #include "lightsystem.h"
 #include "movementsystem.h"
 #include "rendersystem.h"
+#include "scriptsystem.h"
 #include "soundsystem.h"
 
 #include "colorshader.h"
@@ -128,6 +129,7 @@ void RenderWindow::init() {
     mSoundSystem->createContext();
     mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
     mAIsystem = mRegistry->registerSystem<AIsystem>();
+    mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();

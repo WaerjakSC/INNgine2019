@@ -1,4 +1,4 @@
-QT          += core gui widgets
+QT          += core gui widgets qml
 
 TEMPLATE    = app
 CONFIG      += c++17
@@ -69,6 +69,7 @@ HEADERS += \
     ECS/Systems/isystem.h \
     ECS/Systems/aisystem.h \
     ECS/Systems/inputsystem.h \
+    ECS/Systems/scriptsystem.h \
     ECS/Systems/soundsystem.h \
     ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
@@ -126,6 +127,7 @@ HEADERS += \
 SOURCES += main.cpp \
     ECS/Systems/aisystem.cpp \
     ECS/Systems/inputsystem.cpp \
+    ECS/Systems/scriptsystem.cpp \
     ECS/Systems/soundsystem.cpp \
     ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
@@ -182,6 +184,9 @@ DISTFILES += \
     GSL/README.md \
     README.md \
     Shaders/textureshader.vert
+
+OTHER_FILES += \
+    Assets/Scripts/testscript.js
 
  RESOURCES += \
  icons.qrc
