@@ -13,13 +13,14 @@ public:
 
     // void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
     vec3 evaluateBSpline(const BSplineCurve &bspline, int my, float x);
-    vec3 evaluateBSpline(int my, float x);
+    vec3 evaluateBSpline(int my, float x) const;
 
     int findKnotInterval(float x);
     std::vector<float> findKnots() const;
     void setControlPoints(const std::vector<vec3> &cp);
 
     int getMy(float x) const;
+    vec3 eval(float x) const;
 
 
     //vec2 deBoor(float x);
@@ -29,6 +30,7 @@ public:
     BSplineCurve(std::vector<float> knots, std::vector<vec3> controlpoints, int degree = 2) : b(controlpoints), d(degree), t(knots) {
         n = knots.size();
     }
+
 
 };
 

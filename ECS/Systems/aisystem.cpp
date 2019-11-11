@@ -26,8 +26,6 @@ void AIsystem::update(DeltaTime dt) {
 void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute) {
 }
 
-void AIsystem::setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points) {
-}
 
 /**
  * @brief AIsystem::evaluateBSpline, deBoor's algorithm for b-splines
@@ -36,27 +34,17 @@ void AIsystem::setKnotsAndControlPoints(std::vector<float> knots, std::vector<ve
  * @param x paramterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
-vec3 AIsystem::evaluateBSpline(const BSplineCurve &bspline, int my, float x) {
 
-}
-
-int AIsystem::findKnotInterval(float x) {
-}
-
-vec3 AIsystem::evaluateBSpline(int degree, int startKnot, float x) {
-}
 
 vec2 AIsystem::deBoor(float x) {
     // return curve position calculated by deBoor's algorithm (evaluateBSpline)
 }
 
-void AIsystem::move() {
+// follow b-spline from start of path to end of path
+// if end of path is reached,
+// remove 1 LP (lifepoint) from player's base
 
-    // follow b-spline from start of path to end of path
-    // if end of path is reached,
-    // remove 1 LP (lifepoint) from player's base
-
-    /* position = deBoor(t)
+/* position = deBoor(t)
      * draw NPC
      * if(endpoint arrived)
      *  notify(endpoint_arrived)
@@ -66,7 +54,27 @@ void AIsystem::move() {
      *
      *
      */
+std::optional<NPCevents> AIsystem::move(float deltaT)
+{
+    t += deltaT * dir;
+    bool endPoint = 0.98f <= t || t < 0.f;
+
+    if (endPoint)
+        t = gsl::clamp(t, 0.f, 1.f);
+    if (endPoint){
+        // remove 1 hp from player
+        return ENDPOINT_ARRIVED;
+    }
+    // if (getAIhp() <= 0)
+    // return state DEATH
+
+    // move NPC
+
+    return std::nullopt;
+
+
 }
+
 
 void AIsystem::death() {
 
