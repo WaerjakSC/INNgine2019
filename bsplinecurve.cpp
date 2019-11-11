@@ -75,7 +75,8 @@ void BSplineCurve::registerTrophies() {
  * @param x
  * @return
  */
-vec3 BSplineCurve::evaluateBSpline(int my, float x) {
+vec3 BSplineCurve::evaluateBSpline(int my, float x) const
+{
     std::vector<vec3> a;
     a.resize(t.size() + d + 1);
 
@@ -92,4 +93,13 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) {
         }
     }
     return a[0];
+}
+
+vec3 BSplineCurve::eval(float x) const
+{
+    auto my = getMy(x);
+    if (my > -1)
+        return evaluateBSpline(my, x);
+
+    return {0.f, 0.f, 0.f};
 }

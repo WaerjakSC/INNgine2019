@@ -300,6 +300,7 @@ enum NPCstates { MOVE,
                  GOAL_REACHED };
 
 enum NPCevents { ENDPOINT_ARRIVED,
+                 ITEM_TAKEN,
                  DAMAGE_TAKEN };
 
 // GNOMER

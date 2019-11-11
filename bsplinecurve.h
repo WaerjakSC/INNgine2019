@@ -13,13 +13,16 @@ public:
     std::vector<float> t; // knots
 
     // void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
-    vec3 evaluateBSpline(int my, float x);
+
+    vec3 evaluateBSpline(int my, float x) const;
+
 
     int findKnotInterval(float x);
     std::vector<float> findKnots() const;
     void setControlPoints(const std::vector<vec3> &cp);
 
     int getMy(float x) const;
+    vec3 eval(float x) const;
 
     void registerTrophies();
 

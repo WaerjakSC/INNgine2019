@@ -26,6 +26,11 @@ public:
 
     vec2 deBoor(float x);
 
+     std::optional<NPCevents> move(float deltaTime);
+     float t{0};
+     int dir{1};
+
+     void eventHandler();
 private:
     // FSM
     void move();
