@@ -584,6 +584,8 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
     setMesh(name, eID);
 }
 void ResourceManager::setMesh(std::string name, GLuint eID) {
+    if (name.empty())
+        return;
     auto search = mMeshMap.find(name);
     if (search != mMeshMap.end()) {
         registry->get<Mesh>(eID) = search->second;

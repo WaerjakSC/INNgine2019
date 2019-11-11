@@ -251,6 +251,10 @@ void MainWindow::createActions() {
     components->addAction(aiAction);
     connect(aiAction, &QAction::triggered, mComponentList, &ComponentList::addAIComponent);
 
+    QAction *bspline = new QAction(tr("BSplinePoint"), this);
+    components->addAction(bspline);
+    connect(bspline, &QAction::triggered, mComponentList, &ComponentList::addBSplineComponent);
+
     ui->mainToolBar->setMovable(false);
 
     // Set up the prefab actions

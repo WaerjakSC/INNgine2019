@@ -291,6 +291,9 @@ struct Cylinder : public Collision {
  * @brief The BSplineCurve struct
  */
 struct BSplinePoint : Component {
+    BSplinePoint() {
+        qDebug() << "added BSplinePoint to entity.";
+    }
 };
 
 // TD enemies følger en path fra A til B

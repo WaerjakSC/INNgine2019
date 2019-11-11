@@ -81,7 +81,14 @@ void ComponentList::addTransformComponent() {
         setupComponentList();
     }
 }
-
+void ComponentList::addBSplineComponent() {
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<BSplinePoint>(eID))
+            registry->add<BSplinePoint>(eID);
+        setupComponentList();
+    }
+}
 void ComponentList::addAIComponent() {
     if (mMainWindow->selectedEntity) {
         GLuint eID = mMainWindow->selectedEntity->id();

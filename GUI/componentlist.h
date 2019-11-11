@@ -38,6 +38,8 @@ public slots:
     void addSphereCollider();
     void addPlaneCollider();
     void addCylinderCollider();
+    void addBSplineComponent();
+
 signals:
     void posX(GLfloat xIn);
     void posY(GLfloat yIn);

@@ -136,8 +136,8 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Key("mesh");
                 writer.StartObject();
                 const Mesh &mesh = registry->get<Mesh>(eID);
-                if (mesh.mName == "")
-                    qDebug() << "No mesh name!";
+                //                if (mesh.mName == "")
+                //                    qDebug() << "No mesh name!";
                 writer.Key("name");
                 writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
                 writer.EndObject();
@@ -302,6 +302,13 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(ai.damage);
                 writer.EndObject();
             }
+            if (registry->contains<BSplinePoint>(eID)) {
+                writer.Key("BSplinePoint");
+                writer.StartObject();
+                writer.Key("isPoint");
+                writer.Bool(true);
+                writer.EndObject();
+            }
 
             writer.EndObject();
             writer.EndObject();
@@ -449,8 +456,9 @@ void Scene::populateScene(const Document &scene) {
             } else if (comp->name == "AI") {
                 int health = comp->value["health"].GetInt();
                 int damage = comp->value["damage"].GetInt();
-                // Need rotation matrix here
                 registry->add<AIcomponent>(id, health, damage);
+            } else if (comp->name == "BSplinePoint") {
+                registry->add<BSplinePoint>(id);
             }
         }
     }

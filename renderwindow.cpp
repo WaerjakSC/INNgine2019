@@ -163,8 +163,8 @@ void RenderWindow::render() {
         mSoundSystem->update(dt);
         if (mFactory->isPlaying()) {
             mMoveSystem->update(dt);
+            mCollisionSystem->update(dt);
         }
-        mCollisionSystem->update(dt);
         mLightSystem->update(dt);
         mRenderer->update(dt);
     }

@@ -57,7 +57,7 @@
                 "position": [
                     4.0,
                     3.0,
-                    -3.5
+                    -8.5
                 ],
                 "rotation": [
                     0.0,
@@ -168,57 +168,6 @@
                 ],
                 "size": [
                     0.5,
-                    0.5,
-                    0.5
-                ],
-                "static": true
-            }
-        }
-    },
-    "Entity": {
-        "name": "box2.txt",
-        "id": 5,
-        "components": {
-            "transform": {
-                "position": [
-                    -2.5,
-                    0.5,
-                    -3.5
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    10.0,
-                    1.0,
-                    1.0
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": "box2.txt"
-            },
-            "AABB": {
-                "origin": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    5.0,
                     0.5,
                     0.5
                 ],
@@ -525,6 +474,222 @@
                 ],
                 "radius": 1.0,
                 "static": false
+            }
+        }
+    },
+    "Entity": {
+        "name": "Trophy 1",
+        "id": 12,
+        "components": {
+            "transform": {
+                "position": [
+                    -5.0,
+                    1.0,
+                    6.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": ""
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "static": true
+            },
+            "BSplinePoint": {
+                "isPoint": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Trophy 2",
+        "id": 13,
+        "components": {
+            "transform": {
+                "position": [
+                    6.0,
+                    1.0,
+                    -5.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": ""
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "static": true
+            },
+            "BSplinePoint": {
+                "isPoint": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Trophy 3",
+        "id": 14,
+        "components": {
+            "transform": {
+                "position": [
+                    6.0,
+                    1.0,
+                    3.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": ""
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "static": true
+            },
+            "BSplinePoint": {
+                "isPoint": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Trophy 4",
+        "id": 15,
+        "components": {
+            "transform": {
+                "position": [
+                    -5.0,
+                    1.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": ""
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "static": true
+            },
+            "BSplinePoint": {
+                "isPoint": true
             }
         }
     }
