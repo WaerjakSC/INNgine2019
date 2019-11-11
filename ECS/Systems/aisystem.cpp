@@ -6,11 +6,17 @@ AIsystem::AIsystem() {
 }
 
 void AIsystem::update(DeltaTime dt) {
-    // RUN FSM HERE?
-    switch (state) {
+    // Run the eventHandler incase of events
+    eventHandler();
 
+    std::optional<NPCevents> event;
+
+    switch (state) {
     case MOVE:
-        move();
+        move(dt*0.1f);
+        if(event){
+            notification_queue.push(event.value());
+        }
         break;
     case DEATH:
         // Whatever happens when gnomes die
@@ -19,6 +25,14 @@ void AIsystem::update(DeltaTime dt) {
     case GOAL_REACHED:
         goalReached();
         break;
+    }
+}
+
+void AIsystem::eventHandler(){
+
+
+    while(!notification_queue.empty()){
+
     }
 }
 

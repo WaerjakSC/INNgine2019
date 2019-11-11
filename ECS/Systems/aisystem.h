@@ -30,6 +30,7 @@ public:
      float t{0};
      int dir{1};
 
+     void eventHandler();
 private:
     // FSM
     void move();
