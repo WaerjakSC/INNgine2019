@@ -1,10 +1,10 @@
 #ifndef AISYSTEM_H
 #define AISYSTEM_H
 
+#include "bsplinecurve.h"
 #include "components.h"
 #include "isystem.h"
 #include "registry.h"
-#include "bsplinecurve.h"
 #include <queue>
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
@@ -19,7 +19,7 @@ public:
 
     // BSplineCurve
     void initVertexBufferObjects();
-    void draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute = -1);
+    void draw();
     void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
     vec3 evaluateBSpline(const BSplinePoint &bspline, int my, float x);
     int findKnotInterval(float x);
@@ -27,11 +27,12 @@ public:
 
     vec2 deBoor(float x);
 
-     std::optional<NPCevents> move(float deltaTime);
-     float t{0};
-     int dir{1};
-     void init(GLuint eID);
-     void eventHandler();
+    std::optional<NPCevents> move(float deltaTime);
+    float t{0};
+    int dir{1};
+    void init(GLuint eID);
+    void eventHandler();
+
 private:
     // FSM
     void move();

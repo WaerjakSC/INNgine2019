@@ -297,9 +297,9 @@ void Scene::saveScene(const QString &fileName) {
                 const AIcomponent &ai = registry->get<AIcomponent>(eID);
 
                 writer.Key("health");
-                writer.Double(ai.hp);
+                writer.Int(ai.hp);
                 writer.Key("damage");
-                writer.Double(ai.damage);
+                writer.Int(ai.damage);
                 writer.EndObject();
             }
             if (registry->contains<BSplinePoint>(eID)) {
@@ -454,9 +454,9 @@ void Scene::populateScene(const Document &scene) {
                 bool isStatic = comp->value["static"].GetBool();
                 registry->add<Cylinder>(id, position, radius, height, isStatic);
             } else if (comp->name == "AI") {
-                int health = comp->value["health"].GetInt();
+                int hp = comp->value["health"].GetInt();
                 int damage = comp->value["damage"].GetInt();
-                registry->add<AIcomponent>(id, health, damage);
+                registry->add<AIcomponent>(id, hp, damage);
             } else if (comp->name == "BSplinePoint") {
                 registry->add<BSplinePoint>(id);
             }

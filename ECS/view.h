@@ -170,7 +170,7 @@ public:
     std::vector<Component> &data() const {
         return pool->data();
     }
-    std::vector<int> &entities() const {
+    const std::vector<int> &entities() const {
         return pool->entities();
     }
     int find(const int &entt) const {
@@ -178,6 +178,13 @@ public:
     }
     bool contains(const int &entt) const {
         return find(entt) != -1;
+    }
+    /**
+     * @brief Checks whether the view is empty.
+     * @return True if the view is empty, false otherwise.
+     */
+    bool empty() const {
+        return pool->empty();
     }
     /**
     * @brief same as the multi-component view, but here you don't need to enter a component type since it's implicitly discovered

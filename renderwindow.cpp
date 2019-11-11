@@ -137,6 +137,11 @@ void RenderWindow::init() {
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mSoundSystem->init();
     mMoveSystem->init();
+    auto view = mRegistry->view<AIcomponent>();
+    if (!view.empty()) {
+        GLuint enemy = mRegistry->view<AIcomponent>().entities()[0];
+        mAIsystem->init(enemy);
+    }
 
     mLightSystem->init();
     mRenderer->init();
@@ -162,6 +167,7 @@ void RenderWindow::render() {
         mInputSystem->update(dt);
         mSoundSystem->update(dt);
         if (mFactory->isPlaying()) {
+            mAIsystem->update(dt);
             mMoveSystem->update(dt);
             mCollisionSystem->update(dt);
         }

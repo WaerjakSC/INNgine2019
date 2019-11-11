@@ -1,8 +1,9 @@
 #ifndef BSPLINECURVE_H
 #define BSPLINECURVE_H
 #include "vector3d.h"
+#include <QOpenGLFunctions_4_1_Core>
 typedef gsl::Vector3D vec3;
-class BSplineCurve: protected QOpenGLFunctions_4_1_Core  {
+class BSplineCurve : protected QOpenGLFunctions_4_1_Core {
 public:
     // default constructor
     BSplineCurve(int degree = 2);

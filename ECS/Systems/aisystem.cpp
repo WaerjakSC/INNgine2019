@@ -1,27 +1,29 @@
 #include "aisystem.h"
 #include "components.h"
+#include "gsl_math.h"
 #include "movementsystem.h"
 #include "registry.h"
-
 AIsystem::AIsystem() {
 }
 
 void AIsystem::update(DeltaTime dt) {
     // Run the eventHandler incase of events
     eventHandler();
-
+    // draw the bspline curve lines
+    draw();
+    // Currently only set up for one entity
     std::optional<NPCevents> event;
 
     switch (state) {
     case MOVE:
-        move(dt*0.1f);
-        if(event){
+        move(dt * 0.1f);
+        if (event) {
             notification_queue.push(event.value());
         }
         break;
     case LEARN:
         dir = -dir;
-        if(updatePath){
+        if (updatePath) {
             mCurve.updatePath();
             updatePath = false;
         }
@@ -37,14 +39,14 @@ void AIsystem::update(DeltaTime dt) {
     }
 }
 
-void AIsystem::eventHandler(){
+void AIsystem::eventHandler() {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
-    auto [ transform, ai ] = view.get<Transform, AIcomponent>(NPC);
+    auto [transform, ai] = view.get<Transform, AIcomponent>(NPC);
 
-    while(!notification_queue.empty()){
+    while (!notification_queue.empty()) {
         auto event = notification_queue.front();
-        switch(event){
+        switch (event) {
         case ENDPOINT_ARRIVED:
             state = GOAL_REACHED;
             break;
@@ -54,17 +56,16 @@ void AIsystem::eventHandler(){
             break;
         case DAMAGE_TAKEN:
             // something
-            if (ai.hp <= 0){
+            if (ai.hp <= 0) {
                 state = DEATH;
             }
             break;
-
         }
         notification_queue.pop();
     }
 }
 
-void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint textureAttribute) {
+void AIsystem::draw() {
     mCurve.draw();
 }
 
@@ -82,11 +83,10 @@ void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint texture
      *
      *
      */
-std::optional<NPCevents> AIsystem::move(float deltaT)
-{
+std::optional<NPCevents> AIsystem::move(float deltaT) {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
-    auto [ transform, ai ] = view.get<Transform, AIcomponent>(NPC);
+    auto [transform, ai] = view.get<Transform, AIcomponent>(NPC);
     t += deltaT * dir;
     bool endPoint = 0.98f <= t || t < 0.f;
 
@@ -97,7 +97,7 @@ std::optional<NPCevents> AIsystem::move(float deltaT)
     transform.localPosition = p;
     transform.matrixOutdated = true;
 
-    if (endPoint){
+    if (endPoint) {
         // remove 1 hp from player
         return ENDPOINT_ARRIVED;
     }
@@ -105,13 +105,10 @@ std::optional<NPCevents> AIsystem::move(float deltaT)
     return std::nullopt;
 }
 
-void AIsystem::init(GLuint eID)
-{
+void AIsystem::init(GLuint eID) {
     NPC = eID;
     mCurve.init();
-
 }
-
 
 void AIsystem::death() {
     // hp >= 0
