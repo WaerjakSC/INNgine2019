@@ -16,6 +16,7 @@ class Entity;
 class Registry;
 class MainWindow;
 class Scene;
+class Script;
 class CameraController;
 using namespace cjk;
 class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {

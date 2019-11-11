@@ -3,7 +3,6 @@
 #include "registry.h"
 
 AIsystem::AIsystem() {
-    Registry::instance()->registerComponent<BSplineCurve>();
 }
 
 void AIsystem::update(DeltaTime dt) {
@@ -34,7 +33,6 @@ void AIsystem::draw(GLint positionAttribute, GLint colorAttribute, GLint texture
  * @param x paramterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
-
 
 vec2 AIsystem::deBoor(float x) {
     // return curve position calculated by deBoor's algorithm (evaluateBSpline)

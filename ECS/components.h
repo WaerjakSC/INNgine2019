@@ -196,15 +196,6 @@ struct Sound : public Component {
     vec3 mPosition;    ///< Vector containing source position.
     vec3 mVelocity{0}; ///< Vector containing source velocity.
 };
-struct Script : public Component {
-    Script() {
-        engine = new QJSEngine;
-        engine->installExtensions(QJSEngine::ConsoleExtension);
-    }
-
-    QJSEngine *engine;
-    QString filePath;
-};
 
 /**
  * @brief The Collision component class is the base class for our various collider types.
@@ -299,8 +290,7 @@ struct Cylinder : public Collision {
 /**
  * @brief The BSplineCurve struct
  */
-struct BSplineCurve : Component {
-
+struct BSplinePoint : Component {
 };
 
 // TD enemies følger en path fra A til B
