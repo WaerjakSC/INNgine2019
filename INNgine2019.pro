@@ -177,6 +177,8 @@ FORMS += \
     mainwindow.ui
 
 DISTFILES += \
+    Shaders/hudshader.frag \
+    Shaders/hudshader.vert \
     Shaders/phongshader.frag \
     Shaders/phongshader.vert \
     Shaders/plainshader.frag \
