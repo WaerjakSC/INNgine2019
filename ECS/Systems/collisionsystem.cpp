@@ -31,7 +31,7 @@ void CollisionSystem::runAABBSimulations() {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
                         QString entity1 = reg->getEntity(entity)->name();
                         QString entity2 = reg->getEntity(otherEntity)->name();
-                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
+                        //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
@@ -45,7 +45,7 @@ void CollisionSystem::runAABBSimulations() {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
                         QString entity1 = reg->getEntity(entity)->name();
                         QString entity2 = reg->getEntity(otherEntity)->name();
-                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
+                        //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
@@ -65,7 +65,7 @@ void CollisionSystem::runSphereSimulations() {
                         //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
                         QString entity1 = reg->getEntity(entity)->name();
                         QString entity2 = reg->getEntity(otherEntity)->name();
-                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
+                        //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }

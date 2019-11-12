@@ -16,7 +16,7 @@ void AIsystem::update(DeltaTime dt) {
 
     switch (state) {
     case MOVE:
-        move(dt * 0.1f);
+        event = move(dt * 0.1f);
         if (event) {
             notification_queue.push(event.value());
         }
@@ -53,7 +53,7 @@ void AIsystem::eventHandler() {
     while (!notification_queue.empty()) {
         auto event = notification_queue.front();
         switch (event) {
-        case ENDPOINT_ARRIVED:            
+        case ENDPOINT_ARRIVED:
             state = LEARN;
             break;
         case ITEM_TAKEN:

@@ -66,8 +66,8 @@ void BSplineCurve::updateTrophies() {
     std::vector<vec3> controlPoints;
     auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
     for (auto entity : view) {
-        auto &trans = view.get<Transform>(entity);
-        controlPoints.push_back(trans.localPosition * 2);
+        auto &bspline = view.get<BSplinePoint>(entity);
+        controlPoints.push_back(bspline.location);
     }
 
     setControlPoints(controlPoints);
@@ -132,7 +132,7 @@ void BSplineCurve::draw() {
 
 void BSplineCurve::init() {
     initializeOpenGLFunctions();
-    //    updateTrophies();
+    updateTrophies();
 
     // Spline curve
     glGenVertexArrays(1, &mVAO);

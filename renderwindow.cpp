@@ -138,15 +138,9 @@ void RenderWindow::init() {
     mSoundSystem->init();
     mMoveSystem->init();
     auto view = mRegistry->view<AIcomponent>();
-    std::vector<vec3> points{{-10, 1, 6}, {10, 1, 3}, {-10, 1, 0}, {10, 1, -10}};
     if (!view.empty()) {
         GLuint enemy = mRegistry->view<AIcomponent>().entities()[0];
-        auto bsplineview = mRegistry->view<BSplinePoint>();
 
-        for (auto entity : bsplineview) {
-            points.push_back(bsplineview.get(entity).location);
-        }
-        mAIsystem->setControlPoints(points);
         mAIsystem->init(enemy);
     }
 
