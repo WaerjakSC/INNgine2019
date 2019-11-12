@@ -35,6 +35,7 @@ void AIsystem::update(DeltaTime dt) {
         death();
         break;
     case GOAL_REACHED:
+        // implement this for folder
         goalReached();
         break;
     }
@@ -52,8 +53,8 @@ void AIsystem::eventHandler() {
     while (!notification_queue.empty()) {
         auto event = notification_queue.front();
         switch (event) {
-        case ENDPOINT_ARRIVED:
-            state = GOAL_REACHED;
+        case ENDPOINT_ARRIVED:            
+            state = LEARN;
             break;
         case ITEM_TAKEN:
             // state = CRY
@@ -104,6 +105,7 @@ std::optional<NPCevents> AIsystem::move(float deltaT) {
 
     if (endPoint) {
         // remove 1 hp from player
+
         return ENDPOINT_ARRIVED;
     }
 
