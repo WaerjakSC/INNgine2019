@@ -609,7 +609,7 @@ void ResourceManager::setMesh(std::string name, GLuint eID) {
             loadMesh(name, eID);
     }
     // the mesh at the back is the latest creation
-    mMeshMap[name] = registry->getLastComponent<Mesh>();
+    mMeshMap[name] = registry->get<Mesh>(eID);
 }
 /**
  * @brief ResourceManager::LoadMesh - Loads the mesh from file if it isn't already in the Meshes map.

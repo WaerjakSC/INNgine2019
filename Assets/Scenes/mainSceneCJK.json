@@ -489,7 +489,7 @@
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    120.0,
                     0.0
                 ],
                 "scale": [
@@ -511,7 +511,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -527,7 +527,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    -5.0,
+                    1.0,
+                    6.0
+                ]
             }
         }
     },
@@ -543,7 +547,7 @@
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    -120.0,
                     0.0
                 ],
                 "scale": [
@@ -565,7 +569,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -581,7 +585,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    10.0,
+                    1.0,
+                    3.0
+                ]
             }
         }
     },
@@ -597,7 +605,7 @@
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    100.0,
                     0.0
                 ],
                 "scale": [
@@ -619,7 +627,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -635,7 +643,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    -10.0,
+                    1.0,
+                    0.0
+                ]
             }
         }
     },
@@ -651,7 +663,7 @@
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    -75.0,
                     0.0
                 ],
                 "scale": [
@@ -673,7 +685,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -689,7 +701,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    6.0,
+                    1.0,
+                    -1.0
+                ]
             }
         }
     },
@@ -709,9 +725,9 @@
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
+                    0.20000000298023225,
+                    0.20000000298023225,
+                    0.20000000298023225
                 ],
                 "parent": -1
             },
@@ -724,10 +740,10 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PhongShader"
+                "shader": "TextureShader"
             },
             "mesh": {
-                "name": "Ball"
+                "name": "OgreOBJ.obj"
             },
             "Sphere": {
                 "position": [
@@ -735,7 +751,7 @@
                     0.0,
                     0.0
                 ],
-                "radius": 0.5,
+                "radius": 0.30000001192092898,
                 "static": false
             },
             "AI": {

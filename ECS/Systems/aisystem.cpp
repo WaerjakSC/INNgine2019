@@ -25,7 +25,7 @@ void AIsystem::update(DeltaTime dt) {
         dir = -dir;
         if (updatePath) {
             mCurve.updatePath();
-            mCurve.updateTrophies();
+            //            mCurve.updateTrophies();
             updatePath = false;
         }
         state = MOVE;
