@@ -454,7 +454,7 @@ void Scene::populateScene(const Document &scene) {
                 float pitch = comp->value["pitch"].GetDouble();
                 float yaw = comp->value["yaw"].GetDouble();
                 bool active = comp->value["active"].GetBool();
-                registry->add<GameCamera>(id, camPos, pitch, yaw, true);
+                registry->add<GameCamera>(id, camPos, pitch, yaw, active);
             }
         }
     }

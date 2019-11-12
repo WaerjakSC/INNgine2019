@@ -137,6 +137,7 @@ void RenderWindow::init() {
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mSoundSystem->init();
     mMoveSystem->init();
+    mScriptSystem->init();
     mInputSystem->init(aspectRatio);
     auto view = mRegistry->view<AIcomponent>();
     if (!view.empty()) {

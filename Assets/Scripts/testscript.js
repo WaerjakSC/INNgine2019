@@ -2,6 +2,11 @@ function addition(a, b)
 {
     return a + b;
 }
+function beginPlay()
+{
+    var debugText = "YOU PRESSED PLAY. REGARDS, THE SCRIPT.";
+    return debugText;
+}
 
 var myVariable = "Really cool! Regards, The Script.";
 

@@ -1,4 +1,5 @@
 #include "scriptsystem.h"
+#include "constants.h"
 #include "resourcemanager.h"
 #include <QFileInfo>
 ScriptSystem::ScriptSystem() : factory(ResourceManager::instance()) {
@@ -9,15 +10,9 @@ void ScriptSystem::update(DeltaTime deltaTime) {
 }
 
 void ScriptSystem::init() {
-    call(script, "beginPlay");
+    readScript(script, QString::fromStdString(gsl::assetFilePath) + "Scripts/testscript.js");
 }
 
-void ScriptSystem::call(Script &script, const QString &func) {
-    QJSValue value = script.engine->evaluate(func, script.filePath);
-    if (value.isError()) {
-        checkError(value);
-    }
-}
 bool ScriptSystem::readScript(Script &comp, const QString &fileName) {
     //Make the Script engine itself
     QJSEngine engine;
@@ -27,17 +22,13 @@ bool ScriptSystem::readScript(Script &comp, const QString &fileName) {
 
     //Make a QFile for it
     QFile scriptFile(fileName);
-    if (scriptFile.exists()) {
+    if (!scriptFile.exists()) {
         qDebug() << "Script file (" + fileName + ") does not exist!";
         return false;
     }
     if (!scriptFile.open(QIODevice::ReadOnly)) {
         qDebug() << "Failed to open script: " << fileName;
     }
-    //Try to open file and give error if something is wrong
-    if (!scriptFile.open(QIODevice::ReadOnly))
-        qDebug() << "Error - NO FILE HERE: " << fileName;
-
     //    //reads the file
     QTextStream stream(&scriptFile);
     QString contents = stream.readAll();
@@ -50,7 +41,8 @@ bool ScriptSystem::readScript(Script &comp, const QString &fileName) {
         return false;
     }
     QFileInfo info(fileName);
-    comp.filePath = info.filePath();
+    QJSValue func = engine.evaluate("beginPlay").call();
+    qDebug() << func.toString();
     return true;
 }
 QString ScriptSystem::checkError(QJSValue value) {
