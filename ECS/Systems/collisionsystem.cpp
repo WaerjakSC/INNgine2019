@@ -45,6 +45,13 @@ void CollisionSystem::runAABBSimulations() {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
                         QString entity1 = reg->getEntity(entity)->name();
                         QString entity2 = reg->getEntity(otherEntity)->name();
+                        // NOTIFY FSM
+                        if(reg->contains<BSplinePoint>()){
+                            auto view = reg->view<Transform, AIcomponent>();
+                            auto [transform, ai] = view.get<Transform, AIcomponent>(entity);
+                            reg->removeEntity(entity);
+                            ai.masterOfCurves();
+                        }
                         qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed

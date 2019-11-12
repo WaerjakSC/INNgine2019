@@ -24,6 +24,7 @@ public:
     void eventHandler();
 
     void draw();
+    void masterOfCurves();
 
 private:
     // FSM

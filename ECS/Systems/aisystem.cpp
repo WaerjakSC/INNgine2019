@@ -41,6 +41,11 @@ void AIsystem::update(DeltaTime dt) {
     }
 }
 
+void AIsystem::masterOfCurves(){
+   mCurve.updateTrophies();
+   mCurve.updatePath();
+}
+
 void AIsystem::setControlPoints(std::vector<vec3> cps) {
     mCurve.setControlPoints(cps);
 }
@@ -105,7 +110,6 @@ std::optional<NPCevents> AIsystem::move(float deltaT) {
 
     if (endPoint) {
         // remove 1 hp from player
-
         return ENDPOINT_ARRIVED;
     }
 
