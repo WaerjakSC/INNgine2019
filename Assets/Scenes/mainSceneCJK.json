@@ -191,9 +191,9 @@
                     0.0
                 ],
                 "scale": [
-                    10.0,
+                    15.0,
                     1.0,
-                    10.0
+                    15.0
                 ],
                 "parent": -1
             },
@@ -218,23 +218,23 @@
                     0.0
                 ],
                 "size": [
-                    8.0,
+                    11.0,
                     0.10000000149011612,
-                    7.5
+                    11.5
                 ],
                 "static": true
             }
         }
     },
     "Entity": {
-        "name": "Wall 1",
+        "name": "Wall 5",
         "id": 6,
         "components": {
             "transform": {
                 "position": [
-                    0.0,
+                    -4.0,
                     0.5,
-                    7.699999809265137
+                    5.699999809265137
                 ],
                 "rotation": [
                     0.0,
@@ -242,7 +242,7 @@
                     0.0
                 ],
                 "scale": [
-                    16.0,
+                    15.0,
                     1.0,
                     0.5
                 ],
@@ -257,7 +257,7 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PlainShader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -269,9 +269,9 @@
                     0.0
                 ],
                 "size": [
-                    8.0,
+                    7.5,
                     0.5,
-                    0.25
+                    0.30000001192092898
                 ],
                 "static": true
             }
@@ -285,7 +285,7 @@
                 "position": [
                     0.0,
                     0.5,
-                    -7.699999809265137
+                    -11.699999809265137
                 ],
                 "rotation": [
                     0.0,
@@ -293,7 +293,7 @@
                     0.0
                 ],
                 "scale": [
-                    16.0,
+                    24.0,
                     1.0,
                     0.5
                 ],
@@ -308,7 +308,7 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PlainShader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -320,9 +320,9 @@
                     0.0
                 ],
                 "size": [
-                    8.0,
+                    12.0,
                     0.5,
-                    0.25
+                    0.30000001192092898
                 ],
                 "static": true
             }
@@ -334,7 +334,7 @@
         "components": {
             "transform": {
                 "position": [
-                    -7.699999809265137,
+                    -11.800000190734864,
                     0.5,
                     0.0
                 ],
@@ -345,8 +345,8 @@
                 ],
                 "scale": [
                     0.5,
-                    1.0,
-                    15.0
+                    1.100000023841858,
+                    23.0
                 ],
                 "parent": -1
             },
@@ -359,7 +359,7 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PlainShader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -371,9 +371,9 @@
                     0.0
                 ],
                 "size": [
-                    0.25,
+                    0.30000001192092898,
                     0.5,
-                    7.5
+                    11.5
                 ],
                 "static": true
             }
@@ -385,7 +385,7 @@
         "components": {
             "transform": {
                 "position": [
-                    7.699999809265137,
+                    11.699999809265137,
                     0.5,
                     0.0
                 ],
@@ -397,7 +397,7 @@
                 "scale": [
                     0.5,
                     1.0,
-                    15.0
+                    23.0
                 ],
                 "parent": -1
             },
@@ -410,7 +410,7 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PlainShader"
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "cube.obj"
@@ -422,9 +422,9 @@
                     0.0
                 ],
                 "size": [
-                    0.25,
+                    0.30000001192092898,
                     0.5,
-                    7.5
+                    11.5
                 ],
                 "static": true
             }
@@ -478,233 +478,125 @@
         }
     },
     "Entity": {
-        "name": "Trophy 1",
+        "name": "CurvePt1",
         "id": 11,
         "components": {
             "transform": {
                 "position": [
-                    -3.840001344680786,
-                    0.5,
-                    5.762400150299072
+                    0.0,
+                    0.0,
+                    0.0
                 ],
                 "rotation": [
                     0.0,
-                    120.0,
+                    0.0,
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
                     1.0,
                     1.0,
                     1.0
                 ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": "monkey.obj"
-            },
-            "AABB": {
-                "origin": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "static": true
+                "parent": -1
             },
             "BSplinePoint": {
                 "location": [
-                    -5.0,
+                    -8.0,
                     0.0,
-                    6.0
+                    9.0
                 ]
             }
         }
     },
     "Entity": {
-        "name": "Trophy 2",
+        "name": "CurvePt2",
         "id": 12,
         "components": {
             "transform": {
                 "position": [
-                    3.000000238418579,
-                    0.5,
-                    2.1600000858306886
+                    0.0,
+                    0.0,
+                    0.0
                 ],
                 "rotation": [
                     0.0,
-                    -120.0,
+                    0.0,
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
                     1.0,
                     1.0,
                     1.0
                 ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": "monkey.obj"
-            },
-            "AABB": {
-                "origin": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "static": true
+                "parent": -1
             },
             "BSplinePoint": {
                 "location": [
-                    10.0,
+                    19.0,
                     0.0,
-                    3.0
+                    4.0
                 ]
             }
         }
     },
     "Entity": {
-        "name": "Trophy 3",
+        "name": "CurvePt3",
         "id": 13,
         "components": {
             "transform": {
                 "position": [
-                    -3.8400001525878908,
-                    0.5,
-                    -0.2599998712539673
+                    0.0,
+                    0.0,
+                    0.0
                 ],
                 "rotation": [
                     0.0,
-                    100.0,
+                    0.0,
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
                     1.0,
                     1.0,
                     1.0
                 ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": "monkey.obj"
-            },
-            "AABB": {
-                "origin": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "static": true
+                "parent": -1
             },
             "BSplinePoint": {
                 "location": [
-                    -10.0,
+                    -13.0,
                     0.0,
-                    0.0
+                    4.0
                 ]
             }
         }
     },
     "Entity": {
-        "name": "Trophy 4",
+        "name": "CurvePt4",
         "id": 14,
         "components": {
             "transform": {
                 "position": [
-                    6.0,
-                    0.5,
-                    -5.0
+                    0.0,
+                    0.0,
+                    0.0
                 ],
                 "rotation": [
                     0.0,
-                    -75.0,
+                    0.0,
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "parent": -1
-            },
-            "material": {
-                "color": [
                     1.0,
                     1.0,
                     1.0
                 ],
-                "specstr": 0.30000001192092898,
-                "specexp": 4,
-                "textureid": 0,
-                "shader": "PlainShader"
-            },
-            "mesh": {
-                "name": "monkey.obj"
-            },
-            "AABB": {
-                "origin": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ],
-                "static": true
+                "parent": -1
             },
             "BSplinePoint": {
                 "location": [
-                    6.0,
+                    -6.0,
                     0.0,
-                    -5.0
+                    -1.0
                 ]
             }
         }
@@ -739,8 +631,8 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": -1,
-                "shader": "PhongShader"
+                "textureid": 0,
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "OgreOBJ.obj"
@@ -761,6 +653,221 @@
             "AI": {
                 "health": 100,
                 "damage": 10
+            }
+        }
+    },
+    "Entity": {
+        "name": "CurvePt5",
+        "id": 16,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "BSplinePoint": {
+                "location": [
+                    15.0,
+                    0.0,
+                    -3.0
+                ]
+            }
+        }
+    },
+    "Entity": {
+        "name": "CurvePt5",
+        "id": 17,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "parent": -1
+            },
+            "BSplinePoint": {
+                "location": [
+                    -9.0,
+                    0.0,
+                    -7.0
+                ]
+            }
+        }
+    },
+    "Entity": {
+        "name": "Wall 1",
+        "id": 18,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    0.5,
+                    11.699999809265137
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    24.0,
+                    1.0,
+                    0.5
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "TextureShader"
+            },
+            "mesh": {
+                "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    12.0,
+                    0.5,
+                    0.25
+                ],
+                "static": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Wall 7",
+        "id": 19,
+        "components": {
+            "transform": {
+                "position": [
+                    -4.0,
+                    0.5,
+                    -3.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    15.0,
+                    1.0,
+                    0.5
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "TextureShader"
+            },
+            "mesh": {
+                "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    7.5,
+                    0.5,
+                    0.30000001192092898
+                ],
+                "static": true
+            }
+        }
+    },
+    "Entity": {
+        "name": "Wall 6",
+        "id": 20,
+        "components": {
+            "transform": {
+                "position": [
+                    4.0,
+                    0.5,
+                    1.7000000476837159
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    15.0,
+                    1.0,
+                    0.5
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "TextureShader"
+            },
+            "mesh": {
+                "name": "cube.obj"
+            },
+            "AABB": {
+                "origin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    7.5,
+                    0.5,
+                    0.30000001192092898
+                ],
+                "static": true
             }
         }
     }
