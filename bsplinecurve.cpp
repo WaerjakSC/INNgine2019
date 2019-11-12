@@ -52,7 +52,7 @@ std::vector<float> BSplineCurve::findKnots() const {
  * @return
  */
 int BSplineCurve::getMy(float x) const {
-    for (unsigned int i{0}; i < t.size() - 1; ++i)
+    for (unsigned int i{0}; !t.empty() && i < t.size() - 1; ++i)
         if (t[i] <= x && x < t[i + 1])
             return static_cast<int>(i);
 

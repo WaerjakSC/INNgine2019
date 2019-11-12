@@ -1,4 +1,5 @@
 #include "collisionsystem.h"
+#include "aisystem.h"
 #include "components.h"
 #include "raycast.h"
 #include "registry.h"
@@ -46,11 +47,9 @@ void CollisionSystem::runAABBSimulations() {
                         QString entity1 = reg->getEntity(entity)->name();
                         QString entity2 = reg->getEntity(otherEntity)->name();
                         // NOTIFY FSM
-                        if(reg->contains<BSplinePoint>()){
-                            auto view = reg->view<Transform, AIcomponent>();
-                            auto [transform, ai] = view.get<Transform, AIcomponent>(entity);
+                        if (reg->contains<BSplinePoint>(entity)) {
                             reg->removeEntity(entity);
-                            ai.masterOfCurves();
+                            reg->getSystem<AIsystem>()->masterOfCurves();
                         }
                         qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         if (entity1 == "Enemy" && entity2 == "Player") {
