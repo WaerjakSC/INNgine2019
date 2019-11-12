@@ -9,12 +9,12 @@ public:
 
     void updateRightVector();
     void updateForwardVector();
-    void update();
+    virtual void update();
 
     void setSpeed(float speed);
     void moveUp(float deltaHeight);
     void moveRight(float delta);
-    void setPosition(const vec3 &position);
+    virtual void setPosition(const vec3 &position);
     vec3 cameraPosition() const;
 
     virtual void pitch(float degrees);
@@ -39,8 +39,6 @@ public:
     float getYaw() const;
     const vec3 getCameraRotation() const;
 
-    void setMeshID(const GLuint &value);
-
 private:
     float mNearPlane{0.5f};
     float mFarPlane{500.f};
@@ -48,12 +46,11 @@ private:
     float mAspectRatio{1.7778f};
 
     Camera mCamera;
-    bool mOutDated{true};
+
     vec3 mForward{0.f, 0.f, -1.f};
     vec3 mRight{1.f, 0.f, 0.f};
     vec3 mUp{0.f, 1.f, 0.f};
     vec3 mCameraPosition{0.f, 0.f, 0.f};
-    GLuint meshID{0};
 
     float mTranslationSpeed{0.02f}; //camera will move by this speed along the mForward vector
     float mRotationSpeed{180.f};
@@ -61,12 +58,24 @@ private:
 protected:
     float mPitch{-25.f};
     float mYaw{0.f};
+    bool mOutDated{true};
 };
 class GameCameraController : public CameraController {
 public:
-    GameCameraController(float aspectRatio = 1.92f);
+    GameCameraController(float aspectRatio, GLuint entityController, bool isActiveCamera = false);
+    GLuint mControllerID;
+    bool mActive;
     void pitch(float degrees) override;
     void yaw(float degrees) override;
+    void update() override;
+    /**
+     * @brief setPosition overloaded function used by movementsystem to set position of the mesh representation of the game camera.
+     * @param position
+     */
+    void setPosition(const vec3 &position) override;
+    void updateMeshPosition();
+
+    vec3 positionWithOffset();
 };
 
 #endif // CAMERACONTROLLER_H
