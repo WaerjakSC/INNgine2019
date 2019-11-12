@@ -322,4 +322,12 @@ struct PlayerComponent : public Component {
     int playerKills = 0;
 };
 
+// Towers
+struct TowerComponent : public Component {
+    TowerComponent() {}
+    int range;
+    int damage;
+    int attackSpeed;
+};
+
 #endif // COMPONENT_H
