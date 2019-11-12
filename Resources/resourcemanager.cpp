@@ -787,6 +787,7 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
             if (registry->contains<Material>(eID)) {
                 auto &mat = registry->get<Material>(eID);
                 mat.mTextureUnit = search->second->id() - 1;
+                mat.mShader = getShader<TextureShader>();
             }
         }
     }
