@@ -9,7 +9,7 @@
         "yaw": 0.0
     },
     "controller": {
-        "id": 11
+        "id": 10
     },
     "Entity": {
         "name": "Skybox",
@@ -60,7 +60,7 @@
                     -8.5
                 ],
                 "rotation": [
-                    0.0,
+                    -45.0,
                     -0.0,
                     -0.0
                 ],
@@ -483,19 +483,19 @@
         "components": {
             "transform": {
                 "position": [
-                    -5.0,
+                    -4.0,
                     1.0,
                     6.0
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    120.0,
                     0.0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    0.5,
+                    0.5,
+                    0.5
                 ],
                 "parent": -1
             },
@@ -511,7 +511,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -527,7 +527,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    -5.0,
+                    0.0,
+                    6.0
+                ]
             }
         }
     },
@@ -537,19 +541,19 @@
         "components": {
             "transform": {
                 "position": [
-                    6.0,
+                    3.5,
                     1.0,
-                    3.0
+                    3.5
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    -120.0,
                     0.0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    0.5,
+                    0.5,
+                    0.5
                 ],
                 "parent": -1
             },
@@ -565,7 +569,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -581,7 +585,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    10.0,
+                    0.0,
+                    3.0
+                ]
             }
         }
     },
@@ -591,19 +599,19 @@
         "components": {
             "transform": {
                 "position": [
-                    -5.0,
+                    -3.5,
                     1.0,
-                    0.0
+                    0.5
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    100.0,
                     0.0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    0.5,
+                    0.5,
+                    0.5
                 ],
                 "parent": -1
             },
@@ -619,7 +627,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -635,7 +643,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    -10.0,
+                    0.0,
+                    0.0
+                ]
             }
         }
     },
@@ -645,19 +657,19 @@
         "components": {
             "transform": {
                 "position": [
-                    6.0,
+                    5.0,
                     1.0,
-                    -5.0
+                    -4.0
                 ],
                 "rotation": [
                     0.0,
-                    0.0,
+                    -75.0,
                     0.0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    0.5,
+                    0.5,
+                    0.5
                 ],
                 "parent": -1
             },
@@ -673,7 +685,7 @@
                 "shader": "PlainShader"
             },
             "mesh": {
-                "name": ""
+                "name": "monkey.obj"
             },
             "AABB": {
                 "origin": [
@@ -689,7 +701,11 @@
                 "static": true
             },
             "BSplinePoint": {
-                "isPoint": true
+                "location": [
+                    6.0,
+                    0.0,
+                    -5.0
+                ]
             }
         }
     },
@@ -709,9 +725,9 @@
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
+                    0.30000001192092898,
+                    0.30000001192092898,
+                    0.30000001192092898
                 ],
                 "parent": -1
             },
@@ -724,19 +740,23 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 0,
-                "shader": "PhongShader"
+                "shader": "TextureShader"
             },
             "mesh": {
-                "name": "Ball"
+                "name": "OgreOBJ.obj"
             },
-            "Sphere": {
-                "position": [
+            "AABB": {
+                "origin": [
                     0.0,
-                    0.0,
-                    0.0
+                    0.800000011920929,
+                    -0.10000000149011612
                 ],
-                "radius": 0.5,
-                "static": false
+                "size": [
+                    0.5,
+                    0.800000011920929,
+                    0.30000001192092898
+                ],
+                "static": true
             },
             "AI": {
                 "health": 100,

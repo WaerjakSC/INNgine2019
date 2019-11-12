@@ -305,8 +305,13 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<BSplinePoint>(eID)) {
                 writer.Key("BSplinePoint");
                 writer.StartObject();
-                writer.Key("isPoint");
-                writer.Bool(true);
+                const BSplinePoint &cp = registry->get<BSplinePoint>(eID);
+                writer.Key("location");
+                writer.StartArray();
+                writer.Double(cp.location.x);
+                writer.Double(cp.location.y);
+                writer.Double(cp.location.z);
+                writer.EndArray();
                 writer.EndObject();
             }
 
@@ -458,7 +463,8 @@ void Scene::populateScene(const Document &scene) {
                 int damage = comp->value["damage"].GetInt();
                 registry->add<AIcomponent>(id, hp, damage);
             } else if (comp->name == "BSplinePoint") {
-                registry->add<BSplinePoint>(id);
+                vec3 location(comp->value["location"][0].GetDouble(), comp->value["location"][1].GetDouble(), comp->value["location"][2].GetDouble());
+                registry->add<BSplinePoint>(id, location);
             }
         }
     }

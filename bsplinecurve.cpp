@@ -63,14 +63,14 @@ int BSplineCurve::getMy(float x) const {
  * @brief updateTrophies call this when a trophy is taken
  */
 void BSplineCurve::updateTrophies() {
-    //    std::vector<vec3> controlPoints;
-    //    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
-    //    for (auto entity : view) {
-    //        auto &trans = view.get<Transform>(entity);
-    //        controlPoints.push_back(trans.localPosition);
-    //    }
+    std::vector<vec3> controlPoints;
+    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
+    for (auto entity : view) {
+        auto &bspline = view.get<BSplinePoint>(entity);
+        controlPoints.push_back(bspline.location);
+    }
 
-    //    setControlPoints(controlPoints);
+    setControlPoints(controlPoints);
 }
 void BSplineCurve::updatePath() {
     std::vector<Vertex> vertices;

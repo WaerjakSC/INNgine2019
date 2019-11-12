@@ -36,8 +36,6 @@ public:
     void updatePath();
 
     //vec2 deBoor(float x);
-private:
-    std::vector<vec3> getTrophyCPs();
 };
 
 #endif // BSPLINECURVE_H

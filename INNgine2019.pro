@@ -1,5 +1,4 @@
 QT          += core gui widgets qml
-
 TEMPLATE    = app
 CONFIG      += c++17
 
