@@ -33,7 +33,7 @@ public:
 
     void updateTrophies();
 
-    void updatePath();
+    void updatePath(bool init = false);
 
     //vec2 deBoor(float x);
 };

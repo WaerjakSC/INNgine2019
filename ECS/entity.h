@@ -9,6 +9,7 @@ class Entity : public QObject {
     Q_OBJECT
 public:
     Entity(GLuint ID, const QString &text = "");
+    Entity(const Entity &other);
     virtual ~Entity();
     GLuint id() const { return eID; }
     QString name() const { return mName; }
@@ -18,6 +19,7 @@ public:
     bool operator==(const Entity &other) {
         return eID == other.eID;
     }
+    Ref<Entity> clone();
     void destroy();
     void newGeneration(GLuint id, const QString &text);
     bool isDestroyed() const;

@@ -72,16 +72,30 @@ void BSplineCurve::updateTrophies() {
 
     setControlPoints(controlPoints);
 }
-void BSplineCurve::updatePath() {
+void BSplineCurve::updatePath(bool init) {
     std::vector<Vertex> vertices;
 
     vertices.reserve(splineResolution + b.size());
-
+    std::vector<vec3> localPos;
+    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
     for (int i{0}; i < splineResolution; ++i) {
         auto p = eval(i * 1.f / splineResolution);
         vertices.emplace_back(p.x, p.y, p.z, 0.f, 1.f, 0.f);
+        if (i == 0 || i == 15 || i == 30 || i == 49) {
+            localPos.push_back(p);
+        }
     }
-
+    if (init) {
+        std::vector<Transform *> temp;
+        for (auto entity : view) {
+            auto &bspline = view.get<Transform>(entity);
+            temp.push_back(&bspline);
+        }
+        for (size_t i = 0; i < temp.size(); i++) {
+            temp[i]->localPosition = localPos[i];
+            temp[i]->matrixOutdated = true;
+        }
+    }
     // Control points
     for (size_t i{0}; i < b.size(); ++i) {
         auto p = b.at(i);
@@ -146,7 +160,7 @@ void BSplineCurve::init() {
     glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    updatePath();
+    updatePath(true);
 }
 
 vec3 BSplineCurve::eval(float x) const {

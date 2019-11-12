@@ -160,7 +160,7 @@ void Registry::makeSnapshot() {
         if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(entity.second)) {
             newEntityMap[entity.first] = board;
         } else {
-            Ref<Entity> entt = entity.second;
+            Ref<Entity> entt = entity.second->clone();
             newEntityMap[entity.first] = entt;
         }
     }
