@@ -19,11 +19,11 @@ int Raycast::mousePick(const QPoint &mousePos, const QRect &rect) {
     //    vec3 rayPoint = getPointOnRay(ray, 5);
     int entityID{-1};
     double closestTarget{rayRange};
+    double intersectionPoint;
     Ref<CollisionSystem> collisionSystem = registry->getSystem<CollisionSystem>();
     auto view = registry->view<AABB>();
     for (auto entity : view) {
         auto &aabb = view.get(entity);
-        double intersectionPoint;
         if (collisionSystem->RayToAABB(ray, aabb, intersectionPoint)) {
             if (intersectionPoint < closestTarget) {
                 closestTarget = intersectionPoint;
@@ -34,7 +34,6 @@ int Raycast::mousePick(const QPoint &mousePos, const QRect &rect) {
     auto sphereView = registry->view<Sphere>();
     for (auto entity : sphereView) {
         auto &sphere = sphereView.get(entity);
-        double intersectionPoint;
         if (collisionSystem->RayToSphere(ray, sphere, intersectionPoint)) {
             if (intersectionPoint < closestTarget) {
                 closestTarget = intersectionPoint;

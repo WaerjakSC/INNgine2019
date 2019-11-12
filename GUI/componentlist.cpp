@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QStyleFactory>
+#include <aisystem.h>
 ComponentList::ComponentList(MainWindow *window, VerticalScrollArea *inScrollArea)
     : registry(Registry::instance()), scrollArea(inScrollArea), mMainWindow(window) {
     fusion = QStyleFactory::create("fusion");
@@ -59,9 +60,9 @@ void ComponentList::setupComponentList() {
         setupMeshSettings(registry->get<Mesh>(eID));
     }
 
-    //    if (registry->contains<Light>(eID)) {
-    //        setupTransformSettings(registry->getComponent<Light>(eID));
-    //    }
+    if (registry->contains<BSplinePoint>(eID)) {
+        setupBSplinePointSettings(registry->get<BSplinePoint>(eID));
+    }
 
     //    if (registry->contains<Transform>(eID)) {
     //        setupMeshSettings(registry->getComponent<Mesh>(eID));
@@ -192,6 +193,26 @@ void ComponentList::addCylinderCollider() {
         }
         setupComponentList();
     }
+}
+void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
+    ComponentGroupBox *box = new ComponentGroupBox("BSpline Point", mMainWindow);
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *locationBox = new QGroupBox(tr("Location"));
+    locationBox->setStyle(fusion);
+    locationBox->setFlat(true);
+    QHBoxLayout *location = new QHBoxLayout;
+    location->setMargin(1);
+    auto [locationX, locationY, locationZ] = makeVectorBox(point.location, location); // Not sure yet if this is something that's supposed to be updated
+    connect(locationX, SIGNAL(valueChanged(double)), this, SLOT(setControlX(double)));
+    connect(locationY, SIGNAL(valueChanged(double)), this, SLOT(setControlY(double)));
+    connect(locationZ, SIGNAL(valueChanged(double)), this, SLOT(setControlZ(double)));
+
+    locationBox->setLayout(location);
+    grid->addWidget(locationBox, 0, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
 }
 void ComponentList::setupAABBSettings(const AABB &col) {
     ComponentGroupBox *box = new ComponentGroupBox("AABB Collider", mMainWindow);
@@ -606,6 +627,7 @@ void ComponentList::setHealth(int health) {
     auto ai = registry->get<AIcomponent>(mMainWindow->selectedEntity->id());
     ai.hp = health;
 }
+
 void ComponentList::setNewTextureFile() {
     QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -690,6 +712,26 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
         emit scaleY(newScale.y);
         emit scaleZ(newScale.z);
     }
+}
+void ComponentList::setControlX(double xIn) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &bspline = registry->get<BSplinePoint>(entityID);
+    bspline.location.x = xIn;
+    registry->getSystem<AIsystem>()->masterOfCurves();
+}
+
+void ComponentList::setControlY(double yIn) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &bspline = registry->get<BSplinePoint>(entityID);
+    bspline.location.y = yIn;
+    registry->getSystem<AIsystem>()->masterOfCurves();
+}
+
+void ComponentList::setControlZ(double zIn) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &bspline = registry->get<BSplinePoint>(entityID);
+    bspline.location.z = zIn;
+    registry->getSystem<AIsystem>()->masterOfCurves();
 }
 void ComponentList::setPositionX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();

@@ -42,7 +42,7 @@ void AIsystem::update(DeltaTime dt) {
 /**
  * @brief AIsystem::learn, flips the direction and updates path
  */
-void AIsystem::learn(){
+void AIsystem::learn() {
     dir = -dir;
     if (updatePath) {
         mCurve.updatePath();
@@ -55,9 +55,9 @@ void AIsystem::learn(){
 /**
  * @brief AIsystem::masterOfCurves, helper function that updates trophies and path
  */
-void AIsystem::masterOfCurves(){
-   mCurve.updateTrophies();
-   mCurve.updatePath();
+void AIsystem::masterOfCurves() {
+    mCurve.updateTrophies();
+    mCurve.updatePath();
 }
 
 /**

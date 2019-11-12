@@ -44,6 +44,8 @@ Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunct
     initializeOpenGLFunctions();
     if (readBitmap(filename))
         setTexture(textureUnit);
+    else
+        isValid = false;
 }
 
 /**

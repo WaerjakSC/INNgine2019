@@ -73,9 +73,6 @@ void BSplineCurve::updateTrophies() {
     setControlPoints(controlPoints);
 }
 
-
-
-
 /**
  * @brief BSplineCurve::updatePath, updates the bspline, called from AIsystem.
  */
@@ -100,6 +97,7 @@ void BSplineCurve::updatePath(bool init) {
         }
         for (size_t i = 0; i < temp.size(); i++) {
             temp[i]->localPosition = localPos[i];
+            temp[i]->localPosition.y += 0.5f;
             temp[i]->matrixOutdated = true;
         }
     }

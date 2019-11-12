@@ -87,6 +87,10 @@ private slots:
     void setNewShader(const QString &text);
     void setHealth(int health);
 
+    void setControlX(double xIn);
+    void setControlY(double yIn);
+    void setControlZ(double zIn);
+
     void setPositionX(double xIn);
     void setPositionY(double yIn);
     void setPositionZ(double zIn);
@@ -155,6 +159,7 @@ private:
     void updateAABB(GLuint eID);
     void updateSphere(GLuint eID);
     QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
+    void setupBSplinePointSettings(const BSplinePoint &point);
 };
 
 #endif // COMPONENTLIST_H

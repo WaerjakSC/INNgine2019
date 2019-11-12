@@ -704,9 +704,11 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
  */
 void ResourceManager::loadTexture(std::string fileName) {
     if (mTextures.find(fileName) == mTextures.end()) {
-        mTextures[fileName] = std::make_shared<Texture>(fileName, mTextures.size());
-
-        qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
+        Ref<Texture> tex = std::make_shared<Texture>(fileName, mTextures.size());
+        if (tex->isValid) {
+            mTextures[fileName] = tex;
+            qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
+        }
     }
 }
 
@@ -776,9 +778,15 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
         tinyobj::material_t *mp = &materials[m];
 
         if (mp->diffuse_texname.length() > 0) {
+            auto search = mTextures.find(mp->diffuse_texname);
             // Only load the texture if it is not already loaded
-            if (mTextures.find(mp->diffuse_texname) == mTextures.end()) {
+            if (search == mTextures.end()) {
                 loadTexture(mp->diffuse_texname);
+            }
+            // Currently doesn't support multiple textures
+            if (registry->contains<Material>(eID)) {
+                auto &mat = registry->get<Material>(eID);
+                mat.mTextureUnit = search->second->id() - 1;
             }
         }
     }
@@ -926,6 +934,7 @@ void ResourceManager::play() {
             shader.second->setCameraController(inputsys->gameCameraController());
         }
         mIsPlaying = true;
+        registry->getSystem<AIsystem>()->masterOfCurves();
         mMainWindow->play->setEnabled(false);
         mMainWindow->pause->setEnabled(true);
         mMainWindow->stop->setEnabled(true);
@@ -949,7 +958,6 @@ void ResourceManager::stop() {
         for (auto shader : mShaders) {
             shader.second->setCameraController(inputsys->editorCamController());
         }
-        registry->getSystem<AIsystem>();
         mIsPlaying = false;
         mMainWindow->insertEntities();
         mMainWindow->play->setEnabled(true);

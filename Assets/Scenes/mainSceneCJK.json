@@ -483,9 +483,9 @@
         "components": {
             "transform": {
                 "position": [
-                    -4.0,
-                    1.0,
-                    6.0
+                    -3.840001344680786,
+                    0.5,
+                    5.762400150299072
                 ],
                 "rotation": [
                     0.0,
@@ -541,9 +541,9 @@
         "components": {
             "transform": {
                 "position": [
-                    3.5,
-                    1.0,
-                    3.5
+                    3.000000238418579,
+                    0.5,
+                    2.1600000858306886
                 ],
                 "rotation": [
                     0.0,
@@ -599,9 +599,9 @@
         "components": {
             "transform": {
                 "position": [
-                    -3.5,
-                    1.0,
-                    0.5
+                    -3.8400001525878908,
+                    0.5,
+                    -0.2599998712539673
                 ],
                 "rotation": [
                     0.0,
@@ -657,9 +657,9 @@
         "components": {
             "transform": {
                 "position": [
-                    5.0,
-                    1.0,
-                    -4.0
+                    6.0,
+                    0.5,
+                    -5.0
                 ],
                 "rotation": [
                     0.0,
@@ -739,8 +739,8 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
-                "shader": "TextureShader"
+                "textureid": -1,
+                "shader": "PhongShader"
             },
             "mesh": {
                 "name": "OgreOBJ.obj"

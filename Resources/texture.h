@@ -23,6 +23,7 @@ public:
     Texture(GLuint textureUnit = 0); //basic texture from code
     Texture(const std::string &filename, GLuint textureUnit = 0);
     GLuint id() const;
+    bool isValid{true};
 
 private:
     //this is put inside this class to avoid spamming the main namespace
