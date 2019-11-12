@@ -72,6 +72,13 @@ void BSplineCurve::updateTrophies() {
 
     setControlPoints(controlPoints);
 }
+
+
+
+
+/**
+ * @brief BSplineCurve::updatePath, updates the bspline, called from AIsystem.
+ */
 void BSplineCurve::updatePath(bool init) {
     std::vector<Vertex> vertices;
 
@@ -112,7 +119,7 @@ void BSplineCurve::updatePath(bool init) {
 /**
  * @brief BSplineCurve::evaluateBSpline, deBoor's algorithm for bsplines
  * @param my et tall slik at bspline.t[my] <= x < bspline.t[my+1]
- * @param x paramterverdi på skjøtvektor
+ * @param x parameterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
 vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
@@ -134,6 +141,9 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
     return a[0];
 }
 
+/**
+ * @brief BSplineCurve::draw
+ */
 void BSplineCurve::draw() {
 
     if (debugLine) {
@@ -144,6 +154,9 @@ void BSplineCurve::draw() {
     }
 }
 
+/**
+ * @brief BSplineCurve::init
+ */
 void BSplineCurve::init() {
     initializeOpenGLFunctions();
     updateTrophies();
@@ -163,6 +176,11 @@ void BSplineCurve::init() {
     updatePath(true);
 }
 
+/**
+ * @brief BSplineCurve::eval
+ * @param x
+ * @return
+ */
 vec3 BSplineCurve::eval(float x) const {
     auto my = getMy(x);
     if (my > -1)

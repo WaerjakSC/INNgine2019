@@ -31,6 +31,7 @@ private:
     void move();
     void death();
     void goalReached();
+    void learn();
 
     bool updatePath = false;
     BSplineCurve mCurve;

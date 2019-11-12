@@ -6,6 +6,10 @@
 AIsystem::AIsystem() {
 }
 
+/**
+ * @brief AIsystem::update, runs the highly sofisticated AI cortex
+ * @param dt
+ */
 void AIsystem::update(DeltaTime dt) {
     // Run the eventHandler incase of events
     eventHandler();
@@ -22,13 +26,7 @@ void AIsystem::update(DeltaTime dt) {
         }
         break;
     case LEARN:
-        dir = -dir;
-        if (updatePath) {
-            mCurve.updatePath();
-            //            mCurve.updateTrophies();
-            updatePath = false;
-        }
-        state = MOVE;
+        learn();
         break;
     case DEATH:
         // Whatever happens when gnomes die
@@ -41,15 +39,38 @@ void AIsystem::update(DeltaTime dt) {
     }
 }
 
+/**
+ * @brief AIsystem::learn, flips the direction and updates path
+ */
+void AIsystem::learn(){
+    dir = -dir;
+    if (updatePath) {
+        mCurve.updatePath();
+        //            mCurve.updateTrophies();
+        updatePath = false;
+    }
+    state = MOVE;
+}
+
+/**
+ * @brief AIsystem::masterOfCurves, helper function that updates trophies and path
+ */
 void AIsystem::masterOfCurves(){
    mCurve.updateTrophies();
    mCurve.updatePath();
 }
 
+/**
+ * @brief AIsystem::setControlPoints
+ * @param cps
+ */
 void AIsystem::setControlPoints(std::vector<vec3> cps) {
     mCurve.setControlPoints(cps);
 }
 
+/**
+ * @brief AIsystem::eventHandler, event handling
+ */
 void AIsystem::eventHandler() {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
@@ -76,6 +97,9 @@ void AIsystem::eventHandler() {
     }
 }
 
+/**
+ * @brief AIsystem::draw
+ */
 void AIsystem::draw() {
     mCurve.draw();
 }
@@ -94,6 +118,12 @@ void AIsystem::draw() {
      *
      *
      */
+
+/**
+ * @brief AIsystem::move, patrols the NPC along the curve
+ * @param deltaT
+ * @return
+ */
 std::optional<NPCevents> AIsystem::move(float deltaT) {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
@@ -116,17 +146,27 @@ std::optional<NPCevents> AIsystem::move(float deltaT) {
     return std::nullopt;
 }
 
+/**
+ * @brief AIsystem::init, initializes NPC and curve
+ * @param eID
+ */
 void AIsystem::init(GLuint eID) {
     NPC = eID;
     mCurve.init();
 }
 
+/**
+ * @brief AIsystem::death, todo
+ */
 void AIsystem::death() {
     // hp >= 0
     // gold++
     // delete entity
 }
 
+/**
+ * @brief AIsystem::goalReached, todo
+ */
 void AIsystem::goalReached() {
     // endpoint reached
     // remove 1LP from player
