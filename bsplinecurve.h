@@ -7,6 +7,7 @@ class BSplineCurve : protected QOpenGLFunctions_4_1_Core {
 public:
     // default constructor
     BSplineCurve(int degree = 2);
+
     std::vector<vec3> b;  // control points
     int n;                // n number of knots
     int d;                // d degrees
