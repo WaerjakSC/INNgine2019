@@ -433,7 +433,7 @@ void ResourceManager::makeLevelMesh(GLuint eID) {
     mMeshData.mVertices = vertices;
     std::vector<GLuint> indices;
     GLuint v = 0;
-    for(int k = 0; k < 1024; k++) {
+    for(int k = 0; k < 256; k++) {
         indices.push_back(v);
         indices.push_back(v+2);
         indices.push_back(v+1);

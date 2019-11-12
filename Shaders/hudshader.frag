@@ -1,8 +1,8 @@
 #version 330 core
 
-in vec2 UV;
 uniform sampler2D qt_Texture0;
-varying vec4 qt_TexCoord0;
+in vec4 qt_TexCoord0;
+out vec4 gl_FragColor;
 
 void main(void)
 {
