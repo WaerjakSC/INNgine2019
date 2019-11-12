@@ -318,7 +318,8 @@ struct AIcomponent : public Component {
 struct PlayerComponent : public Component {
     PlayerComponent() {}
     int playerHP = 100;
-
+    int playerGold = 500;
+    int playerKills = 0;
 };
 
 #endif // COMPONENT_H

@@ -49,6 +49,8 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Cylinder>();
     registry->registerComponent<AIcomponent>();
     registry->registerComponent<BSplinePoint>();
+    registry->registerComponent<PlayerComponent>();
+    registry->registerComponent<TowerComponent>();
 
     mSceneLoader = std::make_unique<Scene>();
 
