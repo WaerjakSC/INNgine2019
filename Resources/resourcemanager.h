@@ -51,7 +51,7 @@ public:
         return std::static_pointer_cast<Type>(mShaders[type]);
     }
     // Loads and generates texture from file
-    void loadTexture(std::string name);
+    bool loadTexture(std::string name);
     // Gets stored texture
     Ref<Texture> getTexture(std::string name);
 

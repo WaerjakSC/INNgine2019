@@ -137,6 +137,7 @@ void RenderWindow::init() {
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mSoundSystem->init();
     mMoveSystem->init();
+    mInputSystem->init(aspectRatio);
     auto view = mRegistry->view<AIcomponent>();
     if (!view.empty()) {
         GLuint enemy = mRegistry->view<AIcomponent>().entities()[0];
@@ -203,8 +204,10 @@ Ref<MovementSystem> RenderWindow::movement() const {
 //and when it is resized
 //exposeEvent is a overridden function from QWindow that we inherit from
 void RenderWindow::exposeEvent(QExposeEvent *) {
-    if (!mInitialized)
+    if (!mInitialized) {
         init();
+        mTime.start();
+    }
 
     //If the window actually is exposed to the screen we start the main loop
     //isExposed() is a function in QWindow
@@ -213,7 +216,6 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
         //16 means 16ms = 60 Frames pr second (should be 16.6666666 to be exact..)
         mRenderTimer->start(1);
         mTimeStart.start();
-        mTime.start();
     }
     //This is just to support modern screens with "double" pixels
     const qreal retinaScale = devicePixelRatio();

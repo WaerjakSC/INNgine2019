@@ -62,14 +62,6 @@ void CameraController::setPosition(const vec3 &position) {
 }
 void CameraController::update() {
     if (mOutDated) {
-        if (meshID != 0) {
-            gsl::Matrix4x4 temp(true);
-            temp.lookAt(cameraPosition(), cameraPosition() - forward(), up());
-            auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
-            auto trans = Registry::instance()->getSystem<MovementSystem>();
-            trans->setLocalPosition(meshID, cameraPosition() - forward());
-            trans->setRotation(meshID, rot);
-        }
         mCamera.setRotation(mPitch, mYaw);
         mCamera.setPosition(mCameraPosition);
         mCamera.calculateViewMatrix();
@@ -96,10 +88,6 @@ void CameraController::goTo(vec3 target) {
     mCameraPosition = position;
     updateForwardVector();
 }
-void CameraController::moveForward(float delta) {
-    mOutDated = true;
-    mCameraPosition += mForward * mTranslationSpeed * delta;
-}
 float CameraController::getPitch() const {
     return mPitch;
 }
@@ -111,8 +99,9 @@ const vec3 CameraController::getCameraRotation() const {
     return mCamera.getRotation();
 }
 
-void CameraController::setMeshID(const GLuint &value) {
-    meshID = value;
+void CameraController::moveForward(float delta) {
+    mOutDated = true;
+    mCameraPosition += mForward * mTranslationSpeed * delta;
 }
 void CameraController::moveUp(float deltaHeight) {
     mOutDated = true;
@@ -133,8 +122,13 @@ void CameraController::resize(float aspectRatio) {
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
 
-GameCameraController::GameCameraController(float aspectRatio) : CameraController(aspectRatio) {
-    mPitch = -45.f;
+GameCameraController::GameCameraController(float aspectRatio, GLuint entityController, bool isActiveCamera)
+    : CameraController(aspectRatio), mControllerID(entityController), mActive(isActiveCamera) {
+    const GameCamera cam = Registry::instance()->get<GameCamera>(mControllerID);
+    mPitch = cam.mPitch;
+    mYaw = cam.mYaw;
+    setPosition(cam.mCameraPosition);
+
     // Set desired pitch and yaw here, they will not be changeable by the player
 }
 
@@ -144,4 +138,27 @@ void GameCameraController::pitch(float degrees) {
 
 void GameCameraController::yaw(float degrees) {
     Q_UNUSED(degrees);
+}
+
+void GameCameraController::update() {
+    if (mOutDated) {
+        updateMeshPosition();
+        CameraController::update();
+    }
+}
+
+void GameCameraController::setPosition(const vec3 &position) {
+    CameraController::setPosition(position);
+}
+
+void GameCameraController::updateMeshPosition() {
+    gsl::Matrix4x4 temp(true);
+    temp.lookAt(cameraPosition(), positionWithOffset(), up());
+    auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
+    auto moveSys = Registry::instance()->getSystem<MovementSystem>();
+    moveSys->setLocalPosition(mControllerID, positionWithOffset());
+    moveSys->setRotation(mControllerID, rot);
+}
+vec3 GameCameraController::positionWithOffset() {
+    return cameraPosition() - forward();
 }

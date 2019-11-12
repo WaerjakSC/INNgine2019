@@ -12,12 +12,22 @@ InputSystem::InputSystem(RenderWindow *window)
 
 void InputSystem::update(DeltaTime dt) {
     if (factory->isPlaying()) {
-        gameCameraController()->update();
+        for (auto &camera : gameCameraControllers()) {
+            if (camera->mActive)
+                camera->update();
+        }
     } else
         editorCamController()->update();
     handlePlayerController(dt);
     handleKeyInput();
     handleMouseInput();
+}
+
+void InputSystem::init(float aspectRatio) {
+    auto view = registry->view<GameCamera>();
+    for (auto entity : view) {
+        mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, entity, view.get(entity).mIsActive));
+    }
 }
 void InputSystem::handleKeyInput() {
     if (editorInput.ESCAPE) //Shuts down whole program
@@ -90,20 +100,13 @@ Ref<CameraController> InputSystem::editorCamController() const {
     return mEditorCamController;
 }
 
-Ref<GameCameraController> InputSystem::gameCameraController() const {
-    return mGameCameraController;
-}
-
-void InputSystem::setGameCameraController(const Ref<GameCameraController> &gameCameraController, GLuint gameCamMeshID) {
-    mGameCameraController = gameCameraController;
-    mGameCameraController->setMeshID(gameCamMeshID);
-
-    mGameCameraController->update();
-}
-
 void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController) {
     mEditorCamController = editorCamController;
     ray = new Raycast(mEditorCamController);
+}
+
+std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() const {
+    return mGameCameraControllers;
 }
 
 Input &InputSystem::playerController() {
@@ -265,7 +268,10 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
 }
 void InputSystem::onResize(float aspectRatio) {
     mEditorCamController->resize(aspectRatio);
-    mGameCameraController->resize(aspectRatio);
+    for (auto camera : gameCameraControllers()) {
+        if (camera->mActive)
+            camera->resize(aspectRatio);
+    }
 }
 void InputSystem::inputMousePress(QMouseEvent *event, Input &input) {
     switch (event->button()) {

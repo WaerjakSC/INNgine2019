@@ -16,6 +16,7 @@ class InputSystem : public QObject, public ISystem {
 public:
     InputSystem(RenderWindow *window);
     void update(DeltaTime dt = 0.016) override;
+    void init(float aspectRatio = 1.92f);
     void keyPressEvent(QKeyEvent *event);
 
     void keyReleaseEvent(QKeyEvent *event);
@@ -30,7 +31,7 @@ public:
     Ref<CameraController> editorCamController() const;
     void setEditorCamController(const Ref<CameraController> &editorCamController);
 
-    Ref<GameCameraController> gameCameraController() const;
+    std::vector<Ref<GameCameraController>> gameCameraControllers() const;
     void setGameCameraController(const Ref<GameCameraController> &gameCameraController, GLuint gameCamMeshID);
 
     void onResize(float aspectRatio);
@@ -38,6 +39,7 @@ public:
 
     void setPlayer(const GLuint &player);
 
+    GLuint gameCamID();
 signals:
     void snapSignal();
     void rayHitEntity(GLuint entityID);
@@ -63,7 +65,7 @@ private:
     Registry *registry{};
     ResourceManager *factory;
     Ref<CameraController> mEditorCamController;
-    Ref<GameCameraController> mGameCameraController;
+    std::vector<Ref<GameCameraController>> mGameCameraControllers;
 
     RenderWindow *mRenderWindow;
 

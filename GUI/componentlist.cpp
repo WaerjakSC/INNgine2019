@@ -59,9 +59,11 @@ void ComponentList::setupComponentList() {
     if (registry->contains<Mesh>(eID)) {
         setupMeshSettings(registry->get<Mesh>(eID));
     }
-
     if (registry->contains<BSplinePoint>(eID)) {
         setupBSplinePointSettings(registry->get<BSplinePoint>(eID));
+    }
+    if (registry->contains<GameCamera>(eID)) {
+        setupGameCameraSettings(registry->get<GameCamera>(eID));
     }
 
     //    if (registry->contains<Transform>(eID)) {
@@ -193,6 +195,51 @@ void ComponentList::addCylinderCollider() {
         }
         setupComponentList();
     }
+}
+void ComponentList::addGameCameraComponent() {
+    if (mMainWindow->selectedEntity) {
+        GLuint eID = mMainWindow->selectedEntity->id();
+        if (!registry->contains<GameCamera>(eID)) {
+            registry->add<GameCamera>(eID);
+        }
+        setupComponentList();
+    }
+}
+void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
+    ComponentGroupBox *box = new ComponentGroupBox("Game Camera", mMainWindow);
+    QGridLayout *grid = new QGridLayout;
+    grid->setMargin(2);
+    QGroupBox *positionBox = new QGroupBox(tr("Position"));
+    positionBox->setStyle(fusion);
+    positionBox->setFlat(true);
+    QHBoxLayout *position = new QHBoxLayout;
+    position->setMargin(1);
+    auto [positionX, positionY, positionZ] = makeVectorBox(cam.mCameraPosition, position); // Not sure yet if this is something that's supposed to be updated
+    connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setCameraPositionX(double)));
+    connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setCameraPositionY(double)));
+    connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setCameraPositionZ(double)));
+
+    positionBox->setLayout(position);
+    grid->addWidget(positionBox, 0, 0);
+
+    QGroupBox *rotationBox = new QGroupBox(tr("Pitch and Yaw"));
+    rotationBox->setAlignment(Qt::AlignCenter);
+
+    rotationBox->setStyle(fusion);
+    rotationBox->setFlat(true);
+
+    QHBoxLayout *rotationLayout = new QHBoxLayout;
+    rotationLayout->setMargin(1);
+    QDoubleSpinBox *pitch = makeDoubleSpinBox(cam.mPitch, rotationLayout, -180, 180);
+    QDoubleSpinBox *yaw = makeDoubleSpinBox(cam.mYaw, rotationLayout, -180, 180);
+    //    connect(this, &ComponentList::sphereRadius, pitch, &QDoubleSpinBox::setValue);
+    connect(pitch, SIGNAL(valueChanged(double)), this, SLOT(setPitch(double)));
+    connect(yaw, SIGNAL(valueChanged(double)), this, SLOT(setYaw(double)));
+    rotationBox->setLayout(rotationLayout);
+
+    grid->addWidget(rotationBox, 1, 0);
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
 }
 void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     ComponentGroupBox *box = new ComponentGroupBox("BSpline Point", mMainWindow);
@@ -330,13 +377,7 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
 
     QHBoxLayout *radiusLayout = new QHBoxLayout;
     radiusLayout->setMargin(1);
-    QDoubleSpinBox *radius = new QDoubleSpinBox;
-    radius->setDecimals(1);
-    radius->setRange(0.1f, 5000);
-    radius->setMaximumWidth(58);
-    radius->setStyle(fusion);
-    radius->setValue(col.radius);
-    radiusLayout->addWidget(radius);
+    QDoubleSpinBox *radius = makeDoubleSpinBox(col.radius, radiusLayout);
     connect(this, &ComponentList::sphereRadius, radius, &QDoubleSpinBox::setValue);
     connect(radius, SIGNAL(valueChanged(double)), this, SLOT(setSphereRadius(double)));
 
@@ -377,13 +418,7 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
 
     QHBoxLayout *radiusLayout = new QHBoxLayout;
     radiusLayout->setMargin(1);
-    QDoubleSpinBox *radius = new QDoubleSpinBox;
-    radius->setDecimals(1);
-    radius->setRange(0.1f, 5000);
-    radius->setMaximumWidth(58);
-    radius->setStyle(fusion);
-    radius->setValue(col.radius);
-    radiusLayout->addWidget(radius);
+    QDoubleSpinBox *radius = makeDoubleSpinBox(col.radius, radiusLayout);
     connect(this, &ComponentList::cylinderRadius, radius, &QDoubleSpinBox::setValue);
     connect(radius, SIGNAL(valueChanged(double)), this, SLOT(setCylinderRadius(double)));
 
@@ -396,13 +431,7 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
 
     QHBoxLayout *heightLayout = new QHBoxLayout;
     heightLayout->setMargin(1);
-    QDoubleSpinBox *height = new QDoubleSpinBox;
-    height->setDecimals(1);
-    height->setRange(0.1f, 5000);
-    height->setMaximumWidth(58);
-    height->setStyle(fusion);
-    height->setValue(col.height);
-    heightLayout->addWidget(height);
+    QDoubleSpinBox *height = makeDoubleSpinBox(col.height, heightLayout);
     connect(this, &ComponentList::cylinderHeight, radius, &QDoubleSpinBox::setValue);
     connect(height, SIGNAL(valueChanged(double)), this, SLOT(setCylinderHeight(double)));
 
@@ -468,13 +497,7 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
 
     QHBoxLayout *distanceLayout = new QHBoxLayout;
     distanceLayout->setMargin(1);
-    QDoubleSpinBox *distance = new QDoubleSpinBox;
-    distance->setDecimals(1);
-    distance->setRange(0.1f, 5000);
-    distance->setMaximumWidth(58);
-    distance->setStyle(fusion);
-    distance->setValue(col.distance);
-    distanceLayout->addWidget(distance);
+    QDoubleSpinBox *distance = makeDoubleSpinBox(col.distance, distanceLayout);
     connect(this, &ComponentList::planeDistance, distance, &QDoubleSpinBox::setValue);
     connect(distance, SIGNAL(valueChanged(double)), this, SLOT(setPlaneDistance(double)));
 
@@ -518,7 +541,9 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     QLabel *textureThumb = new QLabel(box);
     QPixmap thumbNail;
     thumbNail.load(QString::fromStdString(gsl::assetFilePath) + "Textures/" + curTexture); // Load the texture image into the pixmap
-    textureThumb->setPixmap(thumbNail.scaled(18, 18));                                     // Get a scaled version of the image loaded above
+    if (!thumbNail.isNull()) {
+        textureThumb->setPixmap(thumbNail.scaled(18, 18)); // Get a scaled version of the image loaded above
+    }
     texFileLabel = new QLabel(box);
     texFileLabel->setText(curTexture); // Saves the file name of the texture image
     QPushButton *browseImages = new QPushButton("Browse", this);
@@ -732,6 +757,41 @@ void ComponentList::setControlZ(double zIn) {
     auto &bspline = registry->get<BSplinePoint>(entityID);
     bspline.location.z = zIn;
     registry->getSystem<AIsystem>()->masterOfCurves();
+}
+
+void ComponentList::setCameraPositionX(double xIn) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mCameraPosition.x = xIn;
+    cam.mOutOfDate = true;
+}
+
+void ComponentList::setCameraPositionY(double yIn) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mCameraPosition.y = yIn;
+    cam.mOutOfDate = true;
+}
+
+void ComponentList::setCameraPositionZ(double zIn) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mCameraPosition.z = zIn;
+    cam.mOutOfDate = true;
+}
+
+void ComponentList::setPitch(double pitch) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mPitch = pitch;
+    cam.mOutOfDate = true;
+}
+
+void ComponentList::setYaw(double yaw) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mYaw = yaw;
+    cam.mOutOfDate = true;
 }
 void ComponentList::setPositionX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
@@ -991,6 +1051,19 @@ QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Coll
     objectType->addWidget(staticBox);
     objectTypeBox->setLayout(objectType);
     return staticBox;
+}
+QDoubleSpinBox *ComponentList::makeDoubleSpinBox(const double &num, QHBoxLayout *layout,
+                                                 const std::optional<float> &minRange, const std::optional<float> &maxRange) {
+    layout->setMargin(1);
+    QDoubleSpinBox *distance = new QDoubleSpinBox;
+    distance->setDecimals(1);
+    distance->setRange(minRange.value_or(0.1f), maxRange.value_or(5000.f));
+    distance->setMaximumWidth(58);
+    distance->setStyle(fusion);
+    distance->setValue(num);
+    layout->addWidget(distance);
+
+    return distance;
 }
 /**
  * @brief Utility function for making an XYZ box layout from a given vector
