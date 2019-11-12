@@ -458,6 +458,65 @@ void ResourceManager::makeLevelMesh(GLuint eID) {
     glBindVertexArray(0);
 }
 
+void ResourceManager::makeTowerMesh(GLuint eID) {
+    initializeOpenGLFunctions();
+    mMeshData.Clear();
+    mMeshData.mName = "Tower";
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
+    {
+                                   //Vertex data for front
+                                   Vertex{gsl::Vector3D(-0.8f, 0.f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.333f)}, //v0
+                                   Vertex{gsl::Vector3D(0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.333f)},   //v1
+                                   Vertex{gsl::Vector3D(0.8f, 0.f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.666f)},  //v2
+                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.666f)},    //v3
+
+                                   //Vertex data for right
+                                   Vertex{gsl::Vector3D(0.8f, 0.f, -0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v4
+                                   Vertex{gsl::Vector3D(0.8f, 0.8f, 0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.333f)}, //v5
+                                   Vertex{gsl::Vector3D(0.8f, 0.f, 0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v6
+                                   Vertex{gsl::Vector3D(0.8f, 0.8f, -0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.666f)},  //v7
+
+                                   //Vertex data for back
+                                   Vertex{gsl::Vector3D(0.8f, 0.f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.75f, 0.333f)}, //v8
+                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.8f, 0.333f)},  //v9
+                                   Vertex{gsl::Vector3D(-0.8f, 0.f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.75f, 0.666f)},  //v10
+                                   Vertex{gsl::Vector3D(0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.8f, 0.666f)},   //v11
+
+                                   //Vertex data for left
+                                   Vertex{gsl::Vector3D(-0.8f, 0.f, 0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.f, 0.333f)},  //v12
+                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, -0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v13
+                                   Vertex{gsl::Vector3D(-0.8f, 0.f, -0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.f, 0.666f)},   //v14
+                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, 0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v15
+
+                                   //Vertex data for top
+                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v16
+                                   Vertex{gsl::Vector3D(0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v17
+                                   Vertex{gsl::Vector3D(0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.25f, 0.999f)}, //v18
+                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.5f, 0.999f)}    //v19
+                               });
+
+    mMeshData.mIndices.insert(mMeshData.mIndices.end(), {
+                                  0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
+                                  4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
+                                  8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
+                                  12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
+                                  16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
+                              });
+
+    //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
+    if (!registry->contains<Mesh>(eID))
+        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
+    else
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
+
+    auto &towerMesh = registry->get<Mesh>(eID);
+
+    initVertexBuffers(&towerMesh);
+    initIndexBuffers(&towerMesh);
+
+    glBindVertexArray(0);
+}
+
 /**
  * @brief Sphere prefab
  * @param n - number of recursions. Increase number for "rounder" sphere
