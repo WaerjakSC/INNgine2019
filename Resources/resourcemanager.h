@@ -174,6 +174,7 @@ private:
     void makePlaneMesh(GLuint eID);
     void makeBallMesh(GLuint eID, int n = 3);
     void makeBillBoardMesh(int eID);
+    void makeLevelMesh(GLuint eID);
     friend class ComponentList;
     void changeMsg();
 };
