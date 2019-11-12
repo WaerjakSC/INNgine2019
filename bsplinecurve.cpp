@@ -64,9 +64,9 @@ int BSplineCurve::getMy(float x) const {
  */
 void BSplineCurve::updateTrophies() {
     std::vector<vec3> controlPoints;
-    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
+    auto view = Registry::instance()->view<BSplinePoint>(); // Get every entity with these two components
     for (auto entity : view) {
-        auto &bspline = view.get<BSplinePoint>(entity);
+        auto &bspline = view.get(entity);
         controlPoints.push_back(bspline.location);
     }
 

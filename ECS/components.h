@@ -287,6 +287,15 @@ struct Cylinder : public Collision {
         isStatic = stat;
     }
 };
+struct GameCamera : public Component {
+    inline GameCamera(vec3 pos = vec3(0), float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active) {
+    }
+    vec3 mCameraPosition;
+    float mPitch, mYaw;
+    bool mOutOfDate{true};
+    bool mIsActive;
+};
+
 /**
  * @brief The BSplineCurve struct
  */
@@ -318,7 +327,6 @@ struct AIcomponent : public Component {
 struct PlayerComponent : public Component {
     PlayerComponent() {}
     int playerHP = 100;
-
 };
 
 #endif // COMPONENT_H

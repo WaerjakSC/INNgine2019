@@ -49,7 +49,7 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Cylinder>();
     registry->registerComponent<AIcomponent>();
     registry->registerComponent<BSplinePoint>();
-
+    registry->registerComponent<GameCamera>();
     mSceneLoader = std::make_unique<Scene>();
 
     // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
@@ -337,7 +337,6 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
                                   20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
                               });
 
-    //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
     if (!registry->contains<Mesh>(eID))
         registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
@@ -702,14 +701,17 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
  * @param fileName
  * @param textureUnit
  */
-void ResourceManager::loadTexture(std::string fileName) {
+bool ResourceManager::loadTexture(std::string fileName) {
     if (mTextures.find(fileName) == mTextures.end()) {
         Ref<Texture> tex = std::make_shared<Texture>(fileName, mTextures.size());
         if (tex->isValid) {
             mTextures[fileName] = tex;
             qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
+            return true;
         }
+        return false;
     }
+    return false;
 }
 
 Ref<Texture> ResourceManager::getTexture(std::string fileName) {
@@ -780,11 +782,12 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
         if (mp->diffuse_texname.length() > 0) {
             auto search = mTextures.find(mp->diffuse_texname);
             // Only load the texture if it is not already loaded
+            bool textureLoaded = false;
             if (search == mTextures.end()) {
-                loadTexture(mp->diffuse_texname);
+                textureLoaded = loadTexture(mp->diffuse_texname);
             }
             // Currently doesn't support multiple textures
-            if (registry->contains<Material>(eID)) {
+            if (registry->contains<Material>(eID) && textureLoaded) {
                 auto &mat = registry->get<Material>(eID);
                 mat.mTextureUnit = search->second->id() - 1;
                 mat.mShader = getShader<TextureShader>();
@@ -932,7 +935,12 @@ void ResourceManager::play() {
         registry->getSystem<SoundSystem>()->playAll();
         auto inputsys = registry->getSystem<InputSystem>();
         for (auto shader : mShaders) {
-            shader.second->setCameraController(inputsys->gameCameraController());
+            for (auto controller : inputsys->gameCameraControllers()) {
+                if (controller->mActive) {
+                    shader.second->setCameraController(controller);
+                    break;
+                }
+            }
         }
         mIsPlaying = true;
         registry->getSystem<AIsystem>()->masterOfCurves();

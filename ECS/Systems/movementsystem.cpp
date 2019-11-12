@@ -1,5 +1,7 @@
 #include "movementsystem.h"
 #include "billboard.h"
+#include "cameracontroller.h"
+#include "inputsystem.h"
 #include "pool.h"
 #include "registry.h"
 MovementSystem::MovementSystem() : registry(Registry::instance()) {

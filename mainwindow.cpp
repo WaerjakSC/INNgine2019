@@ -255,6 +255,10 @@ void MainWindow::createActions() {
     components->addAction(bspline);
     connect(bspline, &QAction::triggered, mComponentList, &ComponentList::addBSplineComponent);
 
+    QAction *cam = new QAction(tr("Game Camera"), this);
+    components->addAction(cam);
+    connect(cam, &QAction::triggered, mComponentList, &ComponentList::addGameCameraComponent);
+
     ui->mainToolBar->setMovable(false);
 
     // Set up the prefab actions

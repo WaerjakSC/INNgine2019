@@ -27,27 +27,12 @@ void Scene::saveScene(const QString &fileName) {
     Registry *registry = Registry::instance();
     std::map<GLuint, cjk::Ref<Entity>> entities = registry->getEntities();
     auto inputSys = registry->getSystem<InputSystem>();
-    GameCameraController *gameCam = inputSys->gameCameraController().get();
 
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer(buf);
 
     mName = fileName;
     writer.StartObject();
-
-    writer.String("gamecam");
-    writer.StartObject();
-    writer.Key("position");
-    writer.StartArray();
-    writer.Double(gameCam->cameraPosition().x);
-    writer.Double(gameCam->cameraPosition().y);
-    writer.Double(gameCam->cameraPosition().z);
-    writer.EndArray();
-    writer.Key("pitch");
-    writer.Double(gameCam->getPitch());
-    writer.Key("yaw");
-    writer.Double(gameCam->getYaw());
-    writer.EndObject();
 
     writer.String("controller");
     writer.StartObject();
@@ -57,8 +42,6 @@ void Scene::saveScene(const QString &fileName) {
 
     for (auto entity : entities) {
         GLuint eID = entity.first;
-        if (eID == mGameCamID)
-            continue;
         if (eID != 0 && !entity.second->name().isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("Entity");
             writer.StartObject();
@@ -314,6 +297,24 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndArray();
                 writer.EndObject();
             }
+            if (registry->contains<GameCamera>(eID)) {
+                writer.Key("GameCamera");
+                writer.StartObject();
+                const GameCamera &cam = registry->get<GameCamera>(eID);
+                writer.Key("position");
+                writer.StartArray();
+                writer.Double(cam.mCameraPosition.x);
+                writer.Double(cam.mCameraPosition.y);
+                writer.Double(cam.mCameraPosition.z);
+                writer.EndArray();
+                writer.Key("pitch");
+                writer.Double(cam.mPitch);
+                writer.Key("yaw");
+                writer.Double(cam.mYaw);
+                writer.Key("active");
+                writer.Bool(cam.mIsActive);
+                writer.EndObject();
+            }
 
             writer.EndObject();
             writer.EndObject();
@@ -351,26 +352,9 @@ void Scene::populateScene(const Document &scene) {
     std::map<int, int> idPairs;
     Registry *registry = Registry::instance();
     ResourceManager *factory = ResourceManager::instance();
-    if (scene.HasMember("gamecam")) {
-        Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
-        vec3 position(scene["gamecam"]["position"][0].GetDouble(), scene["gamecam"]["position"][1].GetDouble(), scene["gamecam"]["position"][2].GetDouble());
-        gameCam->setPosition(position);
-        gameCam->setPitch(scene["gamecam"]["pitch"].GetDouble());
-        gameCam->setYaw(scene["gamecam"]["yaw"].GetDouble());
-        mGameCamID = registry->makeEntity("Game Camera");
-        registry->add<Transform>(mGameCamID, position, vec3(0), vec3(0.33f, 0.33f, 0.33f));
-        registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
-        // set the initial position and rotation
-        gsl::Matrix4x4 temp(true);
-        temp.lookAt(gameCam->cameraPosition(), gameCam->cameraPosition() - gameCam->forward(), gameCam->up());
-        auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
-        auto moveSys = registry->getSystem<MovementSystem>();
-        moveSys->setLocalPosition(mGameCamID, gameCam->cameraPosition() - gameCam->forward());
-        moveSys->setRotation(mGameCamID, rot);
-        registry->add<Material>(mGameCamID, factory->getShader<ColorShader>());
-        factory->addMeshComponent("camera.obj", mGameCamID);
-        moveSys->init();
-    }
+    //        Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
+    //        registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
+
     if (scene.HasMember("controller")) {
         GLuint controllerID = scene["controller"]["id"].GetUint();
         registry->getSystem<InputSystem>()->setPlayer(controllerID);
@@ -381,7 +365,7 @@ void Scene::populateScene(const Document &scene) {
     // Iterate through each entity in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
         // Iterate through each of the members in the entity (name, id, components)
-        if (itr->name == "gamecam" || itr->name == "controller")
+        if (itr->name == "controller")
             continue;
         GLuint id = registry->makeEntity(itr->value["name"].GetString());
         idPairs[itr->value["id"].GetInt()] = id;
@@ -465,6 +449,12 @@ void Scene::populateScene(const Document &scene) {
             } else if (comp->name == "BSplinePoint") {
                 vec3 location(comp->value["location"][0].GetDouble(), comp->value["location"][1].GetDouble(), comp->value["location"][2].GetDouble());
                 registry->add<BSplinePoint>(id, location);
+            } else if (comp->name == "GameCamera") {
+                vec3 camPos(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
+                float pitch = comp->value["pitch"].GetDouble();
+                float yaw = comp->value["yaw"].GetDouble();
+                bool active = comp->value["active"].GetBool();
+                registry->add<GameCamera>(id, camPos, pitch, yaw, true);
             }
         }
     }

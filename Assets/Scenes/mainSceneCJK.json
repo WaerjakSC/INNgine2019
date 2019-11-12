@@ -1,15 +1,54 @@
 {
-    "gamecam": {
-        "position": [
-            0.0,
-            14.0,
-            15.0
-        ],
-        "pitch": -45.0,
-        "yaw": 0.0
-    },
     "controller": {
         "id": 10
+    },
+    "Entity": {
+        "name": "Game Camera",
+        "id": 1,
+        "components": {
+            "transform": {
+                "position": [
+                    0.0,
+                    14.699999809265137,
+                    15.707106590270996
+                ],
+                "rotation": [
+                    135.0,
+                    0.0,
+                    -180.0
+                ],
+                "scale": [
+                    0.33000001311302187,
+                    0.33000001311302187,
+                    0.33000001311302187
+                ],
+                "parent": -1
+            },
+            "material": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specstr": 0.30000001192092898,
+                "specexp": 4,
+                "textureid": 0,
+                "shader": "PlainShader"
+            },
+            "mesh": {
+                "name": "camera.obj"
+            },
+            "GameCamera": {
+                "position": [
+                    0.0,
+                    14.0,
+                    15.0
+                ],
+                "pitch": -45.0,
+                "yaw": 0.0,
+                "active": true
+            }
+        }
     },
     "Entity": {
         "name": "Skybox",
@@ -60,7 +99,7 @@
                     -8.5
                 ],
                 "rotation": [
-                    -45.0,
+                    0.0,
                     -0.0,
                     -0.0
                 ],
@@ -739,8 +778,8 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": -1,
-                "shader": "PhongShader"
+                "textureid": 0,
+                "shader": "TextureShader"
             },
             "mesh": {
                 "name": "OgreOBJ.obj"

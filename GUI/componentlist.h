@@ -39,6 +39,7 @@ public slots:
     void addPlaneCollider();
     void addCylinderCollider();
     void addBSplineComponent();
+    void addGameCameraComponent();
 
 signals:
     void posX(GLfloat xIn);
@@ -90,6 +91,12 @@ private slots:
     void setControlX(double xIn);
     void setControlY(double yIn);
     void setControlZ(double zIn);
+
+    void setCameraPositionX(double xIn);
+    void setCameraPositionY(double yIn);
+    void setCameraPositionZ(double zIn);
+    void setPitch(double pitch);
+    void setYaw(double yaw);
 
     void setPositionX(double xIn);
     void setPositionY(double yIn);
@@ -143,6 +150,8 @@ private:
     void setupSphereColliderSettings(const Sphere &col);
     void setupCylinderColliderSettings(const Cylinder &col);
     void setupPlaneColliderSettings(const Plane &col);
+    void setupGameCameraSettings(const GameCamera &cam);
+
     Registry *registry;
     QColor rgb;
     QStyle *fusion;
@@ -153,12 +162,13 @@ private:
     VerticalScrollArea *scrollArea;
     MainWindow *mMainWindow;
     friend class MainWindow;
-
+    QDoubleSpinBox *makeDoubleSpinBox(const double &num, QHBoxLayout *layout, const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
     std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
                                                                                    const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
+
     void updateAABB(GLuint eID);
     void updateSphere(GLuint eID);
-    QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
     void setupBSplinePointSettings(const BSplinePoint &point);
 };
 
