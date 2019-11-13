@@ -109,6 +109,8 @@ public:
     bool loadWave(std::string filePath, Sound &sound);
     void setColliderMesh(Mesh &mesh);
     void newScene(const QString &text);
+    std::map<std::string, Ref<Texture>> getTextures() const;
+
 public slots:
     void save();
     void load();

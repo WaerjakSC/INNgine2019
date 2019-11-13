@@ -22,7 +22,7 @@ public:
 
     void call(Script &script, const QString &func);
 
-    bool readScript(Script &comp, const QString &fileName);
+    bool readScript(const QString &fileName);
     QString checkError(QJSValue value);
 
 private:

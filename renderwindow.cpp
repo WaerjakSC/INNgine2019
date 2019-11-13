@@ -111,14 +111,6 @@ void RenderWindow::init() {
     mFactory->loadTexture("gnome.bmp");
     mFactory->loadTexture("skybox.bmp");
 
-    //Set the textures loaded to a texture unit
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("white.bmp")->id());
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("gnome.bmp")->id());
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mFactory->getTexture("skybox.bmp")->id());
-
     // Set up the systems.
     mRenderer = mRegistry->registerSystem<RenderSystem>();
     mMoveSystem = mRegistry->registerSystem<MovementSystem>();

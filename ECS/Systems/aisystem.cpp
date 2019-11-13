@@ -74,7 +74,7 @@ void AIsystem::setControlPoints(std::vector<vec3> cps) {
 void AIsystem::eventHandler() {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
-    auto [transform, ai] = view.get<Transform, AIcomponent>(NPC);
+    auto &ai = view.get<AIcomponent>(NPC);
 
     while (!notification_queue.empty()) {
         auto event = notification_queue.front();
@@ -127,7 +127,7 @@ void AIsystem::draw() {
 std::optional<NPCevents> AIsystem::move(float deltaT) {
     auto reg = Registry::instance();
     auto view = reg->view<Transform, AIcomponent>();
-    auto [transform, ai] = view.get<Transform, AIcomponent>(NPC);
+    auto &transform = view.get<Transform>(NPC);
     t += deltaT * dir;
     bool endPoint = 0.98f <= t || t < 0.f;
 
@@ -159,7 +159,7 @@ void AIsystem::init(GLuint eID) {
  * @brief AIsystem::death, todo
  */
 void AIsystem::death() {
-    // hp >= 0
+    // hp <= 0
     // gold++
     // delete entity
 }

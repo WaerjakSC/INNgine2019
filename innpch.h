@@ -13,6 +13,11 @@
 #include <string>
 #include <vector>
 
+// secondary libs
+#include "wavfilehandler.h"
+#include <stb_image.h>
+//#include <stb_vorbis.c>
+
 //Own stuff
 #include "constants.h"
 #include "gltypes.h"

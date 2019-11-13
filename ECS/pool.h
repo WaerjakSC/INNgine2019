@@ -159,7 +159,7 @@ public:
                 mIndex.push_back(-1);
             }
         }
-        if (entityID < (int)mIndex.size())
+        if (entityID < mIndex.size())
             mIndex[entityID] = mList.size();
         else
             mIndex.push_back(mList.size()); // entity list size is location of new entityID

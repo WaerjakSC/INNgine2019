@@ -10,10 +10,10 @@ void ScriptSystem::update(DeltaTime deltaTime) {
 }
 
 void ScriptSystem::init() {
-    readScript(script, QString::fromStdString(gsl::assetFilePath) + "Scripts/testscript.js");
+    readScript(QString::fromStdString(gsl::assetFilePath) + "Scripts/testscript.js");
 }
 
-bool ScriptSystem::readScript(Script &comp, const QString &fileName) {
+bool ScriptSystem::readScript(const QString &fileName) {
     //Make the Script engine itself
     QJSEngine engine;
 

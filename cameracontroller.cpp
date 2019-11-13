@@ -128,8 +128,6 @@ GameCameraController::GameCameraController(float aspectRatio, GLuint entityContr
     mPitch = cam.mPitch;
     mYaw = cam.mYaw;
     setPosition(cam.mCameraPosition);
-
-    // Set desired pitch and yaw here, they will not be changeable by the player
 }
 
 void GameCameraController::pitch(float degrees) {
@@ -155,6 +153,8 @@ void GameCameraController::updateMeshPosition() {
     gsl::Matrix4x4 temp(true);
     temp.lookAt(cameraPosition(), positionWithOffset(), up());
     auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
+    Q_UNUSED(pos);
+    Q_UNUSED(sca);
     auto moveSys = Registry::instance()->getSystem<MovementSystem>();
     moveSys->setLocalPosition(mControllerID, positionWithOffset());
     moveSys->setRotation(mControllerID, rot);

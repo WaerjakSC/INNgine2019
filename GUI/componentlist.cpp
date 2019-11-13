@@ -662,7 +662,7 @@ void ComponentList::setNewTextureFile() {
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
         factory->loadTexture(fileName.toStdString());
-        registry->get<Material>(mMainWindow->selectedEntity->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->id() - 1;
+        registry->get<Material>(mMainWindow->selectedEntity->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->id();
         texFileLabel->setText(fileName);
     }
 }

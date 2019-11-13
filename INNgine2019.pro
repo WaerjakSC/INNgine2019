@@ -16,6 +16,7 @@ INCLUDEPATH += \
     ./Views \
     ./GUI \
     ./Resources \
+    ./Libs \
 
 mac {
     LIBS += -framework OpenAL
@@ -103,11 +104,13 @@ HEADERS += \
     Shaders/shader.h \
 #
     Resources/scene.h \
-    Resources/wavfilehandler.h \
     Resources/resourcemanager.h \
     Resources/texture.h \
     Resources/triangle.h \
-    Resources/tiny_obj_loader.h \
+#
+    Libs/tiny_obj_loader.h \
+    Libs/stb_image.h \
+    Libs/wavfilehandler.h \
 #
     bsplinecurve.h \
     cameracontroller.h \
@@ -158,11 +161,13 @@ SOURCES += main.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
 #
-    Resources/wavfilehandler.cpp \
     Resources/resourcemanager.cpp \
     Resources/texture.cpp \
     Resources/triangle.cpp \
     Resources/scene.cpp \
+#
+    Libs/wavfilehandler.cpp \
+    Libs/stb_image.cpp \
 #
     billboard.cpp \
     bsplinecurve.cpp \
@@ -171,7 +176,6 @@ SOURCES += main.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     camera.cpp
-
 
 FORMS += \
     mainwindow.ui

@@ -80,7 +80,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 2,
+                "textureid": 3,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -118,7 +118,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 1,
+                "textureid": 2,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -174,7 +174,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -295,7 +295,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -346,7 +346,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -397,7 +397,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -448,7 +448,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -522,9 +522,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    -1.0419590380521213e-25,
+                    0.5,
+                    1.1210387714598537e-44
                 ],
                 "rotation": [
                     0.0,
@@ -553,9 +553,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    2073749504.0,
+                    0.5,
+                    4.3490338756726859e37
                 ],
                 "rotation": [
                     0.0,
@@ -584,9 +584,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    -3.9552035331726076,
+                    0.5,
+                    8.232000350952149
                 ],
                 "rotation": [
                     0.0,
@@ -615,9 +615,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    -9.179998397827149,
+                    0.5,
+                    3.1000003814697267
                 ],
                 "rotation": [
                     0.0,
@@ -670,7 +670,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -701,9 +701,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0.5799990892410278,
+                    0.5,
+                    -1.5399998426437379
                 ],
                 "rotation": [
                     0.0,
@@ -732,9 +732,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    -9.0,
+                    0.5,
+                    -7.0
                 ],
                 "rotation": [
                     0.0,
@@ -787,7 +787,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -838,7 +838,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {
@@ -889,7 +889,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureid": 0,
+                "textureid": 1,
                 "shader": "TextureShader"
             },
             "mesh": {

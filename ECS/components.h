@@ -5,7 +5,6 @@
 #include "matrix3x3.h"
 #include "matrix4x4.h"
 #include "shader.h"
-#include "tiny_obj_loader.h"
 #include "vertex.h"
 #include <QJSEngine>
 #include <QKeyEvent>
