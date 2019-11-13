@@ -122,12 +122,11 @@ void CameraController::resize(float aspectRatio) {
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
 
-GameCameraController::GameCameraController(float aspectRatio, GLuint entityController, bool isActiveCamera)
-    : CameraController(aspectRatio), mControllerID(entityController), mActive(isActiveCamera) {
-    const GameCamera cam = Registry::instance()->get<GameCamera>(mControllerID);
-    mPitch = cam.mPitch;
-    mYaw = cam.mYaw;
-    setPosition(cam.mCameraPosition);
+GameCameraController::GameCameraController(float aspectRatio, GameCamera &gameCam, GLuint controller)
+    : CameraController(aspectRatio), mGameCam(gameCam), mControllerID(controller) {
+    mPitch = gameCam.mPitch;
+    mYaw = gameCam.mYaw;
+    setPosition(gameCam.mCameraPosition);
 }
 
 void GameCameraController::pitch(float degrees) {
@@ -139,10 +138,17 @@ void GameCameraController::yaw(float degrees) {
 }
 
 void GameCameraController::update() {
-    if (mOutDated) {
-        updateMeshPosition();
-        CameraController::update();
+    if (mGameCam.mOutDated) {
+        //        updateMeshPosition();
+        mCamera.setRotation(mGameCam.mPitch, mGameCam.mYaw);
+        mCamera.setPosition(mGameCam.mCameraPosition);
+        mCamera.calculateViewMatrix();
+        mGameCam.mOutDated = false;
     }
+}
+
+bool GameCameraController::isActive() {
+    return mGameCam.mIsActive;
 }
 
 void GameCameraController::setPosition(const vec3 &position) {
@@ -161,4 +167,8 @@ void GameCameraController::updateMeshPosition() {
 }
 vec3 GameCameraController::positionWithOffset() {
     return cameraPosition() - forward();
+}
+
+GLuint GameCameraController::controllerID() const {
+    return mControllerID;
 }

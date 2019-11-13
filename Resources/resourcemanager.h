@@ -101,6 +101,8 @@ public:
     void setCurrentCameraController(Ref<CameraController> currentCameraController);
 
     Ref<CameraController> getCurrentCameraController() const;
+    void setActiveCameraController(Ref<CameraController> controller);
+
     /// Loads one given WAVE file.
     /**
         Calls the wave loader from the FileHandler class, parses the wave data and buffers it.

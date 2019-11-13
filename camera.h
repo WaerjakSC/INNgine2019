@@ -77,6 +77,7 @@ private:
     Frustum mFrustum;
 
     friend class CameraController;
+    friend class GameCameraController;
     void calculateViewMatrix();
 };
 

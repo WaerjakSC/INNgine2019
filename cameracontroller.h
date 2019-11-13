@@ -45,8 +45,6 @@ private:
     float mFieldOfView{45.f};
     float mAspectRatio{1.7778f};
 
-    Camera mCamera;
-
     vec3 mForward{0.f, 0.f, -1.f};
     vec3 mRight{1.f, 0.f, 0.f};
     vec3 mUp{0.f, 1.f, 0.f};
@@ -56,18 +54,20 @@ private:
     float mRotationSpeed{180.f};
 
 protected:
+    Camera mCamera;
+
     float mPitch{-25.f};
     float mYaw{0.f};
     bool mOutDated{true};
 };
 class GameCameraController : public CameraController {
 public:
-    GameCameraController(float aspectRatio, GLuint entityController, bool isActiveCamera = false);
-    GLuint mControllerID;
-    bool mActive;
+    GameCameraController(float aspectRatio, GameCamera &gameCam, GLuint controller);
+
     void pitch(float degrees) override;
     void yaw(float degrees) override;
     void update() override;
+    bool isActive();
     /**
      * @brief setPosition overloaded function used by movementsystem to set position of the mesh representation of the game camera.
      * @param position
@@ -76,6 +76,12 @@ public:
     void updateMeshPosition();
 
     vec3 positionWithOffset();
+
+    GLuint controllerID() const;
+
+private:
+    GameCamera &mGameCam;
+    GLuint mControllerID;
 };
 
 #endif // CAMERACONTROLLER_H

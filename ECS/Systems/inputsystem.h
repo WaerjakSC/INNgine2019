@@ -32,14 +32,14 @@ public:
     void setEditorCamController(const Ref<CameraController> &editorCamController);
 
     std::vector<Ref<GameCameraController>> gameCameraControllers() const;
-    void setGameCameraController(const Ref<GameCameraController> &gameCameraController, GLuint gameCamMeshID);
+    Ref<GameCameraController> currentGameCameraController();
 
     void onResize(float aspectRatio);
     GLuint player() const;
 
     void setPlayer(const GLuint &player);
+    void setGameCameraInactive();
 
-    GLuint gameCamID();
 signals:
     void snapSignal();
     void rayHitEntity(GLuint entityID);
@@ -66,6 +66,7 @@ private:
     ResourceManager *factory;
     Ref<CameraController> mEditorCamController;
     std::vector<Ref<GameCameraController>> mGameCameraControllers;
+    bool mActiveGameCamera{false};
 
     RenderWindow *mRenderWindow;
 

@@ -291,7 +291,7 @@ struct GameCamera : public Component {
     }
     vec3 mCameraPosition;
     float mPitch, mYaw;
-    bool mOutOfDate{true};
+    bool mOutDated{true};
     bool mIsActive;
 };
 

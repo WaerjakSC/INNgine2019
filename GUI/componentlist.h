@@ -87,6 +87,7 @@ private slots:
 
     void setNewShader(const QString &text);
     void setHealth(int health);
+    void setActiveCamera(bool checked);
 
     void setControlX(double xIn);
     void setControlY(double yIn);

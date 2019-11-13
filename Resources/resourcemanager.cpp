@@ -1046,12 +1046,10 @@ void ResourceManager::play() {
             Registry::instance()->makeSnapshot();
         registry->getSystem<SoundSystem>()->playAll();
         auto inputsys = registry->getSystem<InputSystem>();
-        for (auto shader : mShaders) {
-            for (auto controller : inputsys->gameCameraControllers()) {
-                if (controller->mActive) {
-                    shader.second->setCameraController(controller);
-                    break;
-                }
+        for (auto controller : inputsys->gameCameraControllers()) {
+            if (controller->isActive()) {
+                setActiveCameraController(controller);
+                break;
             }
         }
         mIsPlaying = true;
@@ -1067,6 +1065,9 @@ void ResourceManager::pause() {
         mPaused = true;
         mMainWindow->play->setEnabled(true);
         mMainWindow->pause->setEnabled(false);
+        auto inputSys = registry->getSystem<InputSystem>();
+        inputSys->setGameCameraInactive();
+        setActiveCameraController(inputSys->editorCamController());
         registry->getSystem<SoundSystem>()->pauseAll();
     }
 }
@@ -1075,10 +1076,9 @@ void ResourceManager::stop() {
         registry->loadSnapshot();
         registry->getSystem<MovementSystem>()->init();
         registry->getSystem<SoundSystem>()->stopAll();
-        auto inputsys = registry->getSystem<InputSystem>();
-        for (auto shader : mShaders) {
-            shader.second->setCameraController(inputsys->editorCamController());
-        }
+        auto inputSys = registry->getSystem<InputSystem>();
+        inputSys->setGameCameraInactive();
+        setActiveCameraController(inputSys->editorCamController());
         mIsPlaying = false;
         mMainWindow->insertEntities();
         mMainWindow->play->setEnabled(true);
@@ -1086,7 +1086,11 @@ void ResourceManager::stop() {
         mMainWindow->stop->setEnabled(false);
     }
 }
-
+void ResourceManager::setActiveCameraController(Ref<CameraController> controller) {
+    for (auto shader : mShaders) {
+        shader.second->setCameraController(controller);
+    }
+}
 //=========================== Octahedron Functions =========================== //
 void ResourceManager::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3) {
     mMeshData.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));

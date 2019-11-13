@@ -11,12 +11,14 @@ InputSystem::InputSystem(RenderWindow *window)
 }
 
 void InputSystem::update(DeltaTime dt) {
-    if (factory->isPlaying()) {
+    if (factory->isPlaying())
         for (auto &camera : gameCameraControllers()) {
-            if (camera->mActive)
+            if (camera->isActive()) {
                 camera->update();
+                mActiveGameCamera = true;
+            }
         }
-    } else
+    if (!mActiveGameCamera)
         editorCamController()->update();
     handlePlayerController(dt);
     handleKeyInput();
@@ -26,7 +28,7 @@ void InputSystem::update(DeltaTime dt) {
 void InputSystem::init(float aspectRatio) {
     auto view = registry->view<GameCamera>();
     for (auto entity : view) {
-        mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, entity, view.get(entity).mIsActive));
+        mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, view.get(entity), entity));
     }
 }
 void InputSystem::handleKeyInput() {
@@ -92,6 +94,10 @@ void InputSystem::setPlayer(const GLuint &player) {
     mPlayer = player;
 }
 
+void InputSystem::setGameCameraInactive() {
+    mActiveGameCamera = false;
+}
+
 GLuint InputSystem::player() const {
     return mPlayer;
 }
@@ -107,6 +113,15 @@ void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamC
 
 std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() const {
     return mGameCameraControllers;
+}
+
+Ref<GameCameraController> InputSystem::currentGameCameraController() {
+    for (auto controller : gameCameraControllers()) {
+        if (controller->isActive()) {
+            return controller;
+        }
+    }
+    return nullptr;
 }
 
 Input &InputSystem::playerController() {
@@ -125,17 +140,17 @@ void InputSystem::setCameraSpeed(float value) {
         mCameraSpeed = 0.3f;
 }
 void InputSystem::keyPressEvent(QKeyEvent *event) {
-    if (factory->isPlaying())
+    if (factory->isPlaying() && mActiveGameCamera)
         inputKeyPress(event, mPlayerController);
-    else {
+    if (!mActiveGameCamera) {
         inputKeyPress(event, editorInput);
     }
 }
 
 void InputSystem::keyReleaseEvent(QKeyEvent *event) {
-    if (factory->isPlaying())
+    if (factory->isPlaying() && mActiveGameCamera)
         inputKeyRelease(event, mPlayerController);
-    else
+    if (!mActiveGameCamera)
         inputKeyRelease(event, editorInput);
 }
 void InputSystem::inputKeyPress(QKeyEvent *event, Input &input) {
@@ -235,7 +250,7 @@ void InputSystem::wheelEvent(QWheelEvent *event) {
     QPoint numDegrees = event->angleDelta() / 8;
 
     //if RMB, change the speed of the camera
-    if (factory->isPlaying()) {
+    if (!mActiveGameCamera) {
         if (numDegrees.y() < 1)
             setCameraSpeed(0.001f);
         if (numDegrees.y() > 1)
@@ -261,7 +276,7 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
         }
         firstRMB = false;
     }
-    if (!editorInput.RMB && mRenderWindow->cursor() == Qt::BlankCursor && !factory->isPlaying()) {
+    if (!editorInput.RMB && mRenderWindow->cursor() == Qt::BlankCursor && !mActiveGameCamera) {
         mRenderWindow->setCursor(Qt::ArrowCursor);
         firstRMB = true;
     }
@@ -269,7 +284,7 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
 void InputSystem::onResize(float aspectRatio) {
     mEditorCamController->resize(aspectRatio);
     for (auto camera : gameCameraControllers()) {
-        if (camera->mActive)
+        if (camera->isActive())
             camera->resize(aspectRatio);
     }
 }
@@ -302,14 +317,14 @@ void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input) {
     }
 }
 void InputSystem::mouseReleaseEvent(QMouseEvent *event) {
-    if (factory->isPlaying())
+    if (factory->isPlaying() && mActiveGameCamera)
         inputMouseRelease(event, mPlayerController);
-    else
+    if (!mActiveGameCamera)
         inputMouseRelease(event, editorInput);
 }
 void InputSystem::mousePressEvent(QMouseEvent *event) {
-    if (factory->isPlaying())
+    if (factory->isPlaying() && mActiveGameCamera)
         inputMousePress(event, mPlayerController);
-    else
+    if (!mActiveGameCamera)
         inputMousePress(event, editorInput);
 }

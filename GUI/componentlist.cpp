@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include <QStyleFactory>
 #include <aisystem.h>
+#include <inputsystem.h>
 ComponentList::ComponentList(MainWindow *window, VerticalScrollArea *inScrollArea)
     : registry(Registry::instance()), scrollArea(inScrollArea), mMainWindow(window) {
     fusion = QStyleFactory::create("fusion");
@@ -214,7 +215,8 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     positionBox->setFlat(true);
     QHBoxLayout *position = new QHBoxLayout;
     position->setMargin(1);
-    auto [positionX, positionY, positionZ] = makeVectorBox(cam.mCameraPosition, position); // Not sure yet if this is something that's supposed to be updated
+    auto [positionX, positionY, positionZ] = makeVectorBox(cam.mCameraPosition, position);
+
     connect(positionX, SIGNAL(valueChanged(double)), this, SLOT(setCameraPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), this, SLOT(setCameraPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), this, SLOT(setCameraPositionZ(double)));
@@ -222,7 +224,7 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     positionBox->setLayout(position);
     grid->addWidget(positionBox, 0, 0);
 
-    QGroupBox *rotationBox = new QGroupBox(tr("Pitch and Yaw"));
+    QGroupBox *rotationBox = new QGroupBox(tr("Camera Rotation"));
     rotationBox->setAlignment(Qt::AlignCenter);
 
     rotationBox->setStyle(fusion);
@@ -230,14 +232,27 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
 
     QHBoxLayout *rotationLayout = new QHBoxLayout;
     rotationLayout->setMargin(1);
+    QLabel *pitchLabel = new QLabel(tr("Pitch:"));
+    rotationLayout->addWidget(pitchLabel);
     QDoubleSpinBox *pitch = makeDoubleSpinBox(cam.mPitch, rotationLayout, -180, 180);
+    QLabel *yawLabel = new QLabel(tr("Yaw:"));
+    rotationLayout->addWidget(yawLabel);
     QDoubleSpinBox *yaw = makeDoubleSpinBox(cam.mYaw, rotationLayout, -180, 180);
     //    connect(this, &ComponentList::sphereRadius, pitch, &QDoubleSpinBox::setValue);
     connect(pitch, SIGNAL(valueChanged(double)), this, SLOT(setPitch(double)));
     connect(yaw, SIGNAL(valueChanged(double)), this, SLOT(setYaw(double)));
     rotationBox->setLayout(rotationLayout);
-
     grid->addWidget(rotationBox, 1, 0);
+
+    // Check box for showing absolute position instead of local position
+    QHBoxLayout *check = new QHBoxLayout;
+    QPushButton *activeCam = new QPushButton(tr("Is Active"));
+    activeCam->setCheckable(true);
+    activeCam->setChecked(cam.mIsActive);
+    connect(activeCam, &QPushButton::clicked, this, &ComponentList::setActiveCamera);
+    check->addWidget(activeCam);
+    grid->addLayout(check, 2, 0);
+
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
@@ -250,7 +265,7 @@ void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     locationBox->setFlat(true);
     QHBoxLayout *location = new QHBoxLayout;
     location->setMargin(1);
-    auto [locationX, locationY, locationZ] = makeVectorBox(point.location, location); // Not sure yet if this is something that's supposed to be updated
+    auto [locationX, locationY, locationZ] = makeVectorBox(point.location, location);
     connect(locationX, SIGNAL(valueChanged(double)), this, SLOT(setControlX(double)));
     connect(locationY, SIGNAL(valueChanged(double)), this, SLOT(setControlY(double)));
     connect(locationZ, SIGNAL(valueChanged(double)), this, SLOT(setControlZ(double)));
@@ -690,6 +705,32 @@ void ComponentList::setColor() {
     }
     registry->get<Material>(mMainWindow->selectedEntity->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
 }
+void ComponentList::setActiveCamera(bool checked) {
+    GLuint entityID = mMainWindow->selectedEntity->id();
+    auto view = registry->view<GameCamera>();
+    GameCamera &selectedCam = view.get(entityID);
+    ResourceManager *factory = ResourceManager::instance();
+    auto inputSys = registry->getSystem<InputSystem>();
+    if (checked) {
+        selectedCam.mIsActive = true;
+        selectedCam.mOutDated = true;
+        for (GLuint camID : view) {
+            if (camID == entityID)
+                continue;
+            auto &cam = view.get(camID);
+            cam.mIsActive = false;
+            cam.mOutDated = true;
+        }
+        if (factory->isPlaying())
+            factory->setActiveCameraController(inputSys->currentGameCameraController());
+    } else {
+        selectedCam.mIsActive = false;
+        selectedCam.mOutDated = true;
+        inputSys->setGameCameraInactive();
+        // Unchecking a checked box defaults the editor to the main editor camera controller
+        factory->setActiveCameraController(inputSys->editorCamController());
+    }
+}
 void ComponentList::updatePosSpinBoxes(int state) {
     disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
     disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
@@ -763,35 +804,35 @@ void ComponentList::setCameraPositionX(double xIn) {
     GLuint entityID = mMainWindow->selectedEntity->id();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mCameraPosition.x = xIn;
-    cam.mOutOfDate = true;
+    cam.mOutDated = true;
 }
 
 void ComponentList::setCameraPositionY(double yIn) {
     GLuint entityID = mMainWindow->selectedEntity->id();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mCameraPosition.y = yIn;
-    cam.mOutOfDate = true;
+    cam.mOutDated = true;
 }
 
 void ComponentList::setCameraPositionZ(double zIn) {
     GLuint entityID = mMainWindow->selectedEntity->id();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mCameraPosition.z = zIn;
-    cam.mOutOfDate = true;
+    cam.mOutDated = true;
 }
 
 void ComponentList::setPitch(double pitch) {
     GLuint entityID = mMainWindow->selectedEntity->id();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mPitch = pitch;
-    cam.mOutOfDate = true;
+    cam.mOutDated = true;
 }
 
 void ComponentList::setYaw(double yaw) {
     GLuint entityID = mMainWindow->selectedEntity->id();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mYaw = yaw;
-    cam.mOutOfDate = true;
+    cam.mOutDated = true;
 }
 void ComponentList::setPositionX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
