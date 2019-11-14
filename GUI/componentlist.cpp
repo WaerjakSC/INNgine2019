@@ -671,7 +671,7 @@ void ComponentList::setHealth(int health) {
 void ComponentList::setNewTextureFile() {
     QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";
     QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Image"), directory, tr("Image Files (*.bmp)")); // Could add other image files, idk what Texture class supports
+                                                    tr("Open Image"), directory, tr("Image Files (*.bmp *.jpg *.png)"));
     if (!fileName.isEmpty()) {
         QFileInfo file(fileName);
         fileName = file.fileName();

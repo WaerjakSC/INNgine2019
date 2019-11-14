@@ -592,13 +592,13 @@
             },
             "material": {
                 "color": [
-                    0.6666666865348816,
-                    0.0,
-                    0.0
+                    1.0,
+                    1.0,
+                    1.0
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureunit": 0,
+                "textureunit": 3,
                 "shader": "TextureShader"
             },
             "mesh": {

@@ -892,16 +892,17 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
         tinyobj::material_t *mp = &materials[m];
 
         if (mp->diffuse_texname.length() > 0) {
-            auto search = mTextures.find(mp->diffuse_texname);
+            std::string texname = mp->diffuse_texname;
+            auto search = mTextures.find(texname);
             // Only load the texture if it is not already loaded
             bool textureLoaded = false;
             if (search == mTextures.end()) {
-                textureLoaded = loadTexture(mp->diffuse_texname);
+                textureLoaded = loadTexture(texname);
             }
             // Currently doesn't support multiple textures
             if (registry->contains<Material>(eID) && textureLoaded) {
                 auto &mat = registry->get<Material>(eID);
-                mat.mTextureUnit = search->second->textureUnit();
+                mat.mTextureUnit = mTextures[texname]->textureUnit();
                 mat.mShader = getShader<TextureShader>();
             }
         }
