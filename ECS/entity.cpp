@@ -1,9 +1,9 @@
 #include "entity.h"
 
-Entity::Entity(GLuint ID, const QString &text) : eID(ID), mName(text) {
+Entity::Entity(GLuint ID, const QString &text) : QObject(), eID(ID), mName(text) {
 }
 
-Entity::Entity(const Entity &other) {
+Entity::Entity(const Entity &other) : QObject() {
     mName = other.name();
     eID = other.id();
     mGeneration = other.mGeneration;

@@ -393,15 +393,19 @@ void MainWindow::insertEntities() {
     for (auto entity : registry->getEntities()) {
         if (entity.second->isDestroyed())
             continue;
+        GLuint id = entity.second->id();
         QStandardItem *item = new QStandardItem;
         if (entity.second->name() == "")
             item->setText(QString("Entity" + QString::number(unnamedEntityCount)));
         else
             item->setText(entity.second->name());
-        item->setData(entity.second->id());
-        int parentID = registry->get<Transform>(entity.second->id()).parentID;
-        if (parentID != -1) {
-            forEach(parentID, item);
+        item->setData(id);
+        if (registry->contains<Transform>(id)) {
+            int parentID = registry->get<Transform>(id).parentID;
+            if (parentID != -1) {
+                forEach(parentID, item);
+            } else
+                parentItem->appendRow(item);
         } else
             parentItem->appendRow(item);
     }

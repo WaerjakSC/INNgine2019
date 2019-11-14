@@ -9,6 +9,7 @@
 class Texture : protected QOpenGLFunctions_4_1_Core {
 private:
     GLuint mId{0};
+    GLuint mTextureUnit{0};
 
 public:
     /**
@@ -24,8 +25,10 @@ public:
     GLuint id() const;
     bool isValid{true};
 
+    GLuint textureUnit() const;
+
 private:
-    bool TextureFromFile(const std::string &directory, GLuint textureUnit /*, bool gamma = false*/);
+    bool TextureFromFile(const std::string &directory /*, bool gamma = false*/);
 };
 
 #endif // TEXTURE_H

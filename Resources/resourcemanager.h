@@ -55,13 +55,13 @@ public:
     // Gets stored texture
     Ref<Texture> getTexture(std::string name);
 
+    QString getTextureName(GLuint textureUnit);
+
     void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
     void addMeshComponent(std::string name, int eID = -1);
 
     std::map<std::string, Ref<Shader>> getShaders() const;
-
-    QString getTextureName(GLuint id);
 
     QString getMeshName(const Mesh &mesh);
 

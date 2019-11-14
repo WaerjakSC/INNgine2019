@@ -282,7 +282,7 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
 GLuint ResourceManager::makeSkyBox(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->add<Transform>(eID, 0, 0, gsl::Vector3D(15));
-    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["skybox.bmp"]->id());
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["skybox.bmp"]->textureUnit());
     auto search = mMeshMap.find("Skybox");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
@@ -381,7 +381,7 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
 GLuint ResourceManager::makeBillBoard(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->add<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
-    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->id() - 1);
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->textureUnit());
     auto search = mMeshMap.find("BillBoard");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
@@ -565,7 +565,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
 GLuint ResourceManager::makeLightObject(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->add<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
-    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->id() - 1, gsl::Vector3D(0.1f, 0.1f, 0.8f));
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->textureUnit(), gsl::Vector3D(0.1f, 0.1f, 0.8f));
     registry->add<Light>(eID);
     auto search = mMeshMap.find("Pyramid");
     if (search != mMeshMap.end()) {
@@ -829,9 +829,9 @@ Ref<Texture> ResourceManager::getTexture(std::string fileName) {
     return mTextures[fileName];
 }
 
-QString ResourceManager::getTextureName(GLuint id) {
+QString ResourceManager::getTextureName(GLuint textureUnit) {
     for (auto it = mTextures.begin(); it != mTextures.end(); ++it) {
-        if (it->second->id() == id) {
+        if (it->second->textureUnit() == textureUnit) {
             return QString::fromStdString(it->first);
         }
     }
@@ -901,7 +901,7 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
             // Currently doesn't support multiple textures
             if (registry->contains<Material>(eID) && textureLoaded) {
                 auto &mat = registry->get<Material>(eID);
-                mat.mTextureUnit = search->second->id();
+                mat.mTextureUnit = search->second->textureUnit();
                 mat.mShader = getShader<TextureShader>();
             }
         }

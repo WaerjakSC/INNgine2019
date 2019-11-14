@@ -80,7 +80,7 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(Ref<Shader> shader = nullptr, GLuint texture = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4);
+    Material(Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = 1, GLfloat specStr = 0.3f, GLint specExp = 4);
 
     GLfloat mSpecularStrength;
     GLint mSpecularExponent;

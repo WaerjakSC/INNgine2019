@@ -107,7 +107,7 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Key("specexp");
                 writer.Int(mat.mSpecularExponent);
 
-                writer.Key("textureid");
+                writer.Key("textureunit");
                 writer.Int(mat.mTextureUnit);
 
                 writer.Key("shader");
@@ -157,13 +157,6 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(light.mObjectColor.z);
                 writer.EndArray();
 
-                writer.EndObject();
-            }
-            if (registry->contains<Input>(eID)) {
-                writer.Key("input");
-                writer.StartObject();
-                writer.Key("isController");
-                writer.Bool(true);
                 writer.EndObject();
             }
             if (registry->contains<Sound>(eID)) {
@@ -395,7 +388,7 @@ void Scene::populateScene(const Document &scene) {
                     shader = factory->getShader<TextureShader>();
                 else if (shaderName == "PhongShader")
                     shader = factory->getShader<PhongShader>();
-                registry->add<Material>(id, shader, comp->value["textureid"].GetInt(), color, specStr, specExp);
+                registry->add<Material>(id, shader, comp->value["textureunit"].GetInt(), color, specStr, specExp);
             } else if (comp->name == "mesh") {
                 factory->addMeshComponent(comp->value["name"].GetString(), id);
             } else if (comp->name == "light") { // Again, temporary, very static functionality atm

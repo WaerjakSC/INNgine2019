@@ -1,18 +1,19 @@
 #include "texture.h"
 #include "innpch.h"
 
-Texture::Texture(const std::string &filename, GLuint textureUnit)
-    : QOpenGLFunctions_4_1_Core() {
-    isValid = TextureFromFile(filename, textureUnit);
+Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core(), mTextureUnit(textureUnit) {
+    isValid = TextureFromFile(filename);
 }
 
 GLuint Texture::id() const {
     return mId;
 }
-bool Texture::TextureFromFile(const std::string &filename, GLuint textureUnit /*, bool gamma*/) {
+GLuint Texture::textureUnit() const {
+    return mTextureUnit;
+}
+bool Texture::TextureFromFile(const std::string &filename /*, bool gamma*/) {
     initializeOpenGLFunctions();
     std::string fileWithPath = gsl::assetFilePath + "Textures/" + filename;
-
     glGenTextures(1, &mId);
 
     int width, height, nrComponents;
@@ -27,7 +28,7 @@ bool Texture::TextureFromFile(const std::string &filename, GLuint textureUnit /*
         else
             format = GL_RGBA;
         // activate the texture unit first before binding texture
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glActiveTexture(GL_TEXTURE0 + mTextureUnit);
         glBindTexture(GL_TEXTURE_2D, mId);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
