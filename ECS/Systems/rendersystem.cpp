@@ -53,13 +53,14 @@ void RenderSystem::toggleRendered(GLuint entityID) {
     bool &isRendered = registry->view<Mesh>().get(entityID).mRendered;
     isRendered = !isRendered;
 }
-void RenderSystem::changeShader(int entityID, std::string nShader) {
+void RenderSystem::changeShader(const QString &nShader) {
+    GLuint eID = registry->getSelectedEntity()->id();
     Ref<Shader> shader{nullptr};
     ResourceManager *factory = ResourceManager::instance();
     if (nShader == "PlainShader")
-        registry->view<Material>().get(entityID).mShader = factory->getShader<ColorShader>();
+        registry->view<Material>().get(eID).mShader = factory->getShader<ColorShader>();
     else if (nShader == "TextureShader")
-        registry->view<Material>().get(entityID).mShader = factory->getShader<TextureShader>();
+        registry->view<Material>().get(eID).mShader = factory->getShader<TextureShader>();
     else if (nShader == "PhongShader")
-        registry->view<Material>().get(entityID).mShader = factory->getShader<PhongShader>();
+        registry->view<Material>().get(eID).mShader = factory->getShader<PhongShader>();
 }

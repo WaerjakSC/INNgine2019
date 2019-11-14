@@ -13,13 +13,6 @@ void VerticalScrollArea::addGroupBox(QGroupBox *component) {
     componentListLayout->addWidget(component);
 }
 /**
- * @brief VerticalScrollArea::removeGroupBox
- * @todo implement once you can remove components from an entity
- * @param component
- */
-void VerticalScrollArea::removeGroupBox(QGroupBox *component) {
-}
-/**
  * @brief Delete all the children in the Layout and re-make it with new content and connections.
  */
 void VerticalScrollArea::clearLayout() {

@@ -120,7 +120,7 @@ void RenderWindow::init() {
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mSoundSystem->createContext();
     mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
-    mAIsystem = mRegistry->registerSystem<AIsystem>();
+    mAIsystem = mRegistry->registerSystem<AISystem>();
     mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
@@ -131,9 +131,9 @@ void RenderWindow::init() {
     mMoveSystem->init();
     mScriptSystem->init();
     mInputSystem->init(aspectRatio);
-    auto view = mRegistry->view<AIcomponent>();
+    auto view = mRegistry->view<AIComponent>();
     if (!view.empty()) {
-        GLuint enemy = mRegistry->view<AIcomponent>().entities()[0];
+        GLuint enemy = mRegistry->view<AIComponent>().entities()[0];
 
         mAIsystem->init(enemy);
     }
@@ -141,9 +141,10 @@ void RenderWindow::init() {
     mLightSystem->init();
     mRenderer->init();
 
-    connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::snapSignal, mMainWindow, &MainWindow::snapToObject);
-    connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
-    connect(mRegistry->getSystem<InputSystem>().get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
+    connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
+    connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
+    connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
+    connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
 }
 
 ///Called each frame - doing the rendering
@@ -182,9 +183,6 @@ void RenderWindow::render() {
     // and wait for vsync.
     //    auto start = std::chrono::high_resolution_clock::now();
     mContext->swapBuffers(this);
-}
-void RenderWindow::snapToObject(int eID) {
-    mEditorCameraController->goTo(mMoveSystem->getAbsolutePosition(eID));
 }
 
 Ref<RenderSystem> RenderWindow::renderer() const {

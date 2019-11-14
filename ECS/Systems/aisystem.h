@@ -10,9 +10,10 @@
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
 typedef gsl::Vector2D vec2;
 
-class AIsystem : public ISystem {
+class AISystem : public QObject, public ISystem {
+    Q_OBJECT
 public:
-    AIsystem();
+    AISystem();
     Registry *reg;
 
     virtual void update(DeltaTime dt = 0.016) override;
@@ -26,6 +27,12 @@ public:
     void draw();
     void masterOfCurves();
 
+public slots:
+    void setBSPlinePointX(double xIn);
+    void setBSPlinePointY(double yIn);
+    void setBSPlinePointZ(double zIn);
+    void setHealth(int health);
+
 private:
     // FSM
     void move();
@@ -35,6 +42,7 @@ private:
 
     bool updatePath = false;
     BSplineCurve mCurve;
+    Registry *registry = Registry::instance();
 
     GLuint NPC;
 

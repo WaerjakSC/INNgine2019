@@ -126,6 +126,14 @@ std::vector<GLuint> Registry::getChildren(GLuint eID) {
     return get<Transform>(eID).children;
 }
 
+Ref<Entity> Registry::getSelectedEntity() const {
+    return mSelectedEntity;
+}
+
+void Registry::setSelectedEntity(const GLuint selectedEntity) {
+    mSelectedEntity = getEntity(selectedEntity);
+}
+
 void Registry::addChild(const GLuint parentID, const GLuint childID) {
     auto &parent = get<Transform>(parentID);
     parent.children.emplace_back(childID);

@@ -40,8 +40,16 @@ public:
     void setPlayer(const GLuint &player);
     void setGameCameraInactive();
 
+public slots:
+    void setCameraPositionX(double xIn);
+    void setCameraPositionY(double yIn);
+    void setCameraPositionZ(double zIn);
+
+    void setActiveCamera(bool checked);
+
+    void setPitch(double pitch);
+    void setYaw(double yaw);
 signals:
-    void snapSignal();
     void rayHitEntity(GLuint entityID);
     void closeEngine();
 
@@ -95,6 +103,7 @@ private:
 
     void inputMousePress(QMouseEvent *event, Input &input);
     void inputMouseRelease(QMouseEvent *event, Input &input);
+    void snapToObject();
 };
 
 #endif // INPUTSYSTEM_H

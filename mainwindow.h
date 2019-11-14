@@ -39,6 +39,7 @@ public:
 signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
+    void selectedEntity(GLuint eID);
 public slots:
     void parentChanged(GLuint eID);
     void mouseRayHit(int eID);
@@ -46,7 +47,6 @@ public slots:
 
 private slots:
     void onEntityClicked(const QModelIndex &index);
-    void onEntityDragged(GLuint eID);
 
     void onNameChanged(const QModelIndex &index);
     void onEntityAdded(GLuint entity);
@@ -59,8 +59,6 @@ private slots:
     void makeSphere();
 
     void makePlane();
-
-    void snapToObject();
 
     void makeEntity();
 
@@ -76,7 +74,6 @@ private:
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
     ComponentList *mComponentList;
-    Ref<Entity> selectedEntity;
     quint32 unnamedEntityCount{0};
 
     Registry *registry;

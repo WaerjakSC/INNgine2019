@@ -267,10 +267,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(cylinder.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<AIcomponent>(eID)) {
+            if (registry->contains<AIComponent>(eID)) {
                 writer.Key("AI");
                 writer.StartObject();
-                const AIcomponent &ai = registry->get<AIcomponent>(eID);
+                const AIComponent &ai = registry->get<AIComponent>(eID);
 
                 writer.Key("health");
                 writer.Int(ai.hp);
@@ -438,7 +438,7 @@ void Scene::populateScene(const Document &scene) {
             } else if (comp->name == "AI") {
                 int hp = comp->value["health"].GetInt();
                 int damage = comp->value["damage"].GetInt();
-                registry->add<AIcomponent>(id, hp, damage);
+                registry->add<AIComponent>(id, hp, damage);
             } else if (comp->name == "BSplinePoint") {
                 vec3 location(comp->value["location"][0].GetDouble(), comp->value["location"][1].GetDouble(), comp->value["location"][2].GetDouble());
                 registry->add<BSplinePoint>(id, location);

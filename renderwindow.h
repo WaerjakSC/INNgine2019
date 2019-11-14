@@ -21,7 +21,7 @@ class LightSystem;
 class SoundSystem;
 class InputSystem;
 class CollisionSystem;
-class AIsystem;
+class AISystem;
 class ResourceManager;
 class ScriptSystem;
 class Registry;
@@ -53,8 +53,6 @@ public:
     void keyReleaseEvent(QKeyEvent *event) override;
 
 public slots:
-    void snapToObject(int eID);
-
     void toggleWireframe();
     void toggleXYZ();
 
@@ -74,7 +72,7 @@ private:
     Ref<InputSystem> mInputSystem;
     Ref<CollisionSystem> mCollisionSystem;
     Ref<ScriptSystem> mScriptSystem;
-    Ref<AIsystem> mAIsystem;
+    Ref<AISystem> mAIsystem;
 
     ResourceManager *mFactory;
     Registry *mRegistry;

@@ -31,6 +31,11 @@ void InputSystem::init(float aspectRatio) {
         mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, view.get(entity), entity));
     }
 }
+void InputSystem::snapToObject() {
+    GLuint eID = registry->getSelectedEntity()->id();
+    MovementSystem *moveSystem = registry->getSystem<MovementSystem>().get();
+    mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
+}
 void InputSystem::handleKeyInput() {
     if (editorInput.ESCAPE) //Shuts down whole program
     {
@@ -42,7 +47,7 @@ void InputSystem::handleKeyInput() {
         mPlayerController.ESCAPE = false;
     }
     if (editorInput.F) {
-        emit snapSignal();
+        snapToObject();
     }
     if (editorInput.CTRL && editorInput.S) {
         factory->save();
@@ -327,4 +332,58 @@ void InputSystem::mousePressEvent(QMouseEvent *event) {
         inputMousePress(event, mPlayerController);
     if (!mActiveGameCamera)
         inputMousePress(event, editorInput);
+}
+void InputSystem::setCameraPositionX(double xIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mCameraPosition.x = xIn;
+    cam.mOutDated = true;
+}
+void InputSystem::setCameraPositionY(double yIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mCameraPosition.y = yIn;
+    cam.mOutDated = true;
+}
+void InputSystem::setCameraPositionZ(double zIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mCameraPosition.z = zIn;
+    cam.mOutDated = true;
+}
+void InputSystem::setYaw(double yaw) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mYaw = yaw;
+    cam.mOutDated = true;
+}
+void InputSystem::setActiveCamera(bool checked) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto view = registry->view<GameCamera>();
+    GameCamera &selectedCam = view.get(entityID);
+    if (checked) {
+        selectedCam.mIsActive = true;
+        selectedCam.mOutDated = true;
+        for (GLuint camID : view) {
+            if (camID == entityID)
+                continue;
+            auto &cam = view.get(camID);
+            cam.mIsActive = false;
+            cam.mOutDated = true;
+        }
+        if (factory->isPlaying())
+            factory->setActiveCameraController(currentGameCameraController());
+    } else {
+        selectedCam.mIsActive = false;
+        selectedCam.mOutDated = true;
+        setGameCameraInactive();
+        // Unchecking a checked box defaults the editor to the main editor camera controller
+        factory->setActiveCameraController(editorCamController());
+    }
+}
+void InputSystem::setPitch(double pitch) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &cam = registry->get<GameCamera>(entityID);
+    cam.mPitch = pitch;
+    cam.mOutDated = true;
 }

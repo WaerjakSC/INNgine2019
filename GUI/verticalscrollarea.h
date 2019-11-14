@@ -10,8 +10,6 @@ public:
 
     void addGroupBox(QGroupBox *component);
 
-    void removeGroupBox(QGroupBox *component);
-
     void clearLayout();
 
 private:

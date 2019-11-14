@@ -7,17 +7,48 @@
 #include <QOpenGLFunctions_4_1_Core>
 struct Ray;
 class Registry;
-class CollisionSystem : public ISystem, public QOpenGLFunctions_4_1_Core {
+class CollisionSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
+    Q_OBJECT
 public:
     CollisionSystem();
 
     void update(DeltaTime dt = 0.016) override;
+public slots:
+    void setOriginX(double xIn);
+    void setOriginY(double xIn);
+    void setOriginZ(double xIn);
+    void setAABBSizeX(double xIn);
+    void setAABBSizeY(double yIn);
+    void setAABBSizeZ(double zIn);
+    void setOBBPositionX(double xIn);
+    void setOBBPositionY(double yIn);
+    void setOBBPositionZ(double zIn);
+    void setOBBSizeX(double xIn);
+    void setOBBSizeY(double yIn);
+    void setOBBSizeZ(double zIn);
+    void setSpherePositionX(double xIn);
+    void setSpherePositionY(double yIn);
+    void setSpherePositionZ(double zIn);
+    void setSphereRadius(double radius);
+    void setPlaneNormalX(double xIn);
+    void setPlaneNormalY(double yIn);
+    void setPlaneNormalZ(double zIn);
+    void setPlaneDistance(double radius);
+    void setCylinderPositionX(double xIn);
+    void setCylinderPositionY(double yIn);
+    void setCylinderPositionZ(double zIn);
+    void setCylinderRadius(double radius);
+    void setCylinderHeight(double height);
+    void setObjectType(int index);
+signals:
+    void updateAABB(GLuint eID);
+    void updateSphere(GLuint eID);
 
 private:
     float fixedDelta{0.02f};
     float delta{0};
     int collisions{0};
-    Registry *reg;
+    Registry *registry;
     /**
      * @brief runSimulations simple function to run all the "Simulation" type functions in CollisionSystem
      */
@@ -127,6 +158,7 @@ private:
      * @return if both are static objects, return true
      */
     bool bothStatic(const Collision &lhs, const Collision &rhs);
+
     friend class Raycast;
 };
 

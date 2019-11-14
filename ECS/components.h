@@ -316,8 +316,8 @@ enum NPCevents { ENDPOINT_ARRIVED,
                  DAMAGE_TAKEN };
 
 // GNOMER
-struct AIcomponent : public Component {
-    AIcomponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}
+struct AIComponent : public Component {
+    AIComponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}
     int hp = 100;
     int damage;
 };
@@ -331,7 +331,7 @@ struct PlayerComponent : public Component {
 };
 
 // Towers
-struct TowerComponent : public AIcomponent {
+struct TowerComponent : public AIComponent {
     TowerComponent() {}
     int range;
     int attackSpeed;

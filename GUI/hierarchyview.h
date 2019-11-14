@@ -14,6 +14,7 @@ public:
     void setMainWindow(MainWindow *window);
 signals:
     void dragSelection(GLuint id);
+    void selectedEntity(GLuint id);
 
 private slots:
     void renameEntity();

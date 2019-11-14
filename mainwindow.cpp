@@ -33,7 +33,7 @@ void MainWindow::init() {
     hView->setMainWindow(this);
     scrollArea = new VerticalScrollArea();
     ui->horizontalTopLayout->addWidget(scrollArea);
-    mComponentList = new ComponentList(this, scrollArea);
+    mComponentList = new ComponentList(scrollArea);
 
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
@@ -97,9 +97,9 @@ void MainWindow::init() {
 
     connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
-    connect(hView, &HierarchyView::dragSelection, this, &MainWindow::onEntityDragged);
     connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
 
+    connect(this, &MainWindow::selectedEntity, registry, &Registry::setSelectedEntity);
     connect(registry, &Registry::entityCreated, this, &MainWindow::onEntityAdded);
     connect(registry, &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
     connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
@@ -113,6 +113,8 @@ void MainWindow::playButtons() {
     play->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     play->setToolTip("Play");
     connect(play, &QToolButton::clicked, factory, &ResourceManager::play);
+    connect(factory, &ResourceManager::disablePlay, play, &QToolButton::setDisabled);
+
     buttons->addWidget(play);
 
     pause = new QToolButton;
@@ -120,12 +122,15 @@ void MainWindow::playButtons() {
     pause->setEnabled(false);
     pause->setToolTip("Pause");
     connect(pause, &QToolButton::clicked, factory, &ResourceManager::pause);
+    connect(factory, &ResourceManager::disablePause, pause, &QToolButton::setDisabled);
+
     buttons->addWidget(pause);
 
     stop = new QToolButton;
     stop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     stop->setEnabled(false);
     stop->setToolTip("Stop");
+    connect(factory, &ResourceManager::disableStop, stop, &QToolButton::setDisabled);
     connect(stop, &QToolButton::clicked, factory, &ResourceManager::stop);
     buttons->addWidget(stop);
 
@@ -145,34 +150,42 @@ void MainWindow::playButtons() {
     toolbar->addWidget(spacer2); // Spacer #2
 }
 
-void MainWindow::snapToObject() {
-    if (selectedEntity)
-        mRenderWindow->snapToObject(selectedEntity->id());
-}
 void MainWindow::createActions() {
     QMenu *projectActions = ui->menuBar->addMenu(tr("&File"));
     ResourceManager *factory = ResourceManager::instance();
+    std::vector<QAction *> menuActions;
     QAction *newScene = new QAction(tr("New Scene"));
     projectActions->addAction(newScene);
+    menuActions.push_back(newScene);
     connect(newScene, SIGNAL(triggered()), factory, SLOT(newScene()));
     QAction *saveScene = new QAction(tr("&Save"));
+    menuActions.push_back(saveScene);
     projectActions->addAction(saveScene);
     connect(saveScene, &QAction::triggered, factory, &ResourceManager::save);
     QAction *saveAs = new QAction(tr("Save &As"));
+    menuActions.push_back(saveAs);
     projectActions->addAction(saveAs);
     connect(saveAs, &QAction::triggered, factory, &ResourceManager::saveAs);
     QAction *loadScene = new QAction(tr("&Load"));
+    menuActions.push_back(loadScene);
     projectActions->addAction(loadScene);
     connect(loadScene, &QAction::triggered, factory, &ResourceManager::load);
     QAction *newProject = new QAction(tr("&New Project"));
+    menuActions.push_back(newProject);
     projectActions->addAction(newProject);
     connect(newProject, &QAction::triggered, factory, &ResourceManager::newProject);
     QAction *saveProject = new QAction(tr("Save &Project"));
+    menuActions.push_back(saveProject);
     projectActions->addAction(saveProject);
     connect(saveProject, &QAction::triggered, factory, &ResourceManager::saveProject);
     QAction *loadProject = new QAction(tr("&Open Project"));
+    menuActions.push_back(loadProject);
     projectActions->addAction(loadProject);
     connect(loadProject, SIGNAL(triggered()), factory, SLOT(loadProject()));
+
+    for (auto action : menuActions) {
+        connect(factory, &ResourceManager::disableActions, action, &QAction::setDisabled);
+    }
 
     QAction *exit = new QAction(tr("&Exit"));
     projectActions->addAction(exit);
@@ -304,6 +317,7 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     int data = hierarchy->data(newParent, 257).toInt();
+    Ref<Entity> selectedEntity = registry->getSelectedEntity();
     if (data != 0) {
         Entity *parent = registry->getEntity(data).get();
         if (newParent.isValid()) {
@@ -341,12 +355,8 @@ void MainWindow::parentChanged(GLuint eID) {
 }
 void MainWindow::onEntityClicked(const QModelIndex &index) {
     GLuint eID = hierarchy->itemFromIndex(index)->data().toUInt();
-    onEntityDragged(eID);
+    emit selectedEntity(eID);
     mComponentList->setupComponentList();
-}
-
-void MainWindow::onEntityDragged(GLuint eID) {
-    selectedEntity = registry->getEntity(eID);
 }
 void MainWindow::mouseRayHit(int eID) {
     if (eID == -1) {
@@ -356,11 +366,12 @@ void MainWindow::mouseRayHit(int eID) {
     }
     QStandardItem *entity = hierarchy->itemFromEntityID(eID);
     hView->setCurrentIndex(hierarchy->indexFromItem(entity));
-    selectedEntity = registry->getEntity(eID);
+    registry->setSelectedEntity(eID);
     mComponentList->setupComponentList();
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
+    Ref<Entity> selectedEntity = registry->getSelectedEntity();
     if (selectedEntity)
         selectedEntity->setName(hierarchy->data(index).toString());
 }

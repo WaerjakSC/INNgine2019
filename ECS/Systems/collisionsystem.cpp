@@ -4,9 +4,8 @@
 #include "raycast.h"
 #include "registry.h"
 #include <cmath>
-CollisionSystem::CollisionSystem() : reg(Registry::instance()) {
+CollisionSystem::CollisionSystem() : registry(Registry::instance()) {
 }
-
 void CollisionSystem::update(DeltaTime dt) {
     delta += dt;
     if (delta >= fixedDelta) {
@@ -19,8 +18,8 @@ void CollisionSystem::runSimulations() {
     runSphereSimulations();
 }
 void CollisionSystem::runAABBSimulations() {
-    auto view = reg->view<AABB>();
-    auto sphereView = reg->view<Sphere>();
+    auto view = registry->view<AABB>();
+    auto sphereView = registry->view<Sphere>();
     for (auto entity : view) {
         auto &aabb = view.get(entity);
         // Check for AABB-AABB intersections
@@ -30,8 +29,8 @@ void CollisionSystem::runAABBSimulations() {
                 if (!bothStatic(aabb, otherAABB))
                     if (AABBAABB(aabb, otherAABB)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1 = reg->getEntity(entity)->name();
-                        QString entity2 = reg->getEntity(otherEntity)->name();
+                        QString entity1 = registry->getEntity(entity)->name();
+                        QString entity2 = registry->getEntity(otherEntity)->name();
                         //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
@@ -44,12 +43,12 @@ void CollisionSystem::runAABBSimulations() {
                 if (!bothStatic(aabb, sphere))
                     if (SphereAABB(sphere, aabb)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1 = reg->getEntity(entity)->name();
-                        QString entity2 = reg->getEntity(otherEntity)->name();
+                        QString entity1 = registry->getEntity(entity)->name();
+                        QString entity2 = registry->getEntity(otherEntity)->name();
                         // NOTIFY FSM
-                        if (reg->contains<BSplinePoint>(entity)) {
-                            reg->removeEntity(entity);
-                            reg->getSystem<AIsystem>()->masterOfCurves();
+                        if (registry->contains<BSplinePoint>(entity)) {
+                            registry->removeEntity(entity);
+                            registry->getSystem<AISystem>()->masterOfCurves();
                         }
                         qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         if (entity1 == "Enemy" && entity2 == "Player") {
@@ -64,7 +63,7 @@ void CollisionSystem::runAABBSimulations() {
     }
 }
 void CollisionSystem::runSphereSimulations() {
-    auto view = reg->view<Sphere>();
+    auto view = registry->view<Sphere>();
     for (auto entity : view) {
         auto &sphere = view.get(entity);
         for (auto otherEntity : view) {
@@ -73,8 +72,8 @@ void CollisionSystem::runSphereSimulations() {
                 if (!bothStatic(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
                         //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
-                        QString entity1 = reg->getEntity(entity)->name();
-                        QString entity2 = reg->getEntity(otherEntity)->name();
+                        QString entity1 = registry->getEntity(entity)->name();
+                        QString entity2 = registry->getEntity(otherEntity)->name();
 
                         //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
@@ -288,4 +287,160 @@ bool CollisionSystem::RayToAABB(const Ray &r, const AABB &aabb, double &intersec
         return true;
     }
     return false;
+}
+// ************* Collider update slots *************
+void CollisionSystem::setOriginX(double xIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &aabb = registry->get<AABB>(entityID);
+    aabb.origin.x = xIn;
+    aabb.transform.matrixOutdated = true;
+    emit updateAABB(entityID);
+}
+void CollisionSystem::setOriginY(double yIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &aabb = registry->get<AABB>(entityID);
+    aabb.origin.y = yIn;
+    aabb.transform.matrixOutdated = true;
+    emit updateAABB(entityID);
+}
+void CollisionSystem::setOriginZ(double zIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &aabb = registry->get<AABB>(entityID);
+    aabb.origin.z = zIn;
+    aabb.transform.matrixOutdated = true;
+    emit updateAABB(entityID);
+}
+void CollisionSystem::setAABBSizeX(double xIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &aabb = registry->get<AABB>(entityID);
+    aabb.size.x = xIn;
+    aabb.transform.matrixOutdated = true;
+    emit updateAABB(entityID);
+}
+void CollisionSystem::setAABBSizeY(double yIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &aabb = registry->get<AABB>(entityID);
+    aabb.size.y = yIn;
+    aabb.transform.matrixOutdated = true;
+    emit updateAABB(entityID);
+}
+void CollisionSystem::setAABBSizeZ(double zIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &aabb = registry->get<AABB>(entityID);
+    aabb.size.z = zIn;
+    aabb.transform.matrixOutdated = true;
+    emit updateAABB(entityID);
+}
+void CollisionSystem::setOBBPositionX(double xIn) {
+    auto &obb = registry->get<OBB>(registry->getSelectedEntity()->id());
+    obb.position.x = xIn;
+}
+void CollisionSystem::setOBBPositionY(double yIn) {
+    auto &obb = registry->get<OBB>(registry->getSelectedEntity()->id());
+    obb.position.y = yIn;
+}
+void CollisionSystem::setOBBPositionZ(double zIn) {
+    auto &obb = registry->get<OBB>(registry->getSelectedEntity()->id());
+    obb.position.z = zIn;
+}
+void CollisionSystem::setOBBSizeX(double xIn) {
+    auto &obb = registry->get<OBB>(registry->getSelectedEntity()->id());
+    obb.size.x = xIn;
+}
+void CollisionSystem::setOBBSizeY(double yIn) {
+    auto &obb = registry->get<OBB>(registry->getSelectedEntity()->id());
+    obb.size.y = yIn;
+}
+void CollisionSystem::setOBBSizeZ(double zIn) {
+    auto &obb = registry->get<OBB>(registry->getSelectedEntity()->id());
+    obb.size.z = zIn;
+}
+void CollisionSystem::setSpherePositionX(double xIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &sphere = registry->get<Sphere>(entityID);
+    sphere.position.x = xIn;
+    sphere.transform.matrixOutdated = true;
+    emit updateSphere(entityID);
+}
+void CollisionSystem::setSpherePositionY(double yIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &sphere = registry->get<Sphere>(entityID);
+    sphere.position.y = yIn;
+    sphere.transform.matrixOutdated = true;
+    emit updateSphere(entityID);
+}
+void CollisionSystem::setSpherePositionZ(double zIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &sphere = registry->get<Sphere>(entityID);
+    sphere.position.z = zIn;
+    sphere.transform.matrixOutdated = true;
+    emit updateSphere(entityID);
+}
+void CollisionSystem::setSphereRadius(double radius) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &sphere = registry->get<Sphere>(entityID);
+    sphere.radius = radius;
+    sphere.transform.matrixOutdated = true;
+    emit updateSphere(entityID);
+}
+void CollisionSystem::setCylinderPositionX(double xIn) {
+    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity()->id());
+    cylinder.position.x = xIn;
+}
+void CollisionSystem::setCylinderPositionY(double yIn) {
+    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity()->id());
+    cylinder.position.y = yIn;
+}
+void CollisionSystem::setCylinderPositionZ(double zIn) {
+    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity()->id());
+    cylinder.position.z = zIn;
+}
+void CollisionSystem::setCylinderRadius(double radius) {
+    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity()->id());
+    cylinder.radius = radius;
+}
+void CollisionSystem::setCylinderHeight(double height) {
+    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity()->id());
+    cylinder.radius = height;
+}
+void CollisionSystem::setPlaneNormalX(double xIn) {
+    auto &plane = registry->get<Plane>(registry->getSelectedEntity()->id());
+    plane.normal.x = xIn;
+}
+void CollisionSystem::setPlaneNormalY(double yIn) {
+    auto &plane = registry->get<Plane>(registry->getSelectedEntity()->id());
+    plane.normal.y = yIn;
+}
+void CollisionSystem::setPlaneNormalZ(double zIn) {
+    auto &plane = registry->get<Plane>(registry->getSelectedEntity()->id());
+    plane.normal.z = zIn;
+}
+void CollisionSystem::setPlaneDistance(double distance) {
+    auto &plane = registry->get<Plane>(registry->getSelectedEntity()->id());
+    plane.distance = distance;
+}
+void CollisionSystem::setObjectType(int index) {
+    bool isStatic;
+    if (index == 0)
+        isStatic = true;
+    else
+        isStatic = false;
+    GLuint entityID = registry->getSelectedEntity()->id();
+    if (registry->contains<AABB>(entityID)) {
+        auto &aabb = registry->get<AABB>(entityID);
+        aabb.isStatic = isStatic;
+        return;
+    }
+    if (registry->contains<Sphere>(entityID)) {
+        auto &sphere = registry->get<Sphere>(entityID);
+        sphere.isStatic = isStatic;
+    }
+    if (registry->contains<Cylinder>(entityID)) {
+        auto &cylinder = registry->get<Cylinder>(entityID);
+        cylinder.isStatic = isStatic;
+    }
+    if (registry->contains<Plane>(entityID)) {
+        auto &plane = registry->get<Plane>(entityID);
+        plane.isStatic = isStatic;
+    }
 }

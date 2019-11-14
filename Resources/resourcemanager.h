@@ -126,6 +126,11 @@ public slots:
     void newProject();
 
     void newScene();
+signals:
+    void disableActions(bool disable);
+    void disablePlay(bool disable);
+    void disablePause(bool disable);
+    void disableStop(bool disable);
 
 private:
     // Private constructor

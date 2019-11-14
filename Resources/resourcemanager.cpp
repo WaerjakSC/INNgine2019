@@ -46,7 +46,7 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Sphere>();
     registry->registerComponent<Plane>();
     registry->registerComponent<Cylinder>();
-    registry->registerComponent<AIcomponent>();
+    registry->registerComponent<AIComponent>();
     registry->registerComponent<BSplinePoint>();
     registry->registerComponent<GameCamera>();
     registry->registerComponent<PlayerComponent>();
@@ -1054,18 +1054,20 @@ void ResourceManager::play() {
             }
         }
         mIsPlaying = true;
-        registry->getSystem<AIsystem>()->masterOfCurves();
-        mMainWindow->play->setEnabled(false);
-        mMainWindow->pause->setEnabled(true);
-        mMainWindow->stop->setEnabled(true);
+        registry->getSystem<AISystem>()->masterOfCurves();
+        emit disableActions(true);
+        emit disablePlay(true);
+        emit disablePause(false);
+        emit disableStop(false);
     }
 }
 void ResourceManager::pause() {
     if (mIsPlaying) {
         mIsPlaying = false;
         mPaused = true;
-        mMainWindow->play->setEnabled(true);
-        mMainWindow->pause->setEnabled(false);
+        emit disablePlay(false);
+        emit disablePause(true);
+
         auto inputSys = registry->getSystem<InputSystem>();
         inputSys->setGameCameraInactive();
         setActiveCameraController(inputSys->editorCamController());
@@ -1082,9 +1084,10 @@ void ResourceManager::stop() {
         setActiveCameraController(inputSys->editorCamController());
         mIsPlaying = false;
         mMainWindow->insertEntities();
-        mMainWindow->play->setEnabled(true);
-        mMainWindow->pause->setEnabled(false);
-        mMainWindow->stop->setEnabled(false);
+        emit disableActions(false);
+        emit disablePlay(false);
+        emit disablePause(true);
+        emit disableStop(true);
     }
 }
 void ResourceManager::setActiveCameraController(Ref<CameraController> controller) {

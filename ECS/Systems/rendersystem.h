@@ -21,7 +21,7 @@ public slots:
      * @param entityID
      * @param nShader String corresponding to the name of the new shader.
      */
-    void changeShader(int entityID, std::string nShader);
+    void changeShader(const QString &nShader);
     /**
      * @brief toggleRendered Toggle an entity's Mesh.IsRendered state.
      * @param entityID

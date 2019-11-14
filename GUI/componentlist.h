@@ -12,7 +12,7 @@ class Entity;
 class QLabel;
 class QCheckBox;
 class QHBoxLayout;
-class QDoubleSpinBox;
+class CustomDoubleSpinBox;
 class HierarchyModel;
 class QComboBox;
 class HierarchyView;
@@ -22,7 +22,7 @@ class MainWindow;
 class ComponentList : public QWidget {
     Q_OBJECT
 public:
-    ComponentList(MainWindow *window, VerticalScrollArea *inScrollArea);
+    ComponentList(VerticalScrollArea *inScrollArea);
     void setupComponentList();
 
 public slots:
@@ -85,20 +85,6 @@ private slots:
     void updateRotationVals(GLuint eID, vec3 newRot);
     void updateScaleVals(GLuint eID, vec3 newScale);
 
-    void setNewShader(const QString &text);
-    void setHealth(int health);
-    void setActiveCamera(bool checked);
-
-    void setControlX(double xIn);
-    void setControlY(double yIn);
-    void setControlZ(double zIn);
-
-    void setCameraPositionX(double xIn);
-    void setCameraPositionY(double yIn);
-    void setCameraPositionZ(double zIn);
-    void setPitch(double pitch);
-    void setYaw(double yaw);
-
     void setPositionX(double xIn);
     void setPositionY(double yIn);
     void setPositionZ(double zIn);
@@ -109,34 +95,6 @@ private slots:
     void setScaleY(double yIn);
     void setScaleZ(double zIn);
 
-    void setOriginX(double xIn);
-    void setOriginY(double xIn);
-    void setOriginZ(double xIn);
-    void setAABBSizeX(double xIn);
-    void setAABBSizeY(double yIn);
-    void setAABBSizeZ(double zIn);
-    void setOBBPositionX(double xIn);
-    void setOBBPositionY(double yIn);
-    void setOBBPositionZ(double zIn);
-    void setOBBSizeX(double xIn);
-    void setOBBSizeY(double yIn);
-    void setOBBSizeZ(double zIn);
-    void setSpherePositionX(double xIn);
-    void setSpherePositionY(double yIn);
-    void setSpherePositionZ(double zIn);
-    void setSphereRadius(double radius);
-    void setPlaneNormalX(double xIn);
-    void setPlaneNormalY(double yIn);
-    void setPlaneNormalZ(double zIn);
-    void setPlaneDistance(double radius);
-    void setCylinderPositionX(double xIn);
-    void setCylinderPositionY(double yIn);
-    void setCylinderPositionZ(double zIn);
-    void setCylinderRadius(double radius);
-    void setCylinderHeight(double height);
-
-    void setObjectType(int index);
-
 private:
     void setColor();
     void setNewMesh();
@@ -144,7 +102,7 @@ private:
 
     void setupTransformSettings(const Transform &component);
     void setupMaterialSettings(const Material &component);
-    void setupAISettings(const AIcomponent &ai);
+    void setupAISettings(const AIComponent &ai);
     void setupMeshSettings(const Mesh &mesh);
     void setupAABBSettings(const AABB &col);
     void setupOBBSettings(const OBB &col);
@@ -158,18 +116,15 @@ private:
     QStyle *fusion;
     QLabel *colorLabel, *texFileLabel, *objFileLabel;
     QCheckBox *abs;
-    QDoubleSpinBox *xVal, *yVal, *zVal;
+    CustomDoubleSpinBox *xVal, *yVal, *zVal;
 
     VerticalScrollArea *scrollArea;
-    MainWindow *mMainWindow;
     friend class MainWindow;
-    QDoubleSpinBox *makeDoubleSpinBox(const double &num, QHBoxLayout *layout, const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
-    std::tuple<QDoubleSpinBox *, QDoubleSpinBox *, QDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
-                                                                                   const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    CustomDoubleSpinBox *makeDoubleSpinBox(const double &num, QHBoxLayout *layout, const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
+    std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
+                                                                                                  const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
     QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
 
-    void updateAABB(GLuint eID);
-    void updateSphere(GLuint eID);
     void setupBSplinePointSettings(const BSplinePoint &point);
 };
 

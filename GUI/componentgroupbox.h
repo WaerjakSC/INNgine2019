@@ -7,12 +7,11 @@ class QMainWindow;
 class MainWindow;
 class ComponentGroupBox : public QGroupBox {
 public:
-    ComponentGroupBox(const QString &name, QMainWindow *parent = nullptr);
+    ComponentGroupBox(const QString &name, QWidget *parent = nullptr);
 private slots:
     void removeComponent();
 
 private:
-    MainWindow *mMainWindow;
     void createActions();
 };
 

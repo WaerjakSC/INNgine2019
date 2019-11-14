@@ -3,14 +3,14 @@
 #include "gsl_math.h"
 #include "movementsystem.h"
 #include "registry.h"
-AIsystem::AIsystem() {
+AISystem::AISystem() {
 }
 
 /**
  * @brief AIsystem::update, runs the highly sofisticated AI cortex
  * @param dt
  */
-void AIsystem::update(DeltaTime dt) {
+void AISystem::update(DeltaTime dt) {
     // Run the eventHandler incase of events
     eventHandler();
     // draw the bspline curve lines
@@ -42,7 +42,7 @@ void AIsystem::update(DeltaTime dt) {
 /**
  * @brief AIsystem::learn, flips the direction and updates path
  */
-void AIsystem::learn() {
+void AISystem::learn() {
     dir = -dir;
     if (updatePath) {
         mCurve.updatePath();
@@ -55,26 +55,49 @@ void AIsystem::learn() {
 /**
  * @brief AIsystem::masterOfCurves, helper function that updates trophies and path
  */
-void AIsystem::masterOfCurves() {
+void AISystem::masterOfCurves() {
     mCurve.updateTrophies();
     mCurve.updatePath();
 }
+void AISystem::setHealth(int health) {
+    auto ai = registry->get<AIComponent>(registry->getSelectedEntity()->id());
+    ai.hp = health;
+}
+void AISystem::setBSPlinePointX(double xIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &bspline = registry->get<BSplinePoint>(entityID);
+    bspline.location.x = xIn;
+    masterOfCurves();
+}
 
+void AISystem::setBSPlinePointY(double yIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &bspline = registry->get<BSplinePoint>(entityID);
+    bspline.location.y = yIn;
+    masterOfCurves();
+}
+
+void AISystem::setBSPlinePointZ(double zIn) {
+    GLuint entityID = registry->getSelectedEntity()->id();
+    auto &bspline = registry->get<BSplinePoint>(entityID);
+    bspline.location.z = zIn;
+    masterOfCurves();
+}
 /**
  * @brief AIsystem::setControlPoints
  * @param cps
  */
-void AIsystem::setControlPoints(std::vector<vec3> cps) {
+void AISystem::setControlPoints(std::vector<vec3> cps) {
     mCurve.setControlPoints(cps);
 }
 
 /**
  * @brief AIsystem::eventHandler, event handling
  */
-void AIsystem::eventHandler() {
+void AISystem::eventHandler() {
     auto reg = Registry::instance();
-    auto view = reg->view<Transform, AIcomponent>();
-    auto &ai = view.get<AIcomponent>(NPC);
+    auto view = reg->view<Transform, AIComponent>();
+    auto &ai = view.get<AIComponent>(NPC);
 
     while (!notification_queue.empty()) {
         auto event = notification_queue.front();
@@ -100,7 +123,7 @@ void AIsystem::eventHandler() {
 /**
  * @brief AIsystem::draw
  */
-void AIsystem::draw() {
+void AISystem::draw() {
     mCurve.draw();
 }
 
@@ -124,9 +147,9 @@ void AIsystem::draw() {
  * @param deltaT
  * @return
  */
-std::optional<NPCevents> AIsystem::move(float deltaT) {
+std::optional<NPCevents> AISystem::move(float deltaT) {
     auto reg = Registry::instance();
-    auto view = reg->view<Transform, AIcomponent>();
+    auto view = reg->view<Transform, AIComponent>();
     auto &transform = view.get<Transform>(NPC);
     t += deltaT * dir;
     bool endPoint = 0.98f <= t || t < 0.f;
@@ -150,7 +173,7 @@ std::optional<NPCevents> AIsystem::move(float deltaT) {
  * @brief AIsystem::init, initializes NPC and curve
  * @param eID
  */
-void AIsystem::init(GLuint eID) {
+void AISystem::init(GLuint eID) {
     NPC = eID;
     mCurve.init();
 }
@@ -158,7 +181,7 @@ void AIsystem::init(GLuint eID) {
 /**
  * @brief AIsystem::death, todo
  */
-void AIsystem::death() {
+void AISystem::death() {
     // hp <= 0
     // gold++
     // delete entity
@@ -167,7 +190,7 @@ void AIsystem::death() {
 /**
  * @brief AIsystem::goalReached, todo
  */
-void AIsystem::goalReached() {
+void AISystem::goalReached() {
     // endpoint reached
     // remove 1LP from player
     // delete entity

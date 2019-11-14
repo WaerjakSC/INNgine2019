@@ -94,6 +94,7 @@ HEADERS += \
 #
     GUI/componentgroupbox.h \
     GUI/componentlist.h \
+    GUI/customdoublespinbox.h \
     GUI/hierarchymodel.h \
     GUI/hierarchyview.h \
     GUI/verticalscrollarea.h \
@@ -152,6 +153,7 @@ SOURCES += main.cpp \
 #
     GUI/componentgroupbox.cpp \
     GUI/componentlist.cpp \
+    GUI/customdoublespinbox.cpp \
     GUI/hierarchymodel.cpp \
     GUI/hierarchyview.cpp \
     GUI/verticalscrollarea.cpp \

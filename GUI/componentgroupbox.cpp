@@ -6,9 +6,8 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QStyleFactory>
-ComponentGroupBox::ComponentGroupBox(const QString &name, QMainWindow *parent) : QGroupBox(parent) {
+ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox(parent) {
     setTitle(name);
-    mMainWindow = static_cast<MainWindow *>(parent);
     QStyle *fusion = QStyleFactory::create("fusion");
     setAlignment(Qt::AlignCenter);
     setStyle(fusion);
@@ -18,7 +17,7 @@ ComponentGroupBox::ComponentGroupBox(const QString &name, QMainWindow *parent) :
 
 void ComponentGroupBox::removeComponent() {
     Registry *registry = Registry::instance();
-    GLuint entityID = mMainWindow->selectedEntity->id();
+    GLuint entityID = registry->getSelectedEntity()->id();
     if (title() == "Transform")
         registry->remove<Transform>(entityID);
     if (title() == "Material")
@@ -34,7 +33,7 @@ void ComponentGroupBox::removeComponent() {
     if (title() == "Sound")
         registry->remove<Sound>(entityID);
     if (title() == "AI")
-        registry->remove<AIcomponent>(entityID);
+        registry->remove<AIComponent>(entityID);
     if (title() == "AABB Collider")
         registry->remove<AABB>(entityID);
     if (title() == "OBB Collider")

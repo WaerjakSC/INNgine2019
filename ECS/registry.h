@@ -220,6 +220,10 @@ public:
      */
     std::vector<GLuint> getChildren(GLuint eID);
 
+    Ref<Entity> getSelectedEntity() const;
+public slots:
+    void setSelectedEntity(const GLuint selectedEntity);
+
 signals:
     void entityCreated(GLuint eID);
     void entityRemoved(GLuint eID);
@@ -233,6 +237,7 @@ private:
 
     std::map<GLuint, Ref<Entity>> mEntities; // Save Entities as pointers to avoid clipping of derived classes
     std::vector<GLuint> mAvailableSlots;
+    Ref<Entity> mSelectedEntity;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
 
