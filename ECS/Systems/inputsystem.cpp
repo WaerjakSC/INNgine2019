@@ -50,7 +50,8 @@ void InputSystem::handleKeyInput() {
         snapToObject();
     }
     if (editorInput.CTRL && editorInput.S) {
-        factory->save();
+        if (!factory->isPlaying())
+            factory->save();
     }
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
