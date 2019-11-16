@@ -1,9 +1,14 @@
 #ifndef BSPLINECURVE_H
 #define BSPLINECURVE_H
+#include "core.h"
 #include "vector3d.h"
 #include <QOpenGLFunctions_4_1_Core>
 typedef gsl::Vector3D vec3;
+class ColorShader;
 class BSplineCurve : protected QOpenGLFunctions_4_1_Core {
+private:
+    cjk::Ref<ColorShader> debugShader;
+
 public:
     // default constructor
     BSplineCurve(int degree = 2);

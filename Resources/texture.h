@@ -19,6 +19,12 @@ public:
      */
     Texture(const std::string &filename, GLuint textureUnit = 0);
     /**
+     * @brief Texture Read an image file and create a cubemap with standard parameters.
+     * @param filename The name of the image file containing a texture.
+     * @param textureUnit The size of the mTextures map in ResourceManager before this texture was added.
+     */
+    Texture(std::vector<std::string> faces, GLuint textureUnit = 0);
+    /**
     * @brief id() Return the id of a previously generated texture object
     * @return The id of a previously generated texture object
     */
@@ -28,7 +34,8 @@ public:
     GLuint textureUnit() const;
 
 private:
-    bool TextureFromFile(const std::string &directory /*, bool gamma = false*/);
+    bool textureFromFile(const std::string &directory /*, bool gamma = false*/);
+    bool cubeMapFromFile(std::vector<std::string> faces);
 };
 
 #endif // TEXTURE_H

@@ -52,6 +52,8 @@ public:
     }
     // Loads and generates texture from file
     bool loadTexture(std::string name);
+    bool loadCubemap(std::vector<std::string> faces);
+
     // Gets stored texture
     Ref<Texture> getTexture(std::string name);
 
@@ -109,6 +111,7 @@ public:
         \param The file path relative to execution directory.
     **/
     bool loadWave(std::string filePath, Sound &sound);
+
     void setColliderMesh(Mesh &mesh);
     void newScene(const QString &text);
     std::map<std::string, Ref<Texture>> getTextures() const;

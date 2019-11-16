@@ -27,6 +27,7 @@
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
+#include <skyboxshader.h>
 
 ResourceManager *ResourceManager::mInstance = nullptr;
 
@@ -281,8 +282,7 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
  */
 GLuint ResourceManager::makeSkyBox(const QString &name) {
     GLuint eID = registry->makeEntity(name);
-    registry->add<Transform>(eID, 0, 0, gsl::Vector3D(15));
-    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["skybox.bmp"]->textureUnit());
+    registry->add<Material>(eID, getShader<SkyboxShader>(), mTextures["Skybox"]->textureUnit());
     auto search = mMeshMap.find("Skybox");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
@@ -295,53 +295,22 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
     mMeshData.Clear();
     mMeshData.mName = "Skybox";
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {
-                                   //Vertex data for front
-                                   Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.333f)}, //v0
-                                   Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.333f)},   //v1
-                                   Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.666f)},  //v2
-                                   Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.666f)},    //v3
-
-                                   //Vertex data for right
-                                   Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v4
-                                   Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.333f)}, //v5
-                                   Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v6
-                                   Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(1.f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.666f)},  //v7
-
-                                   //Vertex data for back
-                                   Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(0.75f, 0.333f)}, //v8
-                                   Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(1.f, 0.333f)},  //v9
-                                   Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(0.75f, 0.666f)},  //v10
-                                   Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(0.f, 0.f, -1.f), gsl::Vector2D(1.f, 0.666f)},   //v11
-
-                                   //Vertex data for left
-                                   Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.f, 0.333f)},  //v12
-                                   Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v13
-                                   Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.f, 0.666f)},   //v14
-                                   Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(-1.f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v15
-
-                                   //Vertex data for bottom
-                                   Vertex{gsl::Vector3D(-1.f, -1.f, -1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.25f, 0.f)},   //v16
-                                   Vertex{gsl::Vector3D(1.f, -1.f, -1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.5f, 0.f)},     //v17
-                                   Vertex{gsl::Vector3D(-1.f, -1.f, 1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v18
-                                   Vertex{gsl::Vector3D(1.f, -1.f, 1.f), gsl::Vector3D(0.f, -1.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v19
-
-                                   //Vertex data for top
-                                   Vertex{gsl::Vector3D(-1.f, 1.f, 1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v20
-                                   Vertex{gsl::Vector3D(1.f, 1.f, 1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v21
-                                   Vertex{gsl::Vector3D(-1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.25f, 0.999f)}, //v22
-                                   Vertex{gsl::Vector3D(1.f, 1.f, -1.f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.999f)}    //v23
-                               });
+                               {Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f)},  // 0
+                                Vertex{gsl::Vector3D(-1.0f, -1.0f, -1.0f)}, // 1
+                                Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f)},  // 2
+                                Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f)},   // 3
+                                Vertex{gsl::Vector3D(-1.0f, -1.0f, 1.0f)},  // 4
+                                Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f)},   // 5
+                                Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f)},   // 6
+                                Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f)}});  // 7
 
     mMeshData.mIndices.insert(mMeshData.mIndices.end(),
-                              {
-                                  0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
-                                  4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
-                                  8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
-                                  12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
-                                  16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
-                                  20, 22, 21, 21, 22, 23  //Face 5 - triangle strip (v20, v21, v22, v23)
-                              });
+                              {0, 1, 2, 2, 3, 0,
+                               4, 1, 0, 0, 5, 4,
+                               2, 6, 7, 7, 3, 2,
+                               4, 5, 7, 7, 6, 4,
+                               0, 3, 7, 7, 5, 0,
+                               1, 4, 2, 2, 4, 6});
 
     if (!registry->contains<Mesh>(eID))
         registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
@@ -824,7 +793,23 @@ bool ResourceManager::loadTexture(std::string fileName) {
     }
     return false;
 }
-
+/**
+ * @brief ResourceManager::loadCubemap specialized texture loader for the skybox
+ * @param faces List of filenames for the cubemap
+ * @return success
+ */
+bool ResourceManager::loadCubemap(std::vector<std::string> faces) {
+    if (mTextures.find("Skybox") == mTextures.end()) {
+        Ref<Texture> tex = std::make_shared<Texture>(faces, mTextures.size());
+        if (tex->isValid) {
+            mTextures["Skybox"] = tex;
+            qDebug() << "ResourceManager: Added skybox cubemap";
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
 Ref<Texture> ResourceManager::getTexture(std::string fileName) {
     return mTextures[fileName];
 }

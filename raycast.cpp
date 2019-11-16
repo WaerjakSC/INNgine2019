@@ -15,8 +15,7 @@ Raycast::Raycast(cjk::Ref<CameraController> controller) : mCurrentController(con
 int Raycast::mousePick(const QPoint &mousePos, const QRect &rect) {
     Registry *registry = Registry::instance();
     Ray ray = getRayFromMouse(mousePos, rect);
-    // actual point in world space
-    //    vec3 rayPoint = getPointOnRay(ray, 5);
+
     int entityID{-1};
     double closestTarget{rayRange};
     double intersectionPoint;

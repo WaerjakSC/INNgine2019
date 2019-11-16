@@ -45,10 +45,6 @@ public:
     void setCameraSpeed(float value);
     void playSound();
 
-    Ref<RenderSystem> renderer() const;
-
-    Ref<MovementSystem> movement() const;
-
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 

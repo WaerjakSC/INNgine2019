@@ -9,7 +9,7 @@ public:
     Vertex();
     Vertex(float x, float y, float z, float r, float g, float b);
     Vertex(float x, float y, float z, float r, float g, float b, float s, float t);
-    Vertex(vec3 a, vec3 b, gsl::Vector2D c);
+    Vertex(vec3 a, vec3 b = vec3(0), gsl::Vector2D c = gsl::Vector2D(0));
     ~Vertex();
 
     //! Overloaded ostream operator which writes all vertex data on an open textfile stream

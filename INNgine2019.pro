@@ -100,6 +100,7 @@ HEADERS += \
     GUI/verticalscrollarea.h \
 #    
     Shaders/colorshader.h \
+    Shaders/skyboxshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
     Shaders/shader.h \
@@ -159,6 +160,7 @@ SOURCES += main.cpp \
     GUI/verticalscrollarea.cpp \
 #
     Shaders/colorshader.cpp \
+    Shaders/skyboxshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
     Shaders/shader.cpp \
@@ -189,6 +191,8 @@ DISTFILES += \
     Shaders/phongshader.vert \
     Shaders/plainshader.frag \
     Shaders/plainshader.vert \
+    Shaders/skyboxshader.frag \
+    Shaders/skyboxshader.vert \
     Shaders/textureshader.frag \
     GSL/README.md \
     README.md \

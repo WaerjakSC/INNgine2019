@@ -28,11 +28,11 @@ public:
         friend class IPool;
 
     public:
-        iterator(const std::vector<int> *ref, const std::int32_t idx)
+        iterator(const std::vector<GLuint> *ref, const std::int32_t idx)
             : direct{ref}, index{idx} {}
         using difference_type = std::int32_t;
-        using pointer = const int *;
-        using reference = const int &;
+        using pointer = const GLuint *;
+        using reference = const GLuint &;
         using iterator_category = std::random_access_iterator_tag;
 
         iterator() = default;
@@ -115,13 +115,13 @@ public:
         }
 
     private:
-        const std::vector<int> *direct;
+        const std::vector<GLuint> *direct;
         std::int32_t index;
     };
 
 protected:
-    std::vector<int> mIndex; // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
-    std::vector<int> mList;  // Value is entityID.
+    std::vector<int> mIndex;   // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
+    std::vector<GLuint> mList; // Value is entityID.
 };
 
 template <typename Type>
@@ -236,7 +236,7 @@ public:
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
-    const std::vector<int> &entities() { return mList; }
+    const std::vector<GLuint> &entities() { return mList; }
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
      * The index location is equal to the entityID.

@@ -8,6 +8,7 @@
 #include "registry.h"
 #include "resourcemanager.h"
 #include "shader.h"
+#include "skyboxshader.h"
 #include "textureshader.h"
 #include <fstream>
 #include <iostream>
@@ -15,6 +16,7 @@
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
+#include <rendersystem.h>
 #include <sstream>
 
 Scene::Scene() {
@@ -358,7 +360,7 @@ void Scene::populateScene(const Document &scene) {
     // Iterate through each entity in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
         // Iterate through each of the members in the entity (name, id, components)
-        if (itr->name == "controller")
+        if (itr->name == "controller") // Note: Naming an entity "controller" probably fucks with this
             continue;
         GLuint id = registry->makeEntity(itr->value["name"].GetString());
         idPairs[itr->value["id"].GetInt()] = id;
@@ -388,9 +390,14 @@ void Scene::populateScene(const Document &scene) {
                     shader = factory->getShader<TextureShader>();
                 else if (shaderName == "PhongShader")
                     shader = factory->getShader<PhongShader>();
+                else if (shaderName == "SkyboxShader")
+                    shader = factory->getShader<SkyboxShader>();
                 registry->add<Material>(id, shader, comp->value["textureunit"].GetInt(), color, specStr, specExp);
             } else if (comp->name == "mesh") {
-                factory->addMeshComponent(comp->value["name"].GetString(), id);
+                std::string meshName = comp->value["name"].GetString();
+                factory->addMeshComponent(meshName, id);
+                if (meshName == "Skybox")
+                    registry->getSystem<RenderSystem>()->setSkyBoxID(id);
             } else if (comp->name == "light") { // Again, temporary, very static functionality atm
                 GLfloat ambStr = comp->value["ambstr"].GetFloat();
                 vec3 ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());

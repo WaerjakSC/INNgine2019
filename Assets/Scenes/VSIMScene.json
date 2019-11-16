@@ -1,35 +1,11 @@
 {
-    "gamecam": {
-        "position": [
-            0.0,
-            12.0,
-            10.0
-        ],
-        "pitch": -45,
-        "yaw": 0
+    "controller": {
+        "id": 10
     },
-    "GameObject": {
+    "Entity": {
         "name": "Skybox",
         "id": 2,
         "components": {
-            "transform": {
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    15.0,
-                    15.0,
-                    15.0
-                ],
-                "parent": -1
-            },
             "material": {
                 "color": [
                     1.0,
@@ -39,14 +15,14 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureid": 2,
-                "shader": "TextureShader"
+                "shader": "SkyboxShader"
             },
             "mesh": {
                 "name": "Skybox"
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Light",
         "id": 4,
         "components": {
@@ -103,7 +79,7 @@
             }
         }
     },
-    "GameObject": {
+    "Entity": {
         "name": "Player",
         "id": 12,
         "components": {

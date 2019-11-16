@@ -118,6 +118,8 @@ public:
         return candidate()->find(entt);
     }
     bool contains(const int &entt) const {
+        if (entt < 0)
+            return false;
         return find(entt) != -1;
     }
     /**
@@ -170,7 +172,7 @@ public:
     std::vector<Component> &data() const {
         return pool->data();
     }
-    const std::vector<int> &entities() const {
+    const std::vector<GLuint> &entities() const {
         return pool->entities();
     }
     int find(const int &entt) const {

@@ -2,6 +2,7 @@
 #include "registry.h"
 
 BSplineCurve::BSplineCurve(int degree) : d(degree) {
+    debugShader = ResourceManager::instance()->getShader<ColorShader>();
 }
 
 /**
@@ -145,6 +146,7 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
 void BSplineCurve::draw() {
 
     if (debugLine) {
+        glUseProgram(debugShader->getProgram());
         glPointSize(3.f);
         glBindVertexArray(mVAO);
         glDrawArrays(GL_LINE_STRIP, 0, splineResolution);

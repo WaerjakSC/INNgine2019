@@ -54,24 +54,6 @@
         "name": "Skybox",
         "id": 2,
         "components": {
-            "transform": {
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    15.0,
-                    15.0,
-                    15.0
-                ],
-                "parent": -1
-            },
             "material": {
                 "color": [
                     1.0,
@@ -81,7 +63,7 @@
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
                 "textureunit": 2,
-                "shader": "TextureShader"
+                "shader": "SkyboxShader"
             },
             "mesh": {
                 "name": "Skybox"

@@ -23,6 +23,7 @@
 
 #include "colorshader.h"
 #include "phongshader.h"
+#include "skyboxshader.h"
 #include "textureshader.h"
 
 #include "raycast.h"
@@ -105,11 +106,19 @@ void RenderWindow::init() {
     mFactory->loadShader<ColorShader>(mEditorCameraController);
     mFactory->loadShader<TextureShader>(mEditorCameraController);
     mFactory->loadShader<PhongShader>(mEditorCameraController);
+    mFactory->loadShader<SkyboxShader>(mEditorCameraController);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
     mFactory->loadTexture("gnome.bmp");
-    mFactory->loadTexture("skybox.bmp");
+    std::vector<std::string> faces{
+        "Skybox/right.jpg",
+        "Skybox/left.jpg",
+        "Skybox/top.jpg",
+        "Skybox/bottom.jpg",
+        "Skybox/front.jpg",
+        "Skybox/back.jpg"};
+    mFactory->loadCubemap(faces);
 
     // Set up the systems.
     mRenderer = mRegistry->registerSystem<RenderSystem>();
@@ -183,13 +192,6 @@ void RenderWindow::render() {
     // and wait for vsync.
     //    auto start = std::chrono::high_resolution_clock::now();
     mContext->swapBuffers(this);
-}
-
-Ref<RenderSystem> RenderWindow::renderer() const {
-    return mRenderer;
-}
-Ref<MovementSystem> RenderWindow::movement() const {
-    return mMoveSystem;
 }
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized

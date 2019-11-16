@@ -15,6 +15,8 @@ public:
     void update(DeltaTime dt = 0.016) override;
 
     void init();
+    void setSkyBoxID(const GLuint &skyBoxID);
+
 public slots:
     /**
      * @brief changeShader Replace the entity's current shader with a new shader given by the editor GUI.
@@ -39,6 +41,9 @@ private:
      * @todo Update to include Sphere colliders and other types.
      */
     void drawColliders();
+
+    GLuint mSkyBoxID;
+    void drawSkybox();
 };
 
 #endif // RENDERSYSTEM_H

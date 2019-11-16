@@ -4,8 +4,10 @@
 #include "components.h"
 #include "phongshader.h"
 #include "registry.h"
+#include "skyboxshader.h"
 #include "textureshader.h"
 #include "view.h"
+
 RenderSystem::RenderSystem() {
     registry = Registry::instance();
 }
@@ -26,6 +28,7 @@ void RenderSystem::drawEntities() {
                 glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
         }
     }
+    drawSkybox();
 }
 void RenderSystem::init() {
     drawEntities();
@@ -36,6 +39,17 @@ void RenderSystem::update(DeltaTime dt) {
     if (!ResourceManager::instance()->isPlaying()) {
         drawColliders();
     }
+}
+void RenderSystem::drawSkybox() {
+    auto skyBoxview = registry->view<Material, Mesh>();
+    auto [material, mesh] = skyBoxview.get<Material, Mesh>(mSkyBoxID);
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(material.mShader->getProgram());
+    gsl::Matrix4x4 temp;
+    material.mShader->transmitUniformData(temp, &material);
+    glBindVertexArray(mesh.mVAO);
+    glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
+    glDepthFunc(GL_LESS);
 }
 void RenderSystem::drawColliders() {
     auto view = registry->view<AABB>();
@@ -48,6 +62,10 @@ void RenderSystem::drawColliders() {
         glBindVertexArray(aabb.colliderMesh.mVAO);
         glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
     }
+}
+
+void RenderSystem::setSkyBoxID(const GLuint &skyBoxID) {
+    mSkyBoxID = skyBoxID;
 }
 void RenderSystem::toggleRendered(GLuint entityID) {
     bool &isRendered = registry->view<Mesh>().get(entityID).mRendered;
@@ -63,4 +81,6 @@ void RenderSystem::changeShader(const QString &nShader) {
         registry->view<Material>().get(eID).mShader = factory->getShader<TextureShader>();
     else if (nShader == "PhongShader")
         registry->view<Material>().get(eID).mShader = factory->getShader<PhongShader>();
+    else if (nShader == "SkyboxShader")
+        registry->view<Material>().get(eID).mShader = factory->getShader<SkyboxShader>();
 }
