@@ -2,9 +2,12 @@
 #include "cameracontroller.h"
 #include "registry.h"
 #include "resourcemanager.h"
+#include "stb_vorbis.c"
+
 SoundSystem::SoundSystem() : reg(Registry::instance()),
                              mDevice(NULL),
                              mContext(NULL) {
+    stb_vorbis *test = new stb_vorbis;
 }
 
 bool SoundSystem::createContext() {

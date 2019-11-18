@@ -99,6 +99,7 @@ HEADERS += \
     GUI/hierarchyview.h \
     GUI/verticalscrollarea.h \
 #    
+    Libs/stb_vorbis.h \
     Shaders/colorshader.h \
     Shaders/skyboxshader.h \
     Shaders/textureshader.h \
@@ -159,6 +160,7 @@ SOURCES += main.cpp \
     GUI/hierarchyview.cpp \
     GUI/verticalscrollarea.cpp \
 #
+    Libs/stb_vorbis.c \
     Shaders/colorshader.cpp \
     Shaders/skyboxshader.cpp \
     Shaders/textureshader.cpp \
