@@ -40,6 +40,7 @@ public:
     void setPlayer(const GLuint &player);
     void setGameCameraInactive();
 
+    void reset();
 public slots:
     void setCameraPositionX(double xIn);
     void setCameraPositionY(double yIn);
@@ -67,7 +68,7 @@ private:
     float mMoveSpeed{10.f};
     float mCameraRotateSpeed{30.f};
     bool firstRMB{true};
-    bool enteredWindow = false;
+    bool enteredWindow{false};
     bool shouldConfine{false};
     QPoint lastPos; // last position of the mouse in editor, for calculating deltas to move the camera with
     Raycast *ray;
@@ -106,7 +107,7 @@ private:
     void inputMousePress(QMouseEvent *event, Input &input);
     void inputMouseRelease(QMouseEvent *event, Input &input);
     void snapToObject();
-    void confineMouseToScreen();
+    void confineMouseToScreen(DeltaTime dt);
 };
 
 #endif // INPUTSYSTEM_H

@@ -13,7 +13,9 @@ public:
 
     void setSpeed(float speed);
     void moveUp(float deltaHeight);
-    void moveRight(float delta);
+    virtual void moveRight(float delta);
+    virtual void moveForward(float dt);
+
     virtual void setPosition(const vec3 &position);
     vec3 cameraPosition() const;
 
@@ -32,14 +34,12 @@ public:
 
     void resize(float aspectRatio);
 
-    void moveForward(float dt);
-
     float getPitch() const;
 
     float getYaw() const;
     const vec3 getCameraRotation() const;
 
-private:
+protected:
     float mNearPlane{0.5f};
     float mFarPlane{500.f};
     float mFieldOfView{45.f};
@@ -78,6 +78,9 @@ public:
     vec3 positionWithOffset();
 
     GLuint controllerID() const;
+
+    void moveForward(float delta) override;
+    void moveRight(float delta) override;
 
 private:
     GameCamera &mGameCam;

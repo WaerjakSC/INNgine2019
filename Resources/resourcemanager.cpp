@@ -1031,8 +1031,8 @@ void ResourceManager::play() {
         } else
             Registry::instance()->makeSnapshot();
         registry->getSystem<SoundSystem>()->playAll();
-        auto inputsys = registry->getSystem<InputSystem>();
-        for (auto controller : inputsys->gameCameraControllers()) {
+        auto inputSys = registry->getSystem<InputSystem>();
+        for (auto controller : inputSys->gameCameraControllers()) {
             if (controller->isActive()) {
                 setActiveCameraController(controller);
                 break;
@@ -1066,9 +1066,11 @@ void ResourceManager::stop() {
         registry->getSystem<SoundSystem>()->stopAll();
         auto inputSys = registry->getSystem<InputSystem>();
         inputSys->setGameCameraInactive();
+        inputSys->reset();
         setActiveCameraController(inputSys->editorCamController());
         mIsPlaying = false;
         mMainWindow->insertEntities();
+
         emit disableActions(false);
         emit disablePlay(false);
         emit disablePause(true);

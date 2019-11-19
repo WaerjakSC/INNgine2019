@@ -19,7 +19,7 @@ void InputSystem::update(DeltaTime dt) {
             }
         }
         if (shouldConfine)
-            confineMouseToScreen();
+            confineMouseToScreen(dt);
     }
     if (!mActiveGameCamera)
         editorCamController()->update();
@@ -33,6 +33,11 @@ void InputSystem::init(float aspectRatio) {
     for (auto entity : view) {
         mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, view.get(entity), entity));
     }
+}
+void InputSystem::reset() {
+    enteredWindow = false;
+    shouldConfine = false;
+    playerController().F1 = false;
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity()->id();
@@ -275,7 +280,7 @@ void InputSystem::wheelEvent(QWheelEvent *event) {
     }
     event->accept();
 }
-void InputSystem::confineMouseToScreen() {
+void InputSystem::confineMouseToScreen(DeltaTime dt) {
     int width = mRenderWindow->width();
     int height = mRenderWindow->height();
     QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
@@ -286,13 +291,17 @@ void InputSystem::confineMouseToScreen() {
         QPoint newPos = pos;
         if (pos.x() >= width) {
             newPos.rx() = width;
+            currentGameCameraController()->moveRight(dt);
         } else if (pos.x() <= 0) {
             newPos.rx() = 0;
+            currentGameCameraController()->moveRight(-dt);
         }
         if (pos.y() >= height) {
             newPos.ry() = height;
+            currentGameCameraController()->moveForward(-dt);
         } else if (pos.y() <= 0) {
             newPos.ry() = 0;
+            currentGameCameraController()->moveForward(dt);
         }
         newPos = mRenderWindow->mapToGlobal(newPos);
         QCursor::setPos(newPos);
