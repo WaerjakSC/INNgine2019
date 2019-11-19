@@ -172,6 +172,7 @@ struct Input : public Component {
     float MWHEEL{0.f};
     int MOUSEX{0};
     int MOUSEY{0};
+    bool F1{false};
 };
 struct Physics : public Component {
     Physics(float speed = 1.0f) : mSpeed(speed) {}

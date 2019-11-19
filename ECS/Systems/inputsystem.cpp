@@ -11,13 +11,16 @@ InputSystem::InputSystem(RenderWindow *window)
 }
 
 void InputSystem::update(DeltaTime dt) {
-    if (factory->isPlaying())
+    if (factory->isPlaying()) {
         for (auto &camera : gameCameraControllers()) {
             if (camera->isActive()) {
                 camera->update();
                 mActiveGameCamera = true;
             }
         }
+        if (shouldConfine)
+            confineMouseToScreen();
+    }
     if (!mActiveGameCamera)
         editorCamController()->update();
     handlePlayerController(dt);
@@ -53,6 +56,11 @@ void InputSystem::handleKeyInput() {
         if (!factory->isPlaying())
             factory->save();
     }
+    if (mPlayerController.F1) {
+        shouldConfine = false;
+        enteredWindow = false;
+    } else
+        shouldConfine = true;
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
     if (factory->isPlaying()) { // No point going through this if you won't use it anyway
@@ -203,6 +211,9 @@ void InputSystem::inputKeyPress(QKeyEvent *event, Input &input) {
     case Qt::Key_Control:
         input.CTRL = true;
         break;
+    case Qt::Key_F1: // toggle here
+        input.F1 = !input.F1;
+        break;
     default:
         break;
     }
@@ -263,6 +274,29 @@ void InputSystem::wheelEvent(QWheelEvent *event) {
             setCameraSpeed(-0.001f);
     }
     event->accept();
+}
+void InputSystem::confineMouseToScreen() {
+    int width = mRenderWindow->width();
+    int height = mRenderWindow->height();
+    QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
+    if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
+        enteredWindow = true;
+    }
+    if (enteredWindow) {
+        QPoint newPos = pos;
+        if (pos.x() >= width) {
+            newPos.rx() = width;
+        } else if (pos.x() <= 0) {
+            newPos.rx() = 0;
+        }
+        if (pos.y() >= height) {
+            newPos.ry() = height;
+        } else if (pos.y() <= 0) {
+            newPos.ry() = 0;
+        }
+        newPos = mRenderWindow->mapToGlobal(newPos);
+        QCursor::setPos(newPos);
+    }
 }
 void InputSystem::mouseMoveEvent(QMouseEvent *event) {
     if (editorInput.RMB) {
