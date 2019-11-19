@@ -3,7 +3,6 @@
 #include "components.h"
 #include "gltypes.h"
 #include "isystem.h"
-#include "stb_vorbis.h"
 #include "vector3d.h"
 #ifdef _WIN32
 #include <al.h>

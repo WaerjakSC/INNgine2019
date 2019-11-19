@@ -230,7 +230,7 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
 }
 
 bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance) {
-    vec3 center = sphere.transform.modelMatrix.getPosition();
+    vec3 center = sphere.transform.modelMatrix.getPosition() + sphere.position;
     vec3 originToCenter = ray.origin - center;
 
     float a = vec3::dot(ray.direction, ray.direction);
@@ -241,8 +241,9 @@ bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &
         return false;
     if (discriminant > 0.0f) {
         // get the 2 intersection distances along ray
-        double t_a = (-b + sqrt(discriminant) / (2.0 * a));
-        double t_b = (-b - sqrt(discriminant) / (2.0 * a));
+        float sqrtDisc = sqrt(discriminant);
+        double t_a = (-b + sqrtDisc) / (2 * a);
+        double t_b = (-b - sqrtDisc) / (2 * a);
         intersectionDistance = t_b;
         // if behind viewer, throw one or both away
         if (t_a < 0.0f) {
