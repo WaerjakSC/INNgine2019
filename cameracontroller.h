@@ -17,7 +17,7 @@ public:
     virtual void moveForward(float dt);
 
     virtual void setPosition(const vec3 &position);
-    vec3 cameraPosition() const;
+    virtual vec3 cameraPosition() const;
 
     virtual void pitch(float degrees);
     virtual void yaw(float degrees);
@@ -81,6 +81,8 @@ public:
 
     void moveForward(float delta) override;
     void moveRight(float delta) override;
+
+    vec3 cameraPosition() const override;
 
 private:
     GameCamera &mGameCam;

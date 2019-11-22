@@ -54,9 +54,6 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<TowerComponent>();
 
     mSceneLoader = std::make_unique<Scene>();
-
-    // Beware of which class is created first - If ResourceManager is created first and starts making objects, it needs to register component types first.
-    // On the other hand, if the systems are created first then you probably won't need to register anything in here, since those systems should take care of it.
 }
 
 std::map<std::string, Ref<Texture>> ResourceManager::getTextures() const {
@@ -1060,7 +1057,7 @@ void ResourceManager::pause() {
     }
 }
 void ResourceManager::stop() {
-    if (mIsPlaying) {
+    if (mIsPlaying || mPaused) {
         registry->loadSnapshot();
         registry->getSystem<MovementSystem>()->init();
         registry->getSystem<SoundSystem>()->stopAll();

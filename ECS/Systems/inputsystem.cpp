@@ -38,6 +38,7 @@ void InputSystem::reset() {
     enteredWindow = false;
     shouldConfine = false;
     playerController().F1 = false;
+    shouldDrag = false;
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity()->id();
@@ -64,8 +65,13 @@ void InputSystem::handleKeyInput() {
     if (mPlayerController.F1) {
         shouldConfine = false;
         enteredWindow = false;
-    } else
+    } else if (!shouldConfine)
         shouldConfine = true;
+    if (mPlayerController.L) {
+        draggedEntity = factory->makeCube("FauxTower");
+        shouldDrag = true;
+        mPlayerController.L = false;
+    }
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
     if (factory->isPlaying()) { // No point going through this if you won't use it anyway
@@ -107,8 +113,68 @@ void InputSystem::handleMouseInput() {
             mEditorCamController->moveUp(mCameraSpeed);
         }
     }
+    if (mPlayerController.LMB) {
+        if (shouldDrag) {
+            shouldDrag = false;
+            // Maybe add some logic here to place the object in the middle of the AABB
+        }
+    } else if (mPlayerController.RMB) {
+        if (shouldDrag) {
+            shouldDrag = false;
+            registry->removeEntity(draggedEntity);
+        }
+    }
+    if (shouldDrag)
+        dragEntity(draggedEntity);
 }
-
+void InputSystem::confineMouseToScreen(DeltaTime dt) {
+    int width = mRenderWindow->width();
+    int height = mRenderWindow->height();
+    QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
+    qDebug() << "confined mouse pos" << pos;
+    if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
+        enteredWindow = true;
+    }
+    if (enteredWindow) {
+        QPoint newPos = pos;
+        if (pos.x() >= width) {
+            newPos.rx() = width;
+            currentGameCameraController()->moveRight(dt);
+        } else if (pos.x() <= 0) {
+            newPos.rx() = 0;
+            currentGameCameraController()->moveRight(-dt);
+        }
+        if (pos.y() >= height) {
+            newPos.ry() = height;
+            currentGameCameraController()->moveForward(-dt);
+        } else if (pos.y() <= 0) {
+            newPos.ry() = 0;
+            currentGameCameraController()->moveForward(dt);
+        }
+        newPos = mRenderWindow->mapToGlobal(newPos);
+        QCursor::setPos(newPos);
+    }
+}
+void InputSystem::dragEntity(GLuint entity) {
+    // make ray
+    Raycast dragRay(currentGameCameraController(), 50.f);
+    vec3 desiredPos;
+    QPoint cursorPos = mRenderWindow->mapFromGlobal(QCursor::pos());
+    qDebug() << "dragged entity pos" << cursorPos;
+    // Get the intersection point between the ray and the closest entity as a vector3d
+    int entityID = dragRay.mousePick(cursorPos, mRenderWindow->geometry(), desiredPos, entity);
+    Transform &tf = registry->get<Transform>(entity);
+    if (entityID != -1) {
+        if (registry->contains<AABB>(entityID))
+            desiredPos.y += registry->get<AABB>(entityID).size.y; // compensate for size of AABB
+        else
+            desiredPos.y += registry->get<Sphere>(entityID).radius;
+        desiredPos.y += tf.localScale.y;
+    }
+    // place the object either on the mouse at 50.f distance or at correct distance for the AABB hit
+    tf.localPosition = desiredPos;
+    tf.matrixOutdated = true;
+}
 void InputSystem::setPlayer(const GLuint &player) {
     mPlayer = player;
 }
@@ -280,33 +346,7 @@ void InputSystem::wheelEvent(QWheelEvent *event) {
     }
     event->accept();
 }
-void InputSystem::confineMouseToScreen(DeltaTime dt) {
-    int width = mRenderWindow->width();
-    int height = mRenderWindow->height();
-    QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
-    if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
-        enteredWindow = true;
-    }
-    if (enteredWindow) {
-        QPoint newPos = pos;
-        if (pos.x() >= width) {
-            newPos.rx() = width;
-            currentGameCameraController()->moveRight(dt);
-        } else if (pos.x() <= 0) {
-            newPos.rx() = 0;
-            currentGameCameraController()->moveRight(-dt);
-        }
-        if (pos.y() >= height) {
-            newPos.ry() = height;
-            currentGameCameraController()->moveForward(-dt);
-        } else if (pos.y() <= 0) {
-            newPos.ry() = 0;
-            currentGameCameraController()->moveForward(dt);
-        }
-        newPos = mRenderWindow->mapToGlobal(newPos);
-        QCursor::setPos(newPos);
-    }
-}
+
 void InputSystem::mouseMoveEvent(QMouseEvent *event) {
     if (editorInput.RMB) {
         mRenderWindow->setCursor(Qt::BlankCursor);

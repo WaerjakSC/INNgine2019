@@ -22,14 +22,17 @@ class RenderWindow;
 class Entity;
 class Raycast {
 public:
-    Raycast(cjk::Ref<CameraController> controller);
+    Raycast(cjk::Ref<CameraController> controller, float range = 250.f);
+    int mousePick(const QPoint &mousePos, const QRect &rect, vec3 &hitPoint, int ignoredEntity = -1);
     int mousePick(const QPoint &mousePos, const QRect &rect);
 
 private:
     cjk::Ref<CameraController> mCurrentController;
-    Ray ray;
     vec3 getPointOnRay(const Ray &ray, float distance);
     Ray getRayFromMouse(const QPoint &mousePos, const QRect &rect);
+    int checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity = -1);
+    int checkSphere(const Ray &ray, double &closestTarget, int ignoredEntity = -1);
+
     float rayRange{250};
 };
 

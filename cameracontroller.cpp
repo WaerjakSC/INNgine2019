@@ -122,7 +122,9 @@ void CameraController::resize(float aspectRatio) {
     mAspectRatio = aspectRatio;
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
-
+vec3 GameCameraController::cameraPosition() const {
+    return mGameCam.mCameraPosition;
+}
 GameCameraController::GameCameraController(float aspectRatio, GameCamera &gameCam, GLuint controller)
     : CameraController(aspectRatio), mGameCam(gameCam), mControllerID(controller) {
     mPitch = gameCam.mPitch;

@@ -70,8 +70,11 @@ private:
     bool firstRMB{true};
     bool enteredWindow{false};
     bool shouldConfine{false};
+
     QPoint lastPos; // last position of the mouse in editor, for calculating deltas to move the camera with
     Raycast *ray;
+    GLuint draggedEntity{0};
+    bool shouldDrag{false};
 
     Registry *registry{};
     ResourceManager *factory;
@@ -108,6 +111,11 @@ private:
     void inputMouseRelease(QMouseEvent *event, Input &input);
     void snapToObject();
     void confineMouseToScreen(DeltaTime dt);
+    /**
+     * @brief dragEntity - move entity by mouse raycast when activated
+     * @param entity
+     */
+    void dragEntity(GLuint entity);
 };
 
 #endif // INPUTSYSTEM_H
