@@ -67,7 +67,7 @@ void InputSystem::handleKeyInput() {
         enteredWindow = false;
     } else if (!shouldConfine)
         shouldConfine = true;
-    if (mPlayerController.L) {
+    if (mPlayerController.L) { // !!! Temporary proof of concept function, replace with makeTower or something and whatever other logic is wanted.
         draggedEntity = factory->makeCube("FauxTower");
         shouldDrag = true;
         mPlayerController.L = false;
@@ -131,7 +131,6 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
     int width = mRenderWindow->width();
     int height = mRenderWindow->height();
     QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
-    qDebug() << "confined mouse pos" << pos;
     if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
         enteredWindow = true;
     }
@@ -160,7 +159,6 @@ void InputSystem::dragEntity(GLuint entity) {
     Raycast dragRay(currentGameCameraController(), 50.f);
     vec3 desiredPos;
     QPoint cursorPos = mRenderWindow->mapFromGlobal(QCursor::pos());
-    qDebug() << "dragged entity pos" << cursorPos;
     // Get the intersection point between the ray and the closest entity as a vector3d
     int entityID = dragRay.mousePick(cursorPos, mRenderWindow->geometry(), desiredPos, entity);
     Transform &tf = registry->get<Transform>(entity);

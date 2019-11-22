@@ -113,6 +113,7 @@ private:
     void confineMouseToScreen(DeltaTime dt);
     /**
      * @brief dragEntity - move entity by mouse raycast when activated
+     * If the mouse raycast hits an AABB or sphere collider it will place the entity on top of that collider, as close to the mouse as possible
      * @param entity
      */
     void dragEntity(GLuint entity);
