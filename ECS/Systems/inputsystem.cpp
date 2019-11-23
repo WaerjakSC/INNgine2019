@@ -12,7 +12,7 @@ InputSystem::InputSystem(RenderWindow *window)
 
 void InputSystem::update(DeltaTime dt) {
     if (factory->isPlaying()) {
-        for (auto &camera : gameCameraControllers()) {
+        for (auto &camera : mGameCameraControllers) {
             if (camera->isActive()) {
                 camera->update();
                 mActiveGameCamera = true;
@@ -31,7 +31,7 @@ void InputSystem::update(DeltaTime dt) {
 void InputSystem::init(float aspectRatio) {
     auto view = registry->view<GameCamera>();
     for (auto entity : view) {
-        mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, view.get(entity), entity));
+        mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, entity));
     }
 }
 void InputSystem::reset() {
@@ -39,6 +39,9 @@ void InputSystem::reset() {
     mIsConfined = false;
     playerController().F1 = false;
     mIsDragging = false;
+    for (auto controller : mGameCameraControllers) {
+        controller->setupController();
+    }
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity();
@@ -205,7 +208,7 @@ std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() cons
 }
 
 Ref<GameCameraController> InputSystem::currentGameCameraController() {
-    for (auto controller : gameCameraControllers()) {
+    for (auto controller : mGameCameraControllers) {
         if (controller->isActive()) {
             return controller;
         }
@@ -376,7 +379,7 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
 }
 void InputSystem::onResize(float aspectRatio) {
     mEditorCamController->resize(aspectRatio);
-    for (auto camera : gameCameraControllers()) {
+    for (auto camera : mGameCameraControllers) {
         if (camera->isActive())
             camera->resize(aspectRatio);
     }

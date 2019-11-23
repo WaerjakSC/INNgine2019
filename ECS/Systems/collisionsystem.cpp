@@ -19,7 +19,6 @@ void CollisionSystem::runSimulations() {
 }
 void CollisionSystem::runAABBSimulations() {
     auto view = registry->view<EInfo, AABB>();
-    auto sphereView = registry->view<EInfo, Sphere>();
     for (auto entity : view) {
         auto &aabb = view.get<AABB>(entity);
         // Check for AABB-AABB intersections
@@ -37,6 +36,7 @@ void CollisionSystem::runAABBSimulations() {
                     }
             }
         }
+        auto sphereView = registry->view<EInfo, Sphere>();
         for (auto otherEntity : sphereView) {
             if (entity != otherEntity) {
                 auto &sphere = sphereView.get<Sphere>(otherEntity);
@@ -44,7 +44,7 @@ void CollisionSystem::runAABBSimulations() {
                     if (SphereAABB(sphere, aabb)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
                         QString entity1 = view.get<EInfo>(entity).mName;
-                        QString entity2 = view.get<EInfo>(otherEntity).mName;
+                        QString entity2 = sphereView.get<EInfo>(otherEntity).mName;
                         // NOTIFY FSM
                         if (registry->contains<BSplinePoint>(entity)) {
                             registry->removeEntity(entity);

@@ -123,16 +123,20 @@ void CameraController::resize(float aspectRatio) {
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
 vec3 GameCameraController::cameraPosition() const {
-    return mGameCam.mCameraPosition;
+    const auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    return gameCam.mCameraPosition;
 }
-GameCameraController::GameCameraController(float aspectRatio, GameCamera &gameCam, GLuint controller)
-    : CameraController(aspectRatio), mGameCam(gameCam), mControllerID(controller) {
+GameCameraController::GameCameraController(float aspectRatio, GLuint controller)
+    : CameraController(aspectRatio), mControllerID(controller) {
+    setupController();
+    mTranslationSpeed = 9.5f;
+}
+void GameCameraController::setupController() {
+    const auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
     mPitch = gameCam.mPitch;
     mYaw = gameCam.mYaw;
     setPosition(gameCam.mCameraPosition);
-    mTranslationSpeed = 9.5f;
 }
-
 void GameCameraController::pitch(float degrees) {
     Q_UNUSED(degrees);
 }
@@ -142,34 +146,38 @@ void GameCameraController::yaw(float degrees) {
 }
 
 void GameCameraController::update() {
-    if (mGameCam.mOutDated) {
+    auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    if (gameCam.mOutDated) {
         //        updateMeshPosition();
-        mCamera.setRotation(mGameCam.mPitch, mGameCam.mYaw);
-        mCamera.setPosition(mGameCam.mCameraPosition);
+        mCamera.setRotation(gameCam.mPitch, gameCam.mYaw);
+        mCamera.setPosition(gameCam.mCameraPosition);
         mCamera.calculateViewMatrix();
-        mGameCam.mOutDated = false;
+        gameCam.mOutDated = false;
     }
 }
 
 bool GameCameraController::isActive() {
-    return mGameCam.mIsActive;
+    const auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    return gameCam.mIsActive;
 }
 
 void GameCameraController::setPosition(const vec3 &position) {
     CameraController::setPosition(position);
 }
 void GameCameraController::moveForward(float delta) {
-    mGameCam.mOutDated = true;
-    mGameCam.mCameraPosition += mForward * mTranslationSpeed * delta;
+    auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    gameCam.mOutDated = true;
+    gameCam.mCameraPosition += mForward * mTranslationSpeed * delta;
 }
 void GameCameraController::moveRight(float delta) {
-    mGameCam.mOutDated = true;
+    auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    gameCam.mOutDated = true;
     //This fixes a bug in the up and right calculations
     //so camera always holds its height when strafing
     //should be fixed through correct right calculations!
     vec3 right = mRight;
     right.y = 0.f;
-    mGameCam.mCameraPosition += right * mTranslationSpeed * delta;
+    gameCam.mCameraPosition += right * mTranslationSpeed * delta;
 }
 void GameCameraController::updateMeshPosition() {
     gsl::Matrix4x4 temp(true);

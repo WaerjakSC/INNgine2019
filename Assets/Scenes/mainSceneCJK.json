@@ -81,8 +81,8 @@
                     -8.5
                 ],
                 "rotation": [
-                    0.0,
                     -0.0,
+                    -9.659893035888672,
                     -0.0
                 ],
                 "scale": [
@@ -106,14 +106,14 @@
             "mesh": {
                 "name": "BillBoard"
             },
+            "billboard": {
+                "y-up": true,
+                "normalversion": true
+            },
             "sound": {
                 "filename": "gnomed.wav",
                 "loop": true,
                 "gain": 1.0
-            },
-            "billboard": {
-            	"y-up": true,
-            	"normalversion": false
             },
             "AABB": {
                 "origin": [

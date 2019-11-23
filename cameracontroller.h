@@ -62,7 +62,7 @@ protected:
 };
 class GameCameraController : public CameraController {
 public:
-    GameCameraController(float aspectRatio, GameCamera &gameCam, GLuint controller);
+    GameCameraController(float aspectRatio, GLuint controller);
 
     void pitch(float degrees) override;
     void yaw(float degrees) override;
@@ -84,8 +84,9 @@ public:
 
     vec3 cameraPosition() const override;
 
+    void setupController();
+
 private:
-    GameCamera &mGameCam;
     GLuint mControllerID;
 };
 

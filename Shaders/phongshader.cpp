@@ -30,14 +30,16 @@ PhongShader::~PhongShader() {
 void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
     Shader::transmitUniformData(modelMatrix);
     auto view = Registry::instance()->view<Transform, Light>();
-    auto [lightTrans, light] = view.get<Transform, Light>(mLightID);
+    if (view.contains(mLightID)) {
+        auto [lightTrans, light] = view.get<Transform, Light>(mLightID);
 
+        glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
+        glUniform3f(mAmbientColorUniform, light.mAmbientColor.x, light.mAmbientColor.y, light.mAmbientColor.z);
+        glUniform1f(mLightPowerUniform, light.mLightStrength);
+        glUniform3f(mLightColorUniform, light.mLightColor.x, light.mLightColor.y, light.mLightColor.z);
+        glUniform3f(mLightPositionUniform, lightTrans.position.x, lightTrans.position.y, lightTrans.position.z);
+    }
     glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);
-    glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
-    glUniform3f(mAmbientColorUniform, light.mAmbientColor.x, light.mAmbientColor.y, light.mAmbientColor.z);
-    glUniform1f(mLightPowerUniform, light.mLightStrength);
-    glUniform3f(mLightColorUniform, light.mLightColor.x, light.mLightColor.y, light.mLightColor.z);
-    glUniform3f(mLightPositionUniform, lightTrans.position.x, lightTrans.position.y, lightTrans.position.z);
     glUniform1i(mSpecularExponentUniform, material->mSpecularExponent);
     glUniform1f(mSpecularStrengthUniform, material->mSpecularStrength);
     glUniform3f(mObjectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
