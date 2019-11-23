@@ -22,8 +22,8 @@ void Entity::setEntityData(const Entity &value) {
     eID = value.eID;
 }
 
-Scope<Entity> Entity::clone() {
-    return std::make_unique<Entity>(*this);
+Entity *Entity::clone() {
+    return this;
 }
 void Entity::newGeneration(GLuint id, const QString &text) {
     eID = id;

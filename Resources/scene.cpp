@@ -27,7 +27,7 @@ void Scene::saveScene(const QString &fileName) {
         return;
 
     Registry *registry = Registry::instance();
-    std::map<GLuint, cjk::Ref<Entity>> entities = registry->getEntities();
+    std::map<GLuint, cjk::Scope<Entity>> entities = registry->getEntities();
     auto inputSys = registry->getSystem<InputSystem>();
 
     StringBuffer buf;
@@ -42,7 +42,7 @@ void Scene::saveScene(const QString &fileName) {
     writer.Uint(inputSys->player());
     writer.EndObject();
 
-    for (auto entity : entities) {
+    for (auto &entity : entities) {
         GLuint eID = entity.first;
         if (eID != 0 && !entity.second->name().isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("Entity");

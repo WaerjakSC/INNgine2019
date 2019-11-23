@@ -317,9 +317,9 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     int data = hierarchy->data(newParent, 257).toInt();
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (data != 0) {
-        Entity *parent = registry->getEntity(data).get();
+        Entity *parent = registry->getEntity(data);
         if (newParent.isValid()) {
             if (registry->contains<Transform>(parent->id()) && selectedEntity) {
                 // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
@@ -339,7 +339,7 @@ void MainWindow::parentChanged(GLuint eID) {
     QStandardItem *item = hierarchy->itemFromEntityID(eID);
     if (item) {
         hierarchy->removeRow(item->row());
-        Entity *entt = registry->getEntity(eID).get();
+        Entity *entt = registry->getEntity(eID);
         item = new QStandardItem;
         item->setText(entt->name());
         item->setData(entt->id());
@@ -371,14 +371,14 @@ void MainWindow::mouseRayHit(int eID) {
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity)
         selectedEntity->setName(hierarchy->data(index).toString());
 }
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     QStandardItem *item = new QStandardItem;
-    Entity *entt = registry->getEntity(eID).get();
+    Entity *entt = registry->getEntity(eID);
     item->setText(entt->name());
     item->setData(entt->id());
     parentItem->appendRow(item);
@@ -401,7 +401,7 @@ void MainWindow::changeEntityName(const Entity &entt) {
 void MainWindow::insertEntities() {
     hierarchy->clear();
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
-    for (auto entity : registry->getEntities()) {
+    for (auto &entity : registry->getEntities()) {
         if (entity.second->isDestroyed())
             continue;
         GLuint id = entity.second->id();

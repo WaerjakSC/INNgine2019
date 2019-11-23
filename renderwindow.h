@@ -73,8 +73,6 @@ private:
     ResourceManager *mFactory;
     Registry *mRegistry;
 
-    Ref<Entity> mPlayer; //the controllable object
-
     Ref<CameraController> mEditorCameraController{nullptr};
 
     GLuint xyz; // Refers to the colored lines pointing in the X, Y and Z directions.

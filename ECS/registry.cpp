@@ -189,5 +189,4 @@ void Registry::loadSnapshot() {
     for (auto &transform : getPool<Transform>()->data()) {
         transform.matrixOutdated = true;
     }
-    // To-do: Make scene view load back to its pre-parented state if something is parented during play
 }

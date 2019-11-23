@@ -67,7 +67,7 @@ void ComponentList::setupComponentList() {
     }
 }
 void ComponentList::addTransformComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Transform>(eID))
@@ -76,7 +76,7 @@ void ComponentList::addTransformComponent() {
     }
 }
 void ComponentList::addBSplineComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<BSplinePoint>(eID))
@@ -85,7 +85,7 @@ void ComponentList::addBSplineComponent() {
     }
 }
 void ComponentList::addAIComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<AIComponent>(eID))
@@ -94,7 +94,7 @@ void ComponentList::addAIComponent() {
     }
 }
 void ComponentList::addMaterialComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Material>(eID))
@@ -103,7 +103,7 @@ void ComponentList::addMaterialComponent() {
     }
 }
 void ComponentList::addMeshComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Mesh>(eID))
@@ -112,7 +112,7 @@ void ComponentList::addMeshComponent() {
     }
 }
 void ComponentList::addLightComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Light>(eID))
@@ -121,7 +121,7 @@ void ComponentList::addLightComponent() {
     }
 }
 void ComponentList::addPhysicsComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Physics>(eID))
@@ -130,7 +130,7 @@ void ComponentList::addPhysicsComponent() {
     }
 }
 void ComponentList::addSoundComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Sound>(eID))
@@ -139,7 +139,7 @@ void ComponentList::addSoundComponent() {
     }
 }
 void ComponentList::addAABBCollider() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<AABB>(eID)) {
@@ -155,7 +155,7 @@ void ComponentList::addAABBCollider() {
     }
 }
 void ComponentList::addOBBCollider() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<OBB>(eID)) {
@@ -166,7 +166,7 @@ void ComponentList::addOBBCollider() {
     }
 }
 void ComponentList::addSphereCollider() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Sphere>(eID)) {
@@ -177,7 +177,7 @@ void ComponentList::addSphereCollider() {
     }
 }
 void ComponentList::addPlaneCollider() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Plane>(eID)) {
@@ -189,7 +189,7 @@ void ComponentList::addPlaneCollider() {
     }
 }
 void ComponentList::addCylinderCollider() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<Cylinder>(eID)) {
@@ -200,7 +200,7 @@ void ComponentList::addCylinderCollider() {
     }
 }
 void ComponentList::addGameCameraComponent() {
-    Ref<Entity> selectedEntity = registry->getSelectedEntity();
+    Entity *selectedEntity = registry->getSelectedEntity();
     if (selectedEntity) {
         GLuint eID = selectedEntity->id();
         if (!registry->contains<GameCamera>(eID)) {
