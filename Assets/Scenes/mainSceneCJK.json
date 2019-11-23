@@ -111,6 +111,10 @@
                 "loop": true,
                 "gain": 1.0
             },
+            "billboard": {
+            	"y-up": true,
+            	"normalversion": false
+            },
             "AABB": {
                 "origin": [
                     0.0,

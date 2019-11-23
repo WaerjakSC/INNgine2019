@@ -12,9 +12,8 @@ public:
     class iterator;
     virtual ~IPool() = default;
     virtual void remove(int removedEntity) = 0;
-    virtual Scope<IPool> clone() = 0;
+    virtual IPool *clone() = 0;
     virtual void cloneComponent(GLuint cloneFrom, GLuint cloneTo) = 0;
-    virtual void copy(IPool *other) = 0;
     virtual int find(uint eID) const = 0;
     virtual bool has(uint eID) const = 0;
     //    virtual bool has(const Entity &entity) const = 0;
@@ -123,10 +122,10 @@ template <typename Type>
 class Pool : public IPool {
 public:
     Pool() = default;
-    Pool(Pool *other) {
-        mList = other->mList;
-        mIndex = other->mIndex;
-        mComponents = other->mComponents;
+    Pool(const Pool &other) {
+        mList = other.mList;
+        mIndex = other.mIndex;
+        mComponents = other.mComponents;
     }
     Pool(IPool *copyFrom) {
         auto temp = static_cast<Pool<Type> *>(copyFrom);
@@ -136,8 +135,8 @@ public:
         mComponents = temp->mComponents;
     }
     ~Pool() {}
-    virtual Scope<IPool> clone() override {
-        return std::make_unique<Pool>(*this);
+    virtual IPool *clone() override {
+        return new Pool<Type>(*this);
     }
 
     /**

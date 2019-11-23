@@ -62,7 +62,7 @@ private slots:
 
     void makeEntity();
 
-    void changeEntityName(const Entity &entt);
+    void changeEntityName(const GLuint &entt);
 
 private:
     void init();

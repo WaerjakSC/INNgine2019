@@ -52,6 +52,7 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<GameCamera>();
     registry->registerComponent<PlayerComponent>();
     registry->registerComponent<TowerComponent>();
+    registry->registerComponent<BillBoard>();
 
     mSceneLoader = std::make_unique<Scene>();
 }

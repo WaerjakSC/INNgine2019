@@ -317,20 +317,20 @@ void MainWindow::makeCube() {
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent) {
     int data = hierarchy->data(newParent, 257).toInt();
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (data != 0) {
-        Entity *parent = registry->getEntity(data);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (data <= 0) {
+        GLuint parent = data;
         if (newParent.isValid()) {
-            if (registry->contains<Transform>(parent->id()) && selectedEntity) {
+            if (registry->contains<Transform>(parent) && selectedEntity) {
                 // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
-                registry->setParent(selectedEntity->id(), parent->id(), true);
-                registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
+                registry->setParent(selectedEntity, parent, true);
+                registry->getSystem<MovementSystem>()->updateEntity(selectedEntity);
             }
         }
     } else if (selectedEntity)
-        if (registry->contains<Transform>(selectedEntity->id())) {
-            registry->setParent(selectedEntity->id(), -1, true);
-            registry->getSystem<MovementSystem>()->updateEntity(selectedEntity->id());
+        if (registry->contains<Transform>(selectedEntity)) {
+            registry->setParent(selectedEntity, -1, true);
+            registry->getSystem<MovementSystem>()->updateEntity(selectedEntity);
         }
 }
 void MainWindow::parentChanged(GLuint eID) {
@@ -339,11 +339,11 @@ void MainWindow::parentChanged(GLuint eID) {
     QStandardItem *item = hierarchy->itemFromEntityID(eID);
     if (item) {
         hierarchy->removeRow(item->row());
-        Entity *entt = registry->getEntity(eID);
+        EInfo &entt = registry->get<EInfo>(eID);
         item = new QStandardItem;
-        item->setText(entt->name());
-        item->setData(entt->id());
-        int parentID = registry->get<Transform>(entt->id()).parentID;
+        item->setText(entt.mName);
+        item->setData(eID);
+        int parentID = registry->get<Transform>(eID).parentID;
         if (registry->hasParent(eID)) {
             QStandardItem *parent = hierarchy->itemFromEntityID(parentID);
             parent->insertRow(parent->rowCount(), item);
@@ -371,28 +371,30 @@ void MainWindow::mouseRayHit(int eID) {
 }
 void MainWindow::onNameChanged(const QModelIndex &index) {
     QString newName = hierarchy->data(index).toString();
-    Entity *selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity = registry->getSelectedEntity();
+    EInfo &info = registry->get<EInfo>(selectedEntity);
     if (selectedEntity)
-        selectedEntity->setName(hierarchy->data(index).toString());
+        info.mName = hierarchy->data(index).toString();
 }
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     QStandardItem *item = new QStandardItem;
-    Entity *entt = registry->getEntity(eID);
-    item->setText(entt->name());
-    item->setData(entt->id());
+    EInfo &info = registry->get<EInfo>(eID);
+    item->setText(info.mName);
+    item->setData(eID);
     parentItem->appendRow(item);
 
-    connect(entt, &Entity::nameChanged, this, &MainWindow::changeEntityName);
+    connect(registry, &Registry::nameChanged, this, &MainWindow::changeEntityName);
 }
 
 void MainWindow::onEntityRemoved(GLuint entity) {
     QStandardItem *item = hierarchy->itemFromEntityID(entity);
     hierarchy->removeRow(hierarchy->indexFromItem(item).row());
 }
-void MainWindow::changeEntityName(const Entity &entt) {
-    QStandardItem *item = hierarchy->itemFromEntityID(entt.id());
-    item->setText(entt.name());
+void MainWindow::changeEntityName(const GLuint &entt) {
+    QStandardItem *item = hierarchy->itemFromEntityID(entt);
+    EInfo &info = registry->get<EInfo>(entt);
+    item->setText(info.mName);
 }
 /**
  * @brief Initial insertion of entities, such as those made in an init function or read from a level file.
@@ -402,17 +404,17 @@ void MainWindow::insertEntities() {
     hierarchy->clear();
     QStandardItem *parentItem = hierarchy->invisibleRootItem();
     for (auto &entity : registry->getEntities()) {
-        if (entity.second->isDestroyed())
+        EInfo &info = registry->get<EInfo>(entity);
+        if (info.mIsDestroyed)
             continue;
-        GLuint id = entity.second->id();
         QStandardItem *item = new QStandardItem;
-        if (entity.second->name() == "")
+        if (info.mName == "")
             item->setText(QString("Entity" + QString::number(unnamedEntityCount)));
         else
-            item->setText(entity.second->name());
-        item->setData(id);
-        if (registry->contains<Transform>(id)) {
-            int parentID = registry->get<Transform>(id).parentID;
+            item->setText(info.mName);
+        item->setData(entity);
+        if (registry->contains<Transform>(entity)) {
+            int parentID = registry->get<Transform>(entity).parentID;
             if (parentID != -1) {
                 forEach(parentID, item);
             } else

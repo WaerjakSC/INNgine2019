@@ -176,7 +176,7 @@ bool Registry::isDestroyed(GLuint entityID) {
 }
 
 void Registry::makeSnapshot() {
-    std::map<std::string, Scope<IPool>> snapPools;
+    std::map<std::string, IPool *> snapPools;
     for (auto &pool : mPools) {
         snapPools[pool.first] = pool.second->clone();
     }
@@ -185,11 +185,11 @@ void Registry::makeSnapshot() {
 }
 
 void Registry::loadSnapshot() {
-    std::map<std::string, Scope<IPool>> tempPools;
+    std::map<std::string, IPool *> tempPools;
     std::tie(mBillBoards, tempPools) = mSnapshot;
     mPools.clear();
     for (auto &pool : tempPools) {
-        mPools[pool.first] = std::move(pool.second);
+        mPools[pool.first] = std::unique_ptr<IPool>(pool.second);
     }
     for (auto &transform : getPool<Transform>()->data()) {
         transform.matrixOutdated = true;

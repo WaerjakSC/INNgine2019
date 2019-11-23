@@ -37,7 +37,7 @@ public:
             return;
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            mPools.insert({typeName, std::make_unique<Pool<Type>>()});
+            mPools.emplace(typeName, std::make_unique<Pool<Type>>());
         }
     }
     /**
@@ -231,6 +231,7 @@ signals:
     void entityRemoved(GLuint eID);
     void parentChanged(GLuint childID);
     void poolChanged(IPool *pool);
+    void nameChanged(GLuint eID);
 
 private:
     static Registry *mInstance;
@@ -241,7 +242,7 @@ private:
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
     GLuint mSelectedEntity;
-    std::tuple<std::vector<GLuint>, std::map<std::string, Scope<IPool>>> mSnapshot;
+    std::tuple<std::vector<GLuint>, std::map<std::string, IPool *>> mSnapshot;
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>
