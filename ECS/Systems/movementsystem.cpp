@@ -1,5 +1,4 @@
 #include "movementsystem.h"
-#include "billboard.h"
 #include "cameracontroller.h"
 #include "inputsystem.h"
 #include "pool.h"
@@ -23,9 +22,9 @@ void MovementSystem::update(DeltaTime dt) {
     for (auto entity : sphereview) {
         updateSphereTransform(entity);
     }
-    for (auto billBoard : registry->billBoards()) {
-        if (BillBoard *board = dynamic_cast<BillBoard *>(registry->getEntity(billBoard)))
-            board->update();
+    auto billboardView = registry->view<BillBoard, Transform, Material>();
+    for (auto entity : billboardView) {
+        updateBillBoardTransform(entity);
     }
 }
 
@@ -47,7 +46,31 @@ void MovementSystem::updateSphereTransform(GLuint entity) {
         col.transform.matrixOutdated = false;
     }
 }
+void MovementSystem::updateBillBoardTransform(GLuint entity) {
+    auto view = registry->view<BillBoard, Transform, Material>();
+    auto [billboard, transform, mat] = view.get<BillBoard, Transform, Material>(entity);
+    // find direction between this and camera
+    vec3 direction{};
+    if (billboard.mNormalVersion) {
+        vec3 camPosition = mat.mShader->getCameraController()->cameraPosition();
+        //cancel heigth info so billboard is allways upright:
+        if (billboard.mConstantYUp)
+            camPosition.setY(transform.modelMatrix.getPosition().y);
+        direction = camPosition - vec3(transform.modelMatrix.getPosition());
+    } else {
+        vec3 camDirection = mat.mShader->getCameraController()->forward();
+        //cancel heigth info so billboard is allways upright:
+        if (billboard.mConstantYUp)
+            camDirection.setY(transform.modelMatrix.getPosition().y);
+        direction = camDirection * -1;
+    }
 
+    direction.normalize();
+    //set rotation to this direction
+    transform.rotationMatrix.setRotationToVector(direction);
+    transform.localRotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
+    transform.matrixOutdated = true;
+}
 void MovementSystem::updateEntity(GLuint eID) {
     auto &comp = registry->view<Transform>().get(eID);
     comp.matrixOutdated = true;

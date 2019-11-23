@@ -39,6 +39,8 @@ private:
      */
     void updateTS(Sphere &comp);
 
+    void updateBillBoardTransform(GLuint entity);
+
 public:
     MovementSystem();
 

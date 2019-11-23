@@ -76,7 +76,6 @@ HEADERS += \
     ECS/Systems/movementsystem.h \
     ECS/Systems/collisionsystem.h \
 #
-    ECS/entity.h \
     ECS/pool.h \
     ECS/view.h \
     ECS/components.h \
@@ -117,7 +116,6 @@ HEADERS += \
     bsplinecurve.h \
     cameracontroller.h \
     constants.h \
-    billboard.h \
     core.h \
     core.h \
     deltaTime.h \
@@ -139,7 +137,6 @@ SOURCES += main.cpp \
     ECS/Systems/movementsystem.cpp \
     ECS/Systems/collisionsystem.cpp \
 #
-    ECS/entity.cpp \
     ECS/components.cpp \
     ECS/registry.cpp \
 #
@@ -173,7 +170,6 @@ SOURCES += main.cpp \
     Libs/wavfilehandler.cpp \
     Libs/stb_image.cpp \
 #
-    billboard.cpp \
     bsplinecurve.cpp \
     cameracontroller.cpp \
     raycast.cpp \

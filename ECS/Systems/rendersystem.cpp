@@ -1,5 +1,4 @@
 #include "rendersystem.h"
-#include "billboard.h"
 #include "colorshader.h"
 #include "components.h"
 #include "phongshader.h"
@@ -72,7 +71,7 @@ void RenderSystem::toggleRendered(GLuint entityID) {
     isRendered = !isRendered;
 }
 void RenderSystem::changeShader(const QString &nShader) {
-    GLuint eID = registry->getSelectedEntity()->id();
+    GLuint eID = registry->getSelectedEntity();
     Ref<Shader> shader{nullptr};
     ResourceManager *factory = ResourceManager::instance();
     if (nShader == "PlainShader")

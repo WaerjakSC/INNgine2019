@@ -4,7 +4,6 @@
 #include "camera.h"
 #include "cameracontroller.h"
 #include "core.h"
-#include "entity.h"
 #include "texture.h"
 #include <QElapsedTimer>
 #include <QTimer>

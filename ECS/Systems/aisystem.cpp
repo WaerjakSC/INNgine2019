@@ -60,25 +60,25 @@ void AISystem::masterOfCurves() {
     mCurve.updatePath();
 }
 void AISystem::setHealth(int health) {
-    auto ai = registry->get<AIComponent>(registry->getSelectedEntity()->id());
+    auto ai = registry->get<AIComponent>(registry->getSelectedEntity());
     ai.hp = health;
 }
 void AISystem::setBSPlinePointX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &bspline = registry->get<BSplinePoint>(entityID);
     bspline.location.x = xIn;
     masterOfCurves();
 }
 
 void AISystem::setBSPlinePointY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &bspline = registry->get<BSplinePoint>(entityID);
     bspline.location.y = yIn;
     masterOfCurves();
 }
 
 void AISystem::setBSPlinePointZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &bspline = registry->get<BSplinePoint>(entityID);
     bspline.location.z = zIn;
     masterOfCurves();

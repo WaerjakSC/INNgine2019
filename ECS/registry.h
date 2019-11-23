@@ -1,7 +1,6 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
-#include "entity.h"
 #include "isystem.h"
 #include "pool.h"
 #include "view.h"
@@ -143,13 +142,13 @@ public:
      * @return
      */
     GLuint duplicateEntity(GLuint dupedEntity);
-    inline std::map<GLuint, Scope<Entity>> getEntities() const { return mEntities; }
+    inline const std::vector<GLuint> &getEntities() { return getPool<EInfo>()->entities(); }
     /**
     * @brief Get a pointer to the entity with the specified ID.
     * @param eID
     * @return
     */
-    Entity *getEntity(GLuint eID);
+    EInfo &getEntity(GLuint eID);
     /**
     * @brief Destroy an entity - Clears all components from an entity ID and readies that ID for use with the next created entity
     * @param eID - entityID
@@ -159,7 +158,10 @@ public:
      * @brief numEntities size of the mEntities map
      * @return
      */
-    inline GLuint numEntities() { return mEntities.size(); }
+    inline GLuint numEntities() {
+        std::vector<GLuint> entities = getPool<EInfo>()->entities();
+        return entities.size();
+    }
     /**
      * @brief nextAvailable get the next available ID. In a scenario with no destroyed IDs, this will simply return the size of the mEntities map.
      * Destroyed entities give up their ID for use with a new entity. This avoids unnecessary bloating.
@@ -219,7 +221,8 @@ public:
      */
     std::vector<GLuint> getChildren(GLuint eID);
 
-    Entity *getSelectedEntity() const;
+    GLuint getSelectedEntity() const;
+    bool isDestroyed(GLuint entityID);
 public slots:
     void setSelectedEntity(const GLuint selectedEntity);
 
@@ -234,13 +237,11 @@ private:
     std::map<std::string, Scope<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
 
-    std::map<GLuint, Scope<Entity>> mEntities; // Save Entities as pointers to avoid clipping of derived classes
     std::vector<GLuint> mAvailableSlots;
-    Entity *mSelectedEntity;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
-
-    std::tuple<std::map<GLuint, Scope<Entity>>, std::vector<GLuint>, std::map<std::string, Scope<IPool>>> mSnapshot;
+    GLuint mSelectedEntity;
+    std::tuple<std::vector<GLuint>, std::map<std::string, Scope<IPool>>> mSnapshot;
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>
@@ -248,6 +249,7 @@ private:
         std::string typeName = typeid(Type).name();
         return static_cast<Pool<Type> *>(mPools[typeName].get());
     }
+    void newGeneration(GLuint id, const QString &text);
 };
 
 #endif // REGISTRY_H

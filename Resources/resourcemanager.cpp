@@ -1,6 +1,5 @@
 #include "resourcemanager.h"
 #include "aisystem.h"
-#include "billboard.h"
 #include "cameracontroller.h"
 #include "colorshader.h"
 #include "innpch.h"
@@ -34,6 +33,7 @@ ResourceManager *ResourceManager::mInstance = nullptr;
 ResourceManager::ResourceManager() {
     registry = Registry::instance();
 
+    registry->registerComponent<EInfo>();
     registry->registerComponent<Transform>();
     registry->registerComponent<Material>();
     registry->registerComponent<Mesh>();

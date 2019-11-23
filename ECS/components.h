@@ -42,6 +42,22 @@ public:
     Component() = default;
     virtual ~Component() {}
 };
+struct EInfo : Component {
+    EInfo() = default;
+    EInfo(QString name) : mName(name) {}
+    QString mName;
+    GLuint mGeneration{0};
+    bool mIsDestroyed{false};
+};
+struct BillBoard : Component {
+    BillBoard(bool constantYUp = true, bool normalVersion = false) : mConstantYUp(constantYUp), mNormalVersion(normalVersion) {}
+
+    //    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
+    //    gsl::Vector3D normal{0.f, 0.f, -1.f};
+
+    bool mConstantYUp{true};
+    bool mNormalVersion{false}; //flip between two ways to calculate forward direction
+};
 struct Transform : Component {
     Transform() {
         modelMatrix.setToIdentity();

@@ -1,6 +1,5 @@
 #include "componentgroupbox.h"
 #include "componentlist.h"
-#include "entity.h"
 #include "mainwindow.h"
 #include "registry.h"
 #include <QAction>
@@ -17,7 +16,7 @@ ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGr
 
 void ComponentGroupBox::removeComponent() {
     Registry *registry = Registry::instance();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     if (title() == "Transform")
         registry->remove<Transform>(entityID);
     if (title() == "Material")

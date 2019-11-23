@@ -3,7 +3,6 @@
 
 #include "components.h"
 #include "core.h"
-#include "entity.h"
 #include <QObject>
 #include <memory>
 #include <vector>
@@ -18,7 +17,7 @@ public:
     virtual void copy(IPool *other) = 0;
     virtual int find(uint eID) const = 0;
     virtual bool has(uint eID) const = 0;
-    virtual bool has(const Entity &entity) const = 0;
+    //    virtual bool has(const Entity &entity) const = 0;
     virtual size_t size() const = 0;
     virtual bool empty() const = 0;
     virtual iterator begin() const = 0;
@@ -290,9 +289,9 @@ public:
      * @param entity actual entity object
      * @return
      */
-    inline bool has(const Entity &entity) const override {
-        return find(entity.id()) != -1;
-    }
+    //    inline bool has(const Entity &entity) const override {
+    //        return find(entity.id()) != -1;
+    //    }
 
     /**
      * @brief Actual number of entities with owned components in the pool.

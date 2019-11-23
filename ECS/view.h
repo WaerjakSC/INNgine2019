@@ -1,6 +1,5 @@
 #ifndef VIEW_H
 #define VIEW_H
-#include "entity.h"
 #include "pool.h"
 /**
  * @brief Multi-Component View.

@@ -30,7 +30,7 @@ PhongShader::~PhongShader() {
 void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
     Shader::transmitUniformData(modelMatrix);
     auto view = Registry::instance()->view<Transform, Light>();
-    auto [lightTrans, light] = view.get<Transform, Light>(mLight->id());
+    auto [lightTrans, light] = view.get<Transform, Light>(mLightID);
 
     glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);
     glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
@@ -43,6 +43,6 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
     glUniform3f(mObjectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
     glUniform3f(mCameraPositionUniform, mCameraController->getCamera().position().x, mCameraController->getCamera().position().y, mCameraController->getCamera().position().z);
 }
-void PhongShader::setLight(Entity *entt) {
-    mLight = entt;
+void PhongShader::setLight(GLuint entt) {
+    mLightID = entt;
 }

@@ -27,7 +27,7 @@ void Scene::saveScene(const QString &fileName) {
         return;
 
     Registry *registry = Registry::instance();
-    std::map<GLuint, cjk::Scope<Entity>> entities = registry->getEntities();
+    const std::vector<GLuint> &entities = registry->getEntities();
     auto inputSys = registry->getSystem<InputSystem>();
 
     StringBuffer buf;
@@ -43,18 +43,19 @@ void Scene::saveScene(const QString &fileName) {
     writer.EndObject();
 
     for (auto &entity : entities) {
-        GLuint eID = entity.first;
-        if (eID != 0 && !entity.second->name().isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
+        const EInfo info = registry->get<EInfo>(entity);
+
+        if (entity != 0 && !info.mName.isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("Entity");
             writer.StartObject();
             writer.Key("name");
-            writer.String(entity.second->name().toStdString().c_str());
+            writer.String(info.mName.toStdString().c_str());
             writer.Key("id");
-            writer.Uint(eID);
+            writer.Uint(entity);
             writer.Key("components");
             writer.StartObject();
-            if (registry->contains<Transform>(eID)) {
-                const Transform trans = registry->get<Transform>(eID);
+            if (registry->contains<Transform>(entity)) {
+                const Transform trans = registry->get<Transform>(entity);
                 writer.Key("transform");
                 writer.StartObject();
 
@@ -92,10 +93,10 @@ void Scene::saveScene(const QString &fileName) {
                 }
                 writer.EndObject();
             }
-            if (registry->contains<Material>(eID)) {
+            if (registry->contains<Material>(entity)) {
                 writer.Key("material");
                 writer.StartObject();
-                const Material &mat = registry->get<Material>(eID);
+                const Material &mat = registry->get<Material>(entity);
 
                 writer.Key("color");
                 writer.StartArray();
@@ -117,20 +118,20 @@ void Scene::saveScene(const QString &fileName) {
 
                 writer.EndObject();
             }
-            if (registry->contains<Mesh>(eID)) {
+            if (registry->contains<Mesh>(entity)) {
                 writer.Key("mesh");
                 writer.StartObject();
-                const Mesh &mesh = registry->get<Mesh>(eID);
+                const Mesh &mesh = registry->get<Mesh>(entity);
                 //                if (mesh.mName == "")
                 //                    qDebug() << "No mesh name!";
                 writer.Key("name");
                 writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
                 writer.EndObject();
             }
-            if (registry->contains<Light>(eID)) {
+            if (registry->contains<Light>(entity)) {
                 writer.Key("light");
                 writer.StartObject();
-                const Light &light = registry->get<Light>(eID);
+                const Light &light = registry->get<Light>(entity);
 
                 writer.Key("ambstr");
                 writer.Double(light.mAmbientStrength);
@@ -161,8 +162,18 @@ void Scene::saveScene(const QString &fileName) {
 
                 writer.EndObject();
             }
-            if (registry->contains<Sound>(eID)) {
-                const Sound &sound = registry->get<Sound>(eID);
+            if (registry->contains<BillBoard>(entity)) {
+                const BillBoard &board = registry->get<BillBoard>(entity);
+                writer.Key("billboard");
+                writer.StartObject();
+                writer.Key("y-up");
+                writer.Bool(board.mConstantYUp);
+                writer.Key("normalversion");
+                writer.Bool(board.mNormalVersion);
+                writer.EndObject();
+            }
+            if (registry->contains<Sound>(entity)) {
+                const Sound &sound = registry->get<Sound>(entity);
                 writer.Key("sound");
                 writer.StartObject();
                 writer.Key("filename");
@@ -173,10 +184,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(sound.mGain);
                 writer.EndObject();
             }
-            if (registry->contains<AABB>(eID)) {
+            if (registry->contains<AABB>(entity)) {
                 writer.Key("AABB");
                 writer.StartObject();
-                const AABB &aabb = registry->get<AABB>(eID);
+                const AABB &aabb = registry->get<AABB>(entity);
 
                 writer.Key("origin");
                 writer.StartArray();
@@ -194,10 +205,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(aabb.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<OBB>(eID)) {
+            if (registry->contains<OBB>(entity)) {
                 writer.Key("OBB");
                 writer.StartObject();
-                const OBB &obb = registry->get<OBB>(eID);
+                const OBB &obb = registry->get<OBB>(entity);
 
                 writer.Key("position");
                 writer.StartArray();
@@ -216,10 +227,10 @@ void Scene::saveScene(const QString &fileName) {
                 // Need to do something with the rotation mat3
                 writer.EndObject();
             }
-            if (registry->contains<Plane>(eID)) {
+            if (registry->contains<Plane>(entity)) {
                 writer.Key("Plane");
                 writer.StartObject();
-                const Plane &plane = registry->get<Plane>(eID);
+                const Plane &plane = registry->get<Plane>(entity);
 
                 writer.Key("normal");
                 writer.StartArray();
@@ -233,10 +244,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(plane.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<Sphere>(eID)) {
+            if (registry->contains<Sphere>(entity)) {
                 writer.Key("Sphere");
                 writer.StartObject();
-                const Sphere &sphere = registry->get<Sphere>(eID);
+                const Sphere &sphere = registry->get<Sphere>(entity);
 
                 writer.Key("position");
                 writer.StartArray();
@@ -250,10 +261,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(sphere.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<Cylinder>(eID)) {
+            if (registry->contains<Cylinder>(entity)) {
                 writer.Key("Cylinder");
                 writer.StartObject();
-                const Cylinder &cylinder = registry->get<Cylinder>(eID);
+                const Cylinder &cylinder = registry->get<Cylinder>(entity);
 
                 writer.Key("position");
                 writer.StartArray();
@@ -269,10 +280,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(cylinder.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<AIComponent>(eID)) {
+            if (registry->contains<AIComponent>(entity)) {
                 writer.Key("AI");
                 writer.StartObject();
-                const AIComponent &ai = registry->get<AIComponent>(eID);
+                const AIComponent &ai = registry->get<AIComponent>(entity);
 
                 writer.Key("health");
                 writer.Int(ai.hp);
@@ -280,10 +291,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Int(ai.damage);
                 writer.EndObject();
             }
-            if (registry->contains<BSplinePoint>(eID)) {
+            if (registry->contains<BSplinePoint>(entity)) {
                 writer.Key("BSplinePoint");
                 writer.StartObject();
-                const BSplinePoint &cp = registry->get<BSplinePoint>(eID);
+                const BSplinePoint &cp = registry->get<BSplinePoint>(entity);
                 writer.Key("location");
                 writer.StartArray();
                 writer.Double(cp.location.x);
@@ -292,10 +303,10 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndArray();
                 writer.EndObject();
             }
-            if (registry->contains<GameCamera>(eID)) {
+            if (registry->contains<GameCamera>(entity)) {
                 writer.Key("GameCamera");
                 writer.StartObject();
-                const GameCamera &cam = registry->get<GameCamera>(eID);
+                const GameCamera &cam = registry->get<GameCamera>(entity);
                 writer.Key("position");
                 writer.StartArray();
                 writer.Double(cam.mCameraPosition.x);
@@ -405,13 +416,16 @@ void Scene::populateScene(const Document &scene) {
                 vec3 lightColor(comp->value["lightcolor"][0].GetDouble(), comp->value["lightcolor"][1].GetDouble(), comp->value["lightcolor"][2].GetDouble());
                 vec3 color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                 registry->add<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
-                mLight = id;
-                factory->getShader<PhongShader>()->setLight(registry->getEntity(mLight));
+                factory->getShader<PhongShader>()->setLight(id);
             } else if (comp->name == "sound") {
                 std::string filename = comp->value["filename"].GetString();
                 bool looping = comp->value["loop"].GetBool();
                 float gain = comp->value["gain"].GetDouble();
                 registry->add<Sound>(id, filename, looping, gain);
+            } else if (comp->name == "billboard") {
+                bool constantYUp = comp->value["y-up"].GetBool();
+                bool normalVersion = comp->value["normalversion"].GetBool();
+                registry->add<BillBoard>(id, constantYUp, normalVersion);
             } else if (comp->name == "AABB") {
                 vec3 origin(comp->value["origin"][0].GetDouble(), comp->value["origin"][1].GetDouble(), comp->value["origin"][2].GetDouble());
                 vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());

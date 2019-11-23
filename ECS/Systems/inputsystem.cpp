@@ -41,7 +41,7 @@ void InputSystem::reset() {
     mIsDragging = false;
 }
 void InputSystem::snapToObject() {
-    GLuint eID = registry->getSelectedEntity()->id();
+    GLuint eID = registry->getSelectedEntity();
     MovementSystem *moveSystem = registry->getSystem<MovementSystem>().get();
     mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
 }
@@ -422,31 +422,31 @@ void InputSystem::mousePressEvent(QMouseEvent *event) {
         inputMousePress(event, editorInput);
 }
 void InputSystem::setCameraPositionX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mCameraPosition.x = xIn;
     cam.mOutDated = true;
 }
 void InputSystem::setCameraPositionY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mCameraPosition.y = yIn;
     cam.mOutDated = true;
 }
 void InputSystem::setCameraPositionZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mCameraPosition.z = zIn;
     cam.mOutDated = true;
 }
 void InputSystem::setYaw(double yaw) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mYaw = yaw;
     cam.mOutDated = true;
 }
 void InputSystem::setActiveCamera(bool checked) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto view = registry->view<GameCamera>();
     GameCamera &selectedCam = view.get(entityID);
     if (checked) {
@@ -470,7 +470,7 @@ void InputSystem::setActiveCamera(bool checked) {
     }
 }
 void InputSystem::setPitch(double pitch) {
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &cam = registry->get<GameCamera>(entityID);
     cam.mPitch = pitch;
     cam.mOutDated = true;

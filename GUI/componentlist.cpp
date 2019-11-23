@@ -31,7 +31,7 @@ ComponentList::ComponentList(VerticalScrollArea *inScrollArea)
  */
 void ComponentList::setupComponentList() {
     scrollArea->clearLayout();
-    GLuint eID = registry->getSelectedEntity()->id();
+    GLuint eID = registry->getSelectedEntity();
     if (registry->contains<Transform>(eID)) {
         setupTransformSettings(registry->get<Transform>(eID));
     }
@@ -67,144 +67,143 @@ void ComponentList::setupComponentList() {
     }
 }
 void ComponentList::addTransformComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Transform>(eID))
-            registry->add<Transform>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+        if (!registry->contains<Transform>(selectedEntity))
+            registry->add<Transform>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addBSplineComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<BSplinePoint>(eID))
-            registry->add<BSplinePoint>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<BSplinePoint>(selectedEntity))
+            registry->add<BSplinePoint>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addAIComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<AIComponent>(eID))
-            registry->add<AIComponent>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<AIComponent>(selectedEntity))
+            registry->add<AIComponent>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addMaterialComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Material>(eID))
-            registry->add<Material>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Material>(selectedEntity))
+            registry->add<Material>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addMeshComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Mesh>(eID))
-            registry->add<Mesh>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Mesh>(selectedEntity))
+            registry->add<Mesh>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addLightComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Light>(eID))
-            registry->add<Light>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Light>(selectedEntity))
+            registry->add<Light>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addPhysicsComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Physics>(eID))
-            registry->add<Physics>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Physics>(selectedEntity))
+            registry->add<Physics>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addSoundComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Sound>(eID))
-            registry->add<Sound>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Sound>(selectedEntity))
+            registry->add<Sound>(selectedEntity);
         setupComponentList();
     }
 }
 void ComponentList::addAABBCollider() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<AABB>(eID)) {
-            registry->add<AABB>(eID);
-            if (registry->contains<Transform>(eID)) {
-                auto &trans = registry->get<Transform>(eID);
-                auto &aabb = registry->get<AABB>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<AABB>(selectedEntity)) {
+            registry->add<AABB>(selectedEntity);
+            if (registry->contains<Transform>(selectedEntity)) {
+                auto &trans = registry->get<Transform>(selectedEntity);
+                auto &aabb = registry->get<AABB>(selectedEntity);
                 aabb.size = vec3(trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2);
             }
-            registry->getSystem<MovementSystem>()->updateAABBTransform(eID);
+            registry->getSystem<MovementSystem>()->updateAABBTransform(selectedEntity);
         }
         setupComponentList();
     }
 }
 void ComponentList::addOBBCollider() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<OBB>(eID)) {
-            registry->add<OBB>(eID);
-            //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<OBB>(selectedEntity)) {
+            registry->add<OBB>(selectedEntity);
+            //            registry->getSystem<MovementSystem>()->updateColliderTransform(selectedEntity);
         }
         setupComponentList();
     }
 }
 void ComponentList::addSphereCollider() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Sphere>(eID)) {
-            registry->add<Sphere>(eID);
-            registry->getSystem<MovementSystem>()->updateSphereTransform(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Sphere>(selectedEntity)) {
+            registry->add<Sphere>(selectedEntity);
+            registry->getSystem<MovementSystem>()->updateSphereTransform(selectedEntity);
         }
         setupComponentList();
     }
 }
 void ComponentList::addPlaneCollider() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Plane>(eID)) {
-            registry->add<Plane>(eID);
-            //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Plane>(selectedEntity)) {
+            registry->add<Plane>(selectedEntity);
+            //            registry->getSystem<MovementSystem>()->updateColliderTransform(selectedEntity);
         }
 
         setupComponentList();
     }
 }
 void ComponentList::addCylinderCollider() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<Cylinder>(eID)) {
-            registry->add<Cylinder>(eID);
-            //            registry->getSystem<MovementSystem>()->updateColliderTransform(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<Cylinder>(selectedEntity)) {
+            registry->add<Cylinder>(selectedEntity);
+            //            registry->getSystem<MovementSystem>()->updateColliderTransform(selectedEntity);
         }
         setupComponentList();
     }
 }
 void ComponentList::addGameCameraComponent() {
-    Entity *selectedEntity = registry->getSelectedEntity();
-    if (selectedEntity) {
-        GLuint eID = selectedEntity->id();
-        if (!registry->contains<GameCamera>(eID)) {
-            registry->add<GameCamera>(eID);
+    GLuint selectedEntity = registry->getSelectedEntity();
+    if (selectedEntity != 0) {
+
+        if (!registry->contains<GameCamera>(selectedEntity)) {
+            registry->add<GameCamera>(selectedEntity);
         }
         setupComponentList();
     }
@@ -688,7 +687,7 @@ void ComponentList::setNewTextureFile() {
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
         factory->loadTexture(fileName.toStdString());
-        registry->get<Material>(registry->getSelectedEntity()->id()).mTextureUnit = factory->getTexture(fileName.toStdString())->textureUnit();
+        registry->get<Material>(registry->getSelectedEntity()).mTextureUnit = factory->getTexture(fileName.toStdString())->textureUnit();
         texFileLabel->setText(fileName);
     }
 }
@@ -700,7 +699,7 @@ void ComponentList::setNewMesh() {
         QFileInfo file(fileName);
         fileName = file.fileName();
         ResourceManager *factory = ResourceManager::instance();
-        factory->setMesh(fileName.toStdString(), registry->getSelectedEntity()->id());
+        factory->setMesh(fileName.toStdString(), registry->getSelectedEntity());
         objFileLabel->setText(fileName);
     }
 }
@@ -714,14 +713,14 @@ void ComponentList::setColor() {
         newRgb.fill(color);
         colorLabel->setPixmap(newRgb);
     }
-    registry->get<Material>(registry->getSelectedEntity()->id()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
+    registry->get<Material>(registry->getSelectedEntity()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
 }
 
 void ComponentList::updatePosSpinBoxes(int state) {
     disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
     disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
     disconnect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     auto &trans = registry->get<Transform>(entityID);
     switch (state) {
     case 0:
@@ -745,21 +744,21 @@ void ComponentList::updatePosSpinBoxes(int state) {
 void ComponentList::updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal) {
     if (abs->isChecked() != isGlobal) // if absolute position is checked but the signal is local, don't do anything, and vice versa
         return;
-    if (eID == registry->getSelectedEntity()->id()) {
+    if (eID == registry->getSelectedEntity()) {
         emit posX(newPos.x);
         emit posY(newPos.y);
         emit posZ(newPos.z);
     }
 }
 void ComponentList::updateRotationVals(GLuint eID, vec3 newRot) {
-    if (eID == registry->getSelectedEntity()->id()) {
+    if (eID == registry->getSelectedEntity()) {
         emit rotX(newRot.x);
         emit rotY(newRot.y);
         emit rotZ(newRot.z);
     }
 }
 void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
-    if (eID == registry->getSelectedEntity()->id()) {
+    if (eID == registry->getSelectedEntity()) {
         emit scaleX(newScale.x);
         emit scaleY(newScale.y);
         emit scaleZ(newScale.z);
@@ -768,7 +767,7 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
 
 void ComponentList::setPositionX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     if (abs->isChecked())
         movement->setAbsolutePositionX(entityID, xIn, false);
     else
@@ -779,7 +778,7 @@ void ComponentList::setPositionX(double xIn) {
 }
 void ComponentList::setPositionY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     if (abs->isChecked())
         movement->setAbsolutePositionY(entityID, yIn, false);
     else
@@ -789,7 +788,7 @@ void ComponentList::setPositionY(double yIn) {
 }
 void ComponentList::setPositionZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     if (abs->isChecked())
         movement->setAbsolutePositionZ(entityID, zIn, false);
     else
@@ -799,42 +798,42 @@ void ComponentList::setPositionZ(double zIn) {
 }
 void ComponentList::setRotationX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     movement->setRotationX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     movement->setRotationY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     movement->setRotationZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleX(double xIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     movement->setScaleX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleY(double yIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     movement->setScaleY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleZ(double zIn) {
     auto movement = registry->getSystem<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity()->id();
+    GLuint entityID = registry->getSelectedEntity();
     movement->setScaleZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
