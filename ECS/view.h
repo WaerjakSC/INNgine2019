@@ -22,7 +22,7 @@ private:
      * @brief Returns the smallest pool of components for use with begin() and end() functions
      * @return
      */
-    Ref<const IPool> candidate() const {
+    inline Ref<const IPool> candidate() const {
         return std::min({static_cast<Ref<const IPool>>(std::get<Ref<Pool<Component>>>(pools))...}, [](const auto lhs, const auto rhs) {
             return lhs->size() < rhs->size();
         });
@@ -86,7 +86,7 @@ private:
         underlying_iterator_type begin;
         underlying_iterator_type end;
     };
-    unchecked_type unchecked(Ref<const IPool> view) const {
+    inline unchecked_type unchecked(Ref<const IPool> view) const {
         unchecked_type other{};
         typename unchecked_type::size_type pos{};
         ((std::get<Ref<Pool<Component>>>(pools) == view ? nullptr : (other[pos++] = std::get<Ref<Pool<Component>>>(pools))), ...);
@@ -95,7 +95,7 @@ private:
 
 public:
     template <typename Comp>
-    size_t size() const {
+    inline size_t size() const {
         return std::get<Ref<Pool<Comp>>>(pools)->size();
     }
     iterator begin() const {
@@ -107,17 +107,17 @@ public:
         return iterator{unchecked(view), view->end(), view->end()};
     }
     template <typename Comp>
-    std::vector<Comp> &data() {
+    inline std::vector<Comp> &data() {
         return std::get<Pool<Comp>>(pools).data();
     }
     template <typename Comp>
-    std::vector<int> &entities() const {
+    inline std::vector<int> &entities() const {
         return std::get<Pool<Comp>>(pools)->entities();
     }
-    int find(const int &entt) const {
+    inline int find(const int &entt) const {
         return candidate()->find(entt);
     }
-    bool contains(const int &entt) const {
+    inline bool contains(const int &entt) const {
         if (entt < 0)
             return false;
         return find(entt) != -1;
@@ -129,7 +129,7 @@ public:
      * @example auto [trans, mat, msh] = view.get<Transform, Material, Mesh>(entity);
      */
     template <typename... Comp>
-    decltype(auto) get(const int &entt) const {
+    inline decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         if constexpr (sizeof...(Comp) == 1) {
             return (std::get<Ref<Pool<Comp>>>(pools)->get(entt), ...);
@@ -160,7 +160,7 @@ private:
 
 public:
     using iterator_type = typename IPool::iterator;
-    size_t size() const {
+    inline size_t size() const {
         return pool->size();
     }
     iterator_type begin() const {
@@ -169,29 +169,29 @@ public:
     iterator_type end() const {
         return pool->end();
     }
-    std::vector<Component> &data() const {
+    inline std::vector<Component> &data() const {
         return pool->data();
     }
-    const std::vector<GLuint> &entities() const {
+    inline const std::vector<GLuint> &entities() const {
         return pool->entities();
     }
-    int find(const int &entt) const {
+    inline int find(const int &entt) const {
         return pool->find(entt);
     }
-    bool contains(const int &entt) const {
+    inline bool contains(const int &entt) const {
         return find(entt) != -1;
     }
     /**
      * @brief Checks whether the view is empty.
      * @return True if the view is empty, false otherwise.
      */
-    bool empty() const {
+    inline bool empty() const {
         return pool->empty();
     }
     /**
     * @brief same as the multi-component view, but here you don't need to enter a component type since it's implicitly discovered
     */
-    decltype(auto) get(const int &entt) const {
+    inline decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         return pool->get(entt);
     }

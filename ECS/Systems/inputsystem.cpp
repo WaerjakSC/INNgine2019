@@ -18,7 +18,7 @@ void InputSystem::update(DeltaTime dt) {
                 mActiveGameCamera = true;
             }
         }
-        if (shouldConfine)
+        if (mIsConfined)
             confineMouseToScreen(dt);
     }
     if (!mActiveGameCamera)
@@ -35,10 +35,10 @@ void InputSystem::init(float aspectRatio) {
     }
 }
 void InputSystem::reset() {
-    enteredWindow = false;
-    shouldConfine = false;
+    mEnteredWindow = false;
+    mIsConfined = false;
     playerController().F1 = false;
-    shouldDrag = false;
+    mIsDragging = false;
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity()->id();
@@ -63,15 +63,19 @@ void InputSystem::handleKeyInput() {
             factory->save();
     }
     if (mPlayerController.F1) {
-        shouldConfine = false;
-        enteredWindow = false;
-    } else if (!shouldConfine)
-        shouldConfine = true;
-    if (mPlayerController.L) { // !!! Temporary proof of concept function, replace with makeTower or something and whatever other logic is wanted.
-        draggedEntity = factory->makeCube("FauxTower");
-        shouldDrag = true;
+        mIsConfined = false;
+        mEnteredWindow = false;
+    } else if (!mIsConfined)
+        mIsConfined = true;
+    if (mPlayerController.L) {
+        spawnTower();
         mPlayerController.L = false;
     }
+}
+// !!! Temporary proof of concept function, replace with makeTower or something and whatever other logic is wanted.
+void InputSystem::spawnTower() {
+    draggedEntity = factory->makeCube("FauxTower");
+    mIsDragging = true;
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
     if (factory->isPlaying()) { // No point going through this if you won't use it anyway
@@ -96,7 +100,8 @@ void InputSystem::handlePlayerController(DeltaTime dt) {
 }
 void InputSystem::handleMouseInput() {
     if (editorInput.LMB) {
-        int entityID = ray->mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry());
+        Raycast ray(editorCamController());
+        int entityID = ray.mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry());
         emit rayHitEntity(entityID);
     } else if (editorInput.RMB) {
         if (editorInput.W)
@@ -114,17 +119,17 @@ void InputSystem::handleMouseInput() {
         }
     }
     if (mPlayerController.LMB) {
-        if (shouldDrag) {
-            shouldDrag = false;
+        if (mIsDragging) {
+            mIsDragging = false;
             // Maybe add some logic here to place the object in the middle of the AABB
         }
     } else if (mPlayerController.RMB) {
-        if (shouldDrag) {
-            shouldDrag = false;
+        if (mIsDragging) {
+            mIsDragging = false;
             registry->removeEntity(draggedEntity);
         }
     }
-    if (shouldDrag)
+    if (mIsDragging)
         dragEntity(draggedEntity);
 }
 void InputSystem::confineMouseToScreen(DeltaTime dt) {
@@ -132,9 +137,9 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
     int height = mRenderWindow->height();
     QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
     if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
-        enteredWindow = true;
+        mEnteredWindow = true;
     }
-    if (enteredWindow) {
+    if (mEnteredWindow) {
         QPoint newPos = pos;
         if (pos.x() >= width) {
             newPos.rx() = width;
@@ -163,8 +168,10 @@ void InputSystem::dragEntity(GLuint entity) {
     int entityID = dragRay.mousePick(cursorPos, mRenderWindow->geometry(), desiredPos, entity);
     Transform &tf = registry->get<Transform>(entity);
     if (entityID != -1) {
+        // compensate for size of collider
+        // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
         if (registry->contains<AABB>(entityID))
-            desiredPos.y += registry->get<AABB>(entityID).size.y; // compensate for size of AABB
+            desiredPos.y += registry->get<AABB>(entityID).size.y;
         else
             desiredPos.y += registry->get<Sphere>(entityID).radius;
         desiredPos.y += tf.localScale.y;
@@ -191,7 +198,6 @@ Ref<CameraController> InputSystem::editorCamController() const {
 
 void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController) {
     mEditorCamController = editorCamController;
-    ray = new Raycast(mEditorCamController);
 }
 
 std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() const {

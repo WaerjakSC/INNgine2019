@@ -64,20 +64,21 @@ private:
      */
     void handleMouseInput();
 
+    Registry *registry;
+    ResourceManager *factory;
+
     float mCameraSpeed{1.f};
     float mMoveSpeed{10.f};
     float mCameraRotateSpeed{30.f};
     bool firstRMB{true};
-    bool enteredWindow{false};
-    bool shouldConfine{false};
+    // last position of the mouse in editor, for calculating deltas to move the camera with
+    QPoint lastPos;
+    bool mEnteredWindow{false};
+    bool mIsConfined{false};
 
-    QPoint lastPos; // last position of the mouse in editor, for calculating deltas to move the camera with
-    Raycast *ray;
     GLuint draggedEntity{0};
-    bool shouldDrag{false};
+    bool mIsDragging{false};
 
-    Registry *registry{};
-    ResourceManager *factory;
     Ref<CameraController> mEditorCamController;
     std::vector<Ref<GameCameraController>> mGameCameraControllers;
     bool mActiveGameCamera{false};
@@ -117,6 +118,7 @@ private:
      * @param entity
      */
     void dragEntity(GLuint entity);
+    void spawnTower();
 };
 
 #endif // INPUTSYSTEM_H
