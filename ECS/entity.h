@@ -19,7 +19,7 @@ public:
     bool operator==(const Entity &other) {
         return eID == other.eID;
     }
-    Ref<Entity> clone();
+    Scope<Entity> clone();
     void destroy();
     void newGeneration(GLuint id, const QString &text);
     bool isDestroyed() const;

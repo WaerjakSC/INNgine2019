@@ -15,15 +15,15 @@ template <typename... Component>
 class View {
 private:
     using underlying_iterator_type = typename IPool::iterator;
-    using unchecked_type = std::array<Ref<const IPool>, (sizeof...(Component) - 1)>;
+    using unchecked_type = std::array<const IPool *, (sizeof...(Component) - 1)>;
     friend class Registry;
 
     /**
      * @brief Returns the smallest pool of components for use with begin() and end() functions
      * @return
      */
-    inline Ref<const IPool> candidate() const {
-        return std::min({static_cast<Ref<const IPool>>(std::get<Ref<Pool<Component>>>(pools))...}, [](const auto lhs, const auto rhs) {
+    inline const IPool *candidate() const {
+        return std::min({static_cast<const IPool *>(std::get<Pool<Component> *>(pools))...}, [](const auto lhs, const auto rhs) {
             return lhs->size() < rhs->size();
         });
     }
@@ -43,7 +43,7 @@ private:
         }
 
         bool valid() const {
-            return std::all_of(unchecked.cbegin(), unchecked.cend(), [this](Ref<const IPool> view) {
+            return std::all_of(unchecked.cbegin(), unchecked.cend(), [this](const IPool *view) {
                 return view->has(*begin);
             });
         }
@@ -86,17 +86,17 @@ private:
         underlying_iterator_type begin;
         underlying_iterator_type end;
     };
-    inline unchecked_type unchecked(Ref<const IPool> view) const {
+    inline unchecked_type unchecked(const IPool *view) const {
         unchecked_type other{};
         typename unchecked_type::size_type pos{};
-        ((std::get<Ref<Pool<Component>>>(pools) == view ? nullptr : (other[pos++] = std::get<Ref<Pool<Component>>>(pools))), ...);
+        ((std::get<Pool<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<Pool<Component> *>(pools))), ...);
         return other;
     }
 
 public:
     template <typename Comp>
     inline size_t size() const {
-        return std::get<Ref<Pool<Comp>>>(pools)->size();
+        return std::get<Pool<Comp> *>(pools)->size();
     }
     iterator begin() const {
         const auto view = candidate();
@@ -132,16 +132,16 @@ public:
     inline decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         if constexpr (sizeof...(Comp) == 1) {
-            return (std::get<Ref<Pool<Comp>>>(pools)->get(entt), ...);
+            return (std::get<Pool<Comp> *>(pools)->get(entt), ...);
         } else
             return std::tuple<decltype(get<Comp>(entt))...>{get<Comp>(entt)...};
     }
 
 private:
-    View(Ref<Pool<Component>>... ref)
+    View(Pool<Component> *... ref)
         : pools{ref...} {
     }
-    std::tuple<Ref<Pool<Component>>...> pools;
+    std::tuple<Pool<Component> *...> pools;
 };
 /**
  *@brief Single component view type.
@@ -154,9 +154,9 @@ template <typename Component>
 class View<Component> {
 private:
     friend class Registry;
-    View(Ref<Pool<Component>> ref)
+    View(Pool<Component> *ref)
         : pool{ref} {}
-    Ref<Pool<Component>> pool;
+    Pool<Component> *pool;
 
 public:
     using iterator_type = typename IPool::iterator;

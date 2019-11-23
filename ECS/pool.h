@@ -13,9 +13,9 @@ public:
     class iterator;
     virtual ~IPool() = default;
     virtual void remove(int removedEntity) = 0;
-    virtual Ref<IPool> clone() = 0;
+    virtual Scope<IPool> clone() = 0;
     virtual void cloneComponent(GLuint cloneFrom, GLuint cloneTo) = 0;
-    virtual void swap(Ref<IPool> other) = 0;
+    virtual void copy(IPool *other) = 0;
     virtual int find(uint eID) const = 0;
     virtual bool has(uint eID) const = 0;
     virtual bool has(const Entity &entity) const = 0;
@@ -129,15 +129,16 @@ public:
         mIndex = other->mIndex;
         mComponents = other->mComponents;
     }
-    ~Pool() {}
-    virtual Ref<IPool> clone() override {
-        return std::make_shared<Pool>(*this);
+    Pool(IPool *copyFrom) {
+        auto temp = static_cast<Pool<Type> *>(copyFrom);
+
+        mList = temp->mList;
+        mIndex = temp->mIndex;
+        mComponents = temp->mComponents;
     }
-    virtual void swap(Ref<IPool> other) override {
-        auto swapped = std::static_pointer_cast<Pool<Type>>(other);
-        mList = swapped->mList;
-        mIndex = swapped->mIndex;
-        mComponents = swapped->mComponents;
+    ~Pool() {}
+    virtual Scope<IPool> clone() override {
+        return std::make_unique<Pool>(*this);
     }
 
     /**
@@ -192,7 +193,7 @@ public:
     inline void remove(int removedEntityID) {
         if (has(removedEntityID)) {
             GLuint swappedEntity = mList.back();
-            swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
+            copy(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
             mList.pop_back();
             mComponents.pop_back();
             mIndex[removedEntityID] = -1; // Set entity location to an invalid value.
@@ -200,7 +201,7 @@ public:
         if (mList.empty())
             mIndex.clear();
     }
-    inline void swap(GLuint eID, GLuint other) {
+    inline void copy(GLuint eID, GLuint other) {
         assert(has(eID));
         assert(has(other));
         std::swap(mList[mIndex[eID]], mList[mIndex[other]]);             // Swap the two entities in the pool
@@ -214,7 +215,7 @@ public:
     inline void sort(std::vector<int> otherIndex) {
         for (size_t i = 0; i < mList.size(); i++) {
             if (has(i)) {
-                swap(mList[mIndex[i]], mList[otherIndex[i]]);
+                copy(mList[mIndex[i]], mList[otherIndex[i]]);
 
             } /*else
                 mGroupEnd--;*/

@@ -38,8 +38,7 @@ public:
             return;
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            Ref<Pool<Type>> pool = std::make_shared<Pool<Type>>();
-            mPools.insert({typeName, pool});
+            mPools.insert({typeName, std::make_unique<Pool<Type>>()});
         }
     }
     /**
@@ -120,7 +119,7 @@ public:
     template <typename... Type>
     inline bool contains(GLuint eID) {
         [[maybe_unused]] const auto cpools = std::make_tuple(getPool<Type>()...);
-        return ((std::get<Ref<Pool<Type>>>(cpools) ? std::get<Ref<Pool<Type>>>(cpools)->has(eID) : false) && ...);
+        return ((std::get<Pool<Type> *>(cpools) ? std::get<Pool<Type> *>(cpools)->has(eID) : false) && ...);
     }
     /**
      * @brief Simple getter for a type's typeid name
@@ -144,13 +143,13 @@ public:
      * @return
      */
     GLuint duplicateEntity(GLuint dupedEntity);
-    inline std::map<GLuint, Ref<Entity>> getEntities() const { return mEntities; }
+    inline std::map<GLuint, Scope<Entity>> getEntities() const { return mEntities; }
     /**
     * @brief Get a pointer to the entity with the specified ID.
     * @param eID
     * @return
     */
-    Ref<Entity> getEntity(GLuint eID);
+    Entity *getEntity(GLuint eID);
     /**
     * @brief Destroy an entity - Clears all components from an entity ID and readies that ID for use with the next created entity
     * @param eID - entityID
@@ -220,7 +219,7 @@ public:
      */
     std::vector<GLuint> getChildren(GLuint eID);
 
-    Ref<Entity> getSelectedEntity() const;
+    Entity *getSelectedEntity() const;
 public slots:
     void setSelectedEntity(const GLuint selectedEntity);
 
@@ -228,26 +227,26 @@ signals:
     void entityCreated(GLuint eID);
     void entityRemoved(GLuint eID);
     void parentChanged(GLuint childID);
-    void poolChanged(Ref<IPool> pool);
+    void poolChanged(IPool *pool);
 
 private:
     static Registry *mInstance;
-    std::map<std::string, Ref<IPool>> mPools{};
+    std::map<std::string, Scope<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
 
-    std::map<GLuint, Ref<Entity>> mEntities; // Save Entities as pointers to avoid clipping of derived classes
+    std::map<GLuint, Scope<Entity>> mEntities; // Save Entities as pointers to avoid clipping of derived classes
     std::vector<GLuint> mAvailableSlots;
-    Ref<Entity> mSelectedEntity;
+    Entity *mSelectedEntity;
     std::vector<GLuint> mBillBoards;
     bool isBillBoard(GLuint entityID);
 
-    std::tuple<std::map<GLuint, Ref<Entity>>, std::vector<GLuint>, std::map<std::string, Ref<IPool>>> mSnapshot;
+    std::tuple<std::map<GLuint, Scope<Entity>>, std::vector<GLuint>, std::map<std::string, Scope<IPool>>> mSnapshot;
 
     // Convenience function to get the statically casted pointer to the ComponentArray of type T.
     template <typename Type>
-    inline Ref<Pool<Type>> getPool() {
+    inline Pool<Type> *getPool() {
         std::string typeName = typeid(Type).name();
-        return std::static_pointer_cast<Pool<Type>>(mPools[typeName]);
+        return static_cast<Pool<Type> *>(mPools[typeName].get());
     }
 };
 

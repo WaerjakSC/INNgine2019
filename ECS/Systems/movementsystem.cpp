@@ -24,7 +24,7 @@ void MovementSystem::update(DeltaTime dt) {
         updateSphereTransform(entity);
     }
     for (auto billBoard : registry->billBoards()) {
-        if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(registry->getEntity(billBoard)))
+        if (BillBoard *board = dynamic_cast<BillBoard *>(registry->getEntity(billBoard)))
             board->update();
     }
 }

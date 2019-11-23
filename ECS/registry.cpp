@@ -30,10 +30,10 @@ bool Registry::isBillBoard(GLuint entityID) {
     return false;
 }
 
-Ref<Entity> Registry::getEntity(GLuint eID) {
+Entity *Registry::getEntity(GLuint eID) {
     auto search = mEntities.find(eID);
     if (search != mEntities.end())
-        return search->second;
+        return search->second.get();
     return nullptr;
 }
 
@@ -54,14 +54,14 @@ void Registry::removeEntity(GLuint eID) {
 }
 
 GLuint Registry::nextAvailable() {
-    for (auto entity : mEntities)
+    for (auto &entity : mEntities)
         if (entity.second->isDestroyed())
             return entity.first;
     return numEntities();
 }
 
 void Registry::clearScene() {
-    for (auto entity : mEntities) {
+    for (auto &entity : mEntities) {
         if (entity.first != 0) {
             removeEntity(entity.first);
         }
@@ -75,9 +75,9 @@ GLuint Registry::makeEntity(const QString &name, bool signal) {
         search->second->newGeneration(eID, name);
     } else {
         if (name == "BillBoard")
-            mEntities[eID] = std::make_shared<BillBoard>(eID, "BillBoard");
+            mEntities[eID] = std::make_unique<BillBoard>(eID, "BillBoard");
         else
-            mEntities[eID] = std::make_shared<Entity>(eID, name);
+            mEntities[eID] = std::make_unique<Entity>(eID, name);
     }
     if (signal)
         emit entityCreated(eID);
@@ -86,8 +86,8 @@ GLuint Registry::makeEntity(const QString &name, bool signal) {
 
 GLuint Registry::duplicateEntity(GLuint dupedEntity) {
     // Remember it also needs to be at the same parent level
-    Ref<Entity> dupe = getEntity(dupedEntity);
-    GLuint entityID = makeEntity(dupe->name());
+    QString dupeName = getEntity(dupedEntity)->name();
+    GLuint entityID = makeEntity(dupeName);
     for (auto &pool : mPools) {
         if (pool.second->has(dupedEntity)) {
             pool.second->cloneComponent(dupedEntity, entityID);
@@ -126,7 +126,7 @@ std::vector<GLuint> Registry::getChildren(GLuint eID) {
     return get<Transform>(eID).children;
 }
 
-Ref<Entity> Registry::getSelectedEntity() const {
+Entity *Registry::getSelectedEntity() const {
     return mSelectedEntity;
 }
 
@@ -151,7 +151,7 @@ void Registry::removeChild(const GLuint eID, const GLuint childID) {
 }
 
 void Registry::updateChildParent() {
-    for (auto entity : getEntities()) // For every entity
+    for (auto &entity : getEntities()) // For every entity
     {
         if (contains<Transform>(entity.second->id())) {
             Transform &comp = get<Transform>(entity.second->id());
@@ -163,16 +163,15 @@ void Registry::updateChildParent() {
 }
 
 void Registry::makeSnapshot() {
-    std::map<GLuint, Ref<Entity>> newEntityMap;
-    for (auto entity : mEntities) {
-        if (Ref<BillBoard> board = std::dynamic_pointer_cast<BillBoard>(entity.second)) {
-            newEntityMap[entity.first] = board;
+    std::map<GLuint, Scope<Entity>> newEntityMap;
+    for (auto &entity : mEntities) {
+        if (isBillBoard(entity.second->id())) {
+            newEntityMap[entity.first] = entity.second->clone();
         } else {
-            Ref<Entity> entt = entity.second->clone();
-            newEntityMap[entity.first] = entt;
+            newEntityMap[entity.first] = entity.second->clone();
         }
     }
-    std::map<std::string, Ref<IPool>> snapPools;
+    std::map<std::string, Scope<IPool>> snapPools;
     for (auto &pool : mPools) {
         snapPools[pool.first] = pool.second->clone();
     }
@@ -181,10 +180,11 @@ void Registry::makeSnapshot() {
 }
 
 void Registry::loadSnapshot() {
-    std::map<std::string, Ref<IPool>> tempPools;
+    std::map<std::string, Scope<IPool>> tempPools;
     std::tie(mEntities, mBillBoards, tempPools) = mSnapshot;
+    mPools.clear();
     for (auto &pool : tempPools) {
-        mPools[pool.first]->swap(pool.second);
+        mPools[pool.first] = std::move(pool.second);
     }
     for (auto &transform : getPool<Transform>()->data()) {
         transform.matrixOutdated = true;
