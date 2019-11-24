@@ -32,9 +32,9 @@
 #include "scene.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
-    : mContext(nullptr), mInitialized(false),
-      mFactory(ResourceManager::instance()), mRegistry(Registry::instance()),
-      mMainWindow(mainWindow) {
+    : mContext{nullptr}, mInitialized{false},
+      mFactory{ResourceManager::instance()}, mRegistry{Registry::instance()},
+      mMainWindow{mainWindow} {
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
     setFormat(format);
@@ -140,9 +140,9 @@ void RenderWindow::init() {
     mMoveSystem->init();
     mScriptSystem->init();
     mInputSystem->init(aspectRatio);
-    auto view = mRegistry->view<AIComponent>();
+    auto view{mRegistry->view<AIComponent>()};
     if (!view.empty()) {
-        GLuint enemy = mRegistry->view<AIComponent>().entities()[0];
+        GLuint enemy{mRegistry->view<AIComponent>().entities()[0]};
 
         mAIsystem->init(enemy);
     }
@@ -159,8 +159,8 @@ void RenderWindow::init() {
 ///Called each frame - doing the rendering
 void RenderWindow::render() {
 
-    float time = static_cast<float>(mTime.elapsed()) / 1000.f;
-    DeltaTime dt = time - mLastFrameTime;
+    float time{static_cast<float>(mTime.elapsed()) / 1000.f};
+    DeltaTime dt{time - mLastFrameTime};
     mLastFrameTime = time;
 
     mTimeStart.restart();        //restart FPS clock
@@ -211,9 +211,9 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
         mTimeStart.start();
     }
     //This is just to support modern screens with "double" pixels
-    const qreal retinaScale = devicePixelRatio();
+    const qreal retinaScale{devicePixelRatio()};
     glViewport(0, 0, static_cast<GLint>(width() * retinaScale), static_cast<GLint>(height() * retinaScale));
-    float aspectRatio = static_cast<float>(width()) / height();
+    float aspectRatio{static_cast<float>(width()) / height()};
     mInputSystem->onResize(aspectRatio);
 }
 
@@ -240,7 +240,7 @@ void RenderWindow::toggleXYZ() {
 //This will approximate what framerate we COULD have.
 //The actual frame rate on your monitor is limited by the vsync and is probably 60Hz
 void RenderWindow::calculateFramerate() {
-    long long nsecElapsed = mTimeStart.nsecsElapsed();
+    long long nsecElapsed{mTimeStart.nsecsElapsed()};
     static int frameCount{0}; //counting actual frames for a quick "timer" for the statusbar
 
     if (mMainWindow) //if no mainWindow, something is really wrong...
@@ -263,11 +263,11 @@ void RenderWindow::calculateFramerate() {
 /// Reverts to glGetError() if not
 void RenderWindow::checkForGLerrors() {
     if (mOpenGLDebugLogger) {
-        const QList<QOpenGLDebugMessage> messages = mOpenGLDebugLogger->loggedMessages();
+        const QList<QOpenGLDebugMessage> messages{mOpenGLDebugLogger->loggedMessages()};
         for (const QOpenGLDebugMessage &message : messages)
             qDebug() << message;
     } else {
-        GLenum err = GL_NO_ERROR;
+        GLenum err{GL_NO_ERROR};
         while ((err = glGetError()) != GL_NO_ERROR) {
             qDebug() << "glGetError returns " << err;
         }
@@ -276,9 +276,9 @@ void RenderWindow::checkForGLerrors() {
 
 /// Tries to start the extended OpenGL debugger that comes with Qt
 void RenderWindow::startOpenGLDebugger() {
-    QOpenGLContext *temp = this->context();
+    QOpenGLContext *temp{this->context()};
     if (temp) {
-        QSurfaceFormat format = temp->format();
+        QSurfaceFormat format{temp->format()};
         if (!format.testOption(QSurfaceFormat::DebugContext))
             qDebug() << "This system can not use QOpenGLDebugLogger, so we revert to glGetError()";
 
@@ -299,10 +299,10 @@ void RenderWindow::startOpenGLDebugger() {
  * @param f, the frustum
  */
 void RenderWindow::Cull(const Camera::Frustum &f) {
-    auto view = mRegistry->view<Mesh, AABB>();
-    Camera &cam = mInputSystem->editorCamController()->getCamera();
+    auto view{mRegistry->view<Mesh, AABB>()};
+    Camera &cam{mInputSystem->editorCamController()->getCamera()};
     for (auto entity : view) {
-        auto &collider = view.get<AABB>(entity);
+        auto &collider{view.get<AABB>(entity)};
         if (cam.getFrustum().Intersects(f, collider)) {
             view.get<Mesh>(entity).mRendered = true;
         } else

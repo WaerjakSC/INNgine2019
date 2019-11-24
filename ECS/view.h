@@ -98,11 +98,11 @@ public:
         return std::get<Pool<Comp> *>(pools)->size();
     }
     iterator begin() const {
-        const auto view = candidate();
+        const auto view{candidate()};
         return iterator{unchecked(view), view->begin(), view->end()};
     }
     iterator end() const {
-        const auto view = candidate();
+        const auto view{candidate()};
         return iterator{unchecked(view), view->end(), view->end()};
     }
     template <typename Comp>

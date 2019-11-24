@@ -5,7 +5,7 @@
 #include "registry.h"
 #include "renderwindow.h"
 #include <QWindow>
-Raycast::Raycast(cjk::Ref<CameraController> controller, float range) : mCurrentController(controller), rayRange(range) {
+Raycast::Raycast(cjk::Ref<CameraController> controller, float range) : mCurrentController{controller}, rayRange{range} {
 }
 /**
  * @brief Raycast::rayCast
@@ -13,26 +13,26 @@ Raycast::Raycast(cjk::Ref<CameraController> controller, float range) : mCurrentC
  * @return For now this returns -1 if it doesn't hit any targets. Make sure to check if it's valid a valid entity before using it
  */
 int Raycast::mousePick(const QPoint &mousePos, const QRect &rect) {
-    Ray ray = getRayFromMouse(mousePos, rect);
+    Ray ray{getRayFromMouse(mousePos, rect)};
 
     int entityID{-1};
     double closestTarget{rayRange};
     entityID = checkAABB(ray, closestTarget);
-    int sphereID = checkSphere(ray, closestTarget);
+    int sphereID{checkSphere(ray, closestTarget)};
     if (sphereID != -1) {
         entityID = sphereID;
     }
     return entityID;
 }
 int Raycast::mousePick(const QPoint &mousePos, const QRect &rect, vec3 &hitPoint, int ignoredEntity) {
-    Ray ray = getRayFromMouse(mousePos, rect);
+    Ray ray{getRayFromMouse(mousePos, rect)};
 
     int entityID{-1};
     double closestTarget{rayRange};
 
     entityID = checkAABB(ray, closestTarget, ignoredEntity);
     hitPoint = getPointOnRay(ray, closestTarget);
-    int sphereID = checkSphere(ray, closestTarget, ignoredEntity);
+    int sphereID{checkSphere(ray, closestTarget, ignoredEntity)};
     if (sphereID != -1) {
         entityID = sphereID;
         hitPoint = getPointOnRay(ray, closestTarget);
@@ -42,15 +42,15 @@ int Raycast::mousePick(const QPoint &mousePos, const QRect &rect, vec3 &hitPoint
     return entityID;
 }
 int Raycast::checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity) {
-    Registry *registry = Registry::instance();
-    auto collisionSystem = registry->system<CollisionSystem>();
+    Registry *registry{Registry::instance()};
+    auto collisionSystem{registry->system<CollisionSystem>()};
     double intersectionPoint;
     int entityID{-1};
-    auto view = registry->view<AABB>();
+    auto view{registry->view<AABB>()};
     for (auto entity : view) {
         if ((int)entity == ignoredEntity)
             continue;
-        auto &aabb = view.get(entity);
+        auto &aabb{view.get(entity)};
         if (collisionSystem->RayToAABB(ray, aabb, intersectionPoint)) {
             if (intersectionPoint < closestTarget) {
                 closestTarget = intersectionPoint;
@@ -61,15 +61,15 @@ int Raycast::checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity)
     return entityID;
 }
 int Raycast::checkSphere(const Ray &ray, double &closestTarget, int ignoredEntity) {
-    Registry *registry = Registry::instance();
-    auto collisionSystem = registry->system<CollisionSystem>();
+    Registry *registry{Registry::instance()};
+    auto collisionSystem{registry->system<CollisionSystem>()};
     double intersectionPoint;
     int entityID{-1};
-    auto view = registry->view<Sphere>();
+    auto view{registry->view<Sphere>()};
     for (auto entity : view) {
         if ((int)entity == ignoredEntity)
             continue;
-        auto &sphere = view.get(entity);
+        auto &sphere{view.get(entity)};
         if (collisionSystem->RayToSphere(ray, sphere, intersectionPoint)) {
             if (intersectionPoint < closestTarget) {
                 closestTarget = intersectionPoint;
@@ -83,9 +83,9 @@ vec3 Raycast::getPointOnRay(const Ray &ray, float distance) {
     return ray.origin + (ray.direction * distance);
 }
 Ray Raycast::getRayFromMouse(const QPoint &mousePos, const QRect &rect) {
-    vec3 mousePoint(mousePos.x(), mousePos.y(), 0.0f);
-    vec3 direction = mCurrentController->getCamera().calculateMouseRay(mousePoint, rect.height(), rect.width());
-    vec3 origin = mCurrentController->cameraPosition();
+    vec3 mousePoint{static_cast<GLfloat>(mousePos.x()), static_cast<GLfloat>(mousePos.y()), 0.0f};
+    vec3 direction{mCurrentController->getCamera().calculateMouseRay(mousePoint, rect.height(), rect.width())};
+    vec3 origin{mCurrentController->cameraPosition()};
 
     return Ray{origin, direction};
 }

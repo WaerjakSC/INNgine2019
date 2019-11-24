@@ -107,7 +107,6 @@ HEADERS += \
     Resources/scene.h \
     Resources/resourcemanager.h \
     Resources/texture.h \
-    Resources/triangle.h \
 #
     Libs/tiny_obj_loader.h \
     Libs/stb_image.h \
@@ -164,7 +163,6 @@ SOURCES += main.cpp \
 #
     Resources/resourcemanager.cpp \
     Resources/texture.cpp \
-    Resources/triangle.cpp \
     Resources/scene.cpp \
 #
     Libs/wavfilehandler.cpp \

@@ -3,9 +3,7 @@
 #include "registry.h"
 #include "resourcemanager.h"
 
-SoundSystem::SoundSystem() : reg(Registry::instance()),
-                             mDevice(NULL),
-                             mContext(NULL) {
+SoundSystem::SoundSystem() : reg{Registry::instance()} {
 }
 
 bool SoundSystem::createContext() {
@@ -26,9 +24,9 @@ bool SoundSystem::createContext() {
     return true;
 }
 void SoundSystem::cleanUp() {
-    auto view = reg->view<Sound>();
+    auto view{reg->view<Sound>()};
     for (auto entity : view) {
-        Sound &sound = view.get(entity);
+        Sound &sound{view.get(entity)};
         stop(sound);
         alGetError();
         alSourcei(sound.mSource, AL_BUFFER, 0);
@@ -40,14 +38,14 @@ void SoundSystem::cleanUp() {
     }
     mContext = alcGetCurrentContext();
     mDevice = alcGetContextsDevice(mContext);
-    alcMakeContextCurrent(NULL);
+    alcMakeContextCurrent(nullptr);
     alcDestroyContext(mContext);
     alcCloseDevice(mDevice);
 }
 void SoundSystem::init() {
-    auto view = reg->view<Sound, Transform>();
+    auto view{reg->view<Sound, Transform>()};
     for (auto entity : view) {
-        auto [trans, sound] = view.get<Transform, Sound>(entity);
+        auto [trans, sound]{view.get<Transform, Sound>(entity)};
         ALfloat temp[3] = {trans.position.x, trans.position.y, trans.position.z};
         alSourcefv(sound.mSource, AL_POSITION, temp);
         ALfloat temp2[3] = {sound.mVelocity.x, sound.mVelocity.y, sound.mVelocity.z};
@@ -68,9 +66,9 @@ void SoundSystem::init() {
 void SoundSystem::update(DeltaTime dt) {
     Q_UNUSED(dt);
     updateListener();
-    auto view = reg->view<Transform, Sound>();
+    auto view{reg->view<Transform, Sound>()};
     for (auto entity : view) {
-        auto [transform, sound] = view.get<Transform, Sound>(entity);
+        auto [transform, sound]{view.get<Transform, Sound>(entity)};
         if (sound.mOutDated) {
             if (sound.mPlaying) {
                 play(sound);
@@ -94,48 +92,48 @@ void SoundSystem::stop(Sound &sound) {
     alSourceStop(sound.mSource);
 }
 void SoundSystem::playAll() {
-    auto view = reg->view<Sound>();
+    auto view{reg->view<Sound>()};
     for (auto entity : view) {
         play(entity);
     }
 }
 void SoundSystem::pauseAll() {
-    auto view = reg->view<Sound>();
+    auto view{reg->view<Sound>()};
     for (auto entity : view) {
         pause(entity);
     }
 }
 void SoundSystem::stopAll() {
-    auto view = reg->view<Sound>();
+    auto view{reg->view<Sound>()};
     for (auto entity : view) {
         stop(entity);
     }
 }
 void SoundSystem::play(GLuint eID) {
-    Sound &sound = reg->get<Sound>(eID);
+    Sound &sound{reg->get<Sound>(eID)};
     sound.mPlaying = true;
     sound.mPaused = false;
     sound.mOutDated = true;
 }
 void SoundSystem::pause(GLuint eID) {
-    Sound &sound = reg->get<Sound>(eID);
+    Sound &sound{reg->get<Sound>(eID)};
     sound.mPlaying = false;
     sound.mPaused = true;
     sound.mOutDated = true;
 }
 void SoundSystem::stop(GLuint eID) {
-    Sound &sound = reg->get<Sound>(eID);
+    Sound &sound{reg->get<Sound>(eID)};
     sound.mPlaying = false;
     sound.mPaused = false;
     sound.mOutDated = true;
 }
 void SoundSystem::setPosition(GLuint eID, vec3 newPos) {
-    Sound &sound = reg->get<Sound>(eID);
+    Sound &sound{reg->get<Sound>(eID)};
     ALfloat temp[3] = {newPos.x, newPos.y, newPos.z};
     alSourcefv(sound.mSource, AL_POSITION, temp);
 }
 void SoundSystem::setVelocity(GLuint eID, vec3 newVel) {
-    Sound &sound = reg->get<Sound>(eID);
+    Sound &sound{reg->get<Sound>(eID)};
     sound.mVelocity = newVel;
     ALfloat temp[3] = {newVel.x, newVel.y, newVel.z};
     alSourcefv(sound.mSource, AL_VELOCITY, temp);
@@ -144,20 +142,20 @@ void SoundSystem::updateListener() {
     ALfloat posVec[3];
     ALfloat velVec[3];
     ALfloat headVec[6];
-    ResourceManager *factory = ResourceManager::instance();
-    vec3 pos = factory->getCurrentCameraController()->cameraPosition();
+    ResourceManager *factory{ResourceManager::instance()};
+    vec3 pos{factory->getCurrentCameraController()->cameraPosition()};
     posVec[0] = pos.x;
     posVec[1] = pos.y;
     posVec[2] = pos.z;
-    vec3 vel = vec3(1);
+    vec3 vel{1}; // I guess this sets velocity to a constant 1 so we don't have to worry about it
     velVec[0] = vel.x;
     velVec[1] = vel.y;
     velVec[2] = vel.z;
-    vec3 dir = factory->getCurrentCameraController()->forward();
+    vec3 dir{factory->getCurrentCameraController()->forward()};
     headVec[0] = dir.x;
     headVec[1] = dir.y;
     headVec[2] = dir.z;
-    vec3 up = factory->getCurrentCameraController()->up();
+    vec3 up{factory->getCurrentCameraController()->up()};
     headVec[3] = up.x;
     headVec[4] = up.y;
     headVec[5] = up.z;
@@ -166,7 +164,7 @@ void SoundSystem::updateListener() {
     alListenerfv(AL_ORIENTATION, headVec);
 }
 bool SoundSystem::checkError(std::string name) {
-    QString qname = QString::fromStdString(name);
+    QString qname{QString::fromStdString(name)};
     switch (alGetError()) {
     case AL_NO_ERROR:
         break;

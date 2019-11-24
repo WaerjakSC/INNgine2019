@@ -3,7 +3,7 @@
 #include "registry.h"
 
 LightSystem::LightSystem(Ref<PhongShader> shader)
-    : registry(Registry::instance()), mPhong(shader) {
+    : registry{Registry::instance()}, mPhong{shader} {
 }
 void LightSystem::update(DeltaTime dt) {
     Q_UNUSED(dt);

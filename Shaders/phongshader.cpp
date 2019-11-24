@@ -7,7 +7,7 @@
 #include "registry.h"
 
 PhongShader::PhongShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
-    : Shader(camController, "PhongShader", geometryPath) {
+    : Shader{camController, "PhongShader", geometryPath} {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
@@ -29,9 +29,9 @@ PhongShader::~PhongShader() {
 }
 void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
     Shader::transmitUniformData(modelMatrix);
-    auto view = Registry::instance()->view<Transform, Light>();
+    auto view{Registry::instance()->view<Transform, Light>()};
     if (view.contains(mLightID)) {
-        auto [lightTrans, light] = view.get<Transform, Light>(mLightID);
+        auto [lightTrans, light]{view.get<Transform, Light>(mLightID)};
 
         glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
         glUniform3f(mAmbientColorUniform, light.mAmbientColor.x, light.mAmbientColor.y, light.mAmbientColor.z);

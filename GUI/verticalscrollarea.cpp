@@ -1,6 +1,6 @@
 #include "verticalscrollarea.h"
 
-VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea(parent) {
+VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea{parent} {
     setWidgetResizable(true);
     contentWidget = new QWidget(this);
     setWidget(contentWidget);

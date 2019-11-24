@@ -48,33 +48,33 @@ vec3 Camera::position() const {
 }
 
 vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width) {
-    vec3 rayNDC = getNormalizedDeviceCoords(viewportPoint, height, width);
+    vec3 rayNDC{getNormalizedDeviceCoords(viewportPoint, height, width)};
 
-    vec4 rayClip = vec4(rayNDC.x, rayNDC.y, -1.0, 1.0);
+    vec4 rayClip{rayNDC.x, rayNDC.y, -1.0, 1.0};
 
-    gsl::Matrix4x4 projMatrix = mProjectionMatrix;
+    gsl::Matrix4x4 projMatrix{mProjectionMatrix};
     projMatrix.inverse();
 
-    vec4 rayEye = projMatrix * rayClip; // Invert the perspective matrix to get to view/eye space (camera)
-    rayEye = vec4(rayEye.x, rayEye.y, -1.0, 0.0);
+    vec4 rayEye{projMatrix * rayClip}; // Invert the perspective matrix to get to view/eye space (camera)
+    rayEye = vec4{rayEye.x, rayEye.y, -1.0, 0.0};
 
-    gsl::Matrix4x4 viewMatrix = mViewMatrix;
+    gsl::Matrix4x4 viewMatrix{mViewMatrix};
     viewMatrix.inverse();
-    vec3 rayWorld = (viewMatrix * rayEye).getXYZ();
+    vec3 rayWorld{(viewMatrix * rayEye).getXYZ()};
     rayWorld.normalize();
 
     return rayWorld;
 }
 vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width) {
-    float x = (2.0f * mouse.x) / width - 1.0f;
-    float y = 1.0f - (2.0f * mouse.y) / height;
-    float z = mouse.z;
-    return vec3(x, y, z); // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
+    float x{(2.0f * mouse.x) / width - 1.0f};
+    float y{1.0f - (2.0f * mouse.y) / height};
+    float z{mouse.z};
+    return vec3{x, y, z}; // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
 }
 
 void Camera::makeFrustum() {
     Frustum result;
-    mat4 vp = getViewMatrix() * getProjectionMatrix();
+    mat4 vp{getViewMatrix() * getProjectionMatrix()};
 
     vec3 col1{vp.getFloat(0), vp.getFloat(1), vp.getFloat(2)};
     vec3 col2{vp.getFloat(4), vp.getFloat(5), vp.getFloat(6)};
@@ -95,8 +95,8 @@ void Camera::makeFrustum() {
     result.planeType.near.distance = vp.getFloat(11);
     result.planeType.far.distance = vp.getFloat(15) - vp.getFloat(11);
 
-    for (int i = 0; i < 6; i++) {
-        float mag = 1.0f / result.planes[i].normal.length();
+    for (int i{0}; i < 6; i++) {
+        float mag{1.0f / result.planes[i].normal.length()};
         result.planes[i].normal = result.planes[i].normal * mag;
         result.planes[i].distance *= mag;
     }
@@ -121,17 +121,17 @@ vec3 Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3) {
             p1.normal.y, p2.normal.y, p3.normal.y,
             A.x, A.y, A.z};
 
-    float detD = D.determinant();
+    float detD{D.determinant()};
 
     if (detD == 0) {
-        return vec3();
+        return vec3{};
     }
 
-    float detDx = Dx.determinant();
-    float detDy = Dy.determinant();
-    float detDz = Dz.determinant();
+    float detDx{Dx.determinant()};
+    float detDy{Dy.determinant()};
+    float detDz{Dz.determinant()};
 
-    return vec3(detDx / detD, detDy / detD, detDz / detD);
+    return vec3{detDx / detD, detDy / detD, detDz / detD};
 }
 
 // Calls Intersection function 8 times to find all corners in near & far plane of frustum.
@@ -147,10 +147,10 @@ void Camera::Frustum::GetCorners(const Frustum &f, vec3 *outCorners) {
 }
 
 bool Camera::Frustum::Intersects(const Frustum &f, const Sphere &s) {
-    for (int i = 0; i < 6; i++) {
-        vec3 normal = f.planes[i].normal;
-        float dist = f.planes[i].distance;
-        float side = s.position.dot(s.position, normal) + dist;
+    for (int i{0}; i < 6; i++) {
+        vec3 normal{f.planes[i].normal};
+        float dist{f.planes[i].distance};
+        float side{s.position.dot(s.position, normal) + dist};
         if (side < -s.radius) {
             return false;
         }
@@ -160,9 +160,9 @@ bool Camera::Frustum::Intersects(const Frustum &f, const Sphere &s) {
 
 float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
     // maximum extent in direction of plane normal
-    float r = fabsf(aabb.size.x * plane.normal.x) + fabsf(aabb.size.y * plane.normal.y) + fabsf(aabb.size.z * plane.normal.z);
+    float r{fabsf(aabb.size.x * plane.normal.x) + fabsf(aabb.size.y * plane.normal.y) + fabsf(aabb.size.z * plane.normal.z)};
     // signed distance between box center and plane
-    float d = vec3::dot(plane.normal, aabb.origin) + plane.distance;
+    float d{vec3::dot(plane.normal, aabb.origin) + plane.distance};
     if (fabsf(d) < r) {
         return 0.0f;
     } else if (d < 0.0f) {
@@ -192,7 +192,7 @@ float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
 //}
 
 bool Camera::Frustum::Intersects(const Frustum &f, const AABB &aabb) {
-    for (int i = 0; i < 6; ++i) {
+    for (int i{0}; i < 6; ++i) {
         if (Classify(aabb, f.planes[i]) < 0) {
             return false;
         }

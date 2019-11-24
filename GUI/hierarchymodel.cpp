@@ -7,7 +7,7 @@ HierarchyModel::HierarchyModel() {
 }
 
 bool HierarchyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) {
-    bool success = QStandardItemModel::dropMimeData(data, action, row, column, parent);
+    bool success{QStandardItemModel::dropMimeData(data, action, row, column, parent)};
     emit parentChanged(parent);
     return success;
 }
@@ -18,11 +18,11 @@ bool HierarchyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, 
  */
 void HierarchyModel::removeEntity(GLuint eID) {
     for (int i = 0; i < rowCount(); i++) {
-        QModelIndex idx = this->index(i, 0);
-        QStandardItem *item = itemFromIndex(idx);
+        QModelIndex idx{this->index(i, 0)};
+        QStandardItem *item{itemFromIndex(idx)};
         if (item->hasChildren()) {
             for (int j = 0; j < item->rowCount(); j++) {
-                QStandardItem *child = item->child(j);
+                QStandardItem *child{item->child(j)};
                 if (child->data() == eID) {
                     item->removeRow(j);
                     return;
@@ -38,8 +38,8 @@ void HierarchyModel::removeEntity(GLuint eID) {
 
 QStandardItem *HierarchyModel::itemFromEntityID(GLuint eID) {
     for (int i = 0; i < rowCount(); i++) {
-        QModelIndex idx = this->index(i, 0);
-        QStandardItem *item = itemFromIndex(idx);
+        QModelIndex idx{this->index(i, 0)};
+        QStandardItem *item{itemFromIndex(idx)};
         if (item->data() == eID) {
             return item;
         }

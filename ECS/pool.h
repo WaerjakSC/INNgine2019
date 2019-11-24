@@ -136,7 +136,7 @@ public:
     }
     ~Pool() {}
     virtual IPool *clone() override {
-        return new Pool<Type>(*this);
+        return new Pool<Type>{*this};
     }
 
     /**
@@ -150,7 +150,7 @@ public:
     void add(GLuint entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
         if ((size_t)entityID > mIndex.size()) {
-            for (size_t i = mIndex.size(); i < (size_t)entityID; i++) {
+            for (size_t i{mIndex.size()}; i < (size_t)entityID; i++) {
                 mIndex.push_back(-1);
             }
         }
@@ -159,7 +159,7 @@ public:
         else
             mIndex.push_back(mList.size()); // entity list size is location of new entityID
         mList.push_back(entityID);
-        mComponents.push_back(Type(args...));
+        mComponents.push_back(Type{args...});
     }
     /**
      * @brief cloneComponent creates a new component with the exact same parameters as the old component.
@@ -170,7 +170,7 @@ public:
         assert(!has(cloneTo));
         assert(has(cloneFrom));
         if ((size_t)cloneTo > mIndex.size()) {
-            for (size_t i = mIndex.size(); i < (size_t)cloneTo; i++) {
+            for (size_t i{mIndex.size()}; i < (size_t)cloneTo; i++) {
                 mIndex.push_back(-1);
             }
         }
@@ -178,9 +178,8 @@ public:
             mIndex[cloneTo] = mList.size();
         else
             mIndex.push_back(mList.size()); // entity list size is location of new entityID        mList.push_back(cloneTo);
-        Type component(get(cloneFrom));
         mList.push_back(cloneTo);
-        mComponents.push_back(component);
+        mComponents.push_back(get(cloneFrom));
     }
     /**
      * @brief Removes an entity by swapping the entityID/component with the last element of the dense arrays and popping out the last element.
@@ -190,7 +189,7 @@ public:
      */
     inline void remove(int removedEntityID) {
         if (has(removedEntityID)) {
-            GLuint swappedEntity = mList.back();
+            GLuint swappedEntity{mList.back()};
             copy(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
             mList.pop_back();
             mComponents.pop_back();
@@ -211,7 +210,7 @@ public:
      * @param otherIndex
      */
     inline void sort(std::vector<int> otherIndex) {
-        for (size_t i = 0; i < mList.size(); i++) {
+        for (size_t i{0}; i < mList.size(); i++) {
             if (has(i)) {
                 copy(mList[mIndex[i]], mList[otherIndex[i]]);
 
@@ -259,7 +258,7 @@ public:
         return mComponents.back();
     }
     inline iterator begin() const {
-        const int32_t pos = mList.size();
+        const int32_t pos{mList.size()};
         return iterator{&mList, pos};
     }
     inline iterator end() const {

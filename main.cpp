@@ -8,10 +8,10 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 
     //Makes an Qt application
-    QApplication a(argc, argv);
+    QApplication a{argc, argv};
 
-    QSplashScreen *mSplash = new QSplashScreen;
-    mSplash->setPixmap(QPixmap(":/img/Assets/Icons/gnomedsplash.jpg")); // splash picture
+    QSplashScreen *mSplash{new QSplashScreen};
+    mSplash->setPixmap(QPixmap{":/img/Assets/Icons/gnomedsplash.jpg"}); // splash picture
     mSplash->show();
 
     //Makes the Qt MainWindow and shows it.

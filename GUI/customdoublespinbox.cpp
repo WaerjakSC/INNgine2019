@@ -3,7 +3,7 @@
 #include <QWheelEvent>
 
 CustomDoubleSpinBox::CustomDoubleSpinBox(const std::optional<float> &minRange, const std::optional<float> &maxRange) {
-    QStyle *fusion = QStyleFactory::create("fusion");
+    QStyle *fusion{QStyleFactory::create("fusion")};
     setDecimals(1);
     setRange(minRange.value_or(-5000), maxRange.value_or(5000));
     setMaximumWidth(58);

@@ -6,8 +6,8 @@
 #include "renderwindow.h"
 #include "resourcemanager.h"
 InputSystem::InputSystem(RenderWindow *window)
-    : registry(Registry::instance()), factory(ResourceManager::instance()),
-      mRenderWindow(window) {
+    : registry{Registry::instance()}, factory{ResourceManager::instance()},
+      mRenderWindow{window} {
 }
 
 void InputSystem::update(DeltaTime dt) {
@@ -29,7 +29,7 @@ void InputSystem::update(DeltaTime dt) {
 }
 
 void InputSystem::init(float aspectRatio) {
-    auto view = registry->view<GameCamera>();
+    auto view{registry->view<GameCamera>()};
     for (auto entity : view) {
         mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, entity));
     }
@@ -45,7 +45,7 @@ void InputSystem::reset() {
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity();
-    MovementSystem *moveSystem = registry->system<MovementSystem>().get();
+    MovementSystem *moveSystem{registry->system<MovementSystem>().get()};
     mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
 }
 void InputSystem::handleKeyInput() {
@@ -82,7 +82,7 @@ void InputSystem::spawnTower() {
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
     if (factory->isPlaying()) { // No point going through this if you won't use it anyway
-        gsl::Vector3D desiredVelocity(0);
+        gsl::Vector3D desiredVelocity{0};
         if (mPlayerController.W)
             desiredVelocity.z -= mCameraSpeed;
         if (mPlayerController.S)
@@ -103,8 +103,8 @@ void InputSystem::handlePlayerController(DeltaTime dt) {
 }
 void InputSystem::handleMouseInput() {
     if (editorInput.LMB) {
-        Raycast ray(editorCamController());
-        int entityID = ray.mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry());
+        Raycast ray{editorCamController()};
+        int entityID{ray.mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry())};
         emit rayHitEntity(entityID);
     } else if (editorInput.RMB) {
         if (editorInput.W)
@@ -136,14 +136,14 @@ void InputSystem::handleMouseInput() {
         dragEntity(draggedEntity);
 }
 void InputSystem::confineMouseToScreen(DeltaTime dt) {
-    int width = mRenderWindow->width();
-    int height = mRenderWindow->height();
-    QPoint pos = mRenderWindow->mapFromGlobal(QCursor::pos());
+    int width{mRenderWindow->width()};
+    int height{mRenderWindow->height()};
+    QPoint pos{mRenderWindow->mapFromGlobal(QCursor::pos())};
     if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
         mEnteredWindow = true;
     }
     if (mEnteredWindow) {
-        QPoint newPos = pos;
+        QPoint newPos{pos};
         if (pos.x() >= width) {
             newPos.rx() = width;
             currentGameCameraController()->moveRight(dt);
@@ -164,12 +164,12 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
 }
 void InputSystem::dragEntity(GLuint entity) {
     // make ray
-    Raycast dragRay(currentGameCameraController(), 50.f);
-    vec3 desiredPos;
-    QPoint cursorPos = mRenderWindow->mapFromGlobal(QCursor::pos());
+    Raycast dragRay{currentGameCameraController(), 50.f};
+    QPoint cursorPos{mRenderWindow->mapFromGlobal(QCursor::pos())};
     // Get the intersection point between the ray and the closest entity as a vector3d
-    int entityID = dragRay.mousePick(cursorPos, mRenderWindow->geometry(), desiredPos, entity);
-    Transform &tf = registry->get<Transform>(entity);
+    vec3 desiredPos;
+    int entityID{dragRay.mousePick(cursorPos, mRenderWindow->geometry(), desiredPos, entity)};
+    Transform &tf{registry->get<Transform>(entity)};
     if (entityID != -1) {
         // compensate for size of collider
         // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
@@ -342,7 +342,7 @@ void InputSystem::inputKeyRelease(QKeyEvent *event, Input &input) {
     }
 }
 void InputSystem::wheelEvent(QWheelEvent *event) {
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numDegrees{event->angleDelta() / 8};
 
     //if RMB, change the speed of the camera
     if (!mActiveGameCamera) {
@@ -357,13 +357,13 @@ void InputSystem::wheelEvent(QWheelEvent *event) {
 void InputSystem::mouseMoveEvent(QMouseEvent *event) {
     if (editorInput.RMB) {
         mRenderWindow->setCursor(Qt::BlankCursor);
-        QPoint mid = QPoint(mRenderWindow->width() / 2, mRenderWindow->height() / 2);
-        QPoint glob = mRenderWindow->mapToGlobal(mid);
+        QPoint mid{QPoint(mRenderWindow->width() / 2, mRenderWindow->height() / 2)};
+        QPoint glob{mRenderWindow->mapToGlobal(mid)};
         QCursor::setPos(glob);
         lastPos = mid;
         if (!firstRMB) {
-            GLfloat dx = GLfloat(event->x() - lastPos.x()) / mRenderWindow->width();
-            GLfloat dy = GLfloat(event->y() - lastPos.y()) / mRenderWindow->height();
+            GLfloat dx{GLfloat(event->x() - lastPos.x()) / mRenderWindow->width()};
+            GLfloat dy{GLfloat(event->y() - lastPos.y()) / mRenderWindow->height()};
 
             if (dx != 0)
                 mEditorCamController->yaw(mCameraRotateSpeed * dx);
@@ -425,33 +425,33 @@ void InputSystem::mousePressEvent(QMouseEvent *event) {
         inputMousePress(event, editorInput);
 }
 void InputSystem::setCameraPositionX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &cam = registry->get<GameCamera>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &cam{registry->get<GameCamera>(entityID)};
     cam.mCameraPosition.x = xIn;
     cam.mOutDated = true;
 }
 void InputSystem::setCameraPositionY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &cam = registry->get<GameCamera>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &cam{registry->get<GameCamera>(entityID)};
     cam.mCameraPosition.y = yIn;
     cam.mOutDated = true;
 }
 void InputSystem::setCameraPositionZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &cam = registry->get<GameCamera>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &cam{registry->get<GameCamera>(entityID)};
     cam.mCameraPosition.z = zIn;
     cam.mOutDated = true;
 }
 void InputSystem::setYaw(double yaw) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &cam = registry->get<GameCamera>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &cam{registry->get<GameCamera>(entityID)};
     cam.mYaw = yaw;
     cam.mOutDated = true;
 }
 void InputSystem::setActiveCamera(bool checked) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto view = registry->view<GameCamera>();
-    GameCamera &selectedCam = view.get(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto view{registry->view<GameCamera>()};
+    GameCamera &selectedCam{view.get(entityID)};
     if (checked) {
         selectedCam.mIsActive = true;
         selectedCam.mOutDated = true;
@@ -473,8 +473,8 @@ void InputSystem::setActiveCamera(bool checked) {
     }
 }
 void InputSystem::setPitch(double pitch) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &cam = registry->get<GameCamera>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &cam{registry->get<GameCamera>(entityID)};
     cam.mPitch = pitch;
     cam.mOutDated = true;
 }

@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QDropEvent>
 #include <QMimeData>
-HierarchyView::HierarchyView(QWidget *parent) : QTreeView(parent) {
+HierarchyView::HierarchyView(QWidget *parent) : QTreeView{parent} {
     setContextMenuPolicy(Qt::ActionsContextMenu);
     createContextActions();
     connect(this, &HierarchyView::selectedEntity, Registry::instance(), &Registry::setSelectedEntity);
@@ -15,26 +15,26 @@ HierarchyView::HierarchyView(QWidget *parent) : QTreeView(parent) {
 void HierarchyView::dragEnterEvent(QDragEnterEvent *event) {
     QTreeView::dragEnterEvent(event);
     // Get the item from index (must cast to HierarchyModel or QStandardItemModel to get itemFromIndex function
-    QStandardItem *item = static_cast<HierarchyModel *>(model())->itemFromIndex(QTreeView::currentIndex());
+    QStandardItem *item{static_cast<HierarchyModel *>(model())->itemFromIndex(QTreeView::currentIndex())};
 
     emit selectedEntity(item->data().toInt()); // When you start dragging an item, make sure you save that item in MainWindow's selectedEntity.
 }
 void HierarchyView::createContextActions() {
-    QAction *rename = new QAction(tr("Rename"), this);
+    QAction *rename{new QAction(tr("Rename"), this)};
     connect(rename, &QAction::triggered, this, &HierarchyView::renameEntity);
     addAction(rename);
-    QAction *duplicate = new QAction(tr("Duplicate"), this);
+    QAction *duplicate{new QAction(tr("Duplicate"), this)};
     connect(duplicate, &QAction::triggered, this, &HierarchyView::duplicateEntity);
     addAction(duplicate);
-    QAction *player = new QAction(tr("Make Player Controller"), this);
+    QAction *player{new QAction(tr("Make Player Controller"), this)};
     connect(player, &QAction::triggered, this, &HierarchyView::setController);
     addAction(player);
-    QAction *remove = new QAction(tr("Remove"), this);
+    QAction *remove{new QAction(tr("Remove"), this)};
     connect(remove, &QAction::triggered, this, &HierarchyView::removeEntity);
     addAction(remove);
 }
 void HierarchyView::setController() {
-    auto inputsys = Registry::instance()->system<InputSystem>();
+    auto inputsys{Registry::instance()->system<InputSystem>()};
     inputsys->setPlayer(rightClickEntity);
 }
 void HierarchyView::dropEvent(QDropEvent *event) {
@@ -55,9 +55,9 @@ void HierarchyView::removeEntity() {
     Registry::instance()->removeEntity(rightClickEntity);
 }
 void HierarchyView::duplicateEntity() {
-    GLuint newEntity = Registry::instance()->duplicateEntity(rightClickEntity);
-    HierarchyModel *hModel = static_cast<HierarchyModel *>(model());
-    QModelIndex index = hModel->itemFromEntityID(newEntity)->index();
+    GLuint newEntity{Registry::instance()->duplicateEntity(rightClickEntity)};
+    HierarchyModel *hModel{static_cast<HierarchyModel *>(model())};
+    QModelIndex index{hModel->itemFromEntityID(newEntity)->index()};
     setCurrentIndex(index);
 }
 void HierarchyView::keyReleaseEvent(QKeyEvent *event) {
@@ -67,7 +67,7 @@ void HierarchyView::keyReleaseEvent(QKeyEvent *event) {
 void HierarchyView::mousePressEvent(QMouseEvent *event) {
     QTreeView::mousePressEvent(event);
     if (event->button() == Qt::RightButton) {
-        QStandardItem *item = static_cast<HierarchyModel *>(model())->itemFromIndex(QTreeView::currentIndex());
+        QStandardItem *item{static_cast<HierarchyModel *>(model())->itemFromIndex(QTreeView::currentIndex())};
         rightClickEntity = item->data(257).toUInt();
     }
 }

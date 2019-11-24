@@ -19,19 +19,16 @@
 #include <rendersystem.h>
 #include <sstream>
 
-Scene::Scene() {
-}
-
 void Scene::saveScene(const QString &fileName) {
     if (fileName.isEmpty())
         return;
 
     Registry *registry = Registry::instance();
-    const std::vector<GLuint> &entities = registry->getEntities();
-    auto inputSys = registry->system<InputSystem>();
+    const std::vector<GLuint> &entities{registry->getEntities()};
+    auto inputSys{registry->system<InputSystem>()};
 
     StringBuffer buf;
-    PrettyWriter<StringBuffer> writer(buf);
+    PrettyWriter<StringBuffer> writer{buf};
 
     mName = fileName;
     writer.StartObject();
@@ -43,7 +40,7 @@ void Scene::saveScene(const QString &fileName) {
     writer.EndObject();
 
     for (auto &entity : entities) {
-        const EInfo info = registry->get<EInfo>(entity);
+        const EInfo info{registry->get<EInfo>(entity)};
 
         if (entity != 0 && !info.mName.isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("Entity");
@@ -55,7 +52,7 @@ void Scene::saveScene(const QString &fileName) {
             writer.Key("components");
             writer.StartObject();
             if (registry->contains<Transform>(entity)) {
-                const Transform trans = registry->get<Transform>(entity);
+                const Transform trans{registry->get<Transform>(entity)};
                 writer.Key("transform");
                 writer.StartObject();
 
@@ -96,7 +93,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Material>(entity)) {
                 writer.Key("material");
                 writer.StartObject();
-                const Material &mat = registry->get<Material>(entity);
+                const Material &mat{registry->get<Material>(entity)};
 
                 writer.Key("color");
                 writer.StartArray();
@@ -121,7 +118,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Mesh>(entity)) {
                 writer.Key("mesh");
                 writer.StartObject();
-                const Mesh &mesh = registry->get<Mesh>(entity);
+                const Mesh &mesh{registry->get<Mesh>(entity)};
                 //                if (mesh.mName == "")
                 //                    qDebug() << "No mesh name!";
                 writer.Key("name");
@@ -131,7 +128,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Light>(entity)) {
                 writer.Key("light");
                 writer.StartObject();
-                const Light &light = registry->get<Light>(entity);
+                const Light &light{registry->get<Light>(entity)};
 
                 writer.Key("ambstr");
                 writer.Double(light.mAmbientStrength);
@@ -163,7 +160,7 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndObject();
             }
             if (registry->contains<BillBoard>(entity)) {
-                const BillBoard &board = registry->get<BillBoard>(entity);
+                const BillBoard &board{registry->get<BillBoard>(entity)};
                 writer.Key("billboard");
                 writer.StartObject();
                 writer.Key("y-up");
@@ -173,7 +170,7 @@ void Scene::saveScene(const QString &fileName) {
                 writer.EndObject();
             }
             if (registry->contains<Sound>(entity)) {
-                const Sound &sound = registry->get<Sound>(entity);
+                const Sound &sound{registry->get<Sound>(entity)};
                 writer.Key("sound");
                 writer.StartObject();
                 writer.Key("filename");
@@ -187,7 +184,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<AABB>(entity)) {
                 writer.Key("AABB");
                 writer.StartObject();
-                const AABB &aabb = registry->get<AABB>(entity);
+                const AABB &aabb{registry->get<AABB>(entity)};
 
                 writer.Key("origin");
                 writer.StartArray();
@@ -208,7 +205,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<OBB>(entity)) {
                 writer.Key("OBB");
                 writer.StartObject();
-                const OBB &obb = registry->get<OBB>(entity);
+                const OBB &obb{registry->get<OBB>(entity)};
 
                 writer.Key("position");
                 writer.StartArray();
@@ -230,7 +227,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Plane>(entity)) {
                 writer.Key("Plane");
                 writer.StartObject();
-                const Plane &plane = registry->get<Plane>(entity);
+                const Plane &plane{registry->get<Plane>(entity)};
 
                 writer.Key("normal");
                 writer.StartArray();
@@ -247,7 +244,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Sphere>(entity)) {
                 writer.Key("Sphere");
                 writer.StartObject();
-                const Sphere &sphere = registry->get<Sphere>(entity);
+                const Sphere &sphere{registry->get<Sphere>(entity)};
 
                 writer.Key("position");
                 writer.StartArray();
@@ -264,7 +261,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<Cylinder>(entity)) {
                 writer.Key("Cylinder");
                 writer.StartObject();
-                const Cylinder &cylinder = registry->get<Cylinder>(entity);
+                const Cylinder &cylinder{registry->get<Cylinder>(entity)};
 
                 writer.Key("position");
                 writer.StartArray();
@@ -283,7 +280,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<AIComponent>(entity)) {
                 writer.Key("AI");
                 writer.StartObject();
-                const AIComponent &ai = registry->get<AIComponent>(entity);
+                const AIComponent &ai{registry->get<AIComponent>(entity)};
 
                 writer.Key("health");
                 writer.Int(ai.hp);
@@ -294,7 +291,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<BSplinePoint>(entity)) {
                 writer.Key("BSplinePoint");
                 writer.StartObject();
-                const BSplinePoint &cp = registry->get<BSplinePoint>(entity);
+                const BSplinePoint &cp{registry->get<BSplinePoint>(entity)};
                 writer.Key("location");
                 writer.StartArray();
                 writer.Double(cp.location.x);
@@ -306,7 +303,7 @@ void Scene::saveScene(const QString &fileName) {
             if (registry->contains<GameCamera>(entity)) {
                 writer.Key("GameCamera");
                 writer.StartObject();
-                const GameCamera &cam = registry->get<GameCamera>(entity);
+                const GameCamera &cam{registry->get<GameCamera>(entity)};
                 writer.Key("position");
                 writer.StartArray();
                 writer.Double(cam.mCameraPosition.x);
@@ -328,7 +325,7 @@ void Scene::saveScene(const QString &fileName) {
     }
 
     writer.EndObject();
-    std::ofstream of(gsl::sceneFilePath + fileName.toStdString() + ".json");
+    std::ofstream of{gsl::sceneFilePath + fileName.toStdString() + ".json"};
     of << buf.GetString();
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
@@ -337,8 +334,8 @@ void Scene::loadScene(const QString &fileName) {
     if (fileName.isEmpty()) {
         return;
     }
-    Registry *registry = Registry::instance();
-    ResourceManager *factory = ResourceManager::instance();
+    Registry *registry{Registry::instance()};
+    ResourceManager *factory{ResourceManager::instance()};
     factory->setLoading(true);
     registry->clearScene();
     auto search = mScenes.find(fileName);
@@ -356,13 +353,13 @@ void Scene::loadScene(const QString &fileName) {
 void Scene::populateScene(const Document &scene) {
     std::map<int, int> parentID;
     std::map<int, int> idPairs;
-    Registry *registry = Registry::instance();
-    ResourceManager *factory = ResourceManager::instance();
+    Registry *registry{Registry::instance()};
+    ResourceManager *factory{ResourceManager::instance()};
     //        Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
     //        registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
 
     if (scene.HasMember("controller")) {
-        GLuint controllerID = scene["controller"]["id"].GetUint();
+        GLuint controllerID{scene["controller"]["id"].GetUint()};
         registry->system<InputSystem>()->setPlayer(controllerID);
     } else
         registry->system<InputSystem>()->setPlayer(0);
@@ -373,13 +370,13 @@ void Scene::populateScene(const Document &scene) {
         // Iterate through each of the members in the entity (name, id, components)
         if (itr->name == "controller") // Note: Naming an entity "controller" probably fucks with this
             continue;
-        GLuint id = registry->makeEntity(itr->value["name"].GetString());
+        GLuint id{registry->makeEntity(itr->value["name"].GetString())};
         idPairs[itr->value["id"].GetInt()] = id;
-        for (Value::ConstMemberIterator comp = itr->value["components"].MemberBegin(); comp != itr->value["components"].MemberEnd(); ++comp) {
+        for (Value::ConstMemberIterator comp{itr->value["components"].MemberBegin()}; comp != itr->value["components"].MemberEnd(); ++comp) {
             if (comp->name == "transform") {
-                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
-                vec3 rotation(comp->value["rotation"][0].GetDouble(), comp->value["rotation"][1].GetDouble(), comp->value["rotation"][2].GetDouble());
-                vec3 scale(comp->value["scale"][0].GetDouble(), comp->value["scale"][1].GetDouble(), comp->value["scale"][2].GetDouble());
+                vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
+                vec3 rotation{comp->value["rotation"][0].GetFloat(), comp->value["rotation"][1].GetFloat(), comp->value["rotation"][2].GetFloat()};
+                vec3 scale{comp->value["scale"][0].GetFloat(), comp->value["scale"][1].GetFloat(), comp->value["scale"][2].GetFloat()};
                 registry->add<Transform>(id, position, rotation, scale);
                 if (comp->value["parent"].GetInt() != -1) {
                     if (idPairs.find(comp->value["parent"].GetInt()) != idPairs.end())                   // if the parent has been parsed already
@@ -389,12 +386,12 @@ void Scene::populateScene(const Document &scene) {
                 }
                 registry->system<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
             } else if (comp->name == "material") {
-                vec3 color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
-                GLfloat specStr = comp->value["specstr"].GetFloat();
-                GLint specExp = comp->value["specexp"].GetInt();
-                QString shaderName = comp->value["shader"].GetString();
+                vec3 color{comp->value["color"][0].GetFloat(), comp->value["color"][1].GetFloat(), comp->value["color"][2].GetFloat()};
+                GLfloat specStr{comp->value["specstr"].GetFloat()};
+                GLint specExp{comp->value["specexp"].GetInt()};
+                QString shaderName{comp->value["shader"].GetString()};
                 cjk::Ref<Shader> shader{nullptr};
-                ResourceManager *factory = ResourceManager::instance();
+                ResourceManager *factory{ResourceManager::instance()};
                 if (shaderName == "PlainShader")
                     shader = factory->getShader<ColorShader>();
                 else if (shaderName == "TextureShader")
@@ -405,69 +402,69 @@ void Scene::populateScene(const Document &scene) {
                     shader = factory->getShader<SkyboxShader>();
                 registry->add<Material>(id, shader, comp->value["textureunit"].GetInt(), color, specStr, specExp);
             } else if (comp->name == "mesh") {
-                std::string meshName = comp->value["name"].GetString();
+                std::string meshName{comp->value["name"].GetString()};
                 factory->addMeshComponent(meshName, id);
                 if (meshName == "Skybox")
                     registry->system<RenderSystem>()->setSkyBoxID(id);
             } else if (comp->name == "light") { // Again, temporary, very static functionality atm
-                GLfloat ambStr = comp->value["ambstr"].GetFloat();
-                vec3 ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());
-                GLfloat lightStr = comp->value["lightstr"].GetFloat();
-                vec3 lightColor(comp->value["lightcolor"][0].GetDouble(), comp->value["lightcolor"][1].GetDouble(), comp->value["lightcolor"][2].GetDouble());
-                vec3 color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
+                GLfloat ambStr{comp->value["ambstr"].GetFloat()};
+                vec3 ambColor{comp->value["ambcolor"][0].GetFloat(), comp->value["ambcolor"][1].GetFloat(), comp->value["ambcolor"][2].GetFloat()};
+                GLfloat lightStr{comp->value["lightstr"].GetFloat()};
+                vec3 lightColor{comp->value["lightcolor"][0].GetFloat(), comp->value["lightcolor"][1].GetFloat(), comp->value["lightcolor"][2].GetFloat()};
+                vec3 color{comp->value["color"][0].GetFloat(), comp->value["color"][1].GetFloat(), comp->value["color"][2].GetFloat()};
                 registry->add<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
                 factory->getShader<PhongShader>()->setLight(id);
             } else if (comp->name == "sound") {
-                std::string filename = comp->value["filename"].GetString();
-                bool looping = comp->value["loop"].GetBool();
-                float gain = comp->value["gain"].GetDouble();
+                std::string filename{comp->value["filename"].GetString()};
+                bool looping{comp->value["loop"].GetBool()};
+                float gain{comp->value["gain"].GetFloat()};
                 registry->add<Sound>(id, filename, looping, gain);
             } else if (comp->name == "billboard") {
-                bool constantYUp = comp->value["y-up"].GetBool();
-                bool normalVersion = comp->value["normalversion"].GetBool();
+                bool constantYUp{comp->value["y-up"].GetBool()};
+                bool normalVersion{comp->value["normalversion"].GetBool()};
                 registry->add<BillBoard>(id, constantYUp, normalVersion);
             } else if (comp->name == "AABB") {
-                vec3 origin(comp->value["origin"][0].GetDouble(), comp->value["origin"][1].GetDouble(), comp->value["origin"][2].GetDouble());
-                vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
-                bool isStatic = comp->value["static"].GetBool();
+                vec3 origin{comp->value["origin"][0].GetFloat(), comp->value["origin"][1].GetFloat(), comp->value["origin"][2].GetFloat()};
+                vec3 size{comp->value["size"][0].GetFloat(), comp->value["size"][1].GetFloat(), comp->value["size"][2].GetFloat()};
+                bool isStatic{comp->value["static"].GetBool()};
                 registry->add<AABB>(id, origin, size, isStatic);
             } else if (comp->name == "OBB") {
-                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
-                vec3 size(comp->value["size"][0].GetDouble(), comp->value["size"][1].GetDouble(), comp->value["size"][2].GetDouble());
+                vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
+                vec3 size{comp->value["size"][0].GetFloat(), comp->value["size"][1].GetFloat(), comp->value["size"][2].GetFloat()};
                 // Need rotation matrix here
-                bool isStatic = comp->value["static"].GetBool();
+                bool isStatic{comp->value["static"].GetBool()};
                 registry->add<OBB>(id, position, size, isStatic);
             } else if (comp->name == "Plane") {
-                vec3 normal(comp->value["normal"][0].GetDouble(), comp->value["normal"][1].GetDouble(), comp->value["origin"][2].GetDouble());
-                float size = comp->value["distance"].GetDouble();
+                vec3 normal{comp->value["normal"][0].GetFloat(), comp->value["normal"][1].GetFloat(), comp->value["origin"][2].GetFloat()};
+                float size{comp->value["distance"].GetFloat()};
                 // Need rotation matrix here
-                bool isStatic = comp->value["static"].GetBool();
+                bool isStatic{comp->value["static"].GetBool()};
                 registry->add<Plane>(id, normal, size, isStatic);
             } else if (comp->name == "Sphere") {
-                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
-                float radius = comp->value["radius"].GetDouble();
+                vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
+                float radius{comp->value["radius"].GetFloat()};
                 // Need rotation matrix here
-                bool isStatic = comp->value["static"].GetBool();
+                bool isStatic{comp->value["static"].GetBool()};
                 registry->add<Sphere>(id, position, radius, isStatic);
             } else if (comp->name == "Cylinder") {
-                vec3 position(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
-                float radius = comp->value["radius"].GetDouble();
-                float height = comp->value["height"].GetDouble();
+                vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
+                float radius{comp->value["radius"].GetFloat()};
+                float height{comp->value["height"].GetFloat()};
                 // Need rotation matrix here
-                bool isStatic = comp->value["static"].GetBool();
+                bool isStatic{comp->value["static"].GetBool()};
                 registry->add<Cylinder>(id, position, radius, height, isStatic);
             } else if (comp->name == "AI") {
-                int hp = comp->value["health"].GetInt();
-                int damage = comp->value["damage"].GetInt();
+                int hp{comp->value["health"].GetInt()};
+                int damage{comp->value["damage"].GetInt()};
                 registry->add<AIComponent>(id, hp, damage);
             } else if (comp->name == "BSplinePoint") {
-                vec3 location(comp->value["location"][0].GetDouble(), comp->value["location"][1].GetDouble(), comp->value["location"][2].GetDouble());
+                vec3 location{comp->value["location"][0].GetFloat(), comp->value["location"][1].GetFloat(), comp->value["location"][2].GetFloat()};
                 registry->add<BSplinePoint>(id, location);
             } else if (comp->name == "GameCamera") {
-                vec3 camPos(comp->value["position"][0].GetDouble(), comp->value["position"][1].GetDouble(), comp->value["position"][2].GetDouble());
-                float pitch = comp->value["pitch"].GetDouble();
-                float yaw = comp->value["yaw"].GetDouble();
-                bool active = comp->value["active"].GetBool();
+                vec3 camPos{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
+                float pitch{comp->value["pitch"].GetFloat()};
+                float yaw{comp->value["yaw"].GetFloat()};
+                bool active{comp->value["active"].GetBool()};
                 registry->add<GameCamera>(id, camPos, pitch, yaw, active);
             }
         }
@@ -479,15 +476,15 @@ void Scene::populateScene(const Document &scene) {
     }
 }
 void Scene::loadSceneFromFile(const QString &fileName) {
-    std::ifstream file(gsl::sceneFilePath + fileName.toStdString());
+    std::ifstream file{gsl::sceneFilePath + fileName.toStdString()};
     if (!file.good()) {
         qDebug() << "Can't read the JSON scene file!";
         return;
     }
     std::stringstream stream;
     stream << file.rdbuf();
-    const std::string fileCopy = stream.str();
-    const char *scene = fileCopy.c_str();
+    const std::string fileCopy{stream.str()};
+    const char *scene{fileCopy.c_str()};
     Document sceneDoc;
     sceneDoc.Parse(scene);
     populateScene(sceneDoc);

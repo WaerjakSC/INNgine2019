@@ -5,7 +5,7 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QStyleFactory>
-ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox(parent) {
+ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox{parent} {
     setTitle(name);
     QStyle *fusion = QStyleFactory::create("fusion");
     setAlignment(Qt::AlignCenter);
@@ -15,8 +15,8 @@ ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGr
 }
 
 void ComponentGroupBox::removeComponent() {
-    Registry *registry = Registry::instance();
-    GLuint entityID = registry->getSelectedEntity();
+    Registry *registry{Registry::instance()};
+    GLuint entityID{registry->getSelectedEntity()};
     if (title() == "Transform")
         registry->remove<Transform>(entityID);
     if (title() == "Material")
@@ -48,7 +48,7 @@ void ComponentGroupBox::removeComponent() {
 
 void ComponentGroupBox::createActions() {
     QString removeString = "Remove " + title() + " Component";
-    QAction *remove = new QAction(tr(removeString.toStdString().c_str()));
+    QAction *remove{new QAction(tr(removeString.toStdString().c_str()))};
     connect(remove, &QAction::triggered, this, &ComponentGroupBox::removeComponent);
     addAction(remove);
 }

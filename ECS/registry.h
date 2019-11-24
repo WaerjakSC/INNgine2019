@@ -31,7 +31,7 @@ public:
      */
     template <typename Type>
     inline void registerComponent() {
-        std::string typeName = typeid(Type).name();
+        std::string typeName{typeid(Type).name()};
 
         if (mPools.find(typeName) != mPools.end()) {
             return;
@@ -45,17 +45,16 @@ public:
      */
     template <typename Type, class... Args>
     inline Ref<Type> registerSystem(Args... args) {
-        std::string typeName = typeid(Type).name();
-        Ref<Type> newSystem;
+        std::string typeName{typeid(Type).name()};
 
         if (mSystems.find(typeName) != mSystems.end() && mSystems[typeName]) {
-            newSystem = system<Type>();
+            return system<Type>();
         } else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            newSystem = std::make_shared<Type>(args...);
+            Ref<Type> newSystem = std::make_shared<Type>(args...);
             mSystems.insert({typeName, newSystem});
+            return newSystem;
         }
-        return newSystem;
     }
     /**
      * @brief Adds an entity and its new component to a pool of that type.
@@ -119,7 +118,7 @@ public:
      */
     template <typename... Type>
     inline bool contains(GLuint eID) {
-        [[maybe_unused]] const auto cpools = std::make_tuple(getPool<Type>()...);
+        [[maybe_unused]] const auto cpools{std::make_tuple(getPool<Type>()...)};
         return ((std::get<Pool<Type> *>(cpools) ? std::get<Pool<Type> *>(cpools)->has(eID) : false) && ...);
     }
     /**
@@ -158,7 +157,7 @@ public:
      * @return
      */
     inline GLuint numEntities() {
-        std::vector<GLuint> entities = getPool<EInfo>()->entities();
+        std::vector<GLuint> entities{getPool<EInfo>()->entities()};
         return entities.size();
     }
     /**
@@ -245,13 +244,13 @@ private:
 
     template <typename Type>
     inline Ref<Type> getSystem() {
-        std::string typeName = type<Type>();
+        std::string typeName{type<Type>()};
         return std::static_pointer_cast<Type>(mSystems[typeName]);
     }
     // Convenience function to get the statically casted pointer to the Pool of type Type.
     template <typename Type>
     inline Pool<Type> *getPool() {
-        std::string typeName = type<Type>();
+        std::string typeName{type<Type>()};
         return static_cast<Pool<Type> *>(mPools[typeName].get());
     }
 };

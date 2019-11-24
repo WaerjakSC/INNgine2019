@@ -60,26 +60,26 @@ void AISystem::masterOfCurves() {
     mCurve.updatePath();
 }
 void AISystem::setHealth(int health) {
-    auto ai = registry->get<AIComponent>(registry->getSelectedEntity());
+    auto ai{registry->get<AIComponent>(registry->getSelectedEntity())};
     ai.hp = health;
 }
 void AISystem::setBSPlinePointX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &bspline = registry->get<BSplinePoint>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &bspline{registry->get<BSplinePoint>(entityID)};
     bspline.location.x = xIn;
     masterOfCurves();
 }
 
 void AISystem::setBSPlinePointY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &bspline = registry->get<BSplinePoint>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &bspline{registry->get<BSplinePoint>(entityID)};
     bspline.location.y = yIn;
     masterOfCurves();
 }
 
 void AISystem::setBSPlinePointZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &bspline = registry->get<BSplinePoint>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &bspline{registry->get<BSplinePoint>(entityID)};
     bspline.location.z = zIn;
     masterOfCurves();
 }
@@ -95,9 +95,9 @@ void AISystem::setControlPoints(std::vector<vec3> cps) {
  * @brief AIsystem::eventHandler, event handling
  */
 void AISystem::eventHandler() {
-    auto reg = Registry::instance();
-    auto view = reg->view<Transform, AIComponent>();
-    auto &ai = view.get<AIComponent>(NPC);
+    auto reg{Registry::instance()};
+    auto view{reg->view<Transform, AIComponent>()};
+    auto &ai{view.get<AIComponent>(NPC)};
 
     while (!notification_queue.empty()) {
         auto event = notification_queue.front();
@@ -148,16 +148,16 @@ void AISystem::draw() {
  * @return
  */
 std::optional<NPCevents> AISystem::move(float deltaT) {
-    auto reg = Registry::instance();
-    auto view = reg->view<Transform, AIComponent>();
-    auto &transform = view.get<Transform>(NPC);
+    auto reg{Registry::instance()};
+    auto view{reg->view<Transform, AIComponent>()};
+    auto &transform{view.get<Transform>(NPC)};
     t += deltaT * dir;
-    bool endPoint = 0.98f <= t || t < 0.f;
+    bool endPoint{0.98f <= t || t < 0.f};
 
     if (endPoint)
         t = gsl::clamp(t, 0.f, 1.f);
 
-    auto p = mCurve.eval(t);
+    auto p{mCurve.eval(t)};
     transform.localPosition = p;
     transform.matrixOutdated = true;
 

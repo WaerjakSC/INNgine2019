@@ -8,7 +8,7 @@ class ResourceManager;
 class Registry;
 class Scene {
 public:
-    Scene();
+    Scene() = default;
 
     void saveScene(const QString &fileName);
 

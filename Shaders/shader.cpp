@@ -9,11 +9,11 @@
 #include "matrix4x4.h"
 
 Shader::Shader(cjk::Ref<CameraController> camController, const std::string shaderName, const GLchar *geometryPath)
-    : mName(shaderName), mCameraController(camController) {
+    : mName{shaderName}, mCameraController{camController} {
     initializeOpenGLFunctions(); //must do this to get access to OpenGL functions in QOpenGLFunctions
 
-    std::string vertexName = shaderName + ".vert";
-    std::string fragmentName = shaderName + ".frag";
+    std::string vertexName{shaderName + ".vert"};
+    std::string fragmentName{shaderName + ".frag"};
 
     // 1. Retrieve the vertex/fragment source code from filePath
     std::string vertexCode;
@@ -21,8 +21,8 @@ Shader::Shader(cjk::Ref<CameraController> camController, const std::string shade
     std::ifstream vShaderFile;
     std::ifstream fShaderFile;
 
-    std::string vertexWithPath = gsl::shaderFilePath + vertexName;
-    std::string fragmentWithPath = gsl::shaderFilePath + fragmentName;
+    std::string vertexWithPath{gsl::shaderFilePath + vertexName};
+    std::string fragmentWithPath{gsl::shaderFilePath + fragmentName};
 
     // Open files and check for errors
     vShaderFile.open(vertexWithPath);
@@ -42,11 +42,11 @@ Shader::Shader(cjk::Ref<CameraController> camController, const std::string shade
     vertexCode = vShaderStream.str();
     fragmentCode = fShaderStream.str();
 
-    const GLchar *vShaderCode = vertexCode.c_str();
-    const GLchar *fShaderCode = fragmentCode.c_str();
+    const GLchar *vShaderCode{vertexCode.c_str()};
+    const GLchar *fShaderCode{fragmentCode.c_str()};
 
     //Do the same thing with the geometry shader if it exists:
-    const GLchar *gShaderCode = nullptr;
+    const GLchar *gShaderCode{nullptr};
     std::string geometryCode;
     if (geometryPath) {
         std::string geometryCode;

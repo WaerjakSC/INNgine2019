@@ -2,8 +2,8 @@
 #include "movementsystem.h"
 #include "registry.h"
 CameraController::CameraController(float aspectRatio)
-    : mAspectRatio(aspectRatio),
-      mCamera(Camera(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane)) {
+    : mAspectRatio{aspectRatio},
+      mCamera{mFieldOfView, mAspectRatio, mNearPlane, mFarPlane} {
 }
 void CameraController::pitch(float degrees) {
     mOutDated = true;
@@ -45,10 +45,10 @@ void CameraController::updateRightVector() {
 }
 
 void CameraController::updateForwardVector() {
-    mRight = vec3(1.f, 0.f, 0.f);
+    mRight = vec3{1.f, 0.f, 0.f};
     mRight.rotateY(mYaw);
     mRight.normalize();
-    mUp = vec3(0.f, 1.f, 0.f);
+    mUp = vec3{0.f, 1.f, 0.f};
     mUp.rotateX(mPitch);
     mUp.normalize();
     mForward = mUp ^ mRight;
@@ -80,8 +80,8 @@ void CameraController::goTo(vec3 target) {
     mOutDated = true;
 
     vec3 targetDistance{0, 0, 5};
-    const vec3 position = target + targetDistance;
-    const vec3 direction = (position - target).normalized();
+    const vec3 position{target + targetDistance};
+    const vec3 direction{(position - target).normalized()};
 
     mYaw = gsl::rad2degf(gsl::atan2(direction.x, direction.z));
     mPitch = gsl::rad2degf(gsl::asin(-direction.y));
@@ -108,7 +108,7 @@ void CameraController::moveRight(float delta) {
     //This fixes a bug in the up and right calculations
     //so camera always holds its height when strafing
     //should be fixed through correct right calculations!
-    vec3 right = mRight;
+    vec3 right{mRight};
     right.y = 0.f;
     mCameraPosition += right * mTranslationSpeed * delta;
 }
@@ -123,16 +123,16 @@ void CameraController::resize(float aspectRatio) {
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
 vec3 GameCameraController::cameraPosition() const {
-    const auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    const auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     return gameCam.mCameraPosition;
 }
 GameCameraController::GameCameraController(float aspectRatio, GLuint controller)
-    : CameraController(aspectRatio), mControllerID(controller) {
+    : CameraController{aspectRatio}, mControllerID{controller} {
     setupController();
     mTranslationSpeed = 9.5f;
 }
 void GameCameraController::setupController() {
-    const auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    const auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     mPitch = gameCam.mPitch;
     mYaw = gameCam.mYaw;
     setPosition(gameCam.mCameraPosition);
@@ -146,7 +146,7 @@ void GameCameraController::yaw(float degrees) {
 }
 
 void GameCameraController::update() {
-    auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     if (gameCam.mOutDated) {
         //        updateMeshPosition();
         mCamera.setRotation(gameCam.mPitch, gameCam.mYaw);
@@ -157,7 +157,7 @@ void GameCameraController::update() {
 }
 
 bool GameCameraController::isActive() {
-    const auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    const auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     return gameCam.mIsActive;
 }
 
@@ -165,27 +165,27 @@ void GameCameraController::setPosition(const vec3 &position) {
     CameraController::setPosition(position);
 }
 void GameCameraController::moveForward(float delta) {
-    auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     gameCam.mOutDated = true;
     gameCam.mCameraPosition += mForward * mTranslationSpeed * delta;
 }
 void GameCameraController::moveRight(float delta) {
-    auto &gameCam = Registry::instance()->view<GameCamera>().get(mControllerID);
+    auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     gameCam.mOutDated = true;
     //This fixes a bug in the up and right calculations
     //so camera always holds its height when strafing
     //should be fixed through correct right calculations!
-    vec3 right = mRight;
+    vec3 right{mRight};
     right.y = 0.f;
     gameCam.mCameraPosition += right * mTranslationSpeed * delta;
 }
 void GameCameraController::updateMeshPosition() {
     gsl::Matrix4x4 temp(true);
     temp.lookAt(cameraPosition(), positionWithOffset(), up());
-    auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
+    auto [pos, sca, rot]{gsl::Matrix4x4::decomposed(temp)};
     Q_UNUSED(pos);
     Q_UNUSED(sca);
-    auto moveSys = Registry::instance()->system<MovementSystem>();
+    auto moveSys{Registry::instance()->system<MovementSystem>()};
     moveSys->setLocalPosition(mControllerID, positionWithOffset());
     moveSys->setRotation(mControllerID, rot);
 }

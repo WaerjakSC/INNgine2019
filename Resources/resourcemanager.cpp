@@ -30,8 +30,7 @@
 
 ResourceManager *ResourceManager::mInstance = nullptr;
 
-ResourceManager::ResourceManager() {
-    registry = Registry::instance();
+ResourceManager::ResourceManager() : registry{Registry::instance()} {
 
     registry->registerComponent<EInfo>();
     registry->registerComponent<Transform>();
@@ -41,18 +40,19 @@ ResourceManager::ResourceManager() {
     registry->registerComponent<Sound>();
     registry->registerComponent<Input>();
     registry->registerComponent<Light>();
+    registry->registerComponent<BSplinePoint>();
+    registry->registerComponent<GameCamera>();
+    registry->registerComponent<AIComponent>();
+    registry->registerComponent<PlayerComponent>();
+    registry->registerComponent<TowerComponent>();
+    registry->registerComponent<BillBoard>();
+
     // Collision Types
     registry->registerComponent<AABB>();
     registry->registerComponent<OBB>();
     registry->registerComponent<Sphere>();
     registry->registerComponent<Plane>();
     registry->registerComponent<Cylinder>();
-    registry->registerComponent<AIComponent>();
-    registry->registerComponent<BSplinePoint>();
-    registry->registerComponent<GameCamera>();
-    registry->registerComponent<PlayerComponent>();
-    registry->registerComponent<TowerComponent>();
-    registry->registerComponent<BillBoard>();
 
     mSceneLoader = std::make_unique<Scene>();
 }
@@ -101,9 +101,9 @@ ResourceManager *ResourceManager::instance() {
 void ResourceManager::saveProjectSettings(const QString &fileName) {
     if (fileName.isEmpty())
         return;
-    QFileInfo file(fileName);
+    QFileInfo file{fileName};
     StringBuffer buf;
-    PrettyWriter<StringBuffer> writer(buf);
+    PrettyWriter<StringBuffer> writer{buf};
 
     mCurrentProject = file.fileName();
 
@@ -117,14 +117,14 @@ void ResourceManager::saveProjectSettings(const QString &fileName) {
     writer.EndObject();
     writer.EndObject(); // ready to write to rapidjson document
 
-    std::ofstream of(gsl::settingsFilePath + file.fileName().toStdString() + ".json");
+    std::ofstream of{gsl::settingsFilePath + file.fileName().toStdString() + ".json"};
     of << buf.GetString();
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
 void ResourceManager::loadProject(const QString &fileName) {
-    QFileInfo file(fileName);
-    std::ifstream fileStream(gsl::settingsFilePath + file.fileName().toStdString());
+    QFileInfo file{fileName};
+    std::ifstream fileStream{gsl::settingsFilePath + file.fileName().toStdString()};
     if (!fileStream.good()) {
         qDebug() << "Can't read the JSON project file!";
         return;
@@ -132,8 +132,8 @@ void ResourceManager::loadProject(const QString &fileName) {
     std::stringstream stream;
     stream << fileStream.rdbuf();
     fileStream.close();
-    const std::string fileCopy = stream.str();
-    const char *projSettings = fileCopy.c_str();
+    const std::string fileCopy{stream.str()};
+    const char *projSettings{fileCopy.c_str()};
     Document project;
     project.Parse(projSettings);
     mCurrentProject = QString::fromStdString(project.MemberBegin()->name.GetString());
@@ -144,7 +144,7 @@ void ResourceManager::loadProject(const QString &fileName) {
     }
 }
 void ResourceManager::loadLastProject() {
-    std::ifstream fileStream(gsl::settingsFilePath + "EngineSettings/settings.json");
+    std::ifstream fileStream{gsl::settingsFilePath + "EngineSettings/settings.json"};
     if (!fileStream.good()) {
         qDebug() << "Can't read the JSON settings file!";
         return;
@@ -152,8 +152,8 @@ void ResourceManager::loadLastProject() {
     std::stringstream stream;
     stream << fileStream.rdbuf();
     fileStream.close();
-    const std::string fileCopy = stream.str();
-    const char *settings = fileCopy.c_str();
+    const std::string fileCopy{stream.str()};
+    const char *settings{fileCopy.c_str()};
     Document project;
     project.Parse(settings);
     mCurrentProject = project.MemberBegin()->value.GetString();
@@ -161,14 +161,14 @@ void ResourceManager::loadLastProject() {
 }
 void ResourceManager::onExit() {
     StringBuffer buf;
-    PrettyWriter<StringBuffer> writer(buf);
+    PrettyWriter<StringBuffer> writer{buf};
 
     writer.StartObject(); // Start the json file
     writer.Key("last project");
     writer.String(mCurrentProject.toStdString().c_str());
     writer.EndObject(); // ready to write to rapidjson document
 
-    std::ofstream of(gsl::settingsFilePath + "EngineSettings/settings.json");
+    std::ofstream of{gsl::settingsFilePath + "EngineSettings/settings.json"};
     of << buf.GetString();
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
@@ -183,7 +183,7 @@ GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
-        GLuint eID = registry->makeEntity(QString::fromStdString(name));
+        GLuint eID{registry->makeEntity(QString::fromStdString(name))};
         registry->add<Transform>(eID);
         registry->add<Material>(eID, type);
         addMeshComponent(name, eID);
@@ -195,7 +195,7 @@ GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
  * @return
  */
 GLuint ResourceManager::makePlane(const QString &name) {
-    GLuint eID = registry->makeEntity(name);
+    GLuint eID{registry->makeEntity(name)};
     registry->add<Transform>(eID);
     registry->add<Material>(eID, getShader<ColorShader>());
     auto search = mMeshMap.find("Plane");
@@ -222,7 +222,7 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
         registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
-    auto &mesh = registry->get<Mesh>(eID);
+    auto &mesh{registry->get<Mesh>(eID)};
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -233,7 +233,7 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
  * @return
  */
 GLuint ResourceManager::makeCube(const QString &name) {
-    GLuint eID = registry->makeEntity(name);
+    GLuint eID{registry->makeEntity(name)};
     registry->add<Transform>(eID);
     registry->add<Material>(eID, getShader<ColorShader>());
     registry->add<Mesh>(eID);
@@ -245,7 +245,7 @@ GLuint ResourceManager::makeCube(const QString &name) {
  * @brief Creates basic XYZ lines
  */
 GLuint ResourceManager::makeXYZ(const QString &name) {
-    GLuint eID = registry->makeEntity(name);
+    GLuint eID{registry->makeEntity(name)};
     registry->add<Transform>(eID);
     registry->add<Material>(eID, getShader<ColorShader>());
     makeXYZMesh(eID);
@@ -268,7 +268,7 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
         registry->add<Mesh>(eID, GL_LINES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_LINES, mMeshData);
-    auto &mesh = registry->get<Mesh>(eID);
+    auto &mesh{registry->get<Mesh>(eID)};
 
     // set up buffers (equivalent to init() from before)
     initVertexBuffers(&mesh);
@@ -279,7 +279,7 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
  * @return
  */
 GLuint ResourceManager::makeSkyBox(const QString &name) {
-    GLuint eID = registry->makeEntity(name);
+    GLuint eID{registry->makeEntity(name)};
     registry->add<Material>(eID, getShader<SkyboxShader>(), mTextures["Skybox"]->textureUnit());
     auto search = mMeshMap.find("Skybox");
     if (search != mMeshMap.end()) {
@@ -293,14 +293,14 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
     mMeshData.Clear();
     mMeshData.mName = "Skybox";
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f)},  // 0
-                                Vertex{gsl::Vector3D(-1.0f, -1.0f, -1.0f)}, // 1
-                                Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f)},  // 2
-                                Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f)},   // 3
-                                Vertex{gsl::Vector3D(-1.0f, -1.0f, 1.0f)},  // 4
-                                Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f)},   // 5
-                                Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f)},   // 6
-                                Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f)}});  // 7
+                               {Vertex{vec3(-1.0f, 1.0f, -1.0f)},  // 0
+                                Vertex{vec3(-1.0f, -1.0f, -1.0f)}, // 1
+                                Vertex{vec3(1.0f, -1.0f, -1.0f)},  // 2
+                                Vertex{vec3(1.0f, 1.0f, -1.0f)},   // 3
+                                Vertex{vec3(-1.0f, -1.0f, 1.0f)},  // 4
+                                Vertex{vec3(-1.0f, 1.0f, 1.0f)},   // 5
+                                Vertex{vec3(1.0f, -1.0f, 1.0f)},   // 6
+                                Vertex{vec3(1.0f, 1.0f, 1.0f)}});  // 7
 
     mMeshData.mIndices.insert(mMeshData.mIndices.end(),
                               {0, 1, 2, 2, 3, 0,
@@ -315,7 +315,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
-    auto &skyMesh = registry->get<Mesh>(eID);
+    auto &skyMesh{registry->get<Mesh>(eID)};
 
     initVertexBuffers(&skyMesh);
     initIndexBuffers(&skyMesh);
@@ -329,7 +329,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> type) {
-    GLuint eID = registry->makeEntity(QString::fromStdString(fileName));
+    GLuint eID{registry->makeEntity(QString::fromStdString(fileName))};
 
     initializeOpenGLFunctions();
 
@@ -346,8 +346,8 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
  * @return
  */
 GLuint ResourceManager::makeBillBoard(const QString &name) {
-    GLuint eID = registry->makeEntity(name);
-    registry->add<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
+    GLuint eID{registry->makeEntity(name)};
+    registry->add<Transform>(eID, vec3{4.f, 0.f, -3.5f});
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->textureUnit());
     registry->add<BillBoard>(eID);
     auto search = mMeshMap.find("BillBoard");
@@ -365,16 +365,16 @@ void ResourceManager::makeBillBoardMesh(int eID) {
     mMeshData.mName = "BillBoard";
     mMeshData.mVertices.insert(mMeshData.mVertices.end(), {
                                                               // Positions            // Normals          //UVs
-                                                              Vertex{gsl::Vector3D(-2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
-                                                              Vertex{gsl::Vector3D(2.f, -2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
-                                                              Vertex{gsl::Vector3D(-2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
-                                                              Vertex{gsl::Vector3D(2.f, 2.f, 0.f), gsl::Vector3D(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
+                                                              Vertex{vec3(-2.f, -2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
+                                                              Vertex{vec3(2.f, -2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
+                                                              Vertex{vec3(-2.f, 2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
+                                                              Vertex{vec3(2.f, 2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
                                                           });
     if (!registry->contains<Mesh>(eID))
         registry->add<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLE_STRIP, mMeshData);
-    auto &billBoardMesh = registry->get<Mesh>(eID);
+    auto &billBoardMesh{registry->get<Mesh>(eID)};
 
     initVertexBuffers(&billBoardMesh);
 
@@ -386,16 +386,16 @@ void ResourceManager::makeLevelMesh(GLuint eID) {
     mMeshData.Clear();
     mMeshData.mName = "Level";
     std::vector<Vertex> vertices;
-    int x = -8;
-    int y = 0;
-    int z = -8;
-    for (int i = 0; i < 16; i++) {
+    float x{-8};
+    float y{0};
+    float z{-8};
+    for (int i{0}; i < 16; i++) {
 
-        for (int j = 0; j < 16; j++) {
-            vertices.push_back(Vertex{gsl::Vector3D(x, y, z), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.25f, 0.333f)});        //v0
-            vertices.push_back(Vertex{gsl::Vector3D(x + 1, y, z + 1), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.5f, 0.333f)}); //v1
-            vertices.push_back(Vertex{gsl::Vector3D(x + 1, y, z), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.25f, 0.666f)});    //v2
-            vertices.push_back(Vertex{gsl::Vector3D(x, y, z + 1), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.5f, 0.666f)});     // v4
+        for (int j{0}; j < 16; j++) {
+            vertices.push_back(Vertex{vec3{x, y, z}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.333f}});        //v0
+            vertices.push_back(Vertex{vec3{x + 1, y, z + 1}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.333f}}); //v1
+            vertices.push_back(Vertex{vec3{x + 1, y, z}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.666f}});    //v2
+            vertices.push_back(Vertex{vec3{x, y, z + 1}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.666f}});     // v4
 
             x = x + 1;
         }
@@ -403,8 +403,8 @@ void ResourceManager::makeLevelMesh(GLuint eID) {
     }
     mMeshData.mVertices = vertices;
     std::vector<GLuint> indices;
-    GLuint v = 0;
-    for (int k = 0; k < 256; k++) {
+    GLuint v{0};
+    for (int k{0}; k < 256; k++) {
         indices.push_back(v);
         indices.push_back(v + 2);
         indices.push_back(v + 1);
@@ -421,7 +421,7 @@ void ResourceManager::makeLevelMesh(GLuint eID) {
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
-    auto &levelMesh = registry->get<Mesh>(eID);
+    auto &levelMesh{registry->get<Mesh>(eID)};
 
     initVertexBuffers(&levelMesh);
     initIndexBuffers(&levelMesh);
@@ -436,34 +436,34 @@ void ResourceManager::makeTowerMesh(GLuint eID) {
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
                                {
                                    //Vertex data for front
-                                   Vertex{gsl::Vector3D(-0.8f, 0.f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.333f)}, //v0
-                                   Vertex{gsl::Vector3D(0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.333f)},  //v1
-                                   Vertex{gsl::Vector3D(0.8f, 0.f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.25f, 0.666f)},  //v2
-                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.666f)}, //v3
+                                   Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.333f}}, //v0
+                                   Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.333f}},  //v1
+                                   Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.666f}},  //v2
+                                   Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.666f}}, //v3
 
                                    //Vertex data for right
-                                   Vertex{gsl::Vector3D(0.8f, 0.f, -0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.333f)},   //v4
-                                   Vertex{gsl::Vector3D(0.8f, 0.8f, 0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.333f)},  //v5
-                                   Vertex{gsl::Vector3D(0.8f, 0.f, 0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v6
-                                   Vertex{gsl::Vector3D(0.8f, 0.8f, -0.8f), gsl::Vector3D(1.0f, 0.f, 0.f), gsl::Vector2D(0.75f, 0.666f)}, //v7
+                                   Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.333f}},   //v4
+                                   Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.333f}},  //v5
+                                   Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v6
+                                   Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.666f}}, //v7
 
                                    //Vertex data for back
-                                   Vertex{gsl::Vector3D(0.8f, 0.f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.75f, 0.333f)},  //v8
-                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.8f, 0.333f)}, //v9
-                                   Vertex{gsl::Vector3D(-0.8f, 0.f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.75f, 0.666f)}, //v10
-                                   Vertex{gsl::Vector3D(0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 0.f, -1.0f), gsl::Vector2D(0.8f, 0.666f)},  //v11
+                                   Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.333f}},  //v8
+                                   Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.333f}}, //v9
+                                   Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.666f}}, //v10
+                                   Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.666f}},  //v11
 
                                    //Vertex data for left
-                                   Vertex{gsl::Vector3D(-0.8f, 0.f, 0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.f, 0.333f)},     //v12
-                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, -0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.333f)}, //v13
-                                   Vertex{gsl::Vector3D(-0.8f, 0.f, -0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.f, 0.666f)},    //v14
-                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, 0.8f), gsl::Vector3D(-1.0f, 0.f, 0.f), gsl::Vector2D(0.25f, 0.666f)},  //v15
+                                   Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.333f}},     //v12
+                                   Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.333f}}, //v13
+                                   Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.666f}},    //v14
+                                   Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.666f}},  //v15
 
                                    //Vertex data for top
-                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.25f, 0.666f)}, //v16
-                                   Vertex{gsl::Vector3D(0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.5f, 0.666f)},    //v17
-                                   Vertex{gsl::Vector3D(0.8f, 0.8f, -0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.25f, 0.999f)},  //v18
-                                   Vertex{gsl::Vector3D(-0.8f, 0.8f, 0.8f), gsl::Vector3D(0.f, 1.0f, 0.f), gsl::Vector2D(0.5f, 0.999f)}    //v19
+                                   Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.666f}}, //v16
+                                   Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v17
+                                   Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.999f}},  //v18
+                                   Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.999f}}    //v19
                                });
 
     mMeshData.mIndices.insert(mMeshData.mIndices.end(), {
@@ -480,7 +480,7 @@ void ResourceManager::makeTowerMesh(GLuint eID) {
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
-    auto &towerMesh = registry->get<Mesh>(eID);
+    auto &towerMesh{registry->get<Mesh>(eID)};
 
     initVertexBuffers(&towerMesh);
     initIndexBuffers(&towerMesh);
@@ -494,11 +494,11 @@ void ResourceManager::makeTowerMesh(GLuint eID) {
  * @return
  */
 GLuint ResourceManager::makeOctBall(const QString &name, int n) {
-    GLuint eID = registry->makeEntity(name);
+    GLuint eID{registry->makeEntity(name)};
 
     registry->add<Transform>(eID);
     registry->add<Material>(eID, getShader<ColorShader>());
-    auto search = mMeshMap.find("Ball");
+    auto search{mMeshMap.find("Ball")};
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
     } else
@@ -510,7 +510,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Ball";
-    GLint mRecursions = n;
+    GLint mRecursions{n};
 
     makeUnitOctahedron(mRecursions); // This fills mMeshData
 
@@ -519,7 +519,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
 
-    auto &octMesh = registry->get<Mesh>(eID);
+    auto &octMesh{registry->get<Mesh>(eID)};
 
     initVertexBuffers(&octMesh);
     initIndexBuffers(&octMesh);
@@ -531,11 +531,11 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
  * @return
  */
 GLuint ResourceManager::makeLightObject(const QString &name) {
-    GLuint eID = registry->makeEntity(name);
-    registry->add<Transform>(eID, gsl::Vector3D(2.5f, 3.f, 0.f), gsl::Vector3D(0.0f, 180.f, 0.0f));
-    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->textureUnit(), gsl::Vector3D(0.1f, 0.1f, 0.8f));
+    GLuint eID{registry->makeEntity(name)};
+    registry->add<Transform>(eID, vec3(2.5f, 3.f, 0.f), vec3(0.0f, 180.f, 0.0f));
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->textureUnit(), vec3(0.1f, 0.1f, 0.8f));
     registry->add<Light>(eID);
-    auto search = mMeshMap.find("Pyramid");
+    auto search{mMeshMap.find("Pyramid")};
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
     } else
@@ -551,10 +551,10 @@ void ResourceManager::makeLightMesh(int eID) {
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
                                {
                                    //Vertex data - normals not correct
-                                   Vertex{gsl::Vector3D(-0.5f, -0.5f, 0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.f, 0.f)},  //Left low
-                                   Vertex{gsl::Vector3D(0.5f, -0.5f, 0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(1.f, 0.f)},   //Right low
-                                   Vertex{gsl::Vector3D(0.0f, 0.5f, 0.0f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.5f)},  //Top
-                                   Vertex{gsl::Vector3D(0.0f, -0.5f, -0.5f), gsl::Vector3D(0.f, 0.f, 1.0f), gsl::Vector2D(0.5f, 0.5f)} //Back low
+                                   Vertex{vec3{-0.5f, -0.5f, 0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.f, 0.f}},  //Left low
+                                   Vertex{vec3{0.5f, -0.5f, 0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{1.f, 0.f}},   //Right low
+                                   Vertex{vec3{0.0f, 0.5f, 0.0f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
+                                   Vertex{vec3{0.0f, -0.5f, -0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.5f}} //Back low
                                });
 
     mMeshData.mIndices.insert(mMeshData.mIndices.end(),
@@ -566,7 +566,7 @@ void ResourceManager::makeLightMesh(int eID) {
         registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
         registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
-    auto &lightMesh = registry->get<Mesh>(eID);
+    auto &lightMesh{registry->get<Mesh>(eID)};
 
     initVertexBuffers(&lightMesh);
     initIndexBuffers(&lightMesh);
@@ -579,32 +579,32 @@ void ResourceManager::setColliderMesh(Mesh &mesh) {
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
                                {
                                    // Right face
-                                   Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.f, 0.f)},   //Left low
-                                   Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(1.f, 0.f)},  //Right low
-                                   Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
-                                   Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.f, 0.f}},   //Left low
+                                   Vertex{vec3{1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{1.f, 0.f}},  //Right low
+                                   Vertex{vec3{1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
                                    // 0,
                                    // Front face
-                                   Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Top
-                                   Vertex{gsl::Vector3D(1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
-                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                   Vertex{vec3{1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                   Vertex{vec3{-1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
                                    // Left face
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Top
-                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
-                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
+                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                   Vertex{vec3{-1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                   Vertex{vec3{-1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
                                    // Back face
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Top
-                                   Vertex{gsl::Vector3D(-1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Back low
-                                   Vertex{gsl::Vector3D(1.0f, -1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Top
-                                   Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Back low
+                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
+                                   Vertex{vec3{-1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Back low
+                                   Vertex{vec3{1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
+                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Back low
                                    // Top face
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}, //Top
-                                   Vertex{gsl::Vector3D(1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
-                                   Vertex{gsl::Vector3D(1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},   //Top
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, 1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)},  //Back low
-                                   Vertex{gsl::Vector3D(-1.0f, 1.0f, -1.0f), gsl::Vector3D(0.f, 1.f, 0.f), gsl::Vector2D(0.5f, 0.5f)}  //Back low
+                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}  //Back low
                                });
     mesh.mName = "BoxCollider";
     mesh.mVerticeCount = mMeshData.mVertices.size();
@@ -665,7 +665,7 @@ void ResourceManager::addMeshComponent(std::string name, int eID) {
 void ResourceManager::setMesh(std::string name, GLuint eID) {
     if (name.empty())
         return;
-    auto search = mMeshMap.find(name);
+    auto search{mMeshMap.find(name)};
     if (search != mMeshMap.end()) {
         registry->get<Mesh>(eID) = search->second;
         return;
@@ -710,7 +710,7 @@ void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID) {
 bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
     ALuint frequency{};
     ALenum format{};
-    wave_t *waveData = new wave_t();
+    wave_t *waveData{new wave_t()};
     if (!WavFileHandler::loadWave(filePath, waveData)) {
         qDebug() << "Error loading wave file!\n";
         return false; // error loading wave file data
@@ -751,7 +751,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
         break;
     }
 
-    if (waveData->buffer == NULL) {
+    if (waveData->buffer == nullptr) {
         qDebug() << "NO WAVE DATA!\n";
     }
 
@@ -761,7 +761,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
 
     alGetError();
     alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
-    SoundSystem *soundSys = registry->system<SoundSystem>().get();
+    SoundSystem *soundSys{registry->system<SoundSystem>().get()};
     soundSys->checkError("alBufferData");
     alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
     soundSys->checkError("alSourcei (loadWave)");
@@ -781,7 +781,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
  */
 bool ResourceManager::loadTexture(std::string fileName) {
     if (mTextures.find(fileName) == mTextures.end()) {
-        Ref<Texture> tex = std::make_shared<Texture>(fileName, mTextures.size());
+        Ref<Texture> tex{std::make_shared<Texture>(fileName, mTextures.size())};
         if (tex->isValid) {
             mTextures[fileName] = tex;
             qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
@@ -798,7 +798,7 @@ bool ResourceManager::loadTexture(std::string fileName) {
  */
 bool ResourceManager::loadCubemap(std::vector<std::string> faces) {
     if (mTextures.find("Skybox") == mTextures.end()) {
-        Ref<Texture> tex = std::make_shared<Texture>(faces, mTextures.size());
+        Ref<Texture> tex{std::make_shared<Texture>(faces, mTextures.size())};
         if (tex->isValid) {
             mTextures["Skybox"] = tex;
             qDebug() << "ResourceManager: Added skybox cubemap";
@@ -813,7 +813,7 @@ Ref<Texture> ResourceManager::getTexture(std::string fileName) {
 }
 
 QString ResourceManager::getTextureName(GLuint textureUnit) {
-    for (auto it = mTextures.begin(); it != mTextures.end(); ++it) {
+    for (auto it{mTextures.begin()}; it != mTextures.end(); ++it) {
         if (it->second->textureUnit() == textureUnit) {
             return QString::fromStdString(it->first);
         }
@@ -821,7 +821,7 @@ QString ResourceManager::getTextureName(GLuint textureUnit) {
     return QString();
 }
 QString ResourceManager::getMeshName(const Mesh &mesh) {
-    for (auto it = mMeshMap.begin(); it != mMeshMap.end(); ++it) {
+    for (auto it{mMeshMap.begin()}; it != mMeshMap.end(); ++it) {
         if (it->second == mesh) {
             return QString::fromStdString(it->first);
         }
@@ -835,13 +835,13 @@ QString ResourceManager::getMeshName(const Mesh &mesh) {
  */
 bool ResourceManager::readFile(std::string fileName, GLuint eID) {
     //Open File
-    std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
-    std::string mtlPath = gsl::assetFilePath + "Meshes/";
+    std::string fileWithPath{gsl::assetFilePath + "Meshes/" + fileName};
+    std::string mtlPath{gsl::assetFilePath + "Meshes/"};
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, fileWithPath.c_str(), mtlPath.c_str());
+    bool ret{tinyobj::LoadObj(&attrib, &shapes, &materials, &err, fileWithPath.c_str(), mtlPath.c_str())};
     if (!err.empty()) {
         std::cerr << err << std::endl;
     }
@@ -849,7 +849,7 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
         return false;
     mMeshData.Clear();
     // Append `default` material
-    materials.push_back(tinyobj::material_t());
+    materials.push_back(tinyobj::material_t{});
     std::unordered_map<Vertex, GLuint> uniqueVertices;
     for (const auto &shape : shapes) {
         for (const auto &index : shape.mesh.indices) {
@@ -872,26 +872,26 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
         }
     }
     for (size_t m = 0; m < materials.size(); m++) {
-        tinyobj::material_t *mp = &materials[m];
+        tinyobj::material_t *mp{&materials[m]};
 
         if (mp->diffuse_texname.length() > 0) {
-            std::string texname = mp->diffuse_texname;
-            auto search = mTextures.find(texname);
+            std::string texname{mp->diffuse_texname};
+            auto search{mTextures.find(texname)};
             // Only load the texture if it is not already loaded
-            bool textureLoaded = false;
+            bool textureLoaded{false};
             if (search == mTextures.end()) {
                 textureLoaded = loadTexture(texname);
             }
             // Currently doesn't support multiple textures
             if (registry->contains<Material>(eID) && textureLoaded) {
-                auto &mat = registry->get<Material>(eID);
+                auto &mat{registry->get<Material>(eID)};
                 mat.mTextureUnit = mTextures[texname]->textureUnit();
                 mat.mShader = getShader<TextureShader>();
             }
         }
     }
 
-    auto &mesh = registry->get<Mesh>(eID);
+    auto &mesh{registry->get<Mesh>(eID)};
     mesh.mName = fileName;
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mIndiceCount = mMeshData.mIndices.size();
@@ -906,7 +906,7 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
 
 bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
     std::ifstream inn;
-    std::string fileWithPath = gsl::assetFilePath + "Meshes/" + fileName;
+    std::string fileWithPath{gsl::assetFilePath + "Meshes/" + fileName};
     mMeshData.Clear();
     inn.open(fileWithPath);
 
@@ -923,7 +923,7 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
-        auto &mesh = registry->get<Mesh>(eID);
+        auto &mesh{registry->get<Mesh>(eID)};
         mesh.mVerticeCount = mMeshData.mVertices.size();
         mesh.mName = fileName;
         mesh.mDrawType = GL_TRIANGLES;
@@ -964,7 +964,8 @@ void ResourceManager::newScene(const QString &text) {
     getSceneLoader()->loadScene(getCurrentScene() + ".json");
 }
 void ResourceManager::newScene() {
-    QString text = QInputDialog::getText(mMainWindow, tr("New Scene"), tr("Scene name:"), QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint);
+    QString text{QInputDialog::getText(mMainWindow, tr("New Scene"), tr("Scene name:"),
+                                       QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint)};
     if (text.isEmpty()) {
         return;
     }
@@ -975,7 +976,8 @@ void ResourceManager::save() {
     showMessage("Saved Scene!");
 }
 void ResourceManager::saveAs() {
-    QFileInfo file(QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
+    QFileInfo file{QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"),
+                                                QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)"))};
     if (file.fileName().isEmpty())
         return;
     mCurrentScene = file.fileName().chopped(5);
@@ -983,7 +985,8 @@ void ResourceManager::saveAs() {
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
 }
 void ResourceManager::load() {
-    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"), QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)")));
+    QFileInfo file{QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"),
+                                                QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)"))};
     if (file.fileName().isEmpty())
         return;
     stop(); // Stop the editor if it's in play
@@ -995,7 +998,8 @@ void ResourceManager::load() {
     showMessage("Loaded Scene!");
 }
 void ResourceManager::loadProject() {
-    QFileInfo file(QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"), QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)")));
+    QFileInfo file{QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"),
+                                                QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)"))};
     if (file.fileName().isEmpty())
         return;
     stop(); // Stop the editor if it's in play
@@ -1011,7 +1015,8 @@ void ResourceManager::saveProject() {
 }
 
 void ResourceManager::newProject() {
-    QString text = QInputDialog::getText(mMainWindow, tr("New Project"), tr("Project name:"), QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint);
+    QString text{QInputDialog::getText(mMainWindow, tr("New Project"), tr("Project name:"),
+                                       QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint)};
     if (text.isEmpty()) {
         return;
     }
@@ -1028,7 +1033,7 @@ void ResourceManager::play() {
             mPaused = false;
         } else
             Registry::instance()->makeSnapshot();
-        auto [aisys, sound, input] = registry->system<AISystem, SoundSystem, InputSystem>();
+        auto [aisys, sound, input]{registry->system<AISystem, SoundSystem, InputSystem>()};
         sound->playAll();
         for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
@@ -1038,6 +1043,7 @@ void ResourceManager::play() {
         }
         mIsPlaying = true;
         aisys->masterOfCurves();
+
         emit disableActions(true);
         emit disablePlay(true);
         emit disablePause(false);
@@ -1048,19 +1054,19 @@ void ResourceManager::pause() {
     if (mIsPlaying) {
         mIsPlaying = false;
         mPaused = true;
-        emit disablePlay(false);
-        emit disablePause(true);
-        auto [sound, input] = registry->system<SoundSystem, InputSystem>();
+        auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
         input->setGameCameraInactive();
         setActiveCameraController(input->editorCamController());
         sound->pauseAll();
+
+        emit disablePlay(false);
+        emit disablePause(true);
     }
 }
 void ResourceManager::stop() {
     if (mIsPlaying || mPaused) {
         registry->loadSnapshot();
-        auto [movement, sound, input] = registry->system<MovementSystem, SoundSystem, InputSystem>();
-
+        auto [movement, sound, input]{registry->system<MovementSystem, SoundSystem, InputSystem>()};
         movement->init();
         sound->stopAll();
         input->setGameCameraInactive();
@@ -1081,21 +1087,21 @@ void ResourceManager::setActiveCameraController(Ref<CameraController> controller
     }
 }
 //=========================== Octahedron Functions =========================== //
-void ResourceManager::makeTriangle(const gsl::Vector3D &v1, const gsl::Vector3D &v2, const gsl::Vector3D &v3) {
-    mMeshData.mVertices.push_back(Vertex(v1, v1, gsl::Vector2D(0.f, 0.f)));
-    mMeshData.mVertices.push_back(Vertex(v2, v2, gsl::Vector2D(1.f, 0.f)));
-    mMeshData.mVertices.push_back(Vertex(v3, v3, gsl::Vector2D(0.5f, 1.f)));
+void ResourceManager::makeTriangle(const vec3 &v1, const vec3 &v2, const vec3 &v3) {
+    mMeshData.mVertices.push_back(Vertex{v1, v1, gsl::Vector2D{0.f, 0.f}});
+    mMeshData.mVertices.push_back(Vertex{v2, v2, gsl::Vector2D{1.f, 0.f}});
+    mMeshData.mVertices.push_back(Vertex{v3, v3, gsl::Vector2D{0.5f, 1.f}});
 }
 
-void ResourceManager::subDivide(const gsl::Vector3D &a, const gsl::Vector3D &b, const gsl::Vector3D &c, GLint n) {
+void ResourceManager::subDivide(const vec3 &a, const vec3 &b, const vec3 &c, GLint n) {
     if (n > 0) {
-        gsl::Vector3D v1 = a + b;
+        vec3 v1{a + b};
         v1.normalize();
 
-        gsl::Vector3D v2 = a + c;
+        vec3 v2{a + c};
         v2.normalize();
 
-        gsl::Vector3D v3 = c + b;
+        vec3 v3{c + b};
         v3.normalize();
         subDivide(a, v1, v2, n - 1);
         subDivide(c, v2, v3, n - 1);
@@ -1108,12 +1114,12 @@ void ResourceManager::subDivide(const gsl::Vector3D &a, const gsl::Vector3D &b, 
 }
 
 void ResourceManager::makeUnitOctahedron(GLint recursions) {
-    gsl::Vector3D v0(0.f, 0.f, 1.f);
-    gsl::Vector3D v1(1.f, 0.f, 0.f);
-    gsl::Vector3D v2(0.f, 1.f, 0.f);
-    gsl::Vector3D v3(-1.f, 0.f, 0.f);
-    gsl::Vector3D v4(0.f, -1.f, 0.f);
-    gsl::Vector3D v5(0.f, 0.f, -1.f);
+    vec3 v0{0.f, 0.f, 1.f};
+    vec3 v1{1.f, 0.f, 0.f};
+    vec3 v2{0.f, 1.f, 0.f};
+    vec3 v3{-1.f, 0.f, 0.f};
+    vec3 v4{0.f, -1.f, 0.f};
+    vec3 v5{0.f, 0.f, -1.f};
 
     subDivide(v0, v1, v2, recursions);
     subDivide(v0, v2, v3, recursions);

@@ -110,6 +110,7 @@ private:
     void setupCylinderColliderSettings(const Cylinder &col);
     void setupPlaneColliderSettings(const Plane &col);
     void setupGameCameraSettings(const GameCamera &cam);
+    void setupBSplinePointSettings(const BSplinePoint &point);
 
     Registry *registry;
     QColor rgb;
@@ -119,13 +120,11 @@ private:
     CustomDoubleSpinBox *xVal, *yVal, *zVal;
 
     VerticalScrollArea *scrollArea;
-    friend class MainWindow;
     CustomDoubleSpinBox *makeDoubleSpinBox(const double &num, QHBoxLayout *layout, const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
     std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> makeVectorBox(const vec3 &vector, QHBoxLayout *layout = nullptr,
                                                                                                   const std::optional<float> &minRange = std::nullopt, const std::optional<float> &maxRange = std::nullopt);
     QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
-
-    void setupBSplinePointSettings(const BSplinePoint &point);
+    friend class MainWindow;
 };
 
 #endif // COMPONENTLIST_H

@@ -22,7 +22,7 @@
 #include <QPushButton>
 #include <QStyleFactory>
 ComponentList::ComponentList(VerticalScrollArea *inScrollArea)
-    : registry(Registry::instance()), scrollArea(inScrollArea) {
+    : registry{Registry::instance()}, scrollArea{inScrollArea} {
     fusion = QStyleFactory::create("fusion");
 }
 /**
@@ -31,7 +31,7 @@ ComponentList::ComponentList(VerticalScrollArea *inScrollArea)
  */
 void ComponentList::setupComponentList() {
     scrollArea->clearLayout();
-    GLuint eID = registry->getSelectedEntity();
+    GLuint eID{registry->getSelectedEntity()};
     if (registry->contains<Transform>(eID)) {
         setupTransformSettings(registry->get<Transform>(eID));
     }
@@ -67,7 +67,7 @@ void ComponentList::setupComponentList() {
     }
 }
 void ComponentList::addTransformComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
         if (!registry->contains<Transform>(selectedEntity))
             registry->add<Transform>(selectedEntity);
@@ -75,7 +75,7 @@ void ComponentList::addTransformComponent() {
     }
 }
 void ComponentList::addBSplineComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<BSplinePoint>(selectedEntity))
@@ -84,7 +84,7 @@ void ComponentList::addBSplineComponent() {
     }
 }
 void ComponentList::addAIComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<AIComponent>(selectedEntity))
@@ -93,7 +93,7 @@ void ComponentList::addAIComponent() {
     }
 }
 void ComponentList::addMaterialComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Material>(selectedEntity))
@@ -102,7 +102,7 @@ void ComponentList::addMaterialComponent() {
     }
 }
 void ComponentList::addMeshComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Mesh>(selectedEntity))
@@ -111,7 +111,7 @@ void ComponentList::addMeshComponent() {
     }
 }
 void ComponentList::addLightComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Light>(selectedEntity))
@@ -120,7 +120,7 @@ void ComponentList::addLightComponent() {
     }
 }
 void ComponentList::addPhysicsComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Physics>(selectedEntity))
@@ -129,7 +129,7 @@ void ComponentList::addPhysicsComponent() {
     }
 }
 void ComponentList::addSoundComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Sound>(selectedEntity))
@@ -138,15 +138,15 @@ void ComponentList::addSoundComponent() {
     }
 }
 void ComponentList::addAABBCollider() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<AABB>(selectedEntity)) {
             registry->add<AABB>(selectedEntity);
             if (registry->contains<Transform>(selectedEntity)) {
-                auto &trans = registry->get<Transform>(selectedEntity);
-                auto &aabb = registry->get<AABB>(selectedEntity);
-                aabb.size = vec3(trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2);
+                auto &trans{registry->get<Transform>(selectedEntity)};
+                auto &aabb{registry->get<AABB>(selectedEntity)};
+                aabb.size = vec3{trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2};
             }
             registry->system<MovementSystem>()->updateAABBTransform(selectedEntity);
         }
@@ -154,7 +154,7 @@ void ComponentList::addAABBCollider() {
     }
 }
 void ComponentList::addOBBCollider() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<OBB>(selectedEntity)) {
@@ -165,7 +165,7 @@ void ComponentList::addOBBCollider() {
     }
 }
 void ComponentList::addSphereCollider() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Sphere>(selectedEntity)) {
@@ -176,7 +176,7 @@ void ComponentList::addSphereCollider() {
     }
 }
 void ComponentList::addPlaneCollider() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Plane>(selectedEntity)) {
@@ -188,7 +188,7 @@ void ComponentList::addPlaneCollider() {
     }
 }
 void ComponentList::addCylinderCollider() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<Cylinder>(selectedEntity)) {
@@ -199,7 +199,7 @@ void ComponentList::addCylinderCollider() {
     }
 }
 void ComponentList::addGameCameraComponent() {
-    GLuint selectedEntity = registry->getSelectedEntity();
+    GLuint selectedEntity{registry->getSelectedEntity()};
     if (selectedEntity != 0) {
 
         if (!registry->contains<GameCamera>(selectedEntity)) {
@@ -209,17 +209,17 @@ void ComponentList::addGameCameraComponent() {
     }
 }
 void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
-    ComponentGroupBox *box = new ComponentGroupBox("Game Camera", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox{"Game Camera", this}};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *positionBox = new QGroupBox(tr("Position"));
+    QGroupBox *positionBox{new QGroupBox{tr("Position")}};
     positionBox->setStyle(fusion);
     positionBox->setFlat(true);
-    QHBoxLayout *position = new QHBoxLayout;
+    QHBoxLayout *position{new QHBoxLayout};
     position->setMargin(1);
-    auto [positionX, positionY, positionZ] = makeVectorBox(cam.mCameraPosition, position);
+    auto [positionX, positionY, positionZ]{makeVectorBox(cam.mCameraPosition, position)};
 
-    InputSystem *inputSys = registry->system<InputSystem>().get();
+    InputSystem *inputSys{registry->system<InputSystem>().get()};
     connect(positionX, SIGNAL(valueChanged(double)), inputSys, SLOT(setCameraPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), inputSys, SLOT(setCameraPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), inputSys, SLOT(setCameraPositionZ(double)));
@@ -227,28 +227,28 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     positionBox->setLayout(position);
     grid->addWidget(positionBox, 0, 0);
 
-    QGroupBox *rotationBox = new QGroupBox(tr("Camera Rotation"));
+    QGroupBox *rotationBox{new QGroupBox{tr("Camera Rotation")}};
     rotationBox->setAlignment(Qt::AlignCenter);
 
     rotationBox->setStyle(fusion);
     rotationBox->setFlat(true);
 
-    QHBoxLayout *rotationLayout = new QHBoxLayout;
+    QHBoxLayout *rotationLayout{new QHBoxLayout};
     rotationLayout->setMargin(1);
-    QLabel *pitchLabel = new QLabel(tr("Pitch:"));
+    QLabel *pitchLabel{new QLabel(tr("Pitch:"))};
     rotationLayout->addWidget(pitchLabel);
-    QDoubleSpinBox *pitch = makeDoubleSpinBox(cam.mPitch, rotationLayout, -180, 180);
-    QLabel *yawLabel = new QLabel(tr("Yaw:"));
+    QDoubleSpinBox *pitch{makeDoubleSpinBox(cam.mPitch, rotationLayout, -180, 180)};
+    QLabel *yawLabel{new QLabel(tr("Yaw:"))};
     rotationLayout->addWidget(yawLabel);
-    QDoubleSpinBox *yaw = makeDoubleSpinBox(cam.mYaw, rotationLayout, -180, 180);
+    QDoubleSpinBox *yaw{makeDoubleSpinBox(cam.mYaw, rotationLayout, -180, 180)};
     connect(pitch, SIGNAL(valueChanged(double)), inputSys, SLOT(setPitch(double)));
     connect(yaw, SIGNAL(valueChanged(double)), inputSys, SLOT(setYaw(double)));
     rotationBox->setLayout(rotationLayout);
     grid->addWidget(rotationBox, 1, 0);
 
     // Check box for showing absolute position instead of local position
-    QHBoxLayout *check = new QHBoxLayout;
-    QPushButton *activeCam = new QPushButton(tr("Is Active"));
+    QHBoxLayout *check{new QHBoxLayout};
+    QPushButton *activeCam{new QPushButton(tr("Is Active"))};
     activeCam->setCheckable(true);
     activeCam->setChecked(cam.mIsActive);
     connect(activeCam, &QPushButton::clicked, inputSys, &InputSystem::setActiveCamera);
@@ -259,16 +259,16 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
-    ComponentGroupBox *box = new ComponentGroupBox("BSpline Point", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("BSpline Point", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *locationBox = new QGroupBox(tr("Location"));
+    QGroupBox *locationBox{new QGroupBox(tr("Location"))};
     locationBox->setStyle(fusion);
     locationBox->setFlat(true);
-    QHBoxLayout *location = new QHBoxLayout;
+    QHBoxLayout *location{new QHBoxLayout};
     location->setMargin(1);
-    auto [locationX, locationY, locationZ] = makeVectorBox(point.location, location);
-    AISystem *aiSys = registry->system<AISystem>().get();
+    auto [locationX, locationY, locationZ]{makeVectorBox(point.location, location)};
+    AISystem *aiSys{registry->system<AISystem>().get()};
     connect(locationX, SIGNAL(valueChanged(double)), aiSys, SLOT(setBSPlinePointX(double)));
     connect(locationY, SIGNAL(valueChanged(double)), aiSys, SLOT(setBSPlinePointY(double)));
     connect(locationZ, SIGNAL(valueChanged(double)), aiSys, SLOT(setBSPlinePointZ(double)));
@@ -280,20 +280,20 @@ void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupAABBSettings(const AABB &col) {
-    ComponentGroupBox *box = new ComponentGroupBox("AABB Collider", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("AABB Collider", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *originBox = new QGroupBox(tr("Origin"));
+    QGroupBox *originBox{new QGroupBox(tr("Origin"))};
     originBox->setStyle(fusion);
     originBox->setFlat(true);
-    QHBoxLayout *origin = new QHBoxLayout;
+    QHBoxLayout *origin{new QHBoxLayout};
     origin->setMargin(1);
-    auto [originX, originY, originZ] = makeVectorBox(col.origin, origin); // Not sure yet if this is something that's supposed to be updated
+    auto [originX, originY, originZ]{makeVectorBox(col.origin, origin)}; // Not sure yet if this is something that's supposed to be updated
     connect(this, &ComponentList::originX, originX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::originY, originY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::originZ, originZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
+    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
     connect(originX, SIGNAL(valueChanged(double)), colSys, SLOT(setOriginX(double)));
     connect(originY, SIGNAL(valueChanged(double)), colSys, SLOT(setOriginY(double)));
     connect(originZ, SIGNAL(valueChanged(double)), colSys, SLOT(setOriginZ(double)));
@@ -301,14 +301,14 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     originBox->setLayout(origin);
     grid->addWidget(originBox, 0, 0);
 
-    QGroupBox *hSizeBox = new QGroupBox(tr("Half-Size"));
+    QGroupBox *hSizeBox{new QGroupBox(tr("Half-Size"))};
     hSizeBox->setStyle(fusion);
     hSizeBox->setFlat(true);
 
-    QHBoxLayout *hSize = new QHBoxLayout;
+    QHBoxLayout *hSize{new QHBoxLayout};
     hSize->setMargin(1);
 
-    auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize, 0.1f, 5000);
+    auto [sizeX, sizeY, sizeZ]{makeVectorBox(col.size, hSize, 0.1f, 5000)};
     connect(this, &ComponentList::AABBSizeX, sizeX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::AABBSizeY, sizeY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::AABBSizeZ, sizeZ, &QDoubleSpinBox::setValue);
@@ -319,7 +319,7 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
 
-    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    QGroupBox *objectTypeBox{new QGroupBox(tr("Object Type"))};
     makeObjectTypeBox(objectTypeBox, col);
     grid->addWidget(objectTypeBox, 2, 0);
 
@@ -327,35 +327,35 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupOBBSettings(const OBB &col) {
-    ComponentGroupBox *box = new ComponentGroupBox("OBB Collider", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("OBB Collider", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    QGroupBox *posBox{new QGroupBox(tr("Position"))};
     posBox->setStyle(fusion);
     posBox->setFlat(true);
-    QHBoxLayout *position = new QHBoxLayout;
+    QHBoxLayout *position{new QHBoxLayout};
     position->setMargin(1);
-    auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
+    auto [positionX, positionY, positionZ]{makeVectorBox(col.position, position)};
 
     connect(this, &ComponentList::OBBPositionX, positionX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::OBBPositionY, positionY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::OBBPositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
+    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
     connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionZ(double)));
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
 
-    QGroupBox *hSizeBox = new QGroupBox(tr("Half-Size"));
+    QGroupBox *hSizeBox{new QGroupBox(tr("Half-Size"))};
     hSizeBox->setStyle(fusion);
     hSizeBox->setFlat(true);
 
-    QHBoxLayout *hSize = new QHBoxLayout;
+    QHBoxLayout *hSize{new QHBoxLayout};
     hSize->setMargin(1);
 
-    auto [sizeX, sizeY, sizeZ] = makeVectorBox(col.size, hSize);
+    auto [sizeX, sizeY, sizeZ]{makeVectorBox(col.size, hSize)};
     connect(this, &ComponentList::OBBSizeX, sizeX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::OBBSizeY, sizeY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::OBBSizeZ, sizeZ, &QDoubleSpinBox::setValue);
@@ -369,7 +369,7 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     hSizeBox->setLayout(hSize);
     grid->addWidget(hSizeBox, 1, 0);
 
-    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    QGroupBox *objectTypeBox{new QGroupBox(tr("Object Type"))};
     makeObjectTypeBox(objectTypeBox, col);
     grid->addWidget(objectTypeBox, 2, 0);
 
@@ -377,40 +377,40 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupSphereColliderSettings(const Sphere &col) {
-    ComponentGroupBox *box = new ComponentGroupBox("Sphere Collider", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("Sphere Collider", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    QGroupBox *posBox{new QGroupBox(tr("Position"))};
     posBox->setStyle(fusion);
     posBox->setFlat(true);
-    QHBoxLayout *position = new QHBoxLayout;
+    QHBoxLayout *position{new QHBoxLayout};
     position->setMargin(1);
-    auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
+    auto [positionX, positionY, positionZ]{makeVectorBox(col.position, position)};
     connect(this, &ComponentList::spherePositionX, positionX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::spherePositionY, positionY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::spherePositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
+    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
     connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setSpherePositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setSpherePositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setSpherePositionZ(double)));
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
 
-    QGroupBox *radiusBox = new QGroupBox(tr("Radius"));
+    QGroupBox *radiusBox{new QGroupBox(tr("Radius"))};
     radiusBox->setStyle(fusion);
     radiusBox->setFlat(true);
 
-    QHBoxLayout *radiusLayout = new QHBoxLayout;
+    QHBoxLayout *radiusLayout{new QHBoxLayout};
     radiusLayout->setMargin(1);
-    QDoubleSpinBox *radius = makeDoubleSpinBox(col.radius, radiusLayout);
+    QDoubleSpinBox *radius{makeDoubleSpinBox(col.radius, radiusLayout)};
     connect(this, &ComponentList::sphereRadius, radius, &QDoubleSpinBox::setValue);
     connect(radius, SIGNAL(valueChanged(double)), colSys, SLOT(setSphereRadius(double)));
 
     radiusBox->setLayout(radiusLayout);
     grid->addWidget(radiusBox, 1, 0);
 
-    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    QGroupBox *objectTypeBox{new QGroupBox(tr("Object Type"))};
     makeObjectTypeBox(objectTypeBox, col);
     grid->addWidget(objectTypeBox, 2, 0);
 
@@ -418,20 +418,20 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
-    ComponentGroupBox *box = new ComponentGroupBox("Cylinder Collider", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("Cylinder Collider", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    QGroupBox *posBox{new QGroupBox(tr("Position"))};
     posBox->setStyle(fusion);
     posBox->setFlat(true);
-    QHBoxLayout *position = new QHBoxLayout;
+    QHBoxLayout *position{new QHBoxLayout};
     position->setMargin(1);
-    auto [positionX, positionY, positionZ] = makeVectorBox(col.position, position);
+    auto [positionX, positionY, positionZ]{makeVectorBox(col.position, position)};
     connect(this, &ComponentList::cylinderPositionX, positionX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::cylinderPositionY, positionY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::cylinderPositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
+    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
     connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionZ(double)));
@@ -439,33 +439,33 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     posBox->setLayout(position);
     grid->addWidget(posBox, 0, 0);
 
-    QGroupBox *radiusBox = new QGroupBox(tr("Radius"));
+    QGroupBox *radiusBox{new QGroupBox(tr("Radius"))};
     radiusBox->setStyle(fusion);
     radiusBox->setFlat(true);
 
-    QHBoxLayout *radiusLayout = new QHBoxLayout;
+    QHBoxLayout *radiusLayout{new QHBoxLayout};
     radiusLayout->setMargin(1);
-    QDoubleSpinBox *radius = makeDoubleSpinBox(col.radius, radiusLayout);
+    QDoubleSpinBox *radius{makeDoubleSpinBox(col.radius, radiusLayout)};
     connect(this, &ComponentList::cylinderRadius, radius, &QDoubleSpinBox::setValue);
     connect(radius, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderRadius(double)));
 
     radiusBox->setLayout(radiusLayout);
     grid->addWidget(radiusBox, 1, 0);
 
-    QGroupBox *heightBox = new QGroupBox(tr("Height"));
+    QGroupBox *heightBox{new QGroupBox(tr("Height"))};
     heightBox->setStyle(fusion);
     heightBox->setFlat(true);
 
-    QHBoxLayout *heightLayout = new QHBoxLayout;
+    QHBoxLayout *heightLayout{new QHBoxLayout};
     heightLayout->setMargin(1);
-    QDoubleSpinBox *height = makeDoubleSpinBox(col.height, heightLayout);
+    QDoubleSpinBox *height{makeDoubleSpinBox(col.height, heightLayout)};
     connect(this, &ComponentList::cylinderHeight, radius, &QDoubleSpinBox::setValue);
     connect(height, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderHeight(double)));
 
     heightBox->setLayout(heightLayout);
     grid->addWidget(heightBox, 2, 0);
 
-    QGroupBox *objectTypeBox = new QGroupBox(tr("Object Type"));
+    QGroupBox *objectTypeBox{new QGroupBox(tr("Object Type"))};
     makeObjectTypeBox(objectTypeBox, col);
     grid->addWidget(objectTypeBox, 3, 0);
 
@@ -473,21 +473,21 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupPlaneColliderSettings(const Plane &col) {
-    ComponentGroupBox *box = new ComponentGroupBox("Plane Collider", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("Plane Collider", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
-    QGroupBox *normalBox = new QGroupBox(tr("Normal"));
+    QGroupBox *normalBox{new QGroupBox(tr("Normal"))};
     normalBox->setStyle(fusion);
     normalBox->setFlat(true);
-    QHBoxLayout *normal = new QHBoxLayout;
+    QHBoxLayout *normal{new QHBoxLayout};
     normal->setMargin(1);
-    auto [normalX, normalY, normalZ] = makeVectorBox(col.normal, normal);
+    auto [normalX, normalY, normalZ]{makeVectorBox(col.normal, normal)};
 
     connect(this, &ComponentList::planeNormalX, normalX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::planeNormalY, normalY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::planeNormalZ, normalZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
+    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
     connect(normalX, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalX(double)));
     connect(normalY, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalY(double)));
     connect(normalZ, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalZ(double)));
@@ -495,13 +495,13 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     normalBox->setLayout(normal);
     grid->addWidget(normalBox, 0, 0);
 
-    QGroupBox *distanceBox = new QGroupBox(tr("Distance"));
+    QGroupBox *distanceBox{new QGroupBox(tr("Distance"))};
     distanceBox->setStyle(fusion);
     distanceBox->setFlat(true);
 
-    QHBoxLayout *distanceLayout = new QHBoxLayout;
+    QHBoxLayout *distanceLayout{new QHBoxLayout};
     distanceLayout->setMargin(1);
-    QDoubleSpinBox *distance = makeDoubleSpinBox(col.distance, distanceLayout);
+    QDoubleSpinBox *distance{makeDoubleSpinBox(col.distance, distanceLayout)};
     connect(this, &ComponentList::planeDistance, distance, &QDoubleSpinBox::setValue);
     connect(distance, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneDistance(double)));
 
@@ -512,24 +512,24 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupAISettings(const AIComponent &ai) {
-    ComponentGroupBox *box = new ComponentGroupBox("AI", this);
-    QGridLayout *grid = new QGridLayout;
+    ComponentGroupBox *box{new ComponentGroupBox("AI", this)};
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
 
-    QGroupBox *hpBox = new QGroupBox(tr("Health"));
+    QGroupBox *hpBox{new QGroupBox(tr("Health"))};
     hpBox->setStyle(fusion);
     hpBox->setFlat(true);
 
-    QHBoxLayout *hpLayout = new QHBoxLayout;
+    QHBoxLayout *hpLayout{new QHBoxLayout};
     hpLayout->setMargin(1);
-    QSpinBox *health = new QSpinBox;
+    QSpinBox *health{new QSpinBox};
     health->setRange(0, 5000);
     health->setMaximumWidth(58);
     health->setStyle(fusion);
     health->setValue(ai.hp);
     hpLayout->addWidget(health);
     connect(this, &ComponentList::changeHealth, health, &QSpinBox::setValue);
-    AISystem *aiSys = registry->system<AISystem>().get();
+    AISystem *aiSys{registry->system<AISystem>().get()};
     connect(health, SIGNAL(valueChanged(int)), aiSys, SLOT(setHealth(int)));
 
     hpBox->setLayout(hpLayout);
@@ -539,14 +539,14 @@ void ComponentList::setupAISettings(const AIComponent &ai) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupMeshSettings(const Mesh &mesh) {
-    ComponentGroupBox *box = new ComponentGroupBox("Mesh", this);
+    ComponentGroupBox *box{new ComponentGroupBox("Mesh", this)};
 
     objFileLabel = new QLabel(box);
     objFileLabel->setText(ResourceManager::instance()->getMeshName(mesh));
-    QPushButton *button = new QPushButton("Change Mesh");
+    QPushButton *button{new QPushButton("Change Mesh")};
     connect(button, &QPushButton::clicked, this, &ComponentList::setNewMesh);
 
-    QHBoxLayout *meshLayout = new QHBoxLayout;
+    QHBoxLayout *meshLayout{new QHBoxLayout};
     meshLayout->setMargin(1);
     meshLayout->addWidget(objFileLabel);
     meshLayout->addWidget(button);
@@ -554,23 +554,23 @@ void ComponentList::setupMeshSettings(const Mesh &mesh) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupMaterialSettings(const Material &mat) {
-    ComponentGroupBox *box = new ComponentGroupBox("Material", this);
+    ComponentGroupBox *box{new ComponentGroupBox("Material", this)};
 
-    QVBoxLayout *shader = new QVBoxLayout;
+    QVBoxLayout *shader{new QVBoxLayout};
     shader->setMargin(1);
-    QComboBox *shaderType = new QComboBox;
-    ResourceManager *factory = ResourceManager::instance();
+    QComboBox *shaderType{new QComboBox};
+    ResourceManager *factory{ResourceManager::instance()};
     for (auto type : factory->getShaders()) {
-        QString curText = QString::fromStdString(type.second->getName());
+        QString curText{QString::fromStdString(type.second->getName())};
         shaderType->addItem(curText);
         if (curText == QString::fromStdString(mat.mShader->getName()))
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
-    RenderSystem *renderSys = registry->system<RenderSystem>().get();
+    RenderSystem *renderSys{registry->system<RenderSystem>().get()};
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), renderSys, SLOT(changeShader(const QString &)));
 
-    QString curTexture = factory->getTextureName(mat.mTextureUnit);
-    QLabel *textureThumb = new QLabel(box);
+    QString curTexture{factory->getTextureName(mat.mTextureUnit)};
+    QLabel *textureThumb{new QLabel(box)};
     QPixmap thumbNail;
     thumbNail.load(QString::fromStdString(gsl::assetFilePath) + "Textures/" + curTexture); // Load the texture image into the pixmap
     if (!thumbNail.isNull()) {
@@ -578,24 +578,24 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     }
     texFileLabel = new QLabel(box);
     texFileLabel->setText(curTexture); // Saves the file name of the texture image
-    QPushButton *browseImages = new QPushButton("Browse", this);
+    QPushButton *browseImages{new QPushButton("Browse", this)};
     browseImages->setStyle(fusion);
     connect(browseImages, &QPushButton::clicked, this, &ComponentList::setNewTextureFile);
-    QHBoxLayout *texture = new QHBoxLayout;
+    QHBoxLayout *texture{new QHBoxLayout};
     texture->addWidget(textureThumb);
     texture->addWidget(texFileLabel);
     texture->addWidget(browseImages);
 
     colorLabel = new QLabel;
-    QPixmap curColor(18, 18);
-    vec3 oColor = mat.mObjectColor;
+    QPixmap curColor{18, 18};
+    vec3 oColor{mat.mObjectColor};
     rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
     curColor.fill(rgb);
     colorLabel->setPixmap(curColor);
-    QPushButton *colorButton = new QPushButton(tr("Change Color"));
+    QPushButton *colorButton{new QPushButton(tr("Change Color"))};
     connect(colorButton, &QPushButton::clicked, this, &ComponentList::setColor);
 
-    QHBoxLayout *color = new QHBoxLayout;
+    QHBoxLayout *color{new QHBoxLayout};
     color->addWidget(colorLabel);
     color->addWidget(colorButton);
 
@@ -606,21 +606,21 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     scrollArea->addGroupBox(box);
 }
 void ComponentList::setupTransformSettings(const Transform &trans) {
-    ComponentGroupBox *box = new ComponentGroupBox("Transform", this);
+    ComponentGroupBox *box{new ComponentGroupBox("Transform", this)};
 
-    QGridLayout *grid = new QGridLayout;
+    QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
 
-    MovementSystem *movement = registry->system<MovementSystem>().get();
+    MovementSystem *movement{registry->system<MovementSystem>().get()};
     connect(movement, &MovementSystem::positionChanged, this, &ComponentList::updatePositionVals);
     connect(movement, &MovementSystem::rotationChanged, this, &ComponentList::updateRotationVals);
     connect(movement, &MovementSystem::scaleChanged, this, &ComponentList::updateScaleVals);
 
     // Set up the Position display
-    QGroupBox *posBox = new QGroupBox(tr("Position"));
+    QGroupBox *posBox{new QGroupBox(tr("Position"))};
     posBox->setStyle(fusion);
     posBox->setFlat(true);
-    QHBoxLayout *position = new QHBoxLayout;
+    QHBoxLayout *position{new QHBoxLayout};
     position->setMargin(1);
     std::tie(xVal, yVal, zVal) = makeVectorBox(trans.localPosition, position);
     connect(this, &ComponentList::posX, xVal, &QDoubleSpinBox::setValue);
@@ -634,19 +634,19 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     grid->addWidget(posBox, 0, 0);
 
     // Check box for showing absolute position instead of local position
-    QHBoxLayout *check = new QHBoxLayout;
+    QHBoxLayout *check{new QHBoxLayout};
     abs = new QCheckBox(tr("Absolute Position"));
     connect(abs, &QCheckBox::stateChanged, this, &ComponentList::updatePosSpinBoxes);
     check->addWidget(abs);
     grid->addLayout(check, 1, 0);
 
     // Set up the Rotation Display
-    QGroupBox *rotBox = new QGroupBox(tr("Rotation"));
+    QGroupBox *rotBox{new QGroupBox(tr("Rotation"))};
     rotBox->setStyle(fusion);
     rotBox->setFlat(true);
-    QHBoxLayout *rotation = new QHBoxLayout;
+    QHBoxLayout *rotation{new QHBoxLayout};
     rotation->setMargin(1);
-    auto [rotX, rotY, rotZ] = makeVectorBox(trans.localRotation, rotation, -180, 180);
+    auto [rotX, rotY, rotZ]{makeVectorBox(trans.localRotation, rotation, -180, 180)};
     connect(this, &ComponentList::rotX, rotX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::rotY, rotY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::rotZ, rotZ, &QDoubleSpinBox::setValue);
@@ -658,12 +658,12 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     grid->addWidget(rotBox, 2, 0);
 
     // Set up the Rotation Display
-    QGroupBox *scaleBox = new QGroupBox(tr("Scale"));
+    QGroupBox *scaleBox{new QGroupBox(tr("Scale"))};
     scaleBox->setStyle(fusion);
     scaleBox->setFlat(true);
-    QHBoxLayout *scale = new QHBoxLayout(box);
+    QHBoxLayout *scale{new QHBoxLayout(box)};
     scale->setMargin(1);
-    auto [scaleX, scaleY, scaleZ] = makeVectorBox(trans.localScale, scale, 0.1, 100);
+    auto [scaleX, scaleY, scaleZ]{makeVectorBox(trans.localScale, scale, 0.1, 500)};
     connect(this, &ComponentList::scaleX, scaleX, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::scaleY, scaleY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::scaleZ, scaleZ, &QDoubleSpinBox::setValue);
@@ -679,26 +679,26 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
 }
 
 void ComponentList::setNewTextureFile() {
-    QString directory = QString::fromStdString(gsl::assetFilePath) + "Textures";
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Image"), directory, tr("Image Files (*.bmp *.jpg *.png)"));
+    QString directory{QString::fromStdString(gsl::assetFilePath) + "Textures"};
+    QString fileName{QFileDialog::getOpenFileName(this, tr("Open Image"), directory,
+                                                  tr("Image Files (*.bmp *.jpg *.png)"))};
     if (!fileName.isEmpty()) {
-        QFileInfo file(fileName);
+        QFileInfo file{fileName};
         fileName = file.fileName();
-        ResourceManager *factory = ResourceManager::instance();
+        ResourceManager *factory{ResourceManager::instance()};
         factory->loadTexture(fileName.toStdString());
         registry->get<Material>(registry->getSelectedEntity()).mTextureUnit = factory->getTexture(fileName.toStdString())->textureUnit();
         texFileLabel->setText(fileName);
     }
 }
 void ComponentList::setNewMesh() {
-    QString directory = QString::fromStdString(gsl::assetFilePath) + "Meshes";
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Mesh File"), directory, tr("OBJ Files (*.obj)"));
+    QString directory{QString::fromStdString(gsl::assetFilePath) + "Meshes"};
+    QString fileName{QFileDialog::getOpenFileName(this, tr("Open Mesh File"), directory,
+                                                  tr("OBJ Files (*.obj)"))};
     if (!fileName.isEmpty()) {
-        QFileInfo file(fileName);
+        QFileInfo file{fileName};
         fileName = file.fileName();
-        ResourceManager *factory = ResourceManager::instance();
+        ResourceManager *factory{ResourceManager::instance()};
         factory->setMesh(fileName.toStdString(), registry->getSelectedEntity());
         objFileLabel->setText(fileName);
     }
@@ -707,21 +707,21 @@ void ComponentList::setNewMesh() {
  * @brief Not sure why this gives a geometry warning, ask Ole?
  */
 void ComponentList::setColor() {
-    const QColor color = QColorDialog::getColor(rgb, this, "Select Color");
+    const QColor color{QColorDialog::getColor(rgb, this, "Select Color")};
     if (color.isValid()) {
-        QPixmap newRgb(18, 18);
+        QPixmap newRgb{18, 18};
         newRgb.fill(color);
         colorLabel->setPixmap(newRgb);
     }
-    registry->get<Material>(registry->getSelectedEntity()).mObjectColor = vec3(color.redF(), color.greenF(), color.blueF());
+    registry->get<Material>(registry->getSelectedEntity()).mObjectColor = vec3{static_cast<GLfloat>(color.redF()), static_cast<GLfloat>(color.greenF()), static_cast<GLfloat>(color.blueF())};
 }
 
 void ComponentList::updatePosSpinBoxes(int state) {
     disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
     disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
     disconnect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
-    GLuint entityID = registry->getSelectedEntity();
-    auto &trans = registry->get<Transform>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &trans{registry->get<Transform>(entityID)};
     switch (state) {
     case 0:
         xVal->setValue(trans.localPosition.x);
@@ -766,8 +766,8 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
 }
 
 void ComponentList::setPositionX(double xIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     if (abs->isChecked())
         movement->setAbsolutePositionX(entityID, xIn, false);
     else
@@ -777,8 +777,8 @@ void ComponentList::setPositionX(double xIn) {
         movement->updateEntity(entityID);
 }
 void ComponentList::setPositionY(double yIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     if (abs->isChecked())
         movement->setAbsolutePositionY(entityID, yIn, false);
     else
@@ -787,8 +787,8 @@ void ComponentList::setPositionY(double yIn) {
         movement->updateEntity(entityID);
 }
 void ComponentList::setPositionZ(double zIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     if (abs->isChecked())
         movement->setAbsolutePositionZ(entityID, zIn, false);
     else
@@ -797,52 +797,52 @@ void ComponentList::setPositionZ(double zIn) {
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationX(double xIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationY(double yIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationZ(double zIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleX(double xIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleY(double yIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleZ(double zIn) {
-    auto movement = registry->system<MovementSystem>();
-    GLuint entityID = registry->getSelectedEntity();
+    auto movement{registry->system<MovementSystem>()};
+    GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 
 QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col) {
-    QHBoxLayout *objectType = new QHBoxLayout;
+    QHBoxLayout *objectType{new QHBoxLayout};
     objectType->setMargin(1);
-    QComboBox *staticBox = new QComboBox;
+    QComboBox *staticBox{new QComboBox};
     staticBox->addItem("Static");
     staticBox->addItem("Dynamic");
     if (col.isStatic)
@@ -850,7 +850,7 @@ QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Coll
     else
         staticBox->setCurrentIndex(1);
 
-    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
+    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
     connect(staticBox, SIGNAL(currentIndexChanged(int)), colSys, SLOT(setObjectType(int)));
     objectType->addWidget(staticBox);
     objectTypeBox->setLayout(objectType);
@@ -859,7 +859,7 @@ QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Coll
 CustomDoubleSpinBox *ComponentList::makeDoubleSpinBox(const double &num, QHBoxLayout *layout,
                                                       const std::optional<float> &minRange, const std::optional<float> &maxRange) {
     layout->setMargin(1);
-    CustomDoubleSpinBox *distance = new CustomDoubleSpinBox(minRange, maxRange);
+    CustomDoubleSpinBox *distance{new CustomDoubleSpinBox(minRange, maxRange)};
     distance->setValue(num);
     layout->addWidget(distance);
 
@@ -878,14 +878,14 @@ std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> 
                                                                                                              const std::optional<float> &minRange, const std::optional<float> &maxRange) {
     layout->setMargin(1);
 
-    CustomDoubleSpinBox *xBox = new CustomDoubleSpinBox(minRange, maxRange);
-    CustomDoubleSpinBox *yBox = new CustomDoubleSpinBox(minRange, maxRange);
-    CustomDoubleSpinBox *zBox = new CustomDoubleSpinBox(minRange, maxRange);
+    CustomDoubleSpinBox *xBox{new CustomDoubleSpinBox(minRange, maxRange)};
+    CustomDoubleSpinBox *yBox{new CustomDoubleSpinBox(minRange, maxRange)};
+    CustomDoubleSpinBox *zBox{new CustomDoubleSpinBox(minRange, maxRange)};
 
     // Set up the Vector Display
     for (int i = 0; i < 6; i++) {
         if (i % 2 == 0) {
-            QLabel *label = new QLabel;
+            QLabel *label{new QLabel};
             label->setStyle(fusion);
             switch (i) {
             case 0:

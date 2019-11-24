@@ -35,8 +35,8 @@ public:
      * @param geometryPath
      */
     template <typename ShaderType>
-    void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr) {
-        std::string shaderName = typeid(ShaderType).name();
+    inline void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr) {
+        std::string shaderName{typeid(ShaderType).name()};
         if (mShaders.find(shaderName) == mShaders.end()) {
             mShaders[shaderName] = std::make_shared<ShaderType>(camController, geometryPath);
             qDebug() << "ResourceManager: Added shader " << QString::fromStdString(mShaders[shaderName]->getName());
@@ -46,8 +46,8 @@ public:
     }
     // Gets stored shader
     template <typename Type>
-    Ref<Type> getShader() {
-        std::string type = typeid(Type).name();
+    inline Ref<Type> getShader() {
+        std::string type{typeid(Type).name()};
         return std::static_pointer_cast<Type>(mShaders[type]);
     }
     // Loads and generates texture from file

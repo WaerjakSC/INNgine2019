@@ -1,7 +1,7 @@
 #include "bsplinecurve.h"
 #include "registry.h"
 
-BSplineCurve::BSplineCurve(int degree) : d(degree) {
+BSplineCurve::BSplineCurve(int degree) : d{degree} {
     debugShader = ResourceManager::instance()->getShader<ColorShader>();
 }
 
@@ -24,13 +24,13 @@ void BSplineCurve::setControlPoints(const std::vector<vec3> &cp) {
  */
 std::vector<float> BSplineCurve::findKnots() const {
 
-    auto startEndSize = static_cast<unsigned int>(d + 1);
-    auto n = b.size() + startEndSize;
+    auto startEndSize{static_cast<unsigned int>(d + 1)};
+    auto n{b.size() + startEndSize};
 
     if (n < 2 * startEndSize)
         return {};
 
-    auto innerSize = n - 2 * startEndSize;
+    auto innerSize{n - 2 * startEndSize};
 
     std::vector<float> t;
     t.reserve(n);
@@ -65,9 +65,9 @@ int BSplineCurve::getMy(float x) const {
  */
 void BSplineCurve::updateTrophies() {
     std::vector<vec3> controlPoints;
-    auto view = Registry::instance()->view<BSplinePoint>(); // Get every entity with these two components
+    auto view{Registry::instance()->view<BSplinePoint>()}; // Get every entity with these two components
     for (auto entity : view) {
-        auto &bspline = view.get(entity);
+        auto &bspline{view.get(entity)};
         controlPoints.push_back(bspline.location);
     }
 
@@ -82,9 +82,9 @@ void BSplineCurve::updatePath(bool init) {
 
     vertices.reserve(splineResolution + b.size());
     std::vector<vec3> localPos;
-    auto view = Registry::instance()->view<Transform, BSplinePoint>(); // Get every entity with these two components
+    auto view{Registry::instance()->view<Transform, BSplinePoint>()}; // Get every entity with these two components
     for (int i{0}; i < splineResolution; ++i) {
-        auto p = eval(i * 1.f / splineResolution);
+        auto p{eval(i * 1.f / splineResolution)};
         vertices.emplace_back(p.x, p.y, p.z, 0.f, 1.f, 0.f);
         if (i == 0 || i == 15 || i == 30 || i == 49) {
             localPos.push_back(p);
@@ -93,10 +93,10 @@ void BSplineCurve::updatePath(bool init) {
     if (init) {
         std::vector<Transform *> temp;
         for (auto entity : view) {
-            auto &bspline = view.get<Transform>(entity);
+            auto &bspline{view.get<Transform>(entity)};
             temp.push_back(&bspline);
         }
-        for (size_t i = 0; i < temp.size(); i++) {
+        for (size_t i{0}; i < temp.size(); i++) {
             temp[i]->localPosition = localPos[i];
             temp[i]->localPosition.y += 0.5f;
             temp[i]->matrixOutdated = true;
@@ -104,8 +104,8 @@ void BSplineCurve::updatePath(bool init) {
     }
     // Control points
     for (size_t i{0}; i < b.size(); ++i) {
-        auto p = b.at(i);
-        vertices.emplace_back(p.x, p.y, p.z, 1.f, 0.f, 0.f);
+        auto p{b.at(i)};
+        vertices.emplace_back(Vertex{p.x, p.y, p.z, 1.f, 0.f, 0.f});
     }
 
     glBindVertexArray(mVAO);
@@ -125,15 +125,15 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
     std::vector<vec3> a;
     a.resize(t.size() + d + 1);
 
-    for (int j = 0; j <= d; j++) {
+    for (int j{0}; j <= d; j++) {
         a[d - j] = b[my - j];
     }
 
-    for (int k = d; k > 0; k--) {
-        int j = my - k;
-        for (int i = 0; i < k; i++) {
+    for (int k{d}; k > 0; k--) {
+        int j{my - k};
+        for (int i{0}; i < k; i++) {
             j++;
-            float w = (x - t[j]) / (t[j + k] - t[j]);
+            float w{(x - t[j]) / (t[j + k] - t[j])};
             a[i] = a[i] * (1 - w) + a[i + 1] * w;
         }
     }
@@ -182,7 +182,7 @@ void BSplineCurve::init() {
  * @return
  */
 vec3 BSplineCurve::eval(float x) const {
-    auto my = getMy(x);
+    auto my{getMy(x)};
     if (my > -1)
         return evaluateBSpline(my, x);
 

@@ -1,11 +1,11 @@
 #include "texture.h"
 #include "innpch.h"
 
-Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core(), mTextureUnit(textureUnit) {
+Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit} {
     isValid = textureFromFile(filename);
 }
 
-Texture::Texture(std::vector<std::string> faces, GLuint textureUnit) : QOpenGLFunctions_4_1_Core(), mTextureUnit(textureUnit) {
+Texture::Texture(std::vector<std::string> faces, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit} {
     isValid = cubeMapFromFile(faces);
 }
 
@@ -25,9 +25,9 @@ bool Texture::cubeMapFromFile(std::vector<std::string> faces) {
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(false);
-    for (unsigned int i = 0; i < faces.size(); i++) {
-        std::string fileWithPath = gsl::assetFilePath + "Textures/" + faces[i];
-        unsigned char *data = stbi_load(fileWithPath.c_str(), &width, &height, &nrChannels, 0);
+    for (unsigned int i{0}; i < faces.size(); i++) {
+        std::string fileWithPath{gsl::assetFilePath + "Textures/" + faces[i]};
+        unsigned char *data{stbi_load(fileWithPath.c_str(), &width, &height, &nrChannels, 0)};
         if (data) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
@@ -46,12 +46,12 @@ bool Texture::cubeMapFromFile(std::vector<std::string> faces) {
 }
 bool Texture::textureFromFile(const std::string &filename /*, bool gamma*/) {
     initializeOpenGLFunctions();
-    std::string fileWithPath = gsl::assetFilePath + "Textures/" + filename;
+    std::string fileWithPath{gsl::assetFilePath + "Textures/" + filename};
     glGenTextures(1, &mId);
 
     int width, height, nrComponents;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(fileWithPath.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char *data{stbi_load(fileWithPath.c_str(), &width, &height, &nrComponents, 0)};
     if (data) {
         GLenum format;
         if (nrComponents == 1)

@@ -6,7 +6,7 @@
 typedef gsl::Vector3D vec3;
 struct Ray {
     Ray() {}
-    Ray(const vec3 &orig, const vec3 &dir) : origin(orig), direction(dir) {
+    Ray(const vec3 &orig, const vec3 &dir) : origin{orig}, direction{dir} {
         invDir = direction.divide(1.f);
         sign[0] = (invDir.x < 0);
         sign[1] = (invDir.y < 0);

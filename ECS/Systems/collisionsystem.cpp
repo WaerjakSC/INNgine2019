@@ -4,7 +4,7 @@
 #include "raycast.h"
 #include "registry.h"
 #include <cmath>
-CollisionSystem::CollisionSystem() : registry(Registry::instance()) {
+CollisionSystem::CollisionSystem() : registry{Registry::instance()} {
 }
 void CollisionSystem::update(DeltaTime dt) {
     delta += dt;
@@ -18,33 +18,33 @@ void CollisionSystem::runSimulations() {
     runSphereSimulations();
 }
 void CollisionSystem::runAABBSimulations() {
-    auto view = registry->view<EInfo, AABB>();
+    auto view{registry->view<EInfo, AABB>()};
     for (auto entity : view) {
-        auto &aabb = view.get<AABB>(entity);
+        auto &aabb{view.get<AABB>(entity)};
         // Check for AABB-AABB intersections
         for (auto otherEntity : view) {
             if (entity != otherEntity) {
-                auto &otherAABB = view.get<AABB>(otherEntity);
+                auto &otherAABB{view.get<AABB>(otherEntity)};
                 if (!bothStatic(aabb, otherAABB))
                     if (AABBAABB(aabb, otherAABB)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1 = view.get<EInfo>(entity).mName;
-                        QString entity2 = view.get<EInfo>(otherEntity).mName;
+                        QString entity1{view.get<EInfo>(entity).mName};
+                        QString entity2{view.get<EInfo>(otherEntity).mName};
                         //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
             }
         }
-        auto sphereView = registry->view<EInfo, Sphere>();
+        auto sphereView{registry->view<EInfo, Sphere>()};
         for (auto otherEntity : sphereView) {
             if (entity != otherEntity) {
-                auto &sphere = sphereView.get<Sphere>(otherEntity);
+                auto &sphere{sphereView.get<Sphere>(otherEntity)};
                 if (!bothStatic(aabb, sphere))
                     if (SphereAABB(sphere, aabb)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1 = view.get<EInfo>(entity).mName;
-                        QString entity2 = sphereView.get<EInfo>(otherEntity).mName;
+                        QString entity1{view.get<EInfo>(entity).mName};
+                        QString entity2{sphereView.get<EInfo>(otherEntity).mName};
                         // NOTIFY FSM
                         if (registry->contains<BSplinePoint>(entity)) {
                             registry->removeEntity(entity);
@@ -63,17 +63,17 @@ void CollisionSystem::runAABBSimulations() {
     }
 }
 void CollisionSystem::runSphereSimulations() {
-    auto view = registry->view<EInfo, Sphere>();
+    auto view{registry->view<EInfo, Sphere>()};
     for (auto entity : view) {
-        auto &sphere = view.get<Sphere>(entity);
+        auto &sphere{view.get<Sphere>(entity)};
         for (auto otherEntity : view) {
             if (entity != otherEntity) {
-                auto &otherSphere = view.get<Sphere>(otherEntity);
+                auto &otherSphere{view.get<Sphere>(otherEntity)};
                 if (!bothStatic(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
                         //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
-                        QString entity1 = view.get<EInfo>(entity).mName;
-                        QString entity2 = view.get<EInfo>(otherEntity).mName;
+                        QString entity1{view.get<EInfo>(entity).mName};
+                        QString entity2{view.get<EInfo>(otherEntity).mName};
 
                         //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
@@ -88,87 +88,87 @@ bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs) {
 }
 
 vec3 CollisionSystem::getMin(const AABB &aabb) {
-    vec3 origin = aabb.transform.modelMatrix.getPosition();
-    vec3 p1 = origin + aabb.size;
-    vec3 p2 = origin - aabb.size;
+    vec3 origin{aabb.transform.modelMatrix.getPosition()};
+    vec3 p1{origin + aabb.size};
+    vec3 p2{origin - aabb.size};
 
-    return vec3(fminf(p1.x, p2.x),
+    return vec3{fminf(p1.x, p2.x),
                 fminf(p1.y, p2.y),
-                fminf(p1.z, p2.z));
+                fminf(p1.z, p2.z)};
 }
 
 vec3 CollisionSystem::getMax(const AABB &aabb) {
-    vec3 origin = aabb.transform.modelMatrix.getPosition();
-    vec3 p1 = origin + aabb.size;
-    vec3 p2 = origin - aabb.size;
+    vec3 origin{aabb.transform.modelMatrix.getPosition()};
+    vec3 p1{origin + aabb.size};
+    vec3 p2{origin - aabb.size};
 
-    return vec3(fmaxf(p1.x, p2.x),
+    return vec3{fmaxf(p1.x, p2.x),
                 fmaxf(p1.y, p2.y),
-                fmaxf(p1.z, p2.z));
+                fmaxf(p1.z, p2.z)};
 }
 
 bool CollisionSystem::SphereOBB(const Sphere &sphere, const OBB &obb) {
 
     // Finner først nærmeste punktet i OBB til sphere center
-    vec3 p = ClosestPoint(obb, sphere.position);
+    vec3 p{ClosestPoint(obb, sphere.position)};
     // Finner avstanden mellom sphere center og punktet i OBB
-    float dist = (sphere.position - p).length();
-    float radiusSq = sphere.radius * sphere.radius;
-    // Hvis avstanden er mindre en radius^2, har vi en intersection mellom Sphere og OBB
+    float dist{(sphere.position - p).length()};
+    float radiusSq{sphere.radius * sphere.radius};
+    // Hvis avstanden er mindre enn radius^2, har vi en intersection mellom Sphere og OBB
     return dist < radiusSq;
 }
 
 bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2) {
-    vec3 sphere1Pos = sphere1.transform.modelMatrix.getPosition();
-    vec3 sphere2Pos = sphere2.transform.modelMatrix.getPosition();
+    vec3 sphere1Pos{sphere1.transform.modelMatrix.getPosition()};
+    vec3 sphere2Pos{sphere2.transform.modelMatrix.getPosition()};
     // sum of radius
-    float rs = sphere1.radius + sphere2.radius;
+    float rs{sphere1.radius + sphere2.radius};
     // dist squared
-    float dist = (sphere1Pos + sphere2Pos).length();
+    float dist{(sphere1Pos + sphere2Pos).length()};
     // compare
     return dist < (rs * rs);
 }
 
 bool CollisionSystem::AABBPlane(const AABB &aabb, const Plane &plane) { // WIP - not sure if this works
-    float mHalfExtent = aabb.size.x * fabsf(plane.normal.x) +
-                        aabb.size.y * fabsf(plane.normal.y) +
-                        aabb.size.z * fabsf(plane.normal.z);
-    vec3 aabbPos = aabb.transform.modelMatrix.getPosition();
+    float mHalfExtent{aabb.size.x * fabsf(plane.normal.x) +
+                      aabb.size.y * fabsf(plane.normal.y) +
+                      aabb.size.z * fabsf(plane.normal.z)};
+    vec3 aabbPos{aabb.transform.modelMatrix.getPosition()};
     // Distance from center of AABB to plane
-    float dotProduct = vec3::dot(plane.normal, aabbPos);
-    float dist = dotProduct - plane.distance;
+    float dotProduct{vec3::dot(plane.normal, aabbPos)};
+    float dist{dotProduct - plane.distance};
 
     return fabsf(dist) <= mHalfExtent;
 }
 
 bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
     // Get the actual position of the sphere - sphere.position only holds the offset from the entity it belongs to
-    vec3 spherePos = sphere.transform.modelMatrix.getPosition();
+    vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
     // Not sure what ClosestPoint aims to achieve, previously I think it was sending a vec3(sphere.radius, 0,0) due to how vector3d works
     //    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
     // Now sends the center position of the sphere
-    vec3 closestPoint = ClosestPoint(aabb, spherePos);
+    vec3 closestPoint{ClosestPoint(aabb, spherePos)};
     // not 100% sure about this one
-    float dist = (spherePos - closestPoint).length();
-    float radiusSq = sphere.radius * sphere.radius;
+    float dist{(spherePos - closestPoint).length()};
+    float radiusSq{sphere.radius * sphere.radius};
 
     return dist < radiusSq;
 }
 
 bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
-    vec3 aMin = getMin(AABB1);
-    vec3 aMax = getMax(AABB1);
+    vec3 aMin{getMin(AABB1)};
+    vec3 aMax{getMax(AABB1)};
 
-    vec3 bMin = getMin(AABB2);
-    vec3 bMax = getMax(AABB2);
+    vec3 bMin{getMin(AABB2)};
+    vec3 bMax{getMax(AABB2)};
 
     return aMin <= bMax && aMax >= bMin;
 }
 
 vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point) {
-    vec3 result = point;
-    vec3 min = getMin(aabb);
-    vec3 max = getMax(aabb);
+    vec3 result{point};
+    vec3 min{getMin(aabb)};
+    vec3 max{getMax(aabb)};
 
     // Clamping closest point to the minimum point in given AABB
     result.x = (result.x < min.x ? min.x : result.x);
@@ -189,21 +189,21 @@ vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point) {
  * @return
  */
 vec3 CollisionSystem::ClosestPoint(const OBB &obb, const vec3 &point) {
-    vec3 result = obb.position;
+    vec3 result{obb.position};
     //     move the point relative to the OBB
-    vec3 dir = point - obb.position;
+    vec3 dir{point - obb.position};
 
     // Loops three times, once for each axis: #0 for the X-axis, #1 for the Y-axis, #2 for the Z-axis
     // projects the point onto each of the axes of the box,
     // and compares the distance to the extent of the box
     for (int i = 0; i < 3; ++i) {
-        const float *orientation = &obb.orientation.matrix[i * 3];
+        const float *orientation{&obb.orientation.matrix[i * 3]};
         // vector that holds the different axis
-        vec3 axis(orientation[0],
+        vec3 axis{orientation[0],
                   orientation[1],
-                  orientation[2]);
+                  orientation[2]};
         // projects the point onto that axis and stores the distance
-        float dist = vec3::dot(dir, axis);
+        float dist{vec3::dot(dir, axis)};
 
         // clamp
         if (dist > obb.size[i]) {
@@ -221,8 +221,8 @@ vec3 CollisionSystem::ClosestPoint(const OBB &obb, const vec3 &point) {
 }
 
 vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
-    vec3 spherePos = sphere.transform.modelMatrix.getPosition();
-    vec3 sphereCenterToPoint = point - spherePos;
+    vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
+    vec3 sphereCenterToPoint{point - spherePos};
     sphereCenterToPoint.normalize();
     sphereCenterToPoint = sphereCenterToPoint * sphere.radius;
 
@@ -230,20 +230,20 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
 }
 
 bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance) {
-    vec3 center = sphere.transform.modelMatrix.getPosition() + sphere.position;
-    vec3 originToCenter = ray.origin - center;
+    vec3 center{sphere.transform.modelMatrix.getPosition() + sphere.position};
+    vec3 originToCenter{ray.origin - center};
 
-    float a = vec3::dot(ray.direction, ray.direction);
-    float b = 2.0 * vec3::dot(originToCenter, ray.direction);
-    float c = vec3::dot(originToCenter, originToCenter) - (sphere.radius * sphere.radius);
-    float discriminant = (b * b) - (4 * a * c);
+    float a{vec3::dot(ray.direction, ray.direction)};
+    float b{2.f * vec3::dot(originToCenter, ray.direction)};
+    float c{vec3::dot(originToCenter, originToCenter) - (sphere.radius * sphere.radius)};
+    float discriminant{(b * b) - (4 * a * c)};
     if (discriminant < 0)
         return false;
     if (discriminant > 0.0f) {
         // get the 2 intersection distances along ray
-        float sqrtDisc = sqrt(discriminant);
-        double t_a = (-b + sqrtDisc) / (2 * a);
-        double t_b = (-b - sqrtDisc) / (2 * a);
+        float sqrtDisc{sqrtf(discriminant)};
+        double t_a{(-b + sqrtDisc) / (2 * a)};
+        double t_b{(-b - sqrtDisc) / (2 * a)};
         intersectionDistance = t_b;
         // if behind viewer, throw one or both away
         if (t_a < 0.0f) {
@@ -256,7 +256,7 @@ bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &
     // check for ray hitting once (skimming the surface)
     if (0.0f == discriminant) {
         // if behind viewer, throw away
-        double t = (-b + sqrt(discriminant) / (2.0 * a));
+        double t = {-b + sqrt(discriminant) / (2.0 * a)};
         if (t < 0.0f)
             return false;
         intersectionDistance = t;
@@ -266,16 +266,16 @@ bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &
 }
 
 bool CollisionSystem::RayToAABB(const Ray &r, const AABB &aabb, double &intersectionDistance) {
-    vec3 AABBmin = getMin(aabb);
-    vec3 AABBmax = getMax(aabb);
+    vec3 AABBmin{getMin(aabb)};
+    vec3 AABBmax{getMax(aabb)};
 
-    float t1 = (AABBmin.x - r.origin.x) * r.invDir.x;
-    float t2 = (AABBmax.x - r.origin.x) * r.invDir.x;
+    float t1{(AABBmin.x - r.origin.x) * r.invDir.x};
+    float t2{(AABBmax.x - r.origin.x) * r.invDir.x};
 
-    float tmin = std::min(t1, t2);
-    float tmax = std::max(t1, t2);
+    float tmin{std::min(t1, t2)};
+    float tmax{std::max(t1, t2)};
 
-    for (int i = 1; i < 3; ++i) {
+    for (int i{1}; i < 3; ++i) {
         t1 = (AABBmin[i] - r.origin[i]) * r.invDir[i];
         t2 = (AABBmax[i] - r.origin[i]) * r.invDir[i];
 
@@ -291,133 +291,133 @@ bool CollisionSystem::RayToAABB(const Ray &r, const AABB &aabb, double &intersec
 }
 // ************* Collider update slots *************
 void CollisionSystem::setOriginX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &aabb = registry->get<AABB>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.x = xIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
 void CollisionSystem::setOriginY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &aabb = registry->get<AABB>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.y = yIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
 void CollisionSystem::setOriginZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &aabb = registry->get<AABB>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.z = zIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
 void CollisionSystem::setAABBSizeX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &aabb = registry->get<AABB>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.x = xIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
 void CollisionSystem::setAABBSizeY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &aabb = registry->get<AABB>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.y = yIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
 void CollisionSystem::setAABBSizeZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &aabb = registry->get<AABB>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.z = zIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
 void CollisionSystem::setOBBPositionX(double xIn) {
-    auto &obb = registry->get<OBB>(registry->getSelectedEntity());
+    auto &obb{registry->get<OBB>(registry->getSelectedEntity())};
     obb.position.x = xIn;
 }
 void CollisionSystem::setOBBPositionY(double yIn) {
-    auto &obb = registry->get<OBB>(registry->getSelectedEntity());
+    auto &obb{registry->get<OBB>(registry->getSelectedEntity())};
     obb.position.y = yIn;
 }
 void CollisionSystem::setOBBPositionZ(double zIn) {
-    auto &obb = registry->get<OBB>(registry->getSelectedEntity());
+    auto &obb{registry->get<OBB>(registry->getSelectedEntity())};
     obb.position.z = zIn;
 }
 void CollisionSystem::setOBBSizeX(double xIn) {
-    auto &obb = registry->get<OBB>(registry->getSelectedEntity());
+    auto &obb{registry->get<OBB>(registry->getSelectedEntity())};
     obb.size.x = xIn;
 }
 void CollisionSystem::setOBBSizeY(double yIn) {
-    auto &obb = registry->get<OBB>(registry->getSelectedEntity());
+    auto &obb{registry->get<OBB>(registry->getSelectedEntity())};
     obb.size.y = yIn;
 }
 void CollisionSystem::setOBBSizeZ(double zIn) {
-    auto &obb = registry->get<OBB>(registry->getSelectedEntity());
+    auto &obb{registry->get<OBB>(registry->getSelectedEntity())};
     obb.size.z = zIn;
 }
 void CollisionSystem::setSpherePositionX(double xIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &sphere = registry->get<Sphere>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.x = xIn;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
 void CollisionSystem::setSpherePositionY(double yIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &sphere = registry->get<Sphere>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.y = yIn;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
 void CollisionSystem::setSpherePositionZ(double zIn) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &sphere = registry->get<Sphere>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.z = zIn;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
 void CollisionSystem::setSphereRadius(double radius) {
-    GLuint entityID = registry->getSelectedEntity();
-    auto &sphere = registry->get<Sphere>(entityID);
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &sphere{registry->get<Sphere>(entityID)};
     sphere.radius = radius;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
 void CollisionSystem::setCylinderPositionX(double xIn) {
-    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity());
+    auto &cylinder{registry->get<Sphere>(registry->getSelectedEntity())};
     cylinder.position.x = xIn;
 }
 void CollisionSystem::setCylinderPositionY(double yIn) {
-    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity());
+    auto &cylinder{registry->get<Sphere>(registry->getSelectedEntity())};
     cylinder.position.y = yIn;
 }
 void CollisionSystem::setCylinderPositionZ(double zIn) {
-    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity());
+    auto &cylinder{registry->get<Sphere>(registry->getSelectedEntity())};
     cylinder.position.z = zIn;
 }
 void CollisionSystem::setCylinderRadius(double radius) {
-    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity());
+    auto &cylinder{registry->get<Sphere>(registry->getSelectedEntity())};
     cylinder.radius = radius;
 }
 void CollisionSystem::setCylinderHeight(double height) {
-    auto &cylinder = registry->get<Sphere>(registry->getSelectedEntity());
+    auto &cylinder{registry->get<Sphere>(registry->getSelectedEntity())};
     cylinder.radius = height;
 }
 void CollisionSystem::setPlaneNormalX(double xIn) {
-    auto &plane = registry->get<Plane>(registry->getSelectedEntity());
+    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
     plane.normal.x = xIn;
 }
 void CollisionSystem::setPlaneNormalY(double yIn) {
-    auto &plane = registry->get<Plane>(registry->getSelectedEntity());
+    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
     plane.normal.y = yIn;
 }
 void CollisionSystem::setPlaneNormalZ(double zIn) {
-    auto &plane = registry->get<Plane>(registry->getSelectedEntity());
+    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
     plane.normal.z = zIn;
 }
 void CollisionSystem::setPlaneDistance(double distance) {
-    auto &plane = registry->get<Plane>(registry->getSelectedEntity());
+    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
     plane.distance = distance;
 }
 void CollisionSystem::setObjectType(int index) {
@@ -426,22 +426,22 @@ void CollisionSystem::setObjectType(int index) {
         isStatic = true;
     else
         isStatic = false;
-    GLuint entityID = registry->getSelectedEntity();
+    GLuint entityID{registry->getSelectedEntity()};
     if (registry->contains<AABB>(entityID)) {
-        auto &aabb = registry->get<AABB>(entityID);
+        auto &aabb{registry->get<AABB>(entityID)};
         aabb.isStatic = isStatic;
         return;
     }
     if (registry->contains<Sphere>(entityID)) {
-        auto &sphere = registry->get<Sphere>(entityID);
+        auto &sphere{registry->get<Sphere>(entityID)};
         sphere.isStatic = isStatic;
     }
     if (registry->contains<Cylinder>(entityID)) {
-        auto &cylinder = registry->get<Cylinder>(entityID);
+        auto &cylinder{registry->get<Cylinder>(entityID)};
         cylinder.isStatic = isStatic;
     }
     if (registry->contains<Plane>(entityID)) {
-        auto &plane = registry->get<Plane>(entityID);
+        auto &plane{registry->get<Plane>(entityID)};
         plane.isStatic = isStatic;
     }
 }

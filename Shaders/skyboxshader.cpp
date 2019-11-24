@@ -1,7 +1,7 @@
 #include "skyboxshader.h"
 #include "cameracontroller.h"
 SkyboxShader::SkyboxShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
-    : Shader(camController, "SkyboxShader", geometryPath) {
+    : Shader{camController, "SkyboxShader", geometryPath} {
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
 

@@ -144,9 +144,9 @@ struct Mesh : public Component {
     }
 };
 struct Light : public Component {
-    Light(GLfloat ambStr = 0.3f, vec3 ambColor = vec3(0.3f, 0.3f, 0.3f),
-          GLfloat lightStr = 0.7f, vec3 lightColor = vec3(0.3f, 0.3f, 0.3f),
-          vec3 color = vec3(1.f, 1.f, 1.f))
+    Light(GLfloat ambStr = 0.3f, vec3 ambColor = vec3{0.3f, 0.3f, 0.3f},
+          GLfloat lightStr = 0.7f, vec3 lightColor = vec3{0.3f, 0.3f, 0.3f},
+          vec3 color = vec3{1.f, 1.f, 1.f})
         : mAmbientStrength(ambStr), mAmbientColor(ambColor), mLightStrength(lightStr),
           mLightColor(lightColor), mObjectColor(color) {
     }
@@ -251,7 +251,7 @@ struct OBB : public Collision {
     mat3 orientation;
 
     // default constructor: lager en OBB ved origo
-    inline OBB() : size(vec3(2, 2, 2)) {}
+    inline OBB() : size(vec3{2, 2, 2}) {}
     // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
     inline OBB(const vec3 &p, const vec3 &s) : position(p), size(s) {}
     // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
@@ -304,7 +304,7 @@ struct Cylinder : public Collision {
     }
 };
 struct GameCamera : public Component {
-    inline GameCamera(vec3 pos = vec3(0), float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active) {
+    inline GameCamera(vec3 pos = vec3{0}, float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active) {
     }
     vec3 mCameraPosition;
     float mPitch, mYaw;
@@ -316,7 +316,7 @@ struct GameCamera : public Component {
  * @brief The BSplineCurve struct
  */
 struct BSplinePoint : Component {
-    BSplinePoint(vec3 loc = vec3(0)) : location(loc) {
+    BSplinePoint(vec3 loc = vec3{0}) : location(loc) {
     }
     vec3 location{0};
 };

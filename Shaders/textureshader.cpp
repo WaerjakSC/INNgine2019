@@ -3,7 +3,7 @@
 #include "innpch.h"
 
 TextureShader::TextureShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
-    : Shader(camController, "TextureShader", geometryPath) {
+    : Shader{camController, "TextureShader", geometryPath} {
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");

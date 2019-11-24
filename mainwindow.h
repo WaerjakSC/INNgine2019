@@ -32,8 +32,6 @@ public:
     void insertEntities();
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
-    QString windowName = "OpenGL in Qt";
-    QToolButton *play, *pause, *stop;
     void clearEditor();
 
 signals:
