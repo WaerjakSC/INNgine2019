@@ -147,6 +147,7 @@ private:
     QString mCurrentScene;
     QString mDefaultScene;
     Ref<CameraController> mCurrentCameraController;
+    void changeMsg();
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage
@@ -189,7 +190,6 @@ private:
     void makeLevelMesh(GLuint eID);
     void makeTowerMesh(GLuint eID);
     friend class ComponentList;
-    void changeMsg();
 };
 
 #endif // RESOURCEMANAGER_H

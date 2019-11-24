@@ -10,25 +10,6 @@ Registry *Registry::instance() {
     return mInstance;
 }
 
-void Registry::removeBillBoardID(GLuint entityID) {
-    for (auto &billboard : mBillBoards) {
-        if (entityID == billboard) {
-            std::swap(billboard, mBillBoards.back());
-            mBillBoards.pop_back();
-            return;
-        }
-    }
-}
-
-bool Registry::isBillBoard(GLuint entityID) {
-    for (auto billboard : mBillBoards) {
-        if (entityID == billboard) {
-            return true;
-        }
-    }
-    return false;
-}
-
 EInfo &Registry::getEntity(GLuint eID) {
     return get<EInfo>(eID);
 }
@@ -38,9 +19,6 @@ void Registry::removeEntity(GLuint eID) {
 
     if (info.mIsDestroyed)
         return;
-    if (isBillBoard(eID)) {
-        removeBillBoardID(eID);
-    }
     if (contains<Transform>(eID)) {
         setParent(eID, -1);
     }
@@ -76,8 +54,6 @@ GLuint Registry::makeEntity(const QString &name, bool signal) {
     GLuint eID = nextAvailable();
     std::vector<GLuint> entities = getPool<EInfo>()->entities();
 
-    //    if (name == "BillBoard")
-    //        mEntities[eID] = std::make_unique<BillBoard>(eID, "BillBoard");
     if (contains<EInfo>(eID)) {
         newGeneration(eID, name);
     } else
@@ -181,12 +157,12 @@ void Registry::makeSnapshot() {
         snapPools[pool.first] = pool.second->clone();
     }
 
-    mSnapshot = std::make_tuple(mBillBoards, snapPools);
+    mSnapshot = snapPools;
 }
 
 void Registry::loadSnapshot() {
     std::map<std::string, IPool *> tempPools;
-    std::tie(mBillBoards, tempPools) = mSnapshot;
+    tempPools = mSnapshot;
     mPools.clear();
     for (auto &pool : tempPools) {
         mPools[pool.first] = std::unique_ptr<IPool>(pool.second);

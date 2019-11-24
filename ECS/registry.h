@@ -129,9 +129,6 @@ public:
     inline std::string type() {
         return typeid(Type).name();
     }
-    inline void addBillBoard(GLuint entityID) { mBillBoards.push_back(entityID); }
-    void removeBillBoardID(GLuint entityID);
-    inline std::vector<GLuint> billBoards() { return mBillBoards; }
     /**
     * @brief Make a generic entity with no components attached.
     * @param name Name of the entity. Leave blank if no name desired.
@@ -241,10 +238,11 @@ private:
     std::map<std::string, Ref<ISystem>> mSystems{};
 
     std::vector<GLuint> mAvailableSlots;
-    std::vector<GLuint> mBillBoards;
-    bool isBillBoard(GLuint entityID);
+    void newGeneration(GLuint id, const QString &text);
+
     GLuint mSelectedEntity;
-    std::tuple<std::vector<GLuint>, std::map<std::string, IPool *>> mSnapshot;
+    std::map<std::string, IPool *> mSnapshot;
+
     template <typename Type>
     inline Ref<Type> getSystem() {
         std::string typeName = type<Type>();
@@ -256,7 +254,6 @@ private:
         std::string typeName = type<Type>();
         return static_cast<Pool<Type> *>(mPools[typeName].get());
     }
-    void newGeneration(GLuint id, const QString &text);
 };
 
 #endif // REGISTRY_H

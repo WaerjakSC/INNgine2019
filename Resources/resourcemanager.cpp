@@ -349,6 +349,7 @@ GLuint ResourceManager::makeBillBoard(const QString &name) {
     GLuint eID = registry->makeEntity(name);
     registry->add<Transform>(eID, gsl::Vector3D(4.f, 0.f, -3.5f));
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->textureUnit());
+    registry->add<BillBoard>(eID);
     auto search = mMeshMap.find("BillBoard");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
@@ -672,7 +673,6 @@ void ResourceManager::setMesh(std::string name, GLuint eID) {
         makeSkyBoxMesh(eID);
     else if (name == "BillBoard") {
         makeBillBoardMesh(eID);
-        registry->addBillBoard(eID);
     } else if (name == "Pyramid") // Light just refers to the pyramid mesh, probably not needed in the end
         makeLightMesh(eID);
     else if (name == "Plane")
