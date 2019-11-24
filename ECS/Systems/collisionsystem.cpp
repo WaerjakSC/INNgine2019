@@ -48,7 +48,7 @@ void CollisionSystem::runAABBSimulations() {
                         // NOTIFY FSM
                         if (registry->contains<BSplinePoint>(entity)) {
                             registry->removeEntity(entity);
-                            registry->getSystem<AISystem>()->masterOfCurves();
+                            registry->system<AISystem>()->masterOfCurves();
                         }
                         qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         if (entity1 == "Enemy" && entity2 == "Player") {

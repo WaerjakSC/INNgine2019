@@ -324,13 +324,13 @@ void MainWindow::onParentChanged(const QModelIndex &newParent) {
             if (registry->contains<Transform>(parent) && selectedEntity) {
                 // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
                 registry->setParent(selectedEntity, parent, true);
-                registry->getSystem<MovementSystem>()->updateEntity(selectedEntity);
+                registry->system<MovementSystem>()->updateEntity(selectedEntity);
             }
         }
     } else if (selectedEntity)
         if (registry->contains<Transform>(selectedEntity)) {
             registry->setParent(selectedEntity, -1, true);
-            registry->getSystem<MovementSystem>()->updateEntity(selectedEntity);
+            registry->system<MovementSystem>()->updateEntity(selectedEntity);
         }
 }
 void MainWindow::parentChanged(GLuint eID) {
@@ -349,7 +349,7 @@ void MainWindow::parentChanged(GLuint eID) {
             parent->insertRow(parent->rowCount(), item);
         } else
             rootItem->appendRow(item);
-        registry->getSystem<MovementSystem>()->updateEntity(eID);
+        registry->system<MovementSystem>()->updateEntity(eID);
     }
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
 }

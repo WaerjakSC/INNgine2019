@@ -185,7 +185,7 @@ void GameCameraController::updateMeshPosition() {
     auto [pos, sca, rot] = gsl::Matrix4x4::decomposed(temp);
     Q_UNUSED(pos);
     Q_UNUSED(sca);
-    auto moveSys = Registry::instance()->getSystem<MovementSystem>();
+    auto moveSys = Registry::instance()->system<MovementSystem>();
     moveSys->setLocalPosition(mControllerID, positionWithOffset());
     moveSys->setRotation(mControllerID, rot);
 }

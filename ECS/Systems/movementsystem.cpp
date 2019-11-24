@@ -53,7 +53,7 @@ void MovementSystem::updateBillBoardTransform(GLuint entity) {
     vec3 direction{};
     if (billboard.mNormalVersion) {
         vec3 camPosition = mat.mShader->getCameraController()->cameraPosition();
-        //cancel heigth info so billboard is allways upright:
+        //cancel height info so billboard is allways upright:
         if (billboard.mConstantYUp)
             camPosition.setY(transform.modelMatrix.getPosition().y);
         direction = camPosition - vec3(transform.modelMatrix.getPosition());

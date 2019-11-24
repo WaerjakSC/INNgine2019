@@ -28,7 +28,7 @@ void Scene::saveScene(const QString &fileName) {
 
     Registry *registry = Registry::instance();
     const std::vector<GLuint> &entities = registry->getEntities();
-    auto inputSys = registry->getSystem<InputSystem>();
+    auto inputSys = registry->system<InputSystem>();
 
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer(buf);
@@ -363,9 +363,9 @@ void Scene::populateScene(const Document &scene) {
 
     if (scene.HasMember("controller")) {
         GLuint controllerID = scene["controller"]["id"].GetUint();
-        registry->getSystem<InputSystem>()->setPlayer(controllerID);
+        registry->system<InputSystem>()->setPlayer(controllerID);
     } else
-        registry->getSystem<InputSystem>()->setPlayer(0);
+        registry->system<InputSystem>()->setPlayer(0);
     if (!scene.HasMember("Entity"))
         return;
     // Iterate through each entity in the scene
@@ -387,7 +387,7 @@ void Scene::populateScene(const Document &scene) {
                     else
                         parentID[id] = comp->value["parent"].GetInt(); // if not, add it to the list of parent/child pairs that must be updated after the loop
                 }
-                registry->getSystem<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
+                registry->system<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
             } else if (comp->name == "material") {
                 vec3 color(comp->value["color"][0].GetDouble(), comp->value["color"][1].GetDouble(), comp->value["color"][2].GetDouble());
                 GLfloat specStr = comp->value["specstr"].GetFloat();
@@ -408,7 +408,7 @@ void Scene::populateScene(const Document &scene) {
                 std::string meshName = comp->value["name"].GetString();
                 factory->addMeshComponent(meshName, id);
                 if (meshName == "Skybox")
-                    registry->getSystem<RenderSystem>()->setSkyBoxID(id);
+                    registry->system<RenderSystem>()->setSkyBoxID(id);
             } else if (comp->name == "light") { // Again, temporary, very static functionality atm
                 GLfloat ambStr = comp->value["ambstr"].GetFloat();
                 vec3 ambColor(comp->value["ambcolor"][0].GetDouble(), comp->value["ambcolor"][1].GetDouble(), comp->value["ambcolor"][2].GetDouble());

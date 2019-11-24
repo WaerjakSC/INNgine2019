@@ -34,7 +34,7 @@ void HierarchyView::createContextActions() {
     addAction(remove);
 }
 void HierarchyView::setController() {
-    auto inputsys = Registry::instance()->getSystem<InputSystem>();
+    auto inputsys = Registry::instance()->system<InputSystem>();
     inputsys->setPlayer(rightClickEntity);
 }
 void HierarchyView::dropEvent(QDropEvent *event) {

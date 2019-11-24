@@ -43,7 +43,7 @@ int Raycast::mousePick(const QPoint &mousePos, const QRect &rect, vec3 &hitPoint
 }
 int Raycast::checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity) {
     Registry *registry = Registry::instance();
-    auto collisionSystem = registry->getSystem<CollisionSystem>();
+    auto collisionSystem = registry->system<CollisionSystem>();
     double intersectionPoint;
     int entityID{-1};
     auto view = registry->view<AABB>();
@@ -62,7 +62,7 @@ int Raycast::checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity)
 }
 int Raycast::checkSphere(const Ray &ray, double &closestTarget, int ignoredEntity) {
     Registry *registry = Registry::instance();
-    auto collisionSystem = registry->getSystem<CollisionSystem>();
+    auto collisionSystem = registry->system<CollisionSystem>();
     double intersectionPoint;
     int entityID{-1};
     auto view = registry->view<Sphere>();

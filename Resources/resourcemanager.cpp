@@ -761,7 +761,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
 
     alGetError();
     alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
-    SoundSystem *soundSys = registry->getSystem<SoundSystem>().get();
+    SoundSystem *soundSys = registry->system<SoundSystem>().get();
     soundSys->checkError("alBufferData");
     alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
     soundSys->checkError("alSourcei (loadWave)");
@@ -990,7 +990,7 @@ void ResourceManager::load() {
     mMainWindow->clearEditor();
     getSceneLoader()->loadScene(file.fileName());
     setCurrentScene(file.fileName());
-    Registry::instance()->getSystem<MovementSystem>()->init();
+    Registry::instance()->system<MovementSystem>()->init();
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
     showMessage("Loaded Scene!");
 }
@@ -1002,7 +1002,7 @@ void ResourceManager::loadProject() {
     mMainWindow->clearEditor();
     loadProject(file.fileName());
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
-    Registry::instance()->getSystem<MovementSystem>()->init();
+    Registry::instance()->system<MovementSystem>()->init();
     showMessage("Loaded Project: " + getProjectName());
 }
 void ResourceManager::saveProject() {
@@ -1018,7 +1018,7 @@ void ResourceManager::newProject() {
     mCurrentProject = text;
     mDefaultScene = "Untitled";
     newScene(mDefaultScene);
-    Registry::instance()->getSystem<MovementSystem>()->init();
+    Registry::instance()->system<MovementSystem>()->init();
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
     saveProject();
 }
@@ -1028,16 +1028,16 @@ void ResourceManager::play() {
             mPaused = false;
         } else
             Registry::instance()->makeSnapshot();
-        registry->getSystem<SoundSystem>()->playAll();
-        auto inputSys = registry->getSystem<InputSystem>();
-        for (auto controller : inputSys->gameCameraControllers()) {
+        auto [aisys, sound, input] = registry->system<AISystem, SoundSystem, InputSystem>();
+        sound->playAll();
+        for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
                 setActiveCameraController(controller);
                 break;
             }
         }
         mIsPlaying = true;
-        registry->getSystem<AISystem>()->masterOfCurves();
+        aisys->masterOfCurves();
         emit disableActions(true);
         emit disablePlay(true);
         emit disablePause(false);
@@ -1050,22 +1050,22 @@ void ResourceManager::pause() {
         mPaused = true;
         emit disablePlay(false);
         emit disablePause(true);
-
-        auto inputSys = registry->getSystem<InputSystem>();
-        inputSys->setGameCameraInactive();
-        setActiveCameraController(inputSys->editorCamController());
-        registry->getSystem<SoundSystem>()->pauseAll();
+        auto [sound, input] = registry->system<SoundSystem, InputSystem>();
+        input->setGameCameraInactive();
+        setActiveCameraController(input->editorCamController());
+        sound->pauseAll();
     }
 }
 void ResourceManager::stop() {
     if (mIsPlaying || mPaused) {
         registry->loadSnapshot();
-        registry->getSystem<MovementSystem>()->init();
-        registry->getSystem<SoundSystem>()->stopAll();
-        auto inputSys = registry->getSystem<InputSystem>();
-        inputSys->setGameCameraInactive();
-        inputSys->reset();
-        setActiveCameraController(inputSys->editorCamController());
+        auto [movement, sound, input] = registry->system<MovementSystem, SoundSystem, InputSystem>();
+
+        movement->init();
+        sound->stopAll();
+        input->setGameCameraInactive();
+        input->reset();
+        setActiveCameraController(input->editorCamController());
         mIsPlaying = false;
         mMainWindow->insertEntities();
 

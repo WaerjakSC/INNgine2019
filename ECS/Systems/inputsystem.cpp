@@ -45,7 +45,7 @@ void InputSystem::reset() {
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity();
-    MovementSystem *moveSystem = registry->getSystem<MovementSystem>().get();
+    MovementSystem *moveSystem = registry->system<MovementSystem>().get();
     mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
 }
 void InputSystem::handleKeyInput() {
@@ -97,7 +97,7 @@ void InputSystem::handlePlayerController(DeltaTime dt) {
             desiredVelocity.y -= mCameraSpeed;
         mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
         if (mPlayer != 0) {
-            registry->getSystem<MovementSystem>()->move(mPlayer, mDesiredVelocity);
+            registry->system<MovementSystem>()->move(mPlayer, mDesiredVelocity);
         }
     }
 }

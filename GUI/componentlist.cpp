@@ -148,7 +148,7 @@ void ComponentList::addAABBCollider() {
                 auto &aabb = registry->get<AABB>(selectedEntity);
                 aabb.size = vec3(trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2);
             }
-            registry->getSystem<MovementSystem>()->updateAABBTransform(selectedEntity);
+            registry->system<MovementSystem>()->updateAABBTransform(selectedEntity);
         }
         setupComponentList();
     }
@@ -170,7 +170,7 @@ void ComponentList::addSphereCollider() {
 
         if (!registry->contains<Sphere>(selectedEntity)) {
             registry->add<Sphere>(selectedEntity);
-            registry->getSystem<MovementSystem>()->updateSphereTransform(selectedEntity);
+            registry->system<MovementSystem>()->updateSphereTransform(selectedEntity);
         }
         setupComponentList();
     }
@@ -219,7 +219,7 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     position->setMargin(1);
     auto [positionX, positionY, positionZ] = makeVectorBox(cam.mCameraPosition, position);
 
-    InputSystem *inputSys = registry->getSystem<InputSystem>().get();
+    InputSystem *inputSys = registry->system<InputSystem>().get();
     connect(positionX, SIGNAL(valueChanged(double)), inputSys, SLOT(setCameraPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), inputSys, SLOT(setCameraPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), inputSys, SLOT(setCameraPositionZ(double)));
@@ -268,7 +268,7 @@ void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     QHBoxLayout *location = new QHBoxLayout;
     location->setMargin(1);
     auto [locationX, locationY, locationZ] = makeVectorBox(point.location, location);
-    AISystem *aiSys = registry->getSystem<AISystem>().get();
+    AISystem *aiSys = registry->system<AISystem>().get();
     connect(locationX, SIGNAL(valueChanged(double)), aiSys, SLOT(setBSPlinePointX(double)));
     connect(locationY, SIGNAL(valueChanged(double)), aiSys, SLOT(setBSPlinePointY(double)));
     connect(locationZ, SIGNAL(valueChanged(double)), aiSys, SLOT(setBSPlinePointZ(double)));
@@ -293,7 +293,7 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     connect(this, &ComponentList::originY, originY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::originZ, originZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->getSystem<CollisionSystem>().get();
+    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
     connect(originX, SIGNAL(valueChanged(double)), colSys, SLOT(setOriginX(double)));
     connect(originY, SIGNAL(valueChanged(double)), colSys, SLOT(setOriginY(double)));
     connect(originZ, SIGNAL(valueChanged(double)), colSys, SLOT(setOriginZ(double)));
@@ -341,7 +341,7 @@ void ComponentList::setupOBBSettings(const OBB &col) {
     connect(this, &ComponentList::OBBPositionY, positionY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::OBBPositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->getSystem<CollisionSystem>().get();
+    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
     connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionZ(double)));
@@ -390,7 +390,7 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     connect(this, &ComponentList::spherePositionY, positionY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::spherePositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->getSystem<CollisionSystem>().get();
+    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
     connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setSpherePositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setSpherePositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setSpherePositionZ(double)));
@@ -431,7 +431,7 @@ void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
     connect(this, &ComponentList::cylinderPositionY, positionY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::cylinderPositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->getSystem<CollisionSystem>().get();
+    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
     connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionX(double)));
     connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionY(double)));
     connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionZ(double)));
@@ -487,7 +487,7 @@ void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     connect(this, &ComponentList::planeNormalY, normalY, &QDoubleSpinBox::setValue);
     connect(this, &ComponentList::planeNormalZ, normalZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys = registry->getSystem<CollisionSystem>().get();
+    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
     connect(normalX, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalX(double)));
     connect(normalY, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalY(double)));
     connect(normalZ, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalZ(double)));
@@ -529,7 +529,7 @@ void ComponentList::setupAISettings(const AIComponent &ai) {
     health->setValue(ai.hp);
     hpLayout->addWidget(health);
     connect(this, &ComponentList::changeHealth, health, &QSpinBox::setValue);
-    AISystem *aiSys = registry->getSystem<AISystem>().get();
+    AISystem *aiSys = registry->system<AISystem>().get();
     connect(health, SIGNAL(valueChanged(int)), aiSys, SLOT(setHealth(int)));
 
     hpBox->setLayout(hpLayout);
@@ -566,7 +566,7 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
         if (curText == QString::fromStdString(mat.mShader->getName()))
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
-    RenderSystem *renderSys = registry->getSystem<RenderSystem>().get();
+    RenderSystem *renderSys = registry->system<RenderSystem>().get();
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), renderSys, SLOT(changeShader(const QString &)));
 
     QString curTexture = factory->getTextureName(mat.mTextureUnit);
@@ -611,7 +611,7 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     QGridLayout *grid = new QGridLayout;
     grid->setMargin(2);
 
-    MovementSystem *movement = registry->getSystem<MovementSystem>().get();
+    MovementSystem *movement = registry->system<MovementSystem>().get();
     connect(movement, &MovementSystem::positionChanged, this, &ComponentList::updatePositionVals);
     connect(movement, &MovementSystem::rotationChanged, this, &ComponentList::updateRotationVals);
     connect(movement, &MovementSystem::scaleChanged, this, &ComponentList::updateScaleVals);
@@ -729,7 +729,7 @@ void ComponentList::updatePosSpinBoxes(int state) {
         zVal->setValue(trans.localPosition.z);
         break;
     case 2:
-        registry->getSystem<MovementSystem>()->getAbsolutePosition(entityID); // have to call this function once to update the global pos variable if it hasn't been cached yet
+        registry->system<MovementSystem>()->getAbsolutePosition(entityID); // have to call this function once to update the global pos variable if it hasn't been cached yet
         xVal->setValue(trans.position.x);
         yVal->setValue(trans.position.y);
         zVal->setValue(trans.position.z);
@@ -766,7 +766,7 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
 }
 
 void ComponentList::setPositionX(double xIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     if (abs->isChecked())
         movement->setAbsolutePositionX(entityID, xIn, false);
@@ -777,7 +777,7 @@ void ComponentList::setPositionX(double xIn) {
         movement->updateEntity(entityID);
 }
 void ComponentList::setPositionY(double yIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     if (abs->isChecked())
         movement->setAbsolutePositionY(entityID, yIn, false);
@@ -787,7 +787,7 @@ void ComponentList::setPositionY(double yIn) {
         movement->updateEntity(entityID);
 }
 void ComponentList::setPositionZ(double zIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     if (abs->isChecked())
         movement->setAbsolutePositionZ(entityID, zIn, false);
@@ -797,42 +797,42 @@ void ComponentList::setPositionZ(double zIn) {
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationX(double xIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     movement->setRotationX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationY(double yIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     movement->setRotationY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setRotationZ(double zIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     movement->setRotationZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleX(double xIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     movement->setScaleX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleY(double yIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     movement->setScaleY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
 void ComponentList::setScaleZ(double zIn) {
-    auto movement = registry->getSystem<MovementSystem>();
+    auto movement = registry->system<MovementSystem>();
     GLuint entityID = registry->getSelectedEntity();
     movement->setScaleZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
@@ -850,7 +850,7 @@ QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Coll
     else
         staticBox->setCurrentIndex(1);
 
-    CollisionSystem *colSys = registry->getSystem<CollisionSystem>().get();
+    CollisionSystem *colSys = registry->system<CollisionSystem>().get();
     connect(staticBox, SIGNAL(currentIndexChanged(int)), colSys, SLOT(setObjectType(int)));
     objectType->addWidget(staticBox);
     objectTypeBox->setLayout(objectType);
