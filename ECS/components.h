@@ -172,7 +172,7 @@ struct ParticleEmitter : public Component {
 
     GLuint textureUnit{0};
     GLuint VAO{0};
-    GLuint vertexBuffer{0};
+    GLuint VBO{0};
     GLuint particlePositionBuffer{0};
     GLuint particleColorBuffer{0}; //holds the indices (Element Array Buffer - EAB)
 

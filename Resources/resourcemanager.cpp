@@ -660,7 +660,7 @@ void ResourceManager::initParticleVertexBuffers(ParticleEmitter *emitter) {
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->VBO);
     glVertexAttribPointer(
         0,        // attribute. No particular reason for 0, but must match the layout in the shader.
         3,        // size
@@ -697,8 +697,8 @@ void ResourceManager::initParticleBuffers(ParticleEmitter *emitter) {
     // Thanks to instancing, they will be shared by all particles.
     static std::vector<vec3> vertexBufferData = {{-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}};
 
-    glGenBuffers(1, &emitter->vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->vertexBuffer);
+    glGenBuffers(1, &emitter->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->VBO);
     glBufferData(GL_ARRAY_BUFFER, vertexBufferData.size() * sizeof(vec3), vertexBufferData.data(), GL_STATIC_DRAW);
 
     // The VBO containing the positions and sizes of the particles
