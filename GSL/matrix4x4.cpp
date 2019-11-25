@@ -501,7 +501,7 @@ bool Matrix4x4::operator==(const Matrix4x4 &other) {
     return true;
 }
 
-Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) {
+Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
     return {
         matrix[0] * other.matrix[0] + matrix[1] * other.matrix[4] + matrix[2] * other.matrix[8] + matrix[3] * other.matrix[12],
         matrix[0] * other.matrix[1] + matrix[1] * other.matrix[5] + matrix[2] * other.matrix[9] + matrix[3] * other.matrix[13],

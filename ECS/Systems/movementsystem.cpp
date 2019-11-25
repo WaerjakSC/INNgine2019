@@ -12,80 +12,36 @@ void MovementSystem::update(DeltaTime dt) {
     Q_UNUSED(dt)
     auto view{registry->view<Transform>()};
     for (auto entity : view) {
-        updateModelMatrix(entity);
+        auto view{registry->view<Transform>()};
+        Transform &comp{view.get(entity)};
+        if (comp.matrixOutdated) {
+            updateColliders(entity);
+        }
+        updateModelMatrix(comp);
     }
     auto aabbview{registry->view<Transform, AABB>()};
     for (auto entity : aabbview) {
-        updateAABBTransform(entity);
+        auto [trans, col]{aabbview.get<Transform, AABB>(entity)};
+        updateAABBTransformPrivate(col, trans);
     }
     auto sphereview{registry->view<Transform, Sphere>()};
     for (auto entity : sphereview) {
-        updateSphereTransform(entity);
+        auto [trans, col]{sphereview.get<Transform, Sphere>(entity)};
+        updateSphereTransformPrivate(col, trans);
     }
     auto billboardView{registry->view<BillBoard, Transform, Material>()};
     for (auto entity : billboardView) {
-        updateBillBoardTransform(entity);
+        auto [billboard, transform, mat]{billboardView.get<BillBoard, Transform, Material>(entity)};
+        updateBillBoardTransformPrivate(billboard, transform, mat);
     }
 }
-
-void MovementSystem::updateAABBTransform(GLuint entity) {
-    auto view{registry->view<Transform, AABB>()};
-    auto [trans, col]{view.get<Transform, AABB>(entity)};
-    if (col.transform.matrixOutdated) {
-        updateTS(col);
-        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
-        col.transform.matrixOutdated = false;
-    }
-}
-void MovementSystem::updateSphereTransform(GLuint entity) {
-    auto view{registry->view<Transform, Sphere>()};
-    auto [trans, col]{view.get<Transform, Sphere>(entity)};
-    if (col.transform.matrixOutdated) {
-        updateTS(col);
-        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
-        col.transform.matrixOutdated = false;
-    }
-}
-void MovementSystem::updateBillBoardTransform(GLuint entity) {
-    auto view{registry->view<BillBoard, Transform, Material>()};
-    auto [billboard, transform, mat]{view.get<BillBoard, Transform, Material>(entity)};
-    // find direction between this and camera
-    vec3 direction{};
-    if (billboard.mNormalVersion) {
-        vec3 camPosition{mat.mShader->getCameraController()->cameraPosition()};
-        //cancel height info so billboard is allways upright:
-        if (billboard.mConstantYUp)
-            camPosition.setY(transform.modelMatrix.getPosition().y);
-        direction = camPosition - vec3(transform.modelMatrix.getPosition());
-    } else {
-        vec3 camDirection{mat.mShader->getCameraController()->forward()};
-        //cancel height info so billboard is allways upright:
-        if (billboard.mConstantYUp)
-            camDirection.setY(transform.modelMatrix.getPosition().y);
-        direction = camDirection * -1;
-    }
-
-    direction.normalize();
-    //set rotation to this direction
-    transform.rotationMatrix.setRotationToVector(direction);
-    transform.localRotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
-    transform.matrixOutdated = true;
-}
-void MovementSystem::updateEntity(GLuint eID) {
-    auto &comp{registry->view<Transform>().get(eID)};
-    comp.matrixOutdated = true;
-    updateModelMatrix(eID);
-    for (auto child : comp.children)
-        updateEntity(child);
-    if (registry->contains<AABB>(eID))
-        updateAABBTransform(eID);
-    if (registry->contains<Sphere>(eID))
-        updateSphereTransform(eID);
-}
-
 void MovementSystem::updateModelMatrix(GLuint eID) {
     auto view{registry->view<Transform>()};
     Transform &comp{view.get(eID)};
+    updateModelMatrix(comp);
+    updateColliders(eID);
+}
+void MovementSystem::updateModelMatrix(Transform &comp) {
     if (comp.matrixOutdated) {
         //calculate matrix from position, scale, rotation
         updateTRS(comp);
@@ -104,19 +60,84 @@ void MovementSystem::updateModelMatrix(GLuint eID) {
             Transform &childComp{view.get(child)};
             childComp.matrixOutdated = true;
         }
-        if (registry->contains<AABB>(eID))
-            registry->get<AABB>(eID).transform.matrixOutdated = true;
-        else if (registry->contains<Sphere>(eID))
-            registry->get<Sphere>(eID).transform.matrixOutdated = true;
-        if (registry->contains<OBB>(eID))
-            registry->get<OBB>(eID).transform.matrixOutdated = true;
-        else if (registry->contains<Cylinder>(eID))
-            registry->get<Cylinder>(eID).transform.matrixOutdated = true;
-        else if (registry->contains<Plane>(eID))
-            registry->get<Plane>(eID).transform.matrixOutdated = true;
     }
 }
-gsl::Matrix4x4 MovementSystem::getTRMatrix(Transform &comp) {
+void MovementSystem::updateColliders(GLuint eID) {
+    if (registry->contains<AABB>(eID))
+        registry->get<AABB>(eID).transform.matrixOutdated = true;
+    else if (registry->contains<Sphere>(eID))
+        registry->get<Sphere>(eID).transform.matrixOutdated = true;
+    if (registry->contains<OBB>(eID))
+        registry->get<OBB>(eID).transform.matrixOutdated = true;
+    else if (registry->contains<Cylinder>(eID))
+        registry->get<Cylinder>(eID).transform.matrixOutdated = true;
+    else if (registry->contains<Plane>(eID))
+        registry->get<Plane>(eID).transform.matrixOutdated = true;
+}
+void MovementSystem::updateAABBTransform(GLuint entity) {
+    auto view{registry->view<Transform, AABB>()};
+    auto [trans, col]{view.get<Transform, AABB>(entity)};
+    updateAABBTransformPrivate(col, trans);
+}
+void MovementSystem::updateAABBTransformPrivate(AABB &col, const Transform &trans) {
+    if (col.transform.matrixOutdated) {
+        updateTS(col);
+        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
+        col.transform.matrixOutdated = false;
+    }
+}
+void MovementSystem::updateSphereTransform(GLuint entity) {
+    auto view{registry->view<Transform, Sphere>()};
+    auto [trans, col]{view.get<Transform, Sphere>(entity)};
+    updateSphereTransformPrivate(col, trans);
+}
+void MovementSystem::updateSphereTransformPrivate(Sphere &col, const Transform &trans) {
+    if (col.transform.matrixOutdated) {
+        updateTS(col);
+        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
+        col.transform.matrixOutdated = false;
+    }
+}
+void MovementSystem::updateBillBoardTransform(GLuint entity) {
+    auto view{registry->view<BillBoard, Transform, Material>()};
+    auto [billboard, transform, mat]{view.get<BillBoard, Transform, Material>(entity)};
+    updateBillBoardTransformPrivate(billboard, transform, mat);
+}
+void MovementSystem::updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat) {
+    // find direction between this and camera
+    vec3 direction{};
+    if (billboard.mNormalVersion) {
+        vec3 camPosition{mat.mShader->getCameraController()->cameraPosition()};
+        //cancel height info so billboard is allways upright:
+        if (billboard.mConstantYUp)
+            camPosition.setY(transform.modelMatrix.getPosition().y);
+        direction = camPosition - vec3(transform.modelMatrix.getPosition());
+    } else {
+        vec3 camDirection{mat.mShader->getCameraController()->forward()};
+        //cancel height info so billboard is allways upright:
+        if (billboard.mConstantYUp)
+            camDirection.setY(transform.modelMatrix.getPosition().y);
+        direction = camDirection * -1;
+    }
+    direction.normalize();
+    //set rotation to this direction
+    transform.rotationMatrix.setRotationToVector(direction);
+    transform.localRotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
+    transform.matrixOutdated = true;
+}
+void MovementSystem::updateEntity(GLuint eID) {
+    auto &comp{registry->view<Transform>().get(eID)};
+    comp.matrixOutdated = true;
+    updateModelMatrix(eID);
+    for (auto child : comp.children)
+        updateEntity(child);
+    if (registry->contains<AABB>(eID))
+        updateAABBTransform(eID);
+    if (registry->contains<Sphere>(eID))
+        updateSphereTransform(eID);
+}
+
+gsl::Matrix4x4 MovementSystem::getTRMatrix(const Transform &comp) {
     if (comp.parentID != -1) {
         Transform &parent{registry->view<Transform>().get(comp.parentID)};
         gsl::Matrix4x4 parentMatrix{getTRMatrix(parent)};

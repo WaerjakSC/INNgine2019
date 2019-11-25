@@ -11,21 +11,19 @@ ParticleSystem::ParticleSystem(Ref<ParticleShader> shader)
 }
 
 void ParticleSystem::update(DeltaTime deltaTime) {
-    auto view{registry->view<ParticleEmitter>()};
+    auto view{registry->view<ParticleEmitter, Transform>()};
     initializeOpenGLFunctions();
     for (auto entity : view) {
-        const auto &emitter{view.get(entity)};
+        auto [emitter, transform]{view.get<ParticleEmitter, Transform>(entity)};
         if (emitter.shouldEmit) {
-            generateParticles(deltaTime, entity);
-            simulateParticles(deltaTime, entity);
-            renderParticles(entity);
+            generateParticles(deltaTime, emitter, transform);
+            simulateParticles(deltaTime, emitter);
+            renderParticles(emitter);
         }
     }
 }
 
-void ParticleSystem::generateParticles(DeltaTime deltaTime, GLuint entityID) {
-    auto view{registry->view<ParticleEmitter>()};
-    auto &emitter{view.get(entityID)};
+void ParticleSystem::generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform) {
     // Generate 10 new particule each millisecond,
     // but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
     // newparticles will be huge and the next frame even longer.
@@ -35,12 +33,11 @@ void ParticleSystem::generateParticles(DeltaTime deltaTime, GLuint entityID) {
     if (newParticles > clamped)
         newParticles = clamped;
     for (int i{0}; i < newParticles; i++) {
-        int particleIndex{findUnusedParticle(entityID)};
+        int particleIndex{findUnusedParticle(emitter)};
         Particle &particle{emitter.particlesContainer[particleIndex]};
 
         particle.life = emitter.lifeSpan;
-        auto moveSys{registry->system<MovementSystem>()};
-        particle.position = moveSys->getAbsolutePosition(entityID);
+        particle.position = transform.position;
 
         float spread{emitter.spread};
         vec3 mainDir{emitter.initialDirection};
@@ -61,10 +58,8 @@ void ParticleSystem::generateParticles(DeltaTime deltaTime, GLuint entityID) {
         // could do something like change the color with an affector or something here
     }
 }
-void ParticleSystem::simulateParticles(DeltaTime deltaTime, GLuint entityID) {
-    auto view{registry->view<ParticleEmitter>()};
+void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter) {
     auto input{registry->system<InputSystem>()};
-    auto &emitter{view.get(entityID)};
 
     emitter.activeParticles = 0;
     for (int i{0}; i < emitter.numParticles; i++) {
@@ -97,10 +92,7 @@ void ParticleSystem::sortParticles(ParticleEmitter &emitter) {
     std::sort(&emitter.particlesContainer[0], &emitter.particlesContainer[emitter.numParticles]);
 }
 
-void ParticleSystem::renderParticles(GLuint entityID) {
-    auto view{registry->view<ParticleEmitter>()};
-    auto &emitter{view.get(entityID)};
-
+void ParticleSystem::renderParticles(ParticleEmitter &emitter) {
     glBindBuffer(GL_ARRAY_BUFFER, emitter.particlePositionBuffer);
     glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
     glBufferSubData(GL_ARRAY_BUFFER, 0, emitter.activeParticles * sizeof(GLfloat) * 4, emitter.particlesContainer.data()->positionSizeData);
@@ -127,9 +119,7 @@ void ParticleSystem::renderParticles(GLuint entityID) {
     glBindVertexArray(0);
 }
 
-int ParticleSystem::findUnusedParticle(GLuint entityID) {
-    auto view{registry->view<ParticleEmitter>()};
-    auto &emitter{view.get(entityID)};
+int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter) {
     int &lastParticle{emitter.lastUsedParticle};
     for (int i{lastParticle}; i < emitter.numParticles; i++) {
         if (emitter.particlesContainer[i].life < 0) {

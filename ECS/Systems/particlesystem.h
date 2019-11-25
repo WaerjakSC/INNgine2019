@@ -16,11 +16,11 @@ public:
 private:
     Registry *registry;
     Ref<ParticleShader> mShader;
-    int findUnusedParticle(GLuint entityID);
-    void generateParticles(DeltaTime deltaTime, GLuint entityID);
-    void simulateParticles(DeltaTime deltaTime, GLuint entityID);
+    int findUnusedParticle(ParticleEmitter &emitter);
+    void generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform);
+    void simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter);
     void sortParticles(ParticleEmitter &emitter);
-    void renderParticles(GLuint entityID);
+    void renderParticles(ParticleEmitter &emitter);
 };
 
 #endif // PARTICLESYSTEM_H

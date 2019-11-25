@@ -18,6 +18,9 @@ private:
      * @param eID
      */
     void updateModelMatrix(GLuint eID);
+    void updateModelMatrix(Transform &comp);
+    void updateColliders(GLuint eID);
+
     /**
      * @brief getTRMatrix Get the Translation and Rotation matrices of a component,
      * multiplied by its parent TR matrices if it has a parent.
@@ -25,7 +28,7 @@ private:
      * @param comp
      * @return
      */
-    gsl::Matrix4x4 getTRMatrix(Transform &comp);
+    gsl::Matrix4x4 getTRMatrix(const Transform &comp);
 
     void updateTRS(Transform &comp);
     /**
@@ -40,6 +43,10 @@ private:
     void updateTS(Sphere &comp);
 
     void updateBillBoardTransform(GLuint entity);
+    void updateAABBTransformPrivate(AABB &col, const Transform &trans);
+    void updateSphereTransformPrivate(Sphere &col, const Transform &trans);
+
+    void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
 
 public:
     MovementSystem();
@@ -151,6 +158,7 @@ public:
      * @param signal
      */
     void rotate(GLuint eID, const vec3 &rotDelta, bool signal = true);
+
 public slots:
     /**
      * @brief updateAABBTransform Gets a list of all AABB colliders and updates them to follow the entity according to their offset

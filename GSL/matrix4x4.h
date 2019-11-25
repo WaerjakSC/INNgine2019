@@ -64,7 +64,7 @@ public:
     GLfloat operator()(const int &y, const int &x) const;
     bool operator==(const Matrix4x4 &other);
 
-    Matrix4x4 operator*(const Matrix4x4 &other);
+    Matrix4x4 operator*(const Matrix4x4 &other) const;
 
     Vector4D operator*(const Vector4D &other);
 
