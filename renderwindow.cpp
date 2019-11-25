@@ -17,11 +17,13 @@
 #include "inputsystem.h"
 #include "lightsystem.h"
 #include "movementsystem.h"
+#include "particlesystem.h"
 #include "rendersystem.h"
 #include "scriptsystem.h"
 #include "soundsystem.h"
 
 #include "colorshader.h"
+#include "particleshader.h"
 #include "phongshader.h"
 #include "skyboxshader.h"
 #include "textureshader.h"
@@ -107,6 +109,7 @@ void RenderWindow::init() {
     mFactory->loadShader<TextureShader>(mEditorCameraController);
     mFactory->loadShader<PhongShader>(mEditorCameraController);
     mFactory->loadShader<SkyboxShader>(mEditorCameraController);
+    mFactory->loadShader<ParticleShader>(mEditorCameraController);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
@@ -131,6 +134,8 @@ void RenderWindow::init() {
     mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
     mAIsystem = mRegistry->registerSystem<AISystem>();
     mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
+    mParticleSystem = mRegistry->registerSystem<ParticleSystem>(mFactory->getShader<ParticleShader>());
+
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
@@ -148,7 +153,6 @@ void RenderWindow::init() {
     }
 
     mLightSystem->init();
-    mRenderer->init();
 
     connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
@@ -177,6 +181,7 @@ void RenderWindow::render() {
             mCollisionSystem->update(dt);
         }
         mLightSystem->update(dt);
+        mParticleSystem->update(dt);
         mRenderer->update(dt);
     }
     //Calculate framerate before

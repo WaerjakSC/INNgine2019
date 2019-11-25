@@ -14,7 +14,6 @@ public:
 
     void update(DeltaTime dt = 0.016) override;
 
-    void init();
     void setSkyBoxID(const GLuint &skyBoxID);
 
 public slots:

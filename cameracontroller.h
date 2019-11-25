@@ -28,6 +28,7 @@ public:
 
     vec3 up() const;
     vec3 forward() const;
+    vec3 right() const;
 
     Camera &getCamera() { return mCamera; }
     const Camera &getCamera() const { return mCamera; }

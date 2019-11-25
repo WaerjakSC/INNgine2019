@@ -2,17 +2,15 @@
 #define VECTOR4D_H
 
 #include "gltypes.h"
+#include <cassert>
 #include <cmath>
 #include <iostream>
-#include <cassert>
 
-namespace gsl
-{
+namespace gsl {
 
 class Vector3D;
 
-class Vector4D
-{
+class Vector4D {
 public:
     //Constructors
     Vector4D(GLfloat x_in = 0.f, GLfloat y_in = 0.f, GLfloat z_in = 0.f, GLfloat w_in = 0.f);
@@ -26,18 +24,17 @@ public:
     void clipNormalize();
 
     //Operators:
-    const Vector4D& operator=(const Vector4D &rhs);     // v = v
-    Vector4D operator+(const Vector4D &rhs) const;      // v + v
-    Vector4D operator-(const Vector4D &rhs) const;      // v - v
-    Vector4D& operator+=(const Vector4D &rhs);          // v += v
-    Vector4D& operator-=(const Vector4D &rhs);          // v -= v
+    const Vector4D &operator=(const Vector4D &rhs); // v = v
+    Vector4D operator+(const Vector4D &rhs) const;  // v + v
+    Vector4D operator-(const Vector4D &rhs) const;  // v - v
+    Vector4D &operator+=(const Vector4D &rhs);      // v += v
+    Vector4D &operator-=(const Vector4D &rhs);      // v -= v
     Vector4D operator-() const;                     // -v
     Vector4D operator*(GLfloat rhs) const;          // v * f
     //Vec4 operator*(Matrix4x4 q) const;        // v * m
 
-    GLfloat& operator[](const int index)
-    {
-        assert(index <4 && index >=0);
+    GLfloat &operator[](const int index) {
+        assert(index < 4 && index >= 0);
 
         switch (index) {
         case 0:
@@ -49,7 +46,7 @@ public:
         case 3:
             return w;
         }
-        return x;   //to silence compiler warnings
+        return x; //to silence compiler warnings
     }
 
     //Functions:
@@ -79,10 +76,8 @@ public:
     Vector3D getXYZ() const;
 
     //Friend functions
-    friend std::ostream& operator<<(std::ostream &output, const Vector4D &rhs )
-    {
-        output << "X = " << rhs.x << ", Y = " << rhs.y <<
-                  ", Z = " << rhs.z << ", W = " << rhs.w;
+    friend std::ostream &operator<<(std::ostream &output, const Vector4D &rhs) {
+        output << "X = " << rhs.x << ", Y = " << rhs.y << ", Z = " << rhs.z << ", W = " << rhs.w;
         return output;
     }
 
@@ -93,6 +88,6 @@ public:
     GLfloat w;
 };
 
-} //namespace
+} // namespace gsl
 
 #endif // VECTOR4D_H

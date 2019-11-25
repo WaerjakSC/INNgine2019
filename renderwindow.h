@@ -20,6 +20,7 @@ class LightSystem;
 class SoundSystem;
 class InputSystem;
 class CollisionSystem;
+class ParticleSystem;
 class AISystem;
 class ResourceManager;
 class ScriptSystem;
@@ -61,6 +62,7 @@ private:
     bool mInitialized{false};
 
     Ref<RenderSystem> mRenderer;
+    Ref<ParticleSystem> mParticleSystem;
     Ref<MovementSystem> mMoveSystem;
     Ref<LightSystem> mLightSystem;
     Ref<SoundSystem> mSoundSystem;

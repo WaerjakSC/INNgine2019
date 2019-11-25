@@ -6,6 +6,7 @@
 #include "matrix4x4.h"
 #include "shader.h"
 #include "vertex.h"
+#include <QColor>
 #include <QJSEngine>
 #include <QKeyEvent>
 #ifdef _WIN32
@@ -143,6 +144,41 @@ struct Mesh : public Component {
         return mName == other.mName; // name of the obj/txt file should be enough to verify if they're the same.
     }
 };
+struct Particle {
+    vec3 position, velocity;
+    float life;           // Remaining life of the particle. if < 0 : dead and unused.
+    float cameraDistance; // *Squared* distance to the camera. if dead : -1.0f
+    GLfloat *positionSizeData{new GLfloat[4]};
+    GLubyte *colorData{new GLubyte[4]};
+    bool operator<(Particle &other) {
+        // Sort in reverse order : far particles drawn first.
+        return cameraDistance > other.cameraDistance;
+    }
+};
+struct ParticleEmitter : public Component {
+    ParticleEmitter() {
+        particlesContainer.reserve(numParticles);
+    }
+    vec3 initialDirection{0.f, 10.f, 0.f};
+    QColor initialColor{255, 0, 0, 127};
+
+    float speed{0.5f};
+    float size, angle, weight, lifeSpan, spread;
+    int numParticles{100000};
+    int particlesPerSecond{100};
+
+    std::vector<Particle> particlesContainer;
+    bool shouldEmit{true};
+
+    GLuint textureUnit{0};
+    GLuint VAO{0};
+    GLuint vertexBuffer{0};
+    GLuint particlePositionBuffer{0};
+    GLuint particleColorBuffer{0}; //holds the indices (Element Array Buffer - EAB)
+
+    int activeParticles{0};
+    int lastUsedParticle{0};
+};
 struct Light : public Component {
     Light(GLfloat ambStr = 0.3f, vec3 ambColor = vec3{0.3f, 0.3f, 0.3f},
           GLfloat lightStr = 0.7f, vec3 lightColor = vec3{0.3f, 0.3f, 0.3f},
@@ -190,6 +226,7 @@ struct Input : public Component {
     int MOUSEY{0};
     bool F1{false};
 };
+
 struct Physics : public Component {
     Physics(float speed = 1.0f) : mSpeed(speed) {}
 

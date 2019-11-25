@@ -36,6 +36,7 @@ ResourceManager::ResourceManager() : registry{Registry::instance()} {
     registry->registerComponent<Transform>();
     registry->registerComponent<Material>();
     registry->registerComponent<Mesh>();
+    registry->registerComponent<ParticleEmitter>();
     registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
     registry->registerComponent<Input>();
@@ -648,6 +649,69 @@ void ResourceManager::initIndexBuffers(Mesh *mesh) {
     glGenBuffers(1, &mesh->mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
+}
+/**
+ * @brief opengl init - initialize the given mesh's buffers and arrays
+ */
+void ResourceManager::initParticleVertexBuffers(ParticleEmitter *emitter) {
+    //Vertex Array Object - VAO
+    glGenVertexArrays(0, &emitter->VAO);
+    glBindVertexArray(emitter->VAO);
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->vertexBuffer);
+    glVertexAttribPointer(
+        0,        // attribute. No particular reason for 0, but must match the layout in the shader.
+        3,        // size
+        GL_FLOAT, // type
+        GL_FALSE, // normalized?
+        0,        // stride
+        (void *)0 // array buffer offset
+    );
+    // 2nd attribute buffer : positions of particles' centers
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->particlePositionBuffer);
+    glVertexAttribPointer(
+        1,        // attribute. No particular reason for 1, but must match the layout in the shader.
+        4,        // size : x + y + z + size => 4
+        GL_FLOAT, // type
+        GL_FALSE, // normalized?
+        0,        // stride
+        (void *)0 // array buffer offset
+    );
+    // 3rd attribute buffer : particles' colors
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->particleColorBuffer);
+    glVertexAttribPointer(
+        2,                // attribute. No particular reason for 2, but must match the layout in the shader.
+        4,                // size : r + g + b + a => 4
+        GL_UNSIGNED_BYTE, // type
+        GL_TRUE,          // normalized? *** YES, this means that the unsigned char[4] will be accessible with a vec4 (floats) in the shader ***
+        0,                // stride
+        (void *)0         // array buffer offset
+    );
+}
+void ResourceManager::initParticleBuffers(ParticleEmitter *emitter) {
+    // The VBO containing the 4 vertices of the particles.
+    // Thanks to instancing, they will be shared by all particles.
+    static std::vector<vec3> vertexBufferData = {{-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}};
+
+    glGenBuffers(1, &emitter->vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertexBufferData.size() * sizeof(vec3), vertexBufferData.data(), GL_STATIC_DRAW);
+
+    // The VBO containing the positions and sizes of the particles
+    glGenBuffers(1, &emitter->particlePositionBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->particlePositionBuffer);
+    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
+    glBufferData(GL_ARRAY_BUFFER, emitter->numParticles * 4 * sizeof(GLfloat), nullptr, GL_STREAM_DRAW);
+
+    // The VBO containing the colors of the particles
+    glGenBuffers(1, &emitter->particleColorBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter->particleColorBuffer);
+    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
+    glBufferData(GL_ARRAY_BUFFER, emitter->numParticles * 4 * sizeof(GLubyte), nullptr, GL_STREAM_DRAW);
 }
 
 /**

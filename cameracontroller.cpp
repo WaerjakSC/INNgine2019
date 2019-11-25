@@ -36,6 +36,9 @@ vec3 CameraController::up() const {
 vec3 CameraController::forward() const {
     return mForward;
 }
+vec3 CameraController::right() const {
+    return mRight;
+}
 vec3 CameraController::cameraPosition() const {
     return mCameraPosition;
 }

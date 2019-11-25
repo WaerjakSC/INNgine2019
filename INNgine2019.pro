@@ -69,6 +69,7 @@ HEADERS += \
     ECS/Systems/isystem.h \
     ECS/Systems/aisystem.h \
     ECS/Systems/inputsystem.h \
+    ECS/Systems/particlesystem.h \
     ECS/Systems/scriptsystem.h \
     ECS/Systems/soundsystem.h \
     ECS/Systems/lightsystem.h \
@@ -99,6 +100,7 @@ HEADERS += \
     GUI/verticalscrollarea.h \
 #    
     Shaders/colorshader.h \
+    Shaders/particleshader.h \
     Shaders/skyboxshader.h \
     Shaders/textureshader.h \
     Shaders/phongshader.h \
@@ -129,6 +131,7 @@ HEADERS += \
 SOURCES += main.cpp \
     ECS/Systems/aisystem.cpp \
     ECS/Systems/inputsystem.cpp \
+    ECS/Systems/particlesystem.cpp \
     ECS/Systems/scriptsystem.cpp \
     ECS/Systems/soundsystem.cpp \
     ECS/Systems/lightsystem.cpp \
@@ -156,6 +159,7 @@ SOURCES += main.cpp \
     GUI/verticalscrollarea.cpp \
 #
     Shaders/colorshader.cpp \
+    Shaders/particleshader.cpp \
     Shaders/skyboxshader.cpp \
     Shaders/textureshader.cpp \
     Shaders/phongshader.cpp \
@@ -181,6 +185,8 @@ FORMS += \
 DISTFILES += \
     Shaders/hudshader.frag \
     Shaders/hudshader.vert \
+    Shaders/particleshader.frag \
+    Shaders/particleshader.vert \
     Shaders/phongshader.frag \
     Shaders/phongshader.vert \
     Shaders/plainshader.frag \
