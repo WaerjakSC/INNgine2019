@@ -156,6 +156,8 @@ void RenderWindow::init() {
     }
 
     mLightSystem->init();
+    mRegistry->add<ParticleEmitter>(10);
+    mParticleSystem->init();
 
     connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
@@ -182,8 +184,8 @@ void RenderWindow::render() {
             mCollisionSystem->update(dt);
         }
         mLightSystem->update(dt);
-        mParticleSystem->update(dt);
         mRenderer->update(dt);
+        mParticleSystem->update(dt);
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time

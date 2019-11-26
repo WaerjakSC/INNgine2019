@@ -181,6 +181,42 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(sound.mGain);
                 writer.EndObject();
             }
+            if (registry->contains<ParticleEmitter>(entity)) {
+                const ParticleEmitter &emitter{registry->get<ParticleEmitter>(entity)};
+                writer.Key("particleemitter");
+                writer.StartObject();
+                writer.Key("numparticles");
+                writer.Int(emitter.numParticles);
+                writer.Key("pps");
+                writer.Int(emitter.particlesPerSecond);
+
+                writer.Key("initdir");
+                writer.StartArray();
+                writer.Double(emitter.initialDirection.x);
+                writer.Double(emitter.initialDirection.y);
+                writer.Double(emitter.initialDirection.z);
+                writer.EndArray();
+
+                writer.Key("initColor");
+                writer.StartArray();
+                writer.Int(emitter.initialColor.red());
+                writer.Int(emitter.initialColor.green());
+                writer.Int(emitter.initialColor.blue());
+                writer.Int(emitter.initialColor.alpha());
+                writer.EndArray();
+
+                writer.Key("textureunit");
+                writer.Int(emitter.textureUnit);
+
+                writer.Key("speed");
+                writer.Double(emitter.speed);
+                writer.Key("size");
+                writer.Double(emitter.size);
+                writer.Key("spread");
+                writer.Double(emitter.spread);
+                writer.Key("lifespan");
+                writer.Double(emitter.lifeSpan);
+            }
             if (registry->contains<AABB>(entity)) {
                 writer.Key("AABB");
                 writer.StartObject();
@@ -419,6 +455,18 @@ void Scene::populateScene(const Document &scene) {
                 bool looping{comp->value["loop"].GetBool()};
                 float gain{comp->value["gain"].GetFloat()};
                 registry->add<Sound>(id, filename, looping, gain);
+            } else if (comp->name == "particleemitter") {
+                size_t numParticles{static_cast<size_t>(comp->value["numparticles"].GetInt())};
+                int pps{comp->value["pps"].GetInt()};
+                const vec3 initDir{comp->value["initdir"][0].GetFloat(), comp->value["initdir"][1].GetFloat(), comp->value["initdir"][2].GetFloat()};
+                const QColor initColor{comp->value["initColor"][0].GetInt(), comp->value["initColor"][1].GetInt(),
+                                       comp->value["initColor"][2].GetInt(), comp->value["initColor"][3].GetInt()};
+                float speed{comp->value["speed"].GetFloat()};
+                float size{comp->value["size"].GetFloat()};
+                float spread{comp->value["spread"].GetFloat()};
+                float lifespan{comp->value["lifespan"].GetFloat()};
+                GLuint textureUnit{comp->value["textureunit"].GetUint()};
+                registry->add<ParticleEmitter>(id, numParticles, pps, initDir, initColor, speed, size, spread, lifespan, textureUnit);
             } else if (comp->name == "billboard") {
                 bool constantYUp{comp->value["y-up"].GetBool()};
                 bool normalVersion{comp->value["normalversion"].GetBool()};

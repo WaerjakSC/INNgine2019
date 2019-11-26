@@ -156,17 +156,22 @@ struct Particle {
     }
 };
 struct ParticleEmitter : public Component {
-    ParticleEmitter() {
+    ParticleEmitter(size_t maxParticles = 10000, int pps = 100,
+                    const vec3 &initDir = vec3{0.f, 10.f, 0.f}, const QColor &initColor = QColor{255, 0, 0, 127},
+                    float inSpeed = 0.5f, float inSize = 0.2f, float inSpread = 1.5f, float inLifeSpan = 5.f,
+                    GLuint texUnit = 0)
+        : numParticles(maxParticles), particlesPerSecond(pps), initialDirection(initDir), initialColor(initColor),
+          speed(inSpeed), size(inSize), spread(inSpread), lifeSpan(inLifeSpan), textureUnit(texUnit) {
         std::vector<Particle> temp{numParticles};
         particlesContainer = temp;
     }
-    vec3 initialDirection{0.f, 10.f, 0.f};
-    QColor initialColor{255, 0, 0, 127};
+    size_t numParticles;
+    int particlesPerSecond;
 
-    float speed{0.5f};
-    float size, angle, weight, lifeSpan, spread;
-    size_t numParticles{100000};
-    int particlesPerSecond{100};
+    vec3 initialDirection;
+    QColor initialColor;
+
+    float speed, size, spread, lifeSpan;
 
     std::vector<Particle> particlesContainer;
     bool shouldEmit{true};
@@ -175,7 +180,8 @@ struct ParticleEmitter : public Component {
     GLuint VAO{0};
     GLuint VBO{0};
     GLuint particlePositionBuffer{0};
-    GLuint particleColorBuffer{0}; //holds the indices (Element Array Buffer - EAB)
+    GLuint particleColorBuffer{0};
+    bool initialized{false};
 
     int activeParticles{0};
     int lastUsedParticle{0};

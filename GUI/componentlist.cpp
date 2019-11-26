@@ -10,6 +10,7 @@
 #include "inputsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
+#include "particlesystem.h"
 #include "rendersystem.h"
 #include "verticalscrollarea.h"
 #include <QCheckBox>
@@ -88,6 +89,11 @@ void ComponentList::addSoundComponent() {
 }
 void ComponentList::addGameCameraComponent() {
     addComponent<GameCamera>();
+}
+
+void ComponentList::addParticleEmitter() {
+    addComponent<ParticleEmitter>();
+    registry->system<ParticleSystem>()->initEmitter(registry->getSelectedEntity());
 }
 void ComponentList::addAIComponent() {
     addComponent<AIComponent>();
@@ -172,6 +178,9 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
 
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
+}
+
+void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
 }
 void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     ComponentGroupBox *box{new ComponentGroupBox("BSpline Point", this)};

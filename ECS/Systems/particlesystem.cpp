@@ -10,6 +10,20 @@ ParticleSystem::ParticleSystem(Ref<ParticleShader> shader)
     : registry{Registry::instance()}, mShader{shader} {
 }
 
+void ParticleSystem::init() {
+    auto view{registry->view<ParticleEmitter>()};
+    for (auto entity : view) {
+        auto &emitter{view.get(entity)};
+        if (!emitter.initialized) {
+            ResourceManager::instance()->initParticleEmitter(emitter);
+        }
+    }
+}
+void ParticleSystem::initEmitter(GLuint entityID) {
+    auto view{registry->view<ParticleEmitter>()};
+    auto &emitter{view.get(entityID)};
+    ResourceManager::instance()->initParticleEmitter(emitter);
+}
 void ParticleSystem::update(DeltaTime deltaTime) {
     auto view{registry->view<ParticleEmitter, Transform>()};
     initializeOpenGLFunctions();
@@ -62,7 +76,7 @@ void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emi
     auto input{registry->system<InputSystem>()};
 
     emitter.activeParticles = 0;
-    for (int i{0}; i < emitter.numParticles; i++) {
+    for (size_t i{0}; i < emitter.numParticles; i++) {
 
         Particle &particle{emitter.particlesContainer[i]};
         if (particle.life > 0.0f) {
@@ -117,11 +131,12 @@ void ParticleSystem::renderParticles(ParticleEmitter &emitter) {
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, emitter.activeParticles);
 
     glBindVertexArray(0);
+    glDisable(GL_BLEND);
 }
 
 int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter) {
     int &lastParticle{emitter.lastUsedParticle};
-    for (int i{lastParticle}; i < emitter.numParticles; i++) {
+    for (size_t i{static_cast<size_t>(lastParticle)}; i < emitter.numParticles; i++) {
         if (emitter.particlesContainer[i].life < 0) {
             lastParticle = i;
             return i;

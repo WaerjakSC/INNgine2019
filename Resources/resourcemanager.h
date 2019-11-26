@@ -61,7 +61,7 @@ public:
 
     void setMainWindow(MainWindow *window) { mMainWindow = window; }
 
-    void addMeshComponent(std::string name, int eID = -1);
+    void addMeshComponent(std::string name, GLuint eID = -1);
 
     std::map<std::string, Ref<Shader>> getShaders() const;
 
@@ -112,6 +112,7 @@ public:
     **/
     bool loadWave(std::string filePath, Sound &sound);
 
+    void initParticleEmitter(ParticleEmitter &emitter);
     void setColliderMesh(Mesh &mesh);
     void newScene(const QString &text);
     std::map<std::string, Ref<Texture>> getTextures() const;
@@ -170,8 +171,8 @@ private:
     void initVertexBuffers(Mesh *mesh);
     void initIndexBuffers(Mesh *mesh);
 
-    void initParticleVertexBuffers(ParticleEmitter *particle);
-    void initParticleBuffers(ParticleEmitter *particle);
+    void initParticleBuffers(ParticleEmitter &particle);
+    void initParticleVertexBuffers(ParticleEmitter &particle);
 
     // Reads and loads mesh
     void loadMesh(std::string fileName, GLuint eID);

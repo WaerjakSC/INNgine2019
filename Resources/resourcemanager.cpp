@@ -650,17 +650,38 @@ void ResourceManager::initIndexBuffers(Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
 }
+void ResourceManager::initParticleBuffers(ParticleEmitter &emitter) {
+    // The VBO containing the 4 vertices of the particles.
+    // Thanks to instancing, they will be shared by all particles.
+    static std::vector<vec3> vertexBufferData = {{-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}};
+
+    glGenBuffers(1, &emitter.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertexBufferData.size() * sizeof(vec3), vertexBufferData.data(), GL_STATIC_DRAW);
+
+    // The VBO containing the positions and sizes of the particles
+    glGenBuffers(1, &emitter.particlePositionBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.particlePositionBuffer);
+    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
+    glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLfloat), nullptr, GL_STREAM_DRAW);
+
+    // The VBO containing the colors of the particles
+    glGenBuffers(1, &emitter.particleColorBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.particleColorBuffer);
+    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
+    glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLubyte), nullptr, GL_STREAM_DRAW);
+}
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */
-void ResourceManager::initParticleVertexBuffers(ParticleEmitter *emitter) {
+void ResourceManager::initParticleVertexBuffers(ParticleEmitter &emitter) {
     //Vertex Array Object - VAO
-    glGenVertexArrays(0, &emitter->VAO);
-    glBindVertexArray(emitter->VAO);
+    glGenVertexArrays(0, &emitter.VAO);
+    glBindVertexArray(emitter.VAO);
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.VBO);
     glVertexAttribPointer(
         0,        // attribute. No particular reason for 0, but must match the layout in the shader.
         3,        // size
@@ -671,7 +692,7 @@ void ResourceManager::initParticleVertexBuffers(ParticleEmitter *emitter) {
     );
     // 2nd attribute buffer : positions of particles' centers
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->particlePositionBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.particlePositionBuffer);
     glVertexAttribPointer(
         1,        // attribute. No particular reason for 1, but must match the layout in the shader.
         4,        // size : x + y + z + size => 4
@@ -682,7 +703,7 @@ void ResourceManager::initParticleVertexBuffers(ParticleEmitter *emitter) {
     );
     // 3rd attribute buffer : particles' colors
     glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->particleColorBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.particleColorBuffer);
     glVertexAttribPointer(
         2,                // attribute. No particular reason for 2, but must match the layout in the shader.
         4,                // size : r + g + b + a => 4
@@ -692,37 +713,12 @@ void ResourceManager::initParticleVertexBuffers(ParticleEmitter *emitter) {
         (void *)0         // array buffer offset
     );
 }
-void ResourceManager::initParticleBuffers(ParticleEmitter *emitter) {
-    // The VBO containing the 4 vertices of the particles.
-    // Thanks to instancing, they will be shared by all particles.
-    static std::vector<vec3> vertexBufferData = {{-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}};
-
-    glGenBuffers(1, &emitter->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexBufferData.size() * sizeof(vec3), vertexBufferData.data(), GL_STATIC_DRAW);
-
-    // The VBO containing the positions and sizes of the particles
-    glGenBuffers(1, &emitter->particlePositionBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->particlePositionBuffer);
-    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
-    glBufferData(GL_ARRAY_BUFFER, emitter->numParticles * 4 * sizeof(GLfloat), nullptr, GL_STREAM_DRAW);
-
-    // The VBO containing the colors of the particles
-    glGenBuffers(1, &emitter->particleColorBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter->particleColorBuffer);
-    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
-    glBufferData(GL_ARRAY_BUFFER, emitter->numParticles * 4 * sizeof(GLubyte), nullptr, GL_STREAM_DRAW);
-}
-
 /**
  * @brief If you know the mesh you want at construction i.e. for prefabs and similar
  * @param name - name of the file you want to read
  * @param eID - entityID
  */
-void ResourceManager::addMeshComponent(std::string name, int eID) {
-    if (eID <= -1 || (size_t)eID > registry->numEntities() - 1) {
-        eID = registry->numEntities() - 1;
-    }
+void ResourceManager::addMeshComponent(std::string name, GLuint eID) {
     registry->add<Mesh>(eID);
     setMesh(name, eID);
 }
@@ -836,6 +832,11 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
     if (waveData)
         delete waveData;
     return true;
+}
+
+void ResourceManager::initParticleEmitter(ParticleEmitter &emitter) {
+    initParticleBuffers(emitter);
+    initParticleVertexBuffers(emitter);
 }
 
 /**

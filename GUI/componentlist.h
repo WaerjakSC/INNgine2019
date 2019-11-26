@@ -35,6 +35,7 @@ public slots:
     void addLightComponent();
     void addBSplineComponent();
     void addGameCameraComponent();
+    void addParticleEmitter();
     void addAIComponent();
     void addAABBCollider();
     void addOBBCollider();
@@ -111,6 +112,7 @@ private:
     void setupCylinderColliderSettings(const Cylinder &col);
     void setupPlaneColliderSettings(const Plane &col);
     void setupGameCameraSettings(const GameCamera &cam);
+    void setupEmitterSettings(const ParticleEmitter &emitter);
     void setupBSplinePointSettings(const BSplinePoint &point);
     template <typename CompType>
     inline void addComponent() {

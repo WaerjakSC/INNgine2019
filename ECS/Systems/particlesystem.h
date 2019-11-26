@@ -10,6 +10,8 @@ class Registry;
 class ParticleSystem : public ISystem, public QOpenGLFunctions_4_1_Core {
 public:
     ParticleSystem(Ref<ParticleShader> shader);
+    void init();
+    void initEmitter(GLuint entityID);
 
     void update(DeltaTime deltaTime = 0.016) override;
 
