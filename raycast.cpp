@@ -42,15 +42,15 @@ int Raycast::mousePick(const QPoint &mousePos, const QRect &rect, vec3 &hitPoint
     return entityID;
 }
 int Raycast::checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity) {
-    Registry *registry{Registry::instance()};
-    auto collisionSystem{registry->system<CollisionSystem>()};
     double intersectionPoint;
     int entityID{-1};
+    Registry *registry{Registry::instance()};
     auto view{registry->view<AABB>()};
     for (auto entity : view) {
         if ((int)entity == ignoredEntity)
             continue;
         auto &aabb{view.get(entity)};
+        auto collisionSystem{registry->system<CollisionSystem>()};
         if (collisionSystem->RayToAABB(ray, aabb, intersectionPoint)) {
             if (intersectionPoint < closestTarget) {
                 closestTarget = intersectionPoint;
@@ -61,15 +61,15 @@ int Raycast::checkAABB(const Ray &ray, double &closestTarget, int ignoredEntity)
     return entityID;
 }
 int Raycast::checkSphere(const Ray &ray, double &closestTarget, int ignoredEntity) {
-    Registry *registry{Registry::instance()};
-    auto collisionSystem{registry->system<CollisionSystem>()};
     double intersectionPoint;
     int entityID{-1};
+    Registry *registry{Registry::instance()};
     auto view{registry->view<Sphere>()};
     for (auto entity : view) {
         if ((int)entity == ignoredEntity)
             continue;
         auto &sphere{view.get(entity)};
+        auto collisionSystem{registry->system<CollisionSystem>()};
         if (collisionSystem->RayToSphere(ray, sphere, intersectionPoint)) {
             if (intersectionPoint < closestTarget) {
                 closestTarget = intersectionPoint;

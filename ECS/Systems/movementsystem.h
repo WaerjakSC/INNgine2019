@@ -43,8 +43,7 @@ private:
     void updateTS(Sphere &comp);
 
     void updateBillBoardTransform(GLuint entity);
-    void updateAABBTransformPrivate(AABB &col, const Transform &trans);
-    void updateSphereTransformPrivate(Sphere &col, const Transform &trans);
+    void updateColliderTransformPrivate(Collision &col, const Transform &trans);
 
     void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
 
@@ -170,6 +169,7 @@ public slots:
      * @param entity Belonging entity
      */
     void updateSphereTransform(GLuint entity);
+
 signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);

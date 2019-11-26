@@ -1,13 +1,14 @@
 #ifndef COMPONENTLIST_H
 #define COMPONENTLIST_H
+#include "collisionsystem.h"
 #include "gltypes.h"
+#include "registry.h"
 #include "resourcemanager.h"
 #include <QColor>
 #include <QWidget>
 class Transform;
 class Material;
 class Mesh;
-class Registry;
 class Entity;
 class QLabel;
 class QCheckBox;
@@ -26,20 +27,20 @@ public:
     void setupComponentList();
 
 public slots:
+    void addTransformComponent();
+    void addMaterialComponent();
+    void addMeshComponent();
     void addSoundComponent();
     void addPhysicsComponent();
     void addLightComponent();
-    void addMeshComponent();
-    void addMaterialComponent();
-    void addTransformComponent();
+    void addBSplineComponent();
+    void addGameCameraComponent();
     void addAIComponent();
     void addAABBCollider();
     void addOBBCollider();
     void addSphereCollider();
     void addPlaneCollider();
     void addCylinderCollider();
-    void addBSplineComponent();
-    void addGameCameraComponent();
 
 signals:
     void posX(GLfloat xIn);
@@ -111,7 +112,25 @@ private:
     void setupPlaneColliderSettings(const Plane &col);
     void setupGameCameraSettings(const GameCamera &cam);
     void setupBSplinePointSettings(const BSplinePoint &point);
-
+    template <typename CompType>
+    inline void addComponent() {
+        GLuint selectedEntity{registry->getSelectedEntity()};
+        if (selectedEntity != 0) {
+            if (!registry->contains<CompType>(selectedEntity))
+                registry->add<CompType>(selectedEntity);
+            setupComponentList();
+        }
+    }
+    template <typename ColliderType>
+    inline void addCollider() {
+        GLuint selectedEntity{registry->getSelectedEntity()};
+        if (selectedEntity != 0) {
+            if (!registry->contains<ColliderType>(selectedEntity)) {
+                registry->add<ColliderType>(selectedEntity);
+            }
+            setupComponentList();
+        }
+    }
     Registry *registry;
     QColor rgb;
     QStyle *fusion;

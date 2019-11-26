@@ -10,7 +10,6 @@
 #include "inputsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
-#include "registry.h"
 #include "rendersystem.h"
 #include "verticalscrollarea.h"
 #include <QCheckBox>
@@ -67,147 +66,63 @@ void ComponentList::setupComponentList() {
     }
 }
 void ComponentList::addTransformComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-        if (!registry->contains<Transform>(selectedEntity))
-            registry->add<Transform>(selectedEntity);
-        setupComponentList();
-    }
-}
-void ComponentList::addBSplineComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<BSplinePoint>(selectedEntity))
-            registry->add<BSplinePoint>(selectedEntity);
-        setupComponentList();
-    }
-}
-void ComponentList::addAIComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<AIComponent>(selectedEntity))
-            registry->add<AIComponent>(selectedEntity);
-        setupComponentList();
-    }
+    addComponent<Transform>();
 }
 void ComponentList::addMaterialComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Material>(selectedEntity))
-            registry->add<Material>(selectedEntity);
-        setupComponentList();
-    }
+    addComponent<Material>();
 }
 void ComponentList::addMeshComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Mesh>(selectedEntity))
-            registry->add<Mesh>(selectedEntity);
-        setupComponentList();
-    }
+    addComponent<Mesh>();
+}
+void ComponentList::addBSplineComponent() {
+    addComponent<BSplinePoint>();
 }
 void ComponentList::addLightComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Light>(selectedEntity))
-            registry->add<Light>(selectedEntity);
-        setupComponentList();
-    }
+    addComponent<Light>();
 }
 void ComponentList::addPhysicsComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Physics>(selectedEntity))
-            registry->add<Physics>(selectedEntity);
-        setupComponentList();
-    }
+    addComponent<Physics>();
 }
 void ComponentList::addSoundComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Sound>(selectedEntity))
-            registry->add<Sound>(selectedEntity);
-        setupComponentList();
-    }
-}
-void ComponentList::addAABBCollider() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<AABB>(selectedEntity)) {
-            registry->add<AABB>(selectedEntity);
-            if (registry->contains<Transform>(selectedEntity)) {
-                auto &trans{registry->get<Transform>(selectedEntity)};
-                auto &aabb{registry->get<AABB>(selectedEntity)};
-                aabb.size = vec3{trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2};
-            }
-            registry->system<MovementSystem>()->updateAABBTransform(selectedEntity);
-        }
-        setupComponentList();
-    }
-}
-void ComponentList::addOBBCollider() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<OBB>(selectedEntity)) {
-            registry->add<OBB>(selectedEntity);
-            //            registry->getSystem<MovementSystem>()->updateColliderTransform(selectedEntity);
-        }
-        setupComponentList();
-    }
-}
-void ComponentList::addSphereCollider() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Sphere>(selectedEntity)) {
-            registry->add<Sphere>(selectedEntity);
-            registry->system<MovementSystem>()->updateSphereTransform(selectedEntity);
-        }
-        setupComponentList();
-    }
-}
-void ComponentList::addPlaneCollider() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Plane>(selectedEntity)) {
-            registry->add<Plane>(selectedEntity);
-            //            registry->getSystem<MovementSystem>()->updateColliderTransform(selectedEntity);
-        }
-
-        setupComponentList();
-    }
-}
-void ComponentList::addCylinderCollider() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
-
-        if (!registry->contains<Cylinder>(selectedEntity)) {
-            registry->add<Cylinder>(selectedEntity);
-            //            registry->getSystem<MovementSystem>()->updateColliderTransform(selectedEntity);
-        }
-        setupComponentList();
-    }
+    addComponent<Sound>();
 }
 void ComponentList::addGameCameraComponent() {
-    GLuint selectedEntity{registry->getSelectedEntity()};
-    if (selectedEntity != 0) {
+    addComponent<GameCamera>();
+}
+void ComponentList::addAIComponent() {
+    addComponent<AIComponent>();
+}
 
-        if (!registry->contains<GameCamera>(selectedEntity)) {
-            registry->add<GameCamera>(selectedEntity);
-        }
-        setupComponentList();
+void ComponentList::addAABBCollider() {
+    addCollider<AABB>();
+    GLuint selectedEntity{registry->getSelectedEntity()};
+    if (registry->contains<Transform>(selectedEntity)) {
+        auto &trans{registry->get<Transform>(selectedEntity)};
+        auto &aabb{registry->get<AABB>(selectedEntity)};
+        aabb.size = vec3{trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2};
+        registry->system<MovementSystem>()->updateAABBTransform(selectedEntity);
     }
 }
+
+void ComponentList::addOBBCollider() {
+    addCollider<OBB>();
+}
+
+void ComponentList::addSphereCollider() {
+    addCollider<Sphere>();
+    GLuint selectedEntity{registry->getSelectedEntity()};
+
+    registry->system<MovementSystem>()->updateSphereTransform(selectedEntity);
+}
+
+void ComponentList::addPlaneCollider() {
+    addCollider<Plane>();
+}
+
+void ComponentList::addCylinderCollider() {
+    addCollider<Cylinder>();
+}
+
 void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     ComponentGroupBox *box{new ComponentGroupBox{"Game Camera", this}};
     QGridLayout *grid{new QGridLayout};

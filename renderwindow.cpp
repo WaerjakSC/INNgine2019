@@ -132,6 +132,9 @@ void RenderWindow::init() {
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mSoundSystem->createContext();
     mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
+    connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
+    connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
+
     mAIsystem = mRegistry->registerSystem<AISystem>();
     mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
     mParticleSystem = mRegistry->registerSystem<ParticleSystem>(mFactory->getShader<ParticleShader>());
@@ -156,8 +159,6 @@ void RenderWindow::init() {
 
     connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
-    connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
-    connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
 }
 
 ///Called each frame - doing the rendering

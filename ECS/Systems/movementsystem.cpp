@@ -22,12 +22,18 @@ void MovementSystem::update(DeltaTime dt) {
     auto aabbview{registry->view<Transform, AABB>()};
     for (auto entity : aabbview) {
         auto [trans, col]{aabbview.get<Transform, AABB>(entity)};
-        updateAABBTransformPrivate(col, trans);
+        if (col.transform.matrixOutdated) {
+            updateTS(col);
+            updateColliderTransformPrivate(col, trans);
+        }
     }
     auto sphereview{registry->view<Transform, Sphere>()};
     for (auto entity : sphereview) {
         auto [trans, col]{sphereview.get<Transform, Sphere>(entity)};
-        updateSphereTransformPrivate(col, trans);
+        if (col.transform.matrixOutdated) {
+            updateTS(col);
+            updateColliderTransformPrivate(col, trans);
+        }
     }
     auto billboardView{registry->view<BillBoard, Transform, Material>()};
     for (auto entity : billboardView) {
@@ -77,26 +83,22 @@ void MovementSystem::updateColliders(GLuint eID) {
 void MovementSystem::updateAABBTransform(GLuint entity) {
     auto view{registry->view<Transform, AABB>()};
     auto [trans, col]{view.get<Transform, AABB>(entity)};
-    updateAABBTransformPrivate(col, trans);
-}
-void MovementSystem::updateAABBTransformPrivate(AABB &col, const Transform &trans) {
     if (col.transform.matrixOutdated) {
         updateTS(col);
-        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
-        col.transform.matrixOutdated = false;
+        updateColliderTransformPrivate(col, trans);
     }
 }
 void MovementSystem::updateSphereTransform(GLuint entity) {
     auto view{registry->view<Transform, Sphere>()};
     auto [trans, col]{view.get<Transform, Sphere>(entity)};
-    updateSphereTransformPrivate(col, trans);
-}
-void MovementSystem::updateSphereTransformPrivate(Sphere &col, const Transform &trans) {
     if (col.transform.matrixOutdated) {
         updateTS(col);
-        col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
-        col.transform.matrixOutdated = false;
+        updateColliderTransformPrivate(col, trans);
     }
+}
+void MovementSystem::updateColliderTransformPrivate(Collision &col, const Transform &trans) {
+    col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;
+    col.transform.matrixOutdated = false;
 }
 void MovementSystem::updateBillBoardTransform(GLuint entity) {
     auto view{registry->view<BillBoard, Transform, Material>()};
@@ -158,6 +160,7 @@ void MovementSystem::updateTRS(Transform &comp) {
     comp.scaleMatrix.setToIdentity();
     comp.scaleMatrix.scale(comp.localScale);
 }
+
 void MovementSystem::updateTS(AABB &comp) {
     auto &trans{comp.transform};
     //calculate matrix from position, scale, rotation
@@ -165,7 +168,7 @@ void MovementSystem::updateTS(AABB &comp) {
     trans.translationMatrix.translate(comp.origin);
 
     trans.scaleMatrix.setToIdentity();
-    trans.scaleMatrix.scale(comp.size); // This might need to be half of size
+    trans.scaleMatrix.scale(comp.size);
 }
 void MovementSystem::updateTS(Sphere &comp) {
     auto &trans{comp.transform};

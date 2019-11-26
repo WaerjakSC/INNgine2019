@@ -157,14 +157,15 @@ struct Particle {
 };
 struct ParticleEmitter : public Component {
     ParticleEmitter() {
-        particlesContainer.reserve(numParticles);
+        std::vector<Particle> temp{numParticles};
+        particlesContainer = temp;
     }
     vec3 initialDirection{0.f, 10.f, 0.f};
     QColor initialColor{255, 0, 0, 127};
 
     float speed{0.5f};
     float size, angle, weight, lifeSpan, spread;
-    int numParticles{100000};
+    size_t numParticles{100000};
     int particlesPerSecond{100};
 
     std::vector<Particle> particlesContainer;
@@ -259,7 +260,7 @@ public:
     Collision() {}
     //    Collision(vec3 size) : colType(type) {}
 
-    bool mTrigger{false};
+    bool trigger{false};
     Mesh colliderMesh;
     Transform transform;
     bool isStatic{true};
