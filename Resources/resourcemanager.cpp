@@ -653,11 +653,18 @@ void ResourceManager::initIndexBuffers(Mesh *mesh) {
 void ResourceManager::initParticleBuffers(ParticleEmitter &emitter) {
     // The VBO containing the 4 vertices of the particles.
     // Thanks to instancing, they will be shared by all particles.
-    static std::vector<vec3> vertexBufferData = {{-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}};
+    static const GLfloat quadVertices[] =
+        {-0.5f, -0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+         -0.5f, 0.5f, 0.0f,
+         0.5f, 0.5f, 0.0f};
 
-    glGenBuffers(1, &emitter.VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter.VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexBufferData.size() * sizeof(vec3), vertexBufferData.data(), GL_STATIC_DRAW);
+    glGenVertexArrays(1, &emitter.VAO);
+    glBindVertexArray(emitter.VAO);
+
+    glGenBuffers(1, &emitter.quadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
 
     // The VBO containing the positions and sizes of the particles
     glGenBuffers(1, &emitter.particlePositionBuffer);
@@ -674,44 +681,27 @@ void ResourceManager::initParticleBuffers(ParticleEmitter &emitter) {
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */
-void ResourceManager::initParticleVertexBuffers(ParticleEmitter &emitter) {
-    //Vertex Array Object - VAO
-    glGenVertexArrays(0, &emitter.VAO);
-    glBindVertexArray(emitter.VAO);
-
+void ResourceManager::initParticleVertexAttribArrays(ParticleEmitter &emitter) {
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, emitter.VBO);
-    glVertexAttribPointer(
-        0,        // attribute. No particular reason for 0, but must match the layout in the shader.
-        3,        // size
-        GL_FLOAT, // type
-        GL_FALSE, // normalized?
-        0,        // stride
-        (void *)0 // array buffer offset
-    );
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.quadVBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     // 2nd attribute buffer : positions of particles' centers
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, emitter.particlePositionBuffer);
-    glVertexAttribPointer(
-        1,        // attribute. No particular reason for 1, but must match the layout in the shader.
-        4,        // size : x + y + z + size => 4
-        GL_FLOAT, // type
-        GL_FALSE, // normalized?
-        0,        // stride
-        (void *)0 // array buffer offset
-    );
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
     // 3rd attribute buffer : particles' colors
     glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, emitter.particleColorBuffer);
-    glVertexAttribPointer(
-        2,                // attribute. No particular reason for 2, but must match the layout in the shader.
-        4,                // size : r + g + b + a => 4
-        GL_UNSIGNED_BYTE, // type
-        GL_TRUE,          // normalized? *** YES, this means that the unsigned char[4] will be accessible with a vec4 (floats) in the shader ***
-        0,                // stride
-        (void *)0         // array buffer offset
-    );
+    glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (GLvoid *)0);
+
+    glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
+    glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
+    glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
+
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 }
 /**
  * @brief If you know the mesh you want at construction i.e. for prefabs and similar
@@ -836,7 +826,7 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
 
 void ResourceManager::initParticleEmitter(ParticleEmitter &emitter) {
     initParticleBuffers(emitter);
-    initParticleVertexBuffers(emitter);
+    initParticleVertexAttribArrays(emitter);
 }
 
 /**

@@ -18,6 +18,7 @@ public:
 private:
     Registry *registry;
     Ref<ParticleShader> mShader;
+
     int findUnusedParticle(ParticleEmitter &emitter);
     void generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform);
     void simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter);

@@ -156,7 +156,6 @@ void RenderWindow::init() {
     }
 
     mLightSystem->init();
-    mRegistry->add<ParticleEmitter>(10);
     mParticleSystem->init();
 
     connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);

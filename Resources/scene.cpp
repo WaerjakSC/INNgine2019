@@ -216,6 +216,7 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(emitter.spread);
                 writer.Key("lifespan");
                 writer.Double(emitter.lifeSpan);
+                writer.EndObject();
             }
             if (registry->contains<AABB>(entity)) {
                 writer.Key("AABB");

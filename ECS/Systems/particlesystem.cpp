@@ -11,17 +11,17 @@ ParticleSystem::ParticleSystem(Ref<ParticleShader> shader)
 }
 
 void ParticleSystem::init() {
-    auto view{registry->view<ParticleEmitter>()};
+    auto view{registry->view<ParticleEmitter, Transform>()};
     for (auto entity : view) {
-        auto &emitter{view.get(entity)};
+        auto &emitter{view.get<ParticleEmitter>(entity)};
         if (!emitter.initialized) {
             ResourceManager::instance()->initParticleEmitter(emitter);
         }
     }
 }
 void ParticleSystem::initEmitter(GLuint entityID) {
-    auto view{registry->view<ParticleEmitter>()};
-    auto &emitter{view.get(entityID)};
+    auto view{registry->view<ParticleEmitter, Transform>()};
+    auto &emitter{view.get<ParticleEmitter>(entityID)};
     ResourceManager::instance()->initParticleEmitter(emitter);
 }
 void ParticleSystem::update(DeltaTime deltaTime) {
@@ -38,20 +38,17 @@ void ParticleSystem::update(DeltaTime deltaTime) {
 }
 
 void ParticleSystem::generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform) {
-    // Generate 10 new particule each millisecond,
-    // but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
-    // newparticles will be huge and the next frame even longer.
     int pps{emitter.particlesPerSecond};
-    int newParticles{static_cast<int>(deltaTime * pps)};
-    int clamped{static_cast<int>(0.016f * pps)};
-    if (newParticles > clamped)
-        newParticles = clamped;
+    int newParticles{static_cast<int>(deltaTime * pps * 10)};
+    //    int clamped{static_cast<int>(0.016f * pps)};
+    //    if (newParticles > clamped)
+    //        newParticles = clamped;
     for (int i{0}; i < newParticles; i++) {
         int particleIndex{findUnusedParticle(emitter)};
         Particle &particle{emitter.particlesContainer[particleIndex]};
 
         particle.life = emitter.lifeSpan;
-        particle.position = transform.position;
+        particle.position = transform.localPosition + vec3{0, 0.5f, 0};
 
         float spread{emitter.spread};
         vec3 mainDir{emitter.initialDirection};
@@ -64,10 +61,10 @@ void ParticleSystem::generateParticles(DeltaTime deltaTime, ParticleEmitter &emi
                        (std::rand() % 2000 - 1000.0f) / 1000.0f};
 
         particle.velocity = mainDir + randomDir * spread;
-        particle.colorData[0] = emitter.initialColor.red();
-        particle.colorData[1] = emitter.initialColor.blue();
-        particle.colorData[2] = emitter.initialColor.green();
-        particle.colorData[3] = emitter.initialColor.alpha();
+        particle.r = emitter.initialColor.red();
+        particle.g = emitter.initialColor.green();
+        particle.b = emitter.initialColor.blue();
+        particle.a = emitter.initialColor.alpha();
 
         // could do something like change the color with an affector or something here
     }
@@ -87,12 +84,15 @@ void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emi
                 particle.cameraDistance = (particle.position - input->currentGameCameraController()->cameraPosition()).length();
 
                 // fill the gpu buffer
-                particle.positionSizeData[0] = particle.position.x;
-                particle.positionSizeData[1] = particle.position.y;
-                particle.positionSizeData[2] = particle.position.z;
+                emitter.particlePositionData[4 * emitter.activeParticles + 0] = particle.position.x;
+                emitter.particlePositionData[4 * emitter.activeParticles + 1] = particle.position.y;
+                emitter.particlePositionData[4 * emitter.activeParticles + 2] = particle.position.z;
+                emitter.particlePositionData[4 * emitter.activeParticles + 3] = emitter.size;
 
-                particle.positionSizeData[3] = emitter.size;
-                // could set the color here?
+                emitter.particleColorData[4 * emitter.activeParticles + 0] = particle.r;
+                emitter.particleColorData[4 * emitter.activeParticles + 1] = particle.g;
+                emitter.particleColorData[4 * emitter.activeParticles + 2] = particle.b;
+                emitter.particleColorData[4 * emitter.activeParticles + 3] = particle.a;
             } else {
                 particle.cameraDistance = -1.f;
             }
@@ -101,36 +101,47 @@ void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emi
     }
     sortParticles(emitter);
 }
-
 void ParticleSystem::sortParticles(ParticleEmitter &emitter) {
     std::sort(&emitter.particlesContainer[0], &emitter.particlesContainer[emitter.numParticles]);
 }
 
 void ParticleSystem::renderParticles(ParticleEmitter &emitter) {
     glBindBuffer(GL_ARRAY_BUFFER, emitter.particlePositionBuffer);
-    glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-    glBufferSubData(GL_ARRAY_BUFFER, 0, emitter.activeParticles * sizeof(GLfloat) * 4, emitter.particlesContainer.data()->positionSizeData);
+    glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLfloat), nullptr, GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, emitter.activeParticles * sizeof(GLfloat) * 4, emitter.particlePositionData.data());
 
     glBindBuffer(GL_ARRAY_BUFFER, emitter.particleColorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-    glBufferSubData(GL_ARRAY_BUFFER, 0, emitter.activeParticles * sizeof(GLubyte) * 4, emitter.particlesContainer.data()->colorData);
+    glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLubyte), nullptr, GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, emitter.activeParticles * sizeof(GLubyte) * 4, emitter.particleColorData.data());
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glUseProgram(mShader->getProgram());
+    mShader->use();
+
     mShader->transmitParticleUniformData(emitter);
 
-    glBindVertexArray(emitter.VAO);
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.quadVBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+    // 2nd attribute buffer : positions of particles' centers
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.particlePositionBuffer);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+    // 3rd attribute buffer : particles' colors
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, emitter.particleColorBuffer);
+    glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (GLvoid *)0);
+
     glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
     glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
     glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
 
-    // Draw the particles!
-    // This draws many small triangle strips (which looks like a quad).
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, emitter.activeParticles);
-
-    glBindVertexArray(0);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, emitter.numParticles);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
     glDisable(GL_BLEND);
 }
 
@@ -144,11 +155,11 @@ int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter) {
     }
 
     for (int i{0}; i < lastParticle; i++) {
-        if (emitter.particlesContainer[i].life < 0) {
+        if (emitter.particlesContainer[i].life <= 0.0f) {
             lastParticle = i;
             return i;
         }
     }
-
+    lastParticle = 0;
     return 0; // All particles are taken, override the first one
 }

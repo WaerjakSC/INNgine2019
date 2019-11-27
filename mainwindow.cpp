@@ -260,6 +260,10 @@ void MainWindow::createActions() {
     components->addAction(soundAction);
     connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
 
+    QAction *emitterAction{new QAction(tr("Particle Emitter"), this)};
+    components->addAction(emitterAction);
+    connect(emitterAction, &QAction::triggered, mComponentList, &ComponentList::addParticleEmitter);
+
     QAction *aiAction{new QAction(tr("AI"), this)};
     components->addAction(aiAction);
     connect(aiAction, &QAction::triggered, mComponentList, &ComponentList::addAIComponent);

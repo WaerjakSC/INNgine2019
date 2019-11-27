@@ -146,10 +146,9 @@ struct Mesh : public Component {
 };
 struct Particle {
     vec3 position, velocity;
-    float life;           // Remaining life of the particle. if < 0 : dead and unused.
-    float cameraDistance; // *Squared* distance to the camera. if dead : -1.0f
-    GLfloat *positionSizeData{new GLfloat[4]};
-    GLubyte *colorData{new GLubyte[4]};
+    float life{-1.f}, size;     // Remaining life of the particle. if < 0 : dead and unused.
+    float cameraDistance{-1.f}; // *Squared* distance to the camera. if dead : -1.0f
+    GLubyte r, b, g, a;
     bool operator<(Particle &other) {
         // Sort in reverse order : far particles drawn first.
         return cameraDistance > other.cameraDistance;
@@ -158,12 +157,18 @@ struct Particle {
 struct ParticleEmitter : public Component {
     ParticleEmitter(size_t maxParticles = 10000, int pps = 100,
                     const vec3 &initDir = vec3{0.f, 10.f, 0.f}, const QColor &initColor = QColor{255, 0, 0, 127},
-                    float inSpeed = 0.5f, float inSize = 0.2f, float inSpread = 1.5f, float inLifeSpan = 5.f,
+                    float inSpeed = 0.5f, float inSize = 0.1f, float inSpread = 1.5f, float inLifeSpan = 5.f,
                     GLuint texUnit = 0)
         : numParticles(maxParticles), particlesPerSecond(pps), initialDirection(initDir), initialColor(initColor),
           speed(inSpeed), size(inSize), spread(inSpread), lifeSpan(inLifeSpan), textureUnit(texUnit) {
-        std::vector<Particle> temp{numParticles};
-        particlesContainer = temp;
+        particlesContainer.reserve(numParticles);
+        for (size_t i{0}; i < numParticles; i++) {
+            particlesContainer.push_back(Particle{});
+        }
+        std::vector<GLfloat> tempData(numParticles * 4);
+        particlePositionData = tempData;
+        std::vector<GLubyte> tempBytes(numParticles * 4);
+        particleColorData = tempBytes;
     }
     size_t numParticles;
     int particlesPerSecond;
@@ -178,9 +183,12 @@ struct ParticleEmitter : public Component {
 
     GLuint textureUnit{0};
     GLuint VAO{0};
-    GLuint VBO{0};
+    GLuint quadVBO{0};
     GLuint particlePositionBuffer{0};
     GLuint particleColorBuffer{0};
+    std::vector<GLfloat> particlePositionData;
+    std::vector<GLubyte> particleColorData;
+
     bool initialized{false};
 
     int activeParticles{0};
