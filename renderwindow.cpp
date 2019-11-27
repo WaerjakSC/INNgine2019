@@ -181,10 +181,10 @@ void RenderWindow::render() {
             mAIsystem->update(dt);
             mMoveSystem->update(dt);
             mCollisionSystem->update(dt);
+            mParticleSystem->update(dt);
         }
         mLightSystem->update(dt);
         mRenderer->update(dt);
-        mParticleSystem->update(dt);
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time
