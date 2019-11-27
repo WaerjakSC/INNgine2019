@@ -185,6 +185,11 @@ void Scene::saveScene(const QString &fileName) {
                 const ParticleEmitter &emitter{registry->get<ParticleEmitter>(entity)};
                 writer.Key("particleemitter");
                 writer.StartObject();
+                writer.Key("isactive");
+                writer.Bool(emitter.isActive);
+                writer.Key("decay");
+                writer.Bool(emitter.shouldDecay);
+
                 writer.Key("numparticles");
                 writer.Int(emitter.numParticles);
                 writer.Key("pps");
@@ -457,6 +462,8 @@ void Scene::populateScene(const Document &scene) {
                 float gain{comp->value["gain"].GetFloat()};
                 registry->add<Sound>(id, filename, looping, gain);
             } else if (comp->name == "particleemitter") {
+                bool active{comp->value["isactive"].GetBool()};
+                bool decay{comp->value["decay"].GetBool()};
                 size_t numParticles{static_cast<size_t>(comp->value["numparticles"].GetInt())};
                 int pps{comp->value["pps"].GetInt()};
                 const vec3 initDir{comp->value["initdir"][0].GetFloat(), comp->value["initdir"][1].GetFloat(), comp->value["initdir"][2].GetFloat()};
@@ -467,7 +474,7 @@ void Scene::populateScene(const Document &scene) {
                 float spread{comp->value["spread"].GetFloat()};
                 float lifespan{comp->value["lifespan"].GetFloat()};
                 GLuint textureUnit{comp->value["textureunit"].GetUint()};
-                registry->add<ParticleEmitter>(id, numParticles, pps, initDir, initColor, speed, size, spread, lifespan, textureUnit);
+                registry->add<ParticleEmitter>(id, active, decay, numParticles, pps, initDir, initColor, speed, size, spread, lifespan, textureUnit);
             } else if (comp->name == "billboard") {
                 bool constantYUp{comp->value["y-up"].GetBool()};
                 bool normalVersion{comp->value["normalversion"].GetBool()};

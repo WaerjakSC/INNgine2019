@@ -3,6 +3,8 @@
 #include "isystem.h"
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
+#include <random>
+
 struct Particle;
 struct ParticleEmitter;
 struct ParticleShader;
@@ -18,12 +20,13 @@ public:
 private:
     Registry *registry;
     Ref<ParticleShader> mShader;
-
+    std::mt19937 rng;
     int findUnusedParticle(ParticleEmitter &emitter);
     void generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform);
     void simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter);
     void sortParticles(ParticleEmitter &emitter);
     void renderParticles(ParticleEmitter &emitter);
+    void drawElements(ParticleEmitter &emitter);
 };
 
 #endif // PARTICLESYSTEM_H

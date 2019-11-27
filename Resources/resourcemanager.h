@@ -172,8 +172,6 @@ private:
     void initIndexBuffers(Mesh *mesh);
 
     void initParticleBuffers(ParticleEmitter &particle);
-    void initParticleVertexAttribArrays(ParticleEmitter &particle);
-
     // Reads and loads mesh
     void loadMesh(std::string fileName, GLuint eID);
     void setMesh(std::string name, GLuint eID);

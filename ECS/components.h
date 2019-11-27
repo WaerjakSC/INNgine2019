@@ -146,48 +146,40 @@ struct Mesh : public Component {
 };
 struct Particle {
     vec3 position, velocity;
-    float life{-1.f}, size;     // Remaining life of the particle. if < 0 : dead and unused.
-    float cameraDistance{-1.f}; // *Squared* distance to the camera. if dead : -1.0f
+    float life{-1.f}, size; // Remaining life of the particle. if < 0 : dead and unused.
     GLubyte r, b, g, a;
-    bool operator<(Particle &other) {
-        // Sort in reverse order : far particles drawn first.
-        return cameraDistance > other.cameraDistance;
-    }
 };
 struct ParticleEmitter : public Component {
-    ParticleEmitter(size_t maxParticles = 10000, int pps = 100,
-                    const vec3 &initDir = vec3{0.f, 10.f, 0.f}, const QColor &initColor = QColor{255, 0, 0, 127},
+    ParticleEmitter(bool active = false, bool decay = false, size_t nrParticles = 100, int pps = 50,
+                    const vec3 &initDir = vec3{0}, const QColor &initColor = QColor{255, 0, 0, 127},
                     float inSpeed = 0.5f, float inSize = 0.1f, float inSpread = 1.5f, float inLifeSpan = 5.f,
                     GLuint texUnit = 0)
-        : numParticles(maxParticles), particlesPerSecond(pps), initialDirection(initDir), initialColor(initColor),
-          speed(inSpeed), size(inSize), spread(inSpread), lifeSpan(inLifeSpan), textureUnit(texUnit) {
-        particlesContainer.reserve(numParticles);
-        for (size_t i{0}; i < numParticles; i++) {
-            particlesContainer.push_back(Particle{});
-        }
-        std::vector<GLfloat> tempData(numParticles * 4);
-        particlePositionData = tempData;
-        std::vector<GLubyte> tempBytes(numParticles * 4);
-        particleColorData = tempBytes;
+        : isActive(active), shouldDecay(decay), numParticles(nrParticles), particlesPerSecond(pps), initialDirection(initDir), initialColor(initColor),
+          speed(inSpeed), size(inSize), spread(inSpread), lifeSpan(inLifeSpan), textureUnit(texUnit),
+          positionData(std::vector<GLfloat>(numParticles * 4)), colorData(std::vector<GLubyte>(numParticles * 4)),
+          particles(std::vector<Particle>(numParticles)) {
+        initLifeSpan = lifeSpan;
     }
+    bool isActive;
+    bool shouldDecay;
+
     size_t numParticles;
     int particlesPerSecond;
 
     vec3 initialDirection;
     QColor initialColor;
 
-    float speed, size, spread, lifeSpan;
-
-    std::vector<Particle> particlesContainer;
-    bool shouldEmit{true};
+    float speed, size, spread, lifeSpan, initLifeSpan;
 
     GLuint textureUnit{0};
     GLuint VAO{0};
+    GLuint EAB{0};
     GLuint quadVBO{0};
-    GLuint particlePositionBuffer{0};
-    GLuint particleColorBuffer{0};
-    std::vector<GLfloat> particlePositionData;
-    std::vector<GLubyte> particleColorData;
+    GLuint positionBuffer{0};
+    GLuint colorBuffer{0};
+    std::vector<GLfloat> positionData;
+    std::vector<GLubyte> colorData;
+    std::vector<Particle> particles;
 
     bool initialized{false};
 
