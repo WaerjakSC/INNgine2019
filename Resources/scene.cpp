@@ -442,7 +442,7 @@ void Scene::populateScene(const Document &scene) {
                     shader = factory->getShader<PhongShader>();
                 else if (shaderName == "SkyboxShader")
                     shader = factory->getShader<SkyboxShader>();
-                registry->add<Material>(id, shader, comp->value["textureunit"].GetInt(), color, specStr, specExp);
+                registry->add<Material>(id, shader, comp->value["textureunit"].GetUint(), color, specStr, specExp);
             } else if (comp->name == "mesh") {
                 std::string meshName{comp->value["name"].GetString()};
                 factory->addMeshComponent(meshName, id);

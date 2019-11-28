@@ -78,6 +78,7 @@ HEADERS += \
     ECS/Systems/collisionsystem.h \
 #
     ECS/pool.h \
+    ECS/sparseset.h \
     ECS/view.h \
     ECS/components.h \
     ECS/registry.h \

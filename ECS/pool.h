@@ -3,6 +3,7 @@
 
 #include "components.h"
 #include "core.h"
+#include "sparseset.h"
 #include <QObject>
 #include <memory>
 #include <vector>
@@ -123,15 +124,12 @@ class Pool : public IPool {
 public:
     Pool() = default;
     Pool(const Pool &other) {
-        mList = other.mList;
-        mIndex = other.mIndex;
+        mEntities = other.mEntities;
         mComponents = other.mComponents;
     }
     Pool(IPool *copyFrom) {
         auto temp = static_cast<Pool<Type> *>(copyFrom);
-
-        mList = temp->mList;
-        mIndex = temp->mIndex;
+        mEntities = temp->mEntities;
         mComponents = temp->mComponents;
     }
     ~Pool() {}
@@ -149,16 +147,11 @@ public:
     template <class... Args>
     void add(GLuint entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
-        if ((size_t)entityID > mIndex.size()) {
-            for (size_t i{mIndex.size()}; i < (size_t)entityID; i++) {
-                mIndex.push_back(-1);
-            }
+        if ((size_t)entityID > mEntities.extent()) {
+            mEntities.padIndex(entityID);
         }
-        if (entityID < mIndex.size())
-            mIndex[entityID] = mList.size();
-        else
-            mIndex.push_back(mList.size()); // entity list size is location of new entityID
-        mList.push_back(entityID);
+        mEntities.insert(entityID);
+
         mComponents.push_back(Type{args...});
     }
     /**
@@ -169,16 +162,10 @@ public:
     void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override {
         assert(!has(cloneTo));
         assert(has(cloneFrom));
-        if ((size_t)cloneTo > mIndex.size()) {
-            for (size_t i{mIndex.size()}; i < (size_t)cloneTo; i++) {
-                mIndex.push_back(-1);
-            }
+        if ((size_t)cloneTo > mEntities.extent()) {
+            mEntities.padIndex(cloneTo);
         }
-        if (cloneTo < mIndex.size())
-            mIndex[cloneTo] = mList.size();
-        else
-            mIndex.push_back(mList.size()); // entity list size is location of new entityID        mList.push_back(cloneTo);
-        mList.push_back(cloneTo);
+        mEntities.insert(cloneTo);
         mComponents.push_back(get(cloneFrom));
     }
     /**
@@ -189,30 +176,27 @@ public:
      */
     inline void remove(int removedEntityID) {
         if (has(removedEntityID)) {
-            GLuint swappedEntity{mList.back()};
+            GLuint swappedEntity{mEntities.back()};
             copy(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
-            mList.pop_back();
+
             mComponents.pop_back();
-            mIndex[removedEntityID] = -1; // Set entity location to an invalid value.
+            mEntities.remove(removedEntityID);
         }
-        if (mList.empty())
-            mIndex.clear();
     }
     inline void copy(GLuint eID, GLuint other) {
         assert(has(eID));
         assert(has(other));
-        std::swap(mList[mIndex[eID]], mList[mIndex[other]]);             // Swap the two entities in the pool
-        std::swap(mComponents[mIndex[eID]], mComponents[mIndex[other]]); // Swap the components to keep the dense set up to date
-        std::swap(mIndex[eID], mIndex[other]);                           // Set the index to point to the location after swap
+        std::swap(mComponents[mEntities.find(eID)], mComponents[mEntities.find(eID)]); // Swap the components to keep the dense set up to date
+        mEntities.swap(eID, other);
     }
     /**
      * @brief sort the pool according to a different index
      * @param otherIndex
      */
     inline void sort(std::vector<int> otherIndex) {
-        for (size_t i{0}; i < mList.size(); i++) {
+        for (size_t i{0}; i < mEntities.size(); i++) {
             if (has(i)) {
-                copy(mList[mIndex[i]], mList[otherIndex[i]]);
+                copy(mEntities.get(i), mEntities.get(otherIndex[i]));
 
             } /*else
                 mGroupEnd--;*/
@@ -230,7 +214,7 @@ public:
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
-    inline const std::vector<GLuint> &entities() { return mList; }
+    inline const std::vector<GLuint> &entities() { return mEntities.getList(); }
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
      * The index location is equal to the entityID.
@@ -238,7 +222,7 @@ public:
      * Both IDs and arrays begin at 0.
      * @return
      */
-    inline const std::vector<int> &indices() { return mIndex; }
+    inline const std::vector<int> &indices() { return mEntities.getIndices(); }
     /**
      * @brief get the component belonging to entity with given ID.
      * Some minor additional overhead due to going through mEntities.mIndices first -
@@ -248,7 +232,7 @@ public:
      */
     inline Type &get(int eID) {
         assert(has(eID));
-        return mComponents[mIndex[eID]];
+        return mComponents[mEntities.getIndex(eID)];
     }
     /**
      * @brief back get the last component in the pool, aka the latest creation
@@ -258,11 +242,11 @@ public:
         return mComponents.back();
     }
     inline iterator begin() const {
-        const int32_t pos{mList.size()};
-        return iterator{&mList, pos};
+        const int32_t pos{static_cast<int32_t>(mEntities.size())};
+        return iterator{mEntities.list(), pos};
     }
     inline iterator end() const {
-        return iterator{&mList, {}};
+        return iterator{mEntities.list(), {}};
     }
     /**
      * @brief find an entity in the index
@@ -270,9 +254,7 @@ public:
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
     inline int find(GLuint eID) const override {
-        if (eID < mIndex.size())
-            return mIndex[eID];
-        return -1;
+        return mEntities.find(eID);
     }
     /**
      * @brief For checking if the pool contains a given entity.
@@ -295,20 +277,19 @@ public:
      * @brief Actual number of entities with owned components in the pool.
      * @return
      */
-    inline size_t size() const override { return mList.size(); }
-    inline bool empty() const override { return mList.empty(); }
+    inline size_t size() const override { return mEntities.size(); }
+    inline bool empty() const override { return mEntities.empty(); }
     /**
      * @brief Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
-    inline size_t extent() { return mIndex.size(); }
+    inline size_t extent() { return mEntities.extent(); }
     /**
      * @brief Reset the arrays to empty.
      */
     inline void clear() {
-        mIndex.clear();
-        mList.clear();
+        mEntities.clear();
         mComponents.clear();
     }
     // Comparison operator overloads
@@ -333,8 +314,7 @@ private:
     // Dense Arrays --  n points to Entity in list[n] and component data in mComponentList[n]
     // Both should be the same length.
     std::vector<Type> mComponents;
-    std::vector<int> mIndex;   // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
-    std::vector<GLuint> mList; // Value is entityID.
+    SparseSet mEntities;
 };
 
 #endif // POOL_H
