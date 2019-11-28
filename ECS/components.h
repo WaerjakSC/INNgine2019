@@ -386,12 +386,20 @@ enum TWRstates { IDLE,
                  ATTACK,
                  COOLDOWN };
 
+enum AttackType { SPLASH,
+                  PHYSICAL,
+                  MAGIC };
+
+
 
 // GNOMER
 struct AIComponent : public Component {
     AIComponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}
     int hp = 100;
     int damage;
+    GLuint targetID;
+    float cd;
+
 };
 
 // BASEN
