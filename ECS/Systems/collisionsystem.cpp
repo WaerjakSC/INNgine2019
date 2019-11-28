@@ -46,9 +46,12 @@ void CollisionSystem::runAABBSimulations() {
                         QString entity1{view.get<EInfo>(entity).mName};
                         QString entity2{sphereView.get<EInfo>(otherEntity).mName};
                         // NOTIFY FSM
-                        // send event notify on first enter
-                        // check if colliding entity OverlapEvent = true
-                        //
+                        // send event notify on first enter (hei se på meg noe er i radius jippi)
+                        if(aabb.OverlapEvent && sphere.OverlapEvent){
+                            // Check list if colliding ID exists, if it does break
+                            // if not, add it to the list
+                            // done
+                        }
                         if (registry->contains<BSplinePoint>(entity)) {
                             registry->removeEntity(entity);
                             registry->system<AISystem>()->masterOfCurves();

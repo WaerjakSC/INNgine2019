@@ -73,19 +73,19 @@ void AISystem::learn() {
     state = MOVE;
 }
 
-void AISystem::detectEnemies()
+void AISystem::detectEnemies(AIComponent &ai)
 {
-    // check list for collision components
-    if(true){
+    // if(!(list.empty())
         // pick random from list
         // save it in targetID
-        twrstate = ATTACK;
-    }
+       // twrstate = ATTACK;
+
 
 }
 
-void AISystem::attack()
+void AISystem::attack(AIComponent &ai)
 {
+    // We already have the targetID here
 
 }
 
