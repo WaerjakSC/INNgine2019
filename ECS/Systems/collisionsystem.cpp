@@ -46,6 +46,9 @@ void CollisionSystem::runAABBSimulations() {
                         QString entity1{view.get<EInfo>(entity).mName};
                         QString entity2{sphereView.get<EInfo>(otherEntity).mName};
                         // NOTIFY FSM
+                        // send event notify on first enter
+                        // check if colliding entity OverlapEvent = true
+                        //
                         if (registry->contains<BSplinePoint>(entity)) {
                             registry->removeEntity(entity);
                             registry->system<AISystem>()->masterOfCurves();

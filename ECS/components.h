@@ -270,7 +270,13 @@ public:
     Mesh colliderMesh;
     Transform transform;
     bool isStatic{true};
+    bool OverlapEvent{false};
+
+    std::vector<int> index;
+    std::vector<GLuint> IDlist;
 };
+
+
 
 /**
   * @brief Axis Aligned Bounding Box
