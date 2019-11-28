@@ -34,7 +34,7 @@ public slots:
     void setHealth(int health);
 
 private:
-    // FSM
+    // FSM npc
     void move();
     void death();
     void goalReached();
@@ -44,6 +44,9 @@ private:
     BSplineCurve mCurve;
     Registry *registry = Registry::instance();
 
+    // FSM twr
+    void detectEnemies(AIComponent ai);
+    void attack(AIComponent ai);
 
 
     GLuint NPC;

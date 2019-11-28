@@ -38,17 +38,26 @@ void AISystem::update(DeltaTime dt) {
         break;
     }
 
-    switch (twrstate) {
-    case IDLE:
-        // scanning for monsters
-        break;
-    case ATTACK:
-        // kill goblin
-        break;
-    case COOLDOWN:
-        // cooldown
-        break;
+    auto view{registry->view<AIComponent>()};
+    for (auto entity : view) {
+        auto &aicomponent{view.get(entity)};
+
+        switch (twrstate) {
+        case IDLE:
+            // scanning for monsters
+            detectEnemies(aicomponent);
+            break;
+        case ATTACK:
+            // kill goblin
+            attack(aicomponent);
+            break;
+        case COOLDOWN:
+            // cooldown
+            break;
+        }
     }
+
+
 }
 
 /**
@@ -62,6 +71,22 @@ void AISystem::learn() {
         updatePath = false;
     }
     state = MOVE;
+}
+
+void AISystem::detectEnemies()
+{
+    // check list for collision components
+    if(true){
+        // pick random from list
+        // save it in targetID
+        twrstate = ATTACK;
+    }
+
+}
+
+void AISystem::attack()
+{
+
 }
 
 /**
