@@ -4,7 +4,6 @@
 #include "core.h"
 #include "matrix3x3.h"
 #include "matrix4x4.h"
-#include "sparseset.h"
 #include "shader.h"
 #include "sparseset.h"
 #include "vertex.h"
@@ -272,10 +271,9 @@ public:
     Mesh colliderMesh;
     Transform transform;
     bool isStatic{true};
-    bool OverlapEvent{false};
+    bool overlapEvent{false};
 
-    SparseSet OverlappedEntities;
-
+    SparseSet overlappedEntities;
 };
 
 /**

@@ -22,6 +22,11 @@ public:
             return mIndex[eID];
         return -1;
     }
+    inline bool contains(GLuint eID) const {
+        if (find(eID) != -1)
+            return true;
+        return false;
+    }
     /**
      * @brief Actual number of entities with owned components in the pool.
      * @return

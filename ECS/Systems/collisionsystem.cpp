@@ -47,9 +47,9 @@ void CollisionSystem::runAABBSimulations() {
                         QString entity2{sphereView.get<EInfo>(otherEntity).mName};
                         // NOTIFY FSM
                         // send event notify on first enter (hei se på meg noe er i radius jippi)
-                        if(aabb.OverlapEvent && sphere.OverlapEvent){
-                            if(aabb.OverlappedEntities.find(otherEntity) == -1){
-                                aabb.OverlappedEntities.insert(otherEntity);
+                        if (aabb.overlapEvent && sphere.overlapEvent) {
+                            if (aabb.overlappedEntities.contains(otherEntity)) {
+                                aabb.overlappedEntities.insert(otherEntity);
                             }
                         }
                         if (registry->contains<BSplinePoint>(entity)) {
