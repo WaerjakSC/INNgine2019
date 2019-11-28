@@ -382,6 +382,11 @@ enum NPCevents { ENDPOINT_ARRIVED,
                  ITEM_TAKEN,
                  DAMAGE_TAKEN };
 
+enum TWRstates { IDLE,
+                 ATTACK,
+                 COOLDOWN };
+
+
 // GNOMER
 struct AIComponent : public Component {
     AIComponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}

@@ -44,8 +44,11 @@ private:
     BSplineCurve mCurve;
     Registry *registry = Registry::instance();
 
+
+
     GLuint NPC;
 
+    TWRstates twrstate{IDLE};
     NPCstates state{MOVE};
     void notify(int notification);
     std::queue<int> notification_queue;

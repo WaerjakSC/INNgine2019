@@ -37,6 +37,18 @@ void AISystem::update(DeltaTime dt) {
         goalReached();
         break;
     }
+
+    switch (twrstate) {
+    case IDLE:
+        // scanning for monsters
+        break;
+    case ATTACK:
+        // kill goblin
+        break;
+    case COOLDOWN:
+        // cooldown
+        break;
+    }
 }
 
 /**
@@ -183,6 +195,7 @@ void AISystem::init(GLuint eID) {
  */
 void AISystem::death() {
     // hp <= 0
+    // particles
     // gold++
     // delete entity
 }
