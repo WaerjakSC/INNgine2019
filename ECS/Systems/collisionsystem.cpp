@@ -49,6 +49,7 @@ void CollisionSystem::runAABBSimulations() {
                         // send event notify on first enter (hei se på meg noe er i radius jippi)
                         if(aabb.OverlapEvent && sphere.OverlapEvent){
                             // Check list if colliding ID exists, if it does break
+
                             // if not, add it to the list
                             // done
                         }

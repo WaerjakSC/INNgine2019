@@ -4,6 +4,7 @@
 #include "core.h"
 #include "matrix3x3.h"
 #include "matrix4x4.h"
+#include "sparseset.h"
 #include "shader.h"
 #include "vertex.h"
 #include <QColor>
@@ -272,8 +273,7 @@ public:
     bool isStatic{true};
     bool OverlapEvent{false};
 
-    std::vector<int> index;
-    std::vector<GLuint> IDlist;
+
 };
 
 
