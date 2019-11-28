@@ -50,7 +50,7 @@ private:
 public:
     MovementSystem();
 
-    void update(DeltaTime dt = 0.016) override;
+    void update(DeltaTime = 0.016) override;
     void init();
     /**
      * @brief updateEntity Force update of matrix to an entity,

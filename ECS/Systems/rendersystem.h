@@ -12,7 +12,7 @@ class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1
 public:
     RenderSystem();
 
-    void update(DeltaTime dt = 0.016) override;
+    void update(DeltaTime = 0.016) override;
 
     void setSkyBoxID(const GLuint &skyBoxID);
 

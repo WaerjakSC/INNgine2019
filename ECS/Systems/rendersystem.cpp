@@ -28,8 +28,7 @@ void RenderSystem::drawEntities() {
     }
     drawSkybox();
 }
-void RenderSystem::update(DeltaTime dt) {
-    Q_UNUSED(dt);
+void RenderSystem::update(DeltaTime) {
     drawEntities();
     if (!ResourceManager::instance()->isPlaying()) {
         drawColliders();

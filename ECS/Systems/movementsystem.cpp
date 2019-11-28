@@ -8,8 +8,7 @@ MovementSystem::MovementSystem() : registry{Registry::instance()} {
 void MovementSystem::init() {
     update();
 }
-void MovementSystem::update(DeltaTime dt) {
-    Q_UNUSED(dt)
+void MovementSystem::update(DeltaTime) {
     auto view{registry->view<Transform>()};
     for (auto entity : view) {
         auto view{registry->view<Transform>()};

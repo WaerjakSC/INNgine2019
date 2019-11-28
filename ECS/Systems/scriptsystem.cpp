@@ -5,8 +5,7 @@
 ScriptSystem::ScriptSystem() : factory{ResourceManager::instance()} {
 }
 
-void ScriptSystem::update(DeltaTime deltaTime) {
-    Q_UNUSED(deltaTime);
+void ScriptSystem::update(DeltaTime) {
 }
 
 void ScriptSystem::init() {
