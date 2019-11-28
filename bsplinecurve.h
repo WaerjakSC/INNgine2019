@@ -17,9 +17,6 @@ public:
     int n;                // n number of knots
     int d;                // d degrees
     std::vector<float> t; // knots
-
-    // void setKnotsAndControlPoints(std::vector<float> knots, std::vector<vec3> points);
-
     vec3 evaluateBSpline(int my, float x) const;
 
     int splineResolution = 50.f;
@@ -38,10 +35,7 @@ public:
     vec3 eval(float x) const;
 
     void updateTrophies();
-
     void updatePath(bool init = false);
-
-    //vec2 deBoor(float x);
 };
 
 #endif // BSPLINECURVE_H

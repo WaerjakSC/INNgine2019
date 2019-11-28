@@ -45,8 +45,8 @@ private:
     Registry *registry = Registry::instance();
 
     // FSM twr
-    void detectEnemies(AIComponent ai);
-    void attack(AIComponent ai);
+    void detectEnemies(AIComponent &ai);
+    void attack(AIComponent &ai);
 
 
     GLuint NPC;
