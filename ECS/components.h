@@ -274,6 +274,7 @@ public:
     bool isStatic{true};
     bool OverlapEvent{false};
 
+    SparseSet OverlappedEntities;
 
 };
 

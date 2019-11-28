@@ -48,10 +48,9 @@ void CollisionSystem::runAABBSimulations() {
                         // NOTIFY FSM
                         // send event notify on first enter (hei se på meg noe er i radius jippi)
                         if(aabb.OverlapEvent && sphere.OverlapEvent){
-                            // Check list if colliding ID exists, if it does break
-
-                            // if not, add it to the list
-                            // done
+                            if(aabb.OverlappedEntities.find(otherEntity) == -1){
+                                aabb.OverlappedEntities.insert(otherEntity);
+                            }
                         }
                         if (registry->contains<BSplinePoint>(entity)) {
                             registry->removeEntity(entity);
