@@ -83,11 +83,13 @@ public:
         std::swap(mIndex[eID], mIndex[other]);               // Set the index to point to the location after swap
     }
     /**
-     * @brief setIndexValue sets the value of the
+     * @brief insert Inserts an entity into the sparse set.
      * @param entityID
-     * @param value
      */
     void insert(GLuint entityID) {
+        if ((size_t)entityID > extent()) {
+            padIndex(entityID);
+        }
         if (entityID < extent())
             mIndex[entityID] = size();
         else

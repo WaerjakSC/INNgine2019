@@ -147,9 +147,6 @@ public:
     template <class... Args>
     void add(GLuint entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
-        if ((size_t)entityID > mEntities.extent()) {
-            mEntities.padIndex(entityID);
-        }
         mEntities.insert(entityID);
 
         mComponents.push_back(Type{args...});
@@ -162,9 +159,6 @@ public:
     void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override {
         assert(!has(cloneTo));
         assert(has(cloneFrom));
-        if ((size_t)cloneTo > mEntities.extent()) {
-            mEntities.padIndex(cloneTo);
-        }
         mEntities.insert(cloneTo);
         mComponents.push_back(get(cloneFrom));
     }
