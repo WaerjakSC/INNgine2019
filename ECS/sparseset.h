@@ -1,7 +1,6 @@
 #ifndef SPARSESET_H
 #define SPARSESET_H
-#include "pool.h"
-
+#include "gsl_math.h"
 class SparseSet {
 public:
     /**
@@ -54,22 +53,28 @@ public:
      * @return
      */
     inline GLuint get(GLuint entityID) const {
-        return mList[getIndex(entityID)];
+        return mList[find(entityID)];
     }
     /**
-     * @brief Returns a read-write copy of the entityID at the index specified.
+     * @brief Returns a read-write reference to the entityID at the index specified.
      * @param index
      * @return
      */
     inline GLuint &get(GLuint entityID) {
         return mList[getIndex(entityID)];
     }
+    /**
+     * @brief getIndex returns the index location to mList for the given entityID
+     * @param entityID
+     * @return
+     */
     inline int &getIndex(GLuint entityID) {
         return mIndex[entityID];
     }
-    inline int getIndex(GLuint entityID) const {
-        return mIndex[entityID];
-    }
+    /**
+     * @brief back returns a read-write reference to the last element in mList.
+     * @return
+     */
     inline GLuint &back() {
         return mList.back();
     }
@@ -78,11 +83,14 @@ public:
         std::swap(mIndex[eID], mIndex[other]);               // Set the index to point to the location after swap
     }
     /**
-     * @brief setIndexValue sets the value of the
+     * @brief insert Inserts an entity into the sparse set.
+     * Pads the index if entityID value is larger than size of mIndex.
      * @param entityID
-     * @param value
      */
     void insert(GLuint entityID) {
+        if ((size_t)entityID > extent()) {
+            padIndex(entityID);
+        }
         if (entityID < extent())
             mIndex[entityID] = size();
         else

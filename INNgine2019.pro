@@ -77,6 +77,7 @@ HEADERS += \
     ECS/Systems/movementsystem.h \
     ECS/Systems/collisionsystem.h \
 #
+    ECS/group.h \
     ECS/pool.h \
     ECS/sparseset.h \
     ECS/view.h \

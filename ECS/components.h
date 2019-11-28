@@ -6,6 +6,7 @@
 #include "matrix4x4.h"
 #include "sparseset.h"
 #include "shader.h"
+#include "sparseset.h"
 #include "vertex.h"
 #include <QColor>
 #include <QJSEngine>
@@ -276,8 +277,6 @@ public:
 
 };
 
-
-
 /**
   * @brief Axis Aligned Bounding Box
   */
@@ -390,8 +389,6 @@ enum AttackType { SPLASH,
                   PHYSICAL,
                   MAGIC };
 
-
-
 // GNOMER
 struct AIComponent : public Component {
     AIComponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}
@@ -399,7 +396,6 @@ struct AIComponent : public Component {
     int damage;
     GLuint targetID;
     float cd;
-
 };
 
 // BASEN
