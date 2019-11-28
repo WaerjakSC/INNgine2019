@@ -84,6 +84,7 @@ public:
     }
     /**
      * @brief insert Inserts an entity into the sparse set.
+     * Pads the index if entityID value is larger than size of mIndex.
      * @param entityID
      */
     void insert(GLuint entityID) {
