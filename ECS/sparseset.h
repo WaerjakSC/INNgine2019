@@ -54,22 +54,28 @@ public:
      * @return
      */
     inline GLuint get(GLuint entityID) const {
-        return mList[getIndex(entityID)];
+        return mList[find(entityID)];
     }
     /**
-     * @brief Returns a read-write copy of the entityID at the index specified.
+     * @brief Returns a read-write reference to the entityID at the index specified.
      * @param index
      * @return
      */
     inline GLuint &get(GLuint entityID) {
         return mList[getIndex(entityID)];
     }
+    /**
+     * @brief getIndex returns the index location to mList for the given entityID
+     * @param entityID
+     * @return
+     */
     inline int &getIndex(GLuint entityID) {
         return mIndex[entityID];
     }
-    inline int getIndex(GLuint entityID) const {
-        return mIndex[entityID];
-    }
+    /**
+     * @brief back returns a read-write reference to the last element in mList.
+     * @return
+     */
     inline GLuint &back() {
         return mList.back();
     }
