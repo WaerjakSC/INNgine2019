@@ -1,7 +1,6 @@
 #ifndef SPARSESET_H
 #define SPARSESET_H
-#include "pool.h"
-
+#include "gsl_math.h"
 class SparseSet {
 public:
     /**
