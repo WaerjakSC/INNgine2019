@@ -1,7 +1,7 @@
 #include "inputsystem.h"
 #include "camera.h"
+#include "collisionsystem.h"
 #include "movementsystem.h"
-#include "raycast.h"
 #include "registry.h"
 #include "renderwindow.h"
 #include "resourcemanager.h"
@@ -103,9 +103,9 @@ void InputSystem::handlePlayerController(DeltaTime dt) {
 }
 void InputSystem::handleMouseInput() {
     if (editorInput.LMB) {
-        Raycast ray{editorCamController()};
-        int entityID{ray.mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry())};
-        emit rayHitEntity(entityID);
+        auto collisionSystem{registry->system<CollisionSystem>()};
+        Raycast ray{collisionSystem->mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry())};
+        emit rayHitEntity(ray.hitEntity);
     } else if (editorInput.RMB) {
         if (editorInput.W)
             mEditorCamController->moveForward(mCameraSpeed);
@@ -146,41 +146,40 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
         QPoint newPos{pos};
         if (pos.x() >= width) {
             newPos.rx() = width;
-            currentGameCameraController()->moveRight(dt);
+            currentCameraController()->moveRight(dt);
         } else if (pos.x() <= 0) {
             newPos.rx() = 0;
-            currentGameCameraController()->moveRight(-dt);
+            currentCameraController()->moveRight(-dt);
         }
         if (pos.y() >= height) {
             newPos.ry() = height;
-            currentGameCameraController()->moveForward(-dt);
+            currentCameraController()->moveForward(-dt);
         } else if (pos.y() <= 0) {
             newPos.ry() = 0;
-            currentGameCameraController()->moveForward(dt);
+            currentCameraController()->moveForward(dt);
         }
         newPos = mRenderWindow->mapToGlobal(newPos);
         QCursor::setPos(newPos);
     }
 }
 void InputSystem::dragEntity(GLuint entity) {
-    // make ray
-    Raycast dragRay{currentGameCameraController(), 50.f};
     QPoint cursorPos{mRenderWindow->mapFromGlobal(QCursor::pos())};
     // Get the intersection point between the ray and the closest entity as a vector3d
-    vec3 desiredPos;
-    int entityID{dragRay.mousePick(cursorPos, mRenderWindow->geometry(), desiredPos, entity)};
+    // make ray
+    auto collisionSystem{registry->system<CollisionSystem>()};
+    Raycast ray{collisionSystem->mousePick(cursorPos, mRenderWindow->geometry(), entity, 50.f)};
     Transform &tf{registry->get<Transform>(entity)};
-    if (entityID != -1) {
+    if (ray.hitEntity != -1) {
         // compensate for size of collider
         // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
-        if (registry->contains<AABB>(entityID))
-            desiredPos.y += registry->get<AABB>(entityID).size.y;
+        if (registry->contains<AABB>(ray.hitEntity))
+            ray.hitPoint.y += registry->get<AABB>(ray.hitEntity).size.y;
         else
-            desiredPos.y += registry->get<Sphere>(entityID).radius;
-        desiredPos.y += tf.localScale.y;
+            ray.hitPoint.y += registry->get<Sphere>(ray.hitEntity).radius;
+        ray.hitPoint.y += tf.localScale.y;
     }
     // place the object either on the mouse at 50.f distance or at correct distance for the AABB hit
-    tf.localPosition = desiredPos;
+    tf.localPosition = ray.hitPoint;
     tf.matrixOutdated = true;
 }
 void InputSystem::setPlayer(const GLuint &player) {
@@ -207,13 +206,15 @@ std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() cons
     return mGameCameraControllers;
 }
 
-Ref<GameCameraController> InputSystem::currentGameCameraController() {
-    for (auto controller : mGameCameraControllers) {
-        if (controller->isActive()) {
-            return controller;
+Ref<CameraController> InputSystem::currentCameraController() {
+    if (factory->isPlaying()) {
+        for (auto controller : mGameCameraControllers) {
+            if (controller->isActive()) {
+                return controller;
+            }
         }
     }
-    return nullptr;
+    return mEditorCamController;
 }
 
 Input &InputSystem::playerController() {
@@ -463,7 +464,7 @@ void InputSystem::setActiveCamera(bool checked) {
             cam.mOutDated = true;
         }
         if (factory->isPlaying())
-            factory->setActiveCameraController(currentGameCameraController());
+            factory->setActiveCameraController(currentCameraController());
     } else {
         selectedCam.mIsActive = false;
         selectedCam.mOutDated = true;

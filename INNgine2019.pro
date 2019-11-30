@@ -123,7 +123,6 @@ HEADERS += \
     core.h \
     deltaTime.h \
     deltaTime.h \
-    raycast.h \
     renderwindow.h \
     mainwindow.h \
     camera.h \
@@ -176,7 +175,6 @@ SOURCES += main.cpp \
 #
     bsplinecurve.cpp \
     cameracontroller.cpp \
-    raycast.cpp \
     renderwindow.cpp \
     mainwindow.cpp \
     camera.cpp

@@ -8,7 +8,6 @@ class RenderWindow;
 class Registry;
 class ResourceManager;
 class MovementSystem;
-class Raycast;
 class CameraController;
 class GameCameraController;
 class InputSystem : public QObject, public ISystem {
@@ -32,7 +31,7 @@ public:
     void setEditorCamController(const Ref<CameraController> &editorCamController);
 
     std::vector<Ref<GameCameraController>> gameCameraControllers() const;
-    Ref<GameCameraController> currentGameCameraController();
+    Ref<CameraController> currentCameraController();
 
     void onResize(float aspectRatio);
     GLuint player() const;

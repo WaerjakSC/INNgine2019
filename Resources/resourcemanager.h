@@ -98,7 +98,7 @@ public:
     void loadLastProject();
     bool isPlaying() const;
 
-    bool getPaused() const;
+    bool isPaused() const;
 
     void setCurrentCameraController(Ref<CameraController> currentCameraController);
 
@@ -165,7 +165,7 @@ private:
     Ref<LightSystem> mLightSystem;
     void showMessage(const QString &message);
     bool mIsPlaying{false};
-    bool mPaused{false}; // Don't make a snapshot if it was just restarted from a pause
+    bool mIsPaused{false}; // Don't make a snapshot if it was just restarted from a pause
 
     // OpenGL init functions
     void initVertexBuffers(Mesh *mesh);

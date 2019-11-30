@@ -976,8 +976,8 @@ void ResourceManager::showMessage(const QString &message) {
     QTimer::singleShot(1000, this, &ResourceManager::changeMsg);
 }
 
-bool ResourceManager::getPaused() const {
-    return mPaused;
+bool ResourceManager::isPaused() const {
+    return mIsPaused;
 }
 
 bool ResourceManager::isPlaying() const {
@@ -1061,8 +1061,8 @@ void ResourceManager::newProject() {
 }
 void ResourceManager::play() {
     if (!mIsPlaying) {
-        if (mPaused) { // Only make snapshot if not resuming from pause
-            mPaused = false;
+        if (mIsPaused) { // Only make snapshot if not resuming from pause
+            mIsPaused = false;
         } else
             Registry::instance()->makeSnapshot();
         auto [aisys, sound, input]{registry->system<AISystem, SoundSystem, InputSystem>()};
@@ -1085,7 +1085,7 @@ void ResourceManager::play() {
 void ResourceManager::pause() {
     if (mIsPlaying) {
         mIsPlaying = false;
-        mPaused = true;
+        mIsPaused = true;
         auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
         input->setGameCameraInactive();
         setActiveCameraController(input->editorCamController());
@@ -1096,7 +1096,7 @@ void ResourceManager::pause() {
     }
 }
 void ResourceManager::stop() {
-    if (mIsPlaying || mPaused) {
+    if (mIsPlaying || mIsPaused) {
         registry->loadSnapshot();
         auto [movement, sound, input]{registry->system<MovementSystem, SoundSystem, InputSystem>()};
         movement->init();

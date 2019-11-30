@@ -1,7 +1,8 @@
 #include "collisionsystem.h"
 #include "aisystem.h"
+#include "cameracontroller.h"
 #include "components.h"
-#include "raycast.h"
+#include "inputsystem.h"
 #include "registry.h"
 #include <cmath>
 CollisionSystem::CollisionSystem() : registry{Registry::instance()} {
@@ -89,7 +90,59 @@ void CollisionSystem::runSphereSimulations() {
         }
     }
 }
-bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs) {
+void CollisionSystem::rayAABB(Raycast &ray, int ignoredEntity) {
+    auto view{registry->view<AABB>()};
+    for (auto entity : view) {
+        if ((int)entity == ignoredEntity)
+            continue;
+        auto &aabb{view.get(entity)};
+        if (calcRayToAABB(ray, aabb)) {
+            if (ray.intersectionDistance < ray.closestTarget) {
+                ray.closestTarget = ray.intersectionDistance;
+                ray.hitEntity = entity;
+            }
+        }
+    }
+}
+void CollisionSystem::raySphere(Raycast &ray, int ignoredEntity) {
+    auto view{registry->view<Sphere>()};
+    for (auto entity : view) {
+        if ((int)entity == ignoredEntity)
+            continue;
+        auto &sphere{view.get(entity)};
+        if (calcRayToSphere(ray, sphere)) {
+            if (ray.intersectionDistance < ray.closestTarget) {
+                ray.closestTarget = ray.intersectionDistance;
+                ray.hitEntity = entity;
+            }
+        }
+    }
+}
+Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, int ignoredEntity, float range) {
+    Raycast raycast{range};
+    raycast.ray = getRayFromMouse(mousePos, rect);
+
+    rayAABB(raycast, ignoredEntity);
+    raySphere(raycast, ignoredEntity);
+    raycast.hitPoint = getPointOnRay(raycast, raycast.closestTarget);
+
+    if (raycast.hitEntity == -1)
+        raycast.hitPoint = getPointOnRay(raycast, raycast.rayRange);
+    return raycast;
+}
+
+vec3 CollisionSystem::getPointOnRay(const Raycast &r, double distance) {
+    return r.ray.origin + (r.ray.direction * distance);
+}
+Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect) {
+    vec3 mousePoint{static_cast<GLfloat>(mousePos.x()), static_cast<GLfloat>(mousePos.y()), 0.0f};
+    auto inputSystem{registry->system<InputSystem>()};
+    CameraController *curController{inputSystem->currentCameraController().get()};
+    vec3 direction{curController->getCamera().calculateMouseRay(mousePoint, rect.height(), rect.width())};
+    vec3 origin{curController->cameraPosition()};
+    return Ray{origin, direction};
+}
+inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs) {
     return (lhs.isStatic == rhs.isStatic) == true;
 }
 
@@ -235,12 +288,12 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
     return sphereCenterToPoint + spherePos;
 }
 
-bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance) {
+bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere) {
     vec3 center{sphere.transform.modelMatrix.getPosition() + sphere.position};
-    vec3 originToCenter{ray.origin - center};
+    vec3 originToCenter{r.ray.origin - center};
 
-    float a{vec3::dot(ray.direction, ray.direction)};
-    float b{2.f * vec3::dot(originToCenter, ray.direction)};
+    float a{vec3::dot(r.ray.direction, r.ray.direction)};
+    float b{2.f * vec3::dot(originToCenter, r.ray.direction)};
     float c{vec3::dot(originToCenter, originToCenter) - (sphere.radius * sphere.radius)};
     float discriminant{(b * b) - (4 * a * c)};
     if (discriminant < 0)
@@ -250,13 +303,13 @@ bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &
         float sqrtDisc{sqrtf(discriminant)};
         double t_a{(-b + sqrtDisc) / (2 * a)};
         double t_b{(-b - sqrtDisc) / (2 * a)};
-        intersectionDistance = t_b;
+        r.intersectionDistance = t_b;
         // if behind viewer, throw one or both away
         if (t_a < 0.0f) {
             if (t_b < 0.0f)
                 return false;
         } else if (t_b < 0.0f)
-            intersectionDistance = t_a;
+            r.intersectionDistance = t_a;
         return true;
     }
     // check for ray hitting once (skimming the surface)
@@ -265,32 +318,32 @@ bool CollisionSystem::RayToSphere(const Ray &ray, const Sphere &sphere, double &
         double t = {-b + sqrt(discriminant) / (2.0 * a)};
         if (t < 0.0f)
             return false;
-        intersectionDistance = t;
+        r.intersectionDistance = t;
         return true;
     }
     return false;
 }
 
-bool CollisionSystem::RayToAABB(const Ray &r, const AABB &aabb, double &intersectionDistance) {
+bool CollisionSystem::calcRayToAABB(Raycast &r, const AABB &aabb) {
     vec3 AABBmin{getMin(aabb)};
     vec3 AABBmax{getMax(aabb)};
 
-    float t1{(AABBmin.x - r.origin.x) * r.invDir.x};
-    float t2{(AABBmax.x - r.origin.x) * r.invDir.x};
+    float t1{(AABBmin.x - r.ray.origin.x) * r.ray.invDir.x};
+    float t2{(AABBmax.x - r.ray.origin.x) * r.ray.invDir.x};
 
     float tmin{std::min(t1, t2)};
     float tmax{std::max(t1, t2)};
 
     for (int i{1}; i < 3; ++i) {
-        t1 = (AABBmin[i] - r.origin[i]) * r.invDir[i];
-        t2 = (AABBmax[i] - r.origin[i]) * r.invDir[i];
+        t1 = (AABBmin[i] - r.ray.origin[i]) * r.ray.invDir[i];
+        t2 = (AABBmax[i] - r.ray.origin[i]) * r.ray.invDir[i];
 
         tmin = std::max(tmin, std::min(t1, t2));
         tmax = std::min(tmax, std::max(t1, t2));
     }
 
     if (tmax >= std::max(tmin, 0.f)) {
-        intersectionDistance = tmax; // This might need to be tmin instead
+        r.intersectionDistance = tmax; // This might need to be tmin instead
         return true;
     }
     return false;

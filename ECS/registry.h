@@ -1,6 +1,7 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
+#include "group.h"
 #include "isystem.h"
 #include "pool.h"
 #include "view.h"
@@ -8,6 +9,8 @@
 #include "resourcemanager.h"
 #include <memory>
 #include <typeinfo>
+struct GroupData {
+};
 
 class Registry : public QObject {
     Q_OBJECT
@@ -24,7 +27,11 @@ public:
      */
     template <typename... Comp>
     inline View<Comp...> view() {
-        return {getPool<Comp>()...};
+        return View{getPool<Comp>()...};
+    }
+    template <typename Owned, typename... Observed>
+    Group<Owned, Observed...> group() { // TEMP, DO NOT USE
+        return Group{getPool<Owned>(), getPool<Observed>...};
     }
     /**
      * @brief Register component type. A component must be registered before it can be used by the ECS.
@@ -235,7 +242,7 @@ private:
     static Registry *mInstance;
     std::map<std::string, Scope<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
-
+    std::vector<GroupData> mGroupData;
     std::vector<GLuint> mAvailableSlots;
     void newGeneration(GLuint id, const QString &text);
 

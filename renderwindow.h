@@ -25,7 +25,6 @@ class AISystem;
 class ResourceManager;
 class ScriptSystem;
 class Registry;
-class Raycast;
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
 /// We also inherit from QOpenGLFunctions, to get access to the OpenGL functions

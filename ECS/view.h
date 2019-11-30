@@ -125,7 +125,7 @@ public:
      * @brief Retrieves the desired components from an entity
      * If multiple component types entered, the returned value will be a tuple of each component.
      * Retrieving these components is easiest done using structured bindings.
-     * @example auto [trans, mat, msh] = view.get<Transform, Material, Mesh>(entity);
+     * @example auto [trans, mat, mesh] = view.get<Transform, Material, Mesh>(entity);
      */
     template <typename... Comp>
     inline decltype(auto) get(const int &entt) const {
@@ -140,7 +140,7 @@ private:
     View(Pool<Component> *... ref)
         : pools{ref...} {
     }
-    std::tuple<Pool<Component> *...> pools;
+    const std::tuple<Pool<Component> *...> pools;
 };
 /**
  *@brief Single component view type.
@@ -151,12 +151,6 @@ private:
  */
 template <typename Component>
 class View<Component> {
-private:
-    friend class Registry;
-    View(Pool<Component> *ref)
-        : pool{ref} {}
-    Pool<Component> *pool;
-
 public:
     using iterator_type = typename IPool::iterator;
     inline size_t size() const {
@@ -194,5 +188,11 @@ public:
         assert(contains(entt));
         return pool->get(entt);
     }
+
+private:
+    View(Pool<Component> *ref)
+        : pool{ref} {}
+    Pool<Component> *pool;
+    friend class Registry;
 };
 #endif // VIEW_H

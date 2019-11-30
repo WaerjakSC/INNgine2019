@@ -5,7 +5,30 @@
 #include "deltaTime.h"
 #include "isystem.h"
 #include <QOpenGLFunctions_4_1_Core>
-struct Ray;
+struct Ray {
+    Ray() {}
+    Ray(const vec3 &orig, const vec3 &dir) : origin{orig}, direction{dir} {
+        invDir = direction.divide(1.f);
+        sign[0] = (invDir.x < 0);
+        sign[1] = (invDir.y < 0);
+        sign[2] = (invDir.z < 0);
+    }
+    vec3 origin;
+    vec3 direction;
+    vec3 invDir;
+    int sign[3];
+};
+struct Raycast {
+    Raycast(float range) : rayRange(range), closestTarget(range) {
+    }
+
+    Ray ray;
+    float rayRange;
+    double intersectionDistance;
+    double closestTarget;
+    int hitEntity{-1};
+    vec3 hitPoint;
+};
 class Registry;
 class CollisionSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
@@ -13,6 +36,15 @@ public:
     CollisionSystem();
 
     void update(DeltaTime dt = 0.016) override;
+    /**
+     * @brief mousePick creates a raycast object with the given range parameter and tries to pick a point in the viewpoint Rect from mousePos (x, y).
+     * @param mousePos
+     * @param rect
+     * @param ignoredEntity Can be supplied to force the function to ignore a certain entity, such as the object being dragged in InputSystem's dragEntity()
+     * @param range
+     * @return
+     */
+    Raycast mousePick(const QPoint &mousePos, const QRect &rect, int ignoredEntity = -1, float range = 250.f);
 public slots:
     void setOriginX(double xIn);
     void setOriginY(double xIn);
@@ -73,8 +105,19 @@ private:
     * @return a vector maximum point found in the AABB
     */
     vec3 getMax(const AABB &aabb);
+    /**
+     * @brief rayAABB checks every entity owning an AABB collider to find the closest one hit by the ray.
+     * @param ray
+     * @param ignoredEntity
+     */
+    void rayAABB(Raycast &ray, int ignoredEntity = -1);
+    /**
+     * @brief raySphere checks every entity owning a Sphere collider to find the closest one hit by the ray.
+     * @param ray
+     * @param ignoredEntity
+     */
+    void raySphere(Raycast &ray, int ignoredEntity = -1);
 
-    // Need AABBSphere() and OBBSphere(), might use macro for swapping?
     /**
     * @brief AABBAABB returns true if an intersection between given AABB's occur
     * @param AABB1
@@ -96,7 +139,6 @@ private:
     * @return true if distance is less than radius (we have an intersection)
     */
     bool SphereAABB(const Sphere &sphere, const AABB &aabb1);
-    // bool SphereOBB(const Collision::Sphere &sphere, const Collision::OBB &obb);
     /**
     * @brief SphereSphere
     * @param sphere1
@@ -112,21 +154,37 @@ private:
     */
     bool SphereOBB(const Sphere &sphere, const OBB &obb);
     /**
-     * @brief RayToSphere finds the intersection point between a ray and a sphere collider
+     * @brief calcRayToSphere finds the intersection point between a ray and a sphere collider
+     * Not to be confused with raySphere which runs this function for each entity
      * @param ray
      * @param sphere
      * @param intersectionDistance retrieves the distance between the ray origin and the sphere
      * @return true if hit, false if not
      */
-    bool RayToSphere(const Ray &ray, const Sphere &sphere, double &intersectionDistance);
+    bool calcRayToSphere(Raycast &r, const Sphere &sphere);
     /**
-     * @brief RayToAABB finds the intersection point between ray and AABB collider
+     * @brief calcRayToAABB finds the intersection point between ray and AABB collider
+     * Not to be confused with rayAABB which runs this function for each entity
      * @param r
      * @param aabb
      * @param intersectionDistance retrieves the distance between ray origin and AABB
      * @return true if hit, false if not
      */
-    bool RayToAABB(const Ray &r, const AABB &aabb, double &intersectionDistance);
+    bool calcRayToAABB(Raycast &r, const AABB &aabb);
+    /**
+     * @brief getRayFromMouse calculates a ray based on the mouse's position in the viewport
+     * @param mousePos
+     * @param rect
+     * @return
+     */
+    Ray getRayFromMouse(const QPoint &mousePos, const QRect &rect);
+    /**
+     * @brief getPointOnRay calculates a point on a ray given a specific distance from the ray's origin
+     * @param r
+     * @param distance
+     * @return
+     */
+    vec3 getPointOnRay(const Raycast &r, double distance);
     // Work in progress this guy
     bool CylinderCylinder(const Cylinder &cylinder1, const Cylinder &cylinder2);
 
@@ -141,8 +199,6 @@ private:
     * @return the vec3 closest point
     */
     vec3 ClosestPoint(const AABB &aabb, const vec3 &point);
-    // todo
-    vec3 ClosestPoint(const OBB &obb, const vec3 &point);
     /**
     * @brief ClosestPoint finds the point in a Sphere closest to a given point
     * @param sphere collider type
@@ -150,7 +206,8 @@ private:
     * @return resized vector, offset by sphere.position
     */
     vec3 ClosestPoint(const Sphere &sphere, const vec3 &point);
-
+    // todo
+    vec3 ClosestPoint(const OBB &obb, const vec3 &point);
     /**
      * @brief bothStatic simple bool check to see if both Collision objects have isStatic set to true
      * @param lhs
@@ -158,8 +215,6 @@ private:
      * @return if both are static objects, return true
      */
     bool bothStatic(const Collision &lhs, const Collision &rhs);
-
-    friend class Raycast;
 };
 
 #endif // COLLISIONSYSTEM_H
