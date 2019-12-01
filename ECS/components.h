@@ -46,10 +46,10 @@ public:
 };
 struct EInfo : Component {
     EInfo() = default;
-    EInfo(QString name) : mName(name) {}
-    QString mName;
-    GLuint mGeneration{0};
-    bool mIsDestroyed{false};
+    EInfo(QString name) : name(name) {}
+    QString name;
+    GLuint generation{0};
+    bool isDestroyed{false};
 };
 struct BillBoard : Component {
     BillBoard(bool constantYUp = true, bool normalVersion = false) : mConstantYUp(constantYUp), mNormalVersion(normalVersion) {}

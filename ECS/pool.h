@@ -15,8 +15,9 @@ public:
     virtual void remove(int removedEntity) = 0;
     virtual IPool *clone() = 0;
     virtual void cloneComponent(GLuint cloneFrom, GLuint cloneTo) = 0;
-    virtual int find(uint eID) const = 0;
-    virtual bool has(uint eID) const = 0;
+    virtual void swap(const GLuint lhs, const GLuint rhs) = 0;
+    virtual int find(const GLuint eID) const = 0;
+    virtual bool has(const GLuint eID) const = 0;
     //    virtual bool has(const Entity &entity) const = 0;
     virtual size_t size() const = 0;
     virtual bool empty() const = 0;
@@ -171,18 +172,19 @@ public:
     inline void remove(int removedEntityID) {
         if (has(removedEntityID)) {
             GLuint swappedEntity{mEntities.back()};
-            copy(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
+            swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
 
             mComponents.pop_back();
             mEntities.remove(removedEntityID);
         }
     }
-    inline void copy(GLuint eID, GLuint other) {
+    inline void swap(GLuint eID, GLuint other) {
         assert(has(eID));
         assert(has(other));
-        std::swap(mComponents[mEntities.find(eID)], mComponents[mEntities.find(eID)]); // Swap the components to keep the dense set up to date
+        std::swap(mComponents[mEntities.find(eID)], mComponents[mEntities.find(other)]); // Swap the components to keep the dense set up to date
         mEntities.swap(eID, other);
     }
+
     /**
      * @brief sort the pool according to a different index
      * @param otherIndex
@@ -190,7 +192,7 @@ public:
     inline void sort(std::vector<int> otherIndex) {
         for (size_t i{0}; i < mEntities.size(); i++) {
             if (has(i)) {
-                copy(mEntities.get(i), mEntities.get(otherIndex[i]));
+                swap(mEntities.get(i), mEntities.get(otherIndex[i]));
 
             } /*else
                 mGroupEnd--;*/
@@ -208,7 +210,7 @@ public:
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
-    inline const std::vector<GLuint> &entities() { return mEntities.getList(); }
+    inline const std::vector<GLuint> &entities() { return mEntities.entities(); }
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
      * The index location is equal to the entityID.
@@ -226,7 +228,7 @@ public:
      */
     inline Type &get(int eID) {
         assert(has(eID));
-        return mComponents[mEntities.getIndex(eID)];
+        return mComponents[mEntities.index(eID)];
     }
     /**
      * @brief back get the last component in the pool, aka the latest creation
@@ -243,11 +245,11 @@ public:
         return iterator{mEntities.list(), {}};
     }
     /**
-     * @brief find an entity in the index
+     * @brief find an entity's position in the sparse set
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
-    inline int find(GLuint eID) const override {
+    inline int find(const GLuint eID) const override {
         return mEntities.find(eID);
     }
     /**

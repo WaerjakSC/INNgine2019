@@ -345,7 +345,7 @@ void MainWindow::parentChanged(GLuint eID) {
         hierarchy->removeRow(item->row());
         EInfo &entt{registry->get<EInfo>(eID)};
         item = new QStandardItem;
-        item->setText(entt.mName);
+        item->setText(entt.name);
         item->setData(eID);
         int parentID{registry->get<Transform>(eID).parentID};
         if (registry->hasParent(eID)) {
@@ -378,13 +378,13 @@ void MainWindow::onNameChanged(const QModelIndex &index) {
     GLuint selectedEntity{registry->getSelectedEntity()};
     EInfo &info{registry->get<EInfo>(selectedEntity)};
     if (selectedEntity)
-        info.mName = hierarchy->data(index).toString();
+        info.name = hierarchy->data(index).toString();
 }
 void MainWindow::onEntityAdded(GLuint eID) {
     QStandardItem *parentItem{hierarchy->invisibleRootItem()};
     QStandardItem *item{new QStandardItem};
     EInfo &info{registry->get<EInfo>(eID)};
-    item->setText(info.mName);
+    item->setText(info.name);
     item->setData(eID);
     parentItem->appendRow(item);
 
@@ -398,7 +398,7 @@ void MainWindow::onEntityRemoved(GLuint entity) {
 void MainWindow::changeEntityName(const GLuint &entt) {
     QStandardItem *item{hierarchy->itemFromEntityID(entt)};
     EInfo &info{registry->get<EInfo>(entt)};
-    item->setText(info.mName);
+    item->setText(info.name);
 }
 /**
  * @brief Initial insertion of entities, such as those made in an init function or read from a level file.
@@ -409,13 +409,13 @@ void MainWindow::insertEntities() {
     QStandardItem *parentItem{hierarchy->invisibleRootItem()};
     for (auto &entity : registry->getEntities()) {
         EInfo &info{registry->get<EInfo>(entity)};
-        if (info.mIsDestroyed)
+        if (info.isDestroyed)
             continue;
         QStandardItem *item{new QStandardItem};
-        if (info.mName == "")
+        if (info.name == "")
             item->setText(QString("Entity" + QString::number(unnamedEntityCount)));
         else
-            item->setText(info.mName);
+            item->setText(info.name);
         item->setData(entity);
         if (registry->contains<Transform>(entity)) {
             int parentID{registry->get<Transform>(entity).parentID};

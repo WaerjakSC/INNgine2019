@@ -7,22 +7,22 @@ public:
      * @brief pads the mIndex vector to make room for an entityID larger than the current size of the index.
      * @param entityID - ID of the entity to be added.
      */
-    void padIndex(GLuint entityID) {
+    void pad(GLuint entityID) {
         for (size_t i{mIndex.size()}; i < (size_t)entityID; i++) {
             mIndex.push_back(-1);
         }
     }
     /**
-     * @brief find an entity in the index
+     * @brief find an entity's position in the sparse set's list
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
-    inline int find(GLuint eID) const {
+    inline int find(const GLuint eID) const {
         if (eID < mIndex.size())
             return mIndex[eID];
         return -1;
     }
-    inline bool contains(GLuint eID) const {
+    inline bool contains(const GLuint eID) const {
         if (find(eID) != -1)
             return true;
         return false;
@@ -66,14 +66,14 @@ public:
      * @return
      */
     inline GLuint &get(GLuint entityID) {
-        return mList[getIndex(entityID)];
+        return mList[index(entityID)];
     }
     /**
      * @brief getIndex returns the index location to mList for the given entityID
      * @param entityID
      * @return
      */
-    inline int &getIndex(GLuint entityID) {
+    inline int &index(GLuint entityID) {
         return mIndex[entityID];
     }
     /**
@@ -83,7 +83,7 @@ public:
     inline GLuint &back() {
         return mList.back();
     }
-    void swap(int eID, int other) {
+    void swap(GLuint eID, GLuint other) {
         std::swap(mList[mIndex[eID]], mList[mIndex[other]]); // Swap the two entities in the pool
         std::swap(mIndex[eID], mIndex[other]);               // Set the index to point to the location after swap
     }
@@ -94,7 +94,7 @@ public:
      */
     void insert(GLuint entityID) {
         if ((size_t)entityID > extent()) {
-            padIndex(entityID);
+            pad(entityID);
         }
         if (entityID < extent())
             mIndex[entityID] = size();
@@ -107,7 +107,7 @@ public:
         return mIndex;
     }
 
-    const std::vector<GLuint> &getList() const {
+    const std::vector<GLuint> &entities() const {
         return mList;
     }
     const std::vector<GLuint> *list() const {

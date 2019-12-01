@@ -17,14 +17,14 @@ EInfo &Registry::getEntity(GLuint eID) {
 void Registry::removeEntity(GLuint eID) {
     EInfo &info{get<EInfo>(eID)};
 
-    if (info.mIsDestroyed)
+    if (info.isDestroyed)
         return;
     if (contains<Transform>(eID)) {
         setParent(eID, -1);
     }
-    info.mIsDestroyed = true;
-    info.mName.clear();
-    info.mGeneration++;
+    info.isDestroyed = true;
+    info.name.clear();
+    info.generation++;
 
     entityDestroyed(eID); // Pass the message on to each pool
 
@@ -35,7 +35,7 @@ GLuint Registry::nextAvailable() {
     std::vector<GLuint> entities{getPool<EInfo>()->entities()};
     for (auto &entity : entities) {
         EInfo &info{get<EInfo>(entity)};
-        if (info.mIsDestroyed)
+        if (info.isDestroyed)
             return entity;
     }
     return numEntities();
@@ -50,22 +50,9 @@ void Registry::clearScene() {
     }
 }
 
-GLuint Registry::makeEntity(const QString &name, bool signal) {
-    GLuint eID{nextAvailable()};
-    std::vector<GLuint> entities{getPool<EInfo>()->entities()};
-
-    if (contains<EInfo>(eID)) {
-        newGeneration(eID, name);
-    } else
-        add<EInfo>(eID, name);
-    if (signal)
-        emit entityCreated(eID);
-    return eID;
-}
-
 GLuint Registry::duplicateEntity(GLuint dupedEntity) {
     // Remember it also needs to be at the same parent level
-    QString dupeName{get<EInfo>(dupedEntity).mName};
+    QString dupeName{get<EInfo>(dupedEntity).name};
     GLuint entityID{makeEntity(dupeName)};
     for (auto &pool : mPools) {
         if (pool.second->has(dupedEntity)) {
@@ -142,13 +129,13 @@ void Registry::updateChildParent() {
 }
 void Registry::newGeneration(GLuint entityID, const QString &text) {
     EInfo &info{get<EInfo>(entityID)};
-    info.mName = text;
-    info.mIsDestroyed = false;
+    info.name = text;
+    info.isDestroyed = false;
 }
 
 bool Registry::isDestroyed(GLuint entityID) {
     EInfo &info{get<EInfo>(entityID)};
-    return info.mIsDestroyed;
+    return info.isDestroyed;
 }
 
 void Registry::makeSnapshot() {

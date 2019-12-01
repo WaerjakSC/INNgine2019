@@ -29,8 +29,8 @@ void CollisionSystem::runAABBSimulations() {
                 if (!bothStatic(aabb, otherAABB))
                     if (AABBAABB(aabb, otherAABB)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1{view.get<EInfo>(entity).mName};
-                        QString entity2{view.get<EInfo>(otherEntity).mName};
+                        QString entity1{view.get<EInfo>(entity).name};
+                        QString entity2{view.get<EInfo>(otherEntity).name};
                         //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
@@ -44,8 +44,8 @@ void CollisionSystem::runAABBSimulations() {
                 if (!bothStatic(aabb, sphere))
                     if (SphereAABB(sphere, aabb)) {
                         //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1{view.get<EInfo>(entity).mName};
-                        QString entity2{sphereView.get<EInfo>(otherEntity).mName};
+                        QString entity1{view.get<EInfo>(entity).name};
+                        QString entity2{sphereView.get<EInfo>(otherEntity).name};
                         // NOTIFY FSM
                         // send event notify on first enter (hei se på meg noe er i radius jippi)
                         if (aabb.overlapEvent && sphere.overlapEvent) {
@@ -79,8 +79,8 @@ void CollisionSystem::runSphereSimulations() {
                 if (!bothStatic(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
                         //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
-                        QString entity1{view.get<EInfo>(entity).mName};
-                        QString entity2{view.get<EInfo>(otherEntity).mName};
+                        QString entity1{view.get<EInfo>(entity).name};
+                        QString entity2{view.get<EInfo>(otherEntity).name};
 
                         //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;

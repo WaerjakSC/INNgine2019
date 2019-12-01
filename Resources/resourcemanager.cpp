@@ -184,8 +184,7 @@ GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
-        GLuint eID{registry->makeEntity(QString::fromStdString(name))};
-        registry->add<Transform>(eID);
+        GLuint eID{registry->makeEntity<Transform>(QString::fromStdString(name))};
         registry->add<Material>(eID, type);
         addMeshComponent(name, eID);
         return eID;
@@ -196,8 +195,7 @@ GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
  * @return
  */
 GLuint ResourceManager::makePlane(const QString &name) {
-    GLuint eID{registry->makeEntity(name)};
-    registry->add<Transform>(eID);
+    GLuint eID{registry->makeEntity<Transform>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
     auto search = mMeshMap.find("Plane");
     if (search != mMeshMap.end()) {
@@ -234,10 +232,8 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
  * @return
  */
 GLuint ResourceManager::makeCube(const QString &name) {
-    GLuint eID{registry->makeEntity(name)};
-    registry->add<Transform>(eID);
+    GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
-    registry->add<Mesh>(eID);
     setMesh("Cube.obj", eID);
 
     return eID;
@@ -246,8 +242,7 @@ GLuint ResourceManager::makeCube(const QString &name) {
  * @brief Creates basic XYZ lines
  */
 GLuint ResourceManager::makeXYZ(const QString &name) {
-    GLuint eID{registry->makeEntity(name)};
-    registry->add<Transform>(eID);
+    GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
     makeXYZMesh(eID);
 
@@ -330,13 +325,11 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> type) {
-    GLuint eID{registry->makeEntity(QString::fromStdString(fileName))};
+    GLuint eID{registry->makeEntity<Transform, Mesh>(QString::fromStdString(fileName))};
 
     initializeOpenGLFunctions();
 
-    registry->add<Transform>(eID);
     registry->add<Material>(eID, type);
-    registry->add<Mesh>(eID);
     setMesh(fileName, eID);
     glBindVertexArray(0);
 
@@ -347,10 +340,9 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
  * @return
  */
 GLuint ResourceManager::makeBillBoard(const QString &name) {
-    GLuint eID{registry->makeEntity(name)};
+    GLuint eID{registry->makeEntity<BillBoard>(name)};
     registry->add<Transform>(eID, vec3{4.f, 0.f, -3.5f});
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->textureUnit());
-    registry->add<BillBoard>(eID);
     auto search = mMeshMap.find("BillBoard");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
@@ -495,9 +487,8 @@ void ResourceManager::makeTowerMesh(GLuint eID) {
  * @return
  */
 GLuint ResourceManager::makeOctBall(const QString &name, int n) {
-    GLuint eID{registry->makeEntity(name)};
+    GLuint eID{registry->makeEntity<Transform>(name)};
 
-    registry->add<Transform>(eID);
     registry->add<Material>(eID, getShader<ColorShader>());
     auto search{mMeshMap.find("Ball")};
     if (search != mMeshMap.end()) {
@@ -532,10 +523,9 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
  * @return
  */
 GLuint ResourceManager::makeLightObject(const QString &name) {
-    GLuint eID{registry->makeEntity(name)};
+    GLuint eID{registry->makeEntity<Light>(name)};
     registry->add<Transform>(eID, vec3(2.5f, 3.f, 0.f), vec3(0.0f, 180.f, 0.0f));
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->textureUnit(), vec3(0.1f, 0.1f, 0.8f));
-    registry->add<Light>(eID);
     auto search{mMeshMap.find("Pyramid")};
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);

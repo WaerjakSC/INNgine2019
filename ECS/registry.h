@@ -9,7 +9,18 @@
 #include "resourcemanager.h"
 #include <memory>
 #include <typeinfo>
+#include <unordered_set>
 struct GroupData {
+    size_t extent;
+    std::unordered_set<std::string> ownedPools;
+    template <typename T>
+    bool contains() {
+        std::string type = typeid(T).name();
+        if (ownedPools.find(type) == ownedPools.end())
+            return false;
+        else
+            return true;
+    }
 };
 
 class Registry : public QObject {
@@ -29,9 +40,15 @@ public:
     inline View<Comp...> view() {
         return View{getPool<Comp>()...};
     }
-    template <typename Owned, typename... Observed>
-    Group<Owned, Observed...> group() { // TEMP, DO NOT USE
-        return Group{getPool<Owned>(), getPool<Observed>...};
+    template <typename... Owned>
+    Group<Owned...> group() {
+        const auto cpools = std::make_tuple(getPool<Owned>()...);
+        const size_t extent[1]{sizeof...(Owned)};
+        if (auto it = std::find_if(mGroupData.cbegin(), mGroupData.cend(), [&extent](const GroupData &groupData) {
+                return std::equal(std::begin(extent), std::end(extent), groupData.extent) && (groupData.contains<Owned>() && ...);
+            });
+            it != mGroupData.cend()) {
+        }
     }
     /**
      * @brief Register component type. A component must be registered before it can be used by the ECS.
@@ -64,13 +81,31 @@ public:
         }
     }
     /**
+    * @brief Make a generic entity with no components attached.
+    * @param name Name of the entity. Leave blank if no name desired.
+    * @return Returns the entity ID for use in adding components or other tasks.
+    */
+    template <typename... Component>
+    GLuint makeEntity(const QString &name = "", bool signal = true) {
+        GLuint eID{nextAvailable()};
+        if (contains<EInfo>(eID)) {
+            newGeneration(eID, name);
+        } else
+            add<EInfo>(eID, name);
+        assert((typeid(Component) != typeid(EInfo)) && ...);
+        (add<Component>(eID), ...);
+        if (signal)
+            emit entityCreated(eID);
+        return eID;
+    }
+    /**
      * @brief Adds an entity and its new component to a pool of that type.
      * Entity is equivalent to Component in this case, since a pool won't contain the entity if the entity doesn't have the component.
      * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
      * @param entityID
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      */
-    template <typename Type, class... Args>
+    template <typename Type, typename... Args>
     inline void add(GLuint entityID, Args... args) {
         // Add a component to the array for an entity
         getPool<Type>()->add(entityID, args...);
@@ -115,6 +150,8 @@ public:
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
         for (auto &pool : mPools) {
+            if (pool.first == typeid(EInfo).name())
+                continue;
             if (pool.second->has(entityID)) {
                 pool.second->remove(entityID);
             }
@@ -135,12 +172,7 @@ public:
     inline std::string type() {
         return typeid(Type).name();
     }
-    /**
-    * @brief Make a generic entity with no components attached.
-    * @param name Name of the entity. Leave blank if no name desired.
-    * @return Returns the entity ID for use in adding components or other tasks.
-    */
-    GLuint makeEntity(const QString &name = "", bool signal = true);
+
     /**
      * @brief duplicateEntity Creates an entity with the exact same name and components as the duped entity.
      * @param dupedEntity
@@ -242,7 +274,7 @@ private:
     static Registry *mInstance;
     std::map<std::string, Scope<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
-    std::vector<GroupData> mGroupData;
+    std::vector<GroupData> mGroupData{};
     std::vector<GLuint> mAvailableSlots;
     void newGeneration(GLuint id, const QString &text);
 

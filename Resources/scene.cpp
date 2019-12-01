@@ -42,11 +42,11 @@ void Scene::saveScene(const QString &fileName) {
     for (auto &entity : entities) {
         const EInfo info{registry->get<EInfo>(entity)};
 
-        if (entity != 0 && !info.mName.isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
+        if (entity != 0 && !info.name.isEmpty()) { // Ignore the first entity, it's reserved for the XYZ lines. (Hardcoded in RenderWindow to be loaded before loadProject, so it's always first)
             writer.String("Entity");
             writer.StartObject();
             writer.Key("name");
-            writer.String(info.mName.toStdString().c_str());
+            writer.String(info.name.toStdString().c_str());
             writer.Key("id");
             writer.Uint(entity);
             writer.Key("components");
