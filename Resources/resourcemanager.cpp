@@ -393,12 +393,8 @@ void ResourceManager::makeBillBoardMesh(int eID) {
 
     glBindVertexArray(0);
 }
-
+/*
 void ResourceManager::makeLevelMesh(GLuint eID) {
-    initializeOpenGLFunctions();
-    mMeshData.Clear();
-    mMeshData.mName = "Level";
-    std::vector<Vertex> vertices;
     float x{-8};
     float y{0};
     float z{-8};
@@ -440,7 +436,7 @@ void ResourceManager::makeLevelMesh(GLuint eID) {
     initIndexBuffers(&levelMesh);
 
     glBindVertexArray(0);
-}
+} */
 
 void ResourceManager::makeTowerMesh(GLuint eID) {
     initializeOpenGLFunctions();
