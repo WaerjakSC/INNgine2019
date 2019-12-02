@@ -38,10 +38,8 @@ public slots:
     void addParticleEmitter();
     void addAIComponent();
     void addAABBCollider();
-    void addOBBCollider();
     void addSphereCollider();
     void addPlaneCollider();
-    void addCylinderCollider();
 
 signals:
     void posX(GLfloat xIn);
@@ -107,9 +105,7 @@ private:
     void setupAISettings(const AIComponent &ai);
     void setupMeshSettings(const Mesh &mesh);
     void setupAABBSettings(const AABB &col);
-    void setupOBBSettings(const OBB &col);
     void setupSphereColliderSettings(const Sphere &col);
-    void setupCylinderColliderSettings(const Cylinder &col);
     void setupPlaneColliderSettings(const Plane &col);
     void setupGameCameraSettings(const GameCamera &cam);
     void setupEmitterSettings(const ParticleEmitter &emitter);

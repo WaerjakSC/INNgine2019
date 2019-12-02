@@ -50,9 +50,9 @@ public:
         void GetCorners(const Frustum &f, vec3 *outCorners);
         bool Intersects(const Frustum &f, const Sphere &s);
         float Classify(const AABB &aabb, const Plane &plane);
-        float Classify(const OBB &obb, const Plane &plane);
+        //        float Classify(const OBB &obb, const Plane &plane);
         bool Intersects(const Frustum &f, const AABB &aabb);
-        bool Intersects(const Frustum &f, const OBB &obb);
+        //        bool Intersects(const Frustum &f, const OBB &obb);
 
     } Frustum;
     Frustum getFrustum() const {

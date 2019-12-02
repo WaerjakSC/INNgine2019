@@ -244,28 +244,6 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(aabb.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<OBB>(entity)) {
-                writer.Key("OBB");
-                writer.StartObject();
-                const OBB &obb{registry->get<OBB>(entity)};
-
-                writer.Key("position");
-                writer.StartArray();
-                writer.Double(obb.position.x);
-                writer.Double(obb.position.y);
-                writer.Double(obb.position.z);
-                writer.EndArray();
-                writer.Key("size");
-                writer.StartArray();
-                writer.Double(obb.size.x);
-                writer.Double(obb.size.y);
-                writer.Double(obb.size.z);
-                writer.EndArray();
-                writer.Key("static");
-                writer.Bool(obb.isStatic);
-                // Need to do something with the rotation mat3
-                writer.EndObject();
-            }
             if (registry->contains<Plane>(entity)) {
                 writer.Key("Plane");
                 writer.StartObject();
@@ -298,25 +276,6 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(sphere.radius);
                 writer.Key("static");
                 writer.Bool(sphere.isStatic);
-                writer.EndObject();
-            }
-            if (registry->contains<Cylinder>(entity)) {
-                writer.Key("Cylinder");
-                writer.StartObject();
-                const Cylinder &cylinder{registry->get<Cylinder>(entity)};
-
-                writer.Key("position");
-                writer.StartArray();
-                writer.Double(cylinder.position.x);
-                writer.Double(cylinder.position.y);
-                writer.Double(cylinder.position.z);
-                writer.EndArray();
-                writer.Key("radius");
-                writer.Double(cylinder.radius);
-                writer.Key("height");
-                writer.Double(cylinder.height);
-                writer.Key("static");
-                writer.Bool(cylinder.isStatic);
                 writer.EndObject();
             }
             if (registry->contains<AIComponent>(entity)) {
@@ -484,12 +443,6 @@ void Scene::populateScene(const Document &scene) {
                 vec3 size{comp->value["size"][0].GetFloat(), comp->value["size"][1].GetFloat(), comp->value["size"][2].GetFloat()};
                 bool isStatic{comp->value["static"].GetBool()};
                 registry->add<AABB>(id, origin, size, isStatic);
-            } else if (comp->name == "OBB") {
-                vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
-                vec3 size{comp->value["size"][0].GetFloat(), comp->value["size"][1].GetFloat(), comp->value["size"][2].GetFloat()};
-                // Need rotation matrix here
-                bool isStatic{comp->value["static"].GetBool()};
-                registry->add<OBB>(id, position, size, isStatic);
             } else if (comp->name == "Plane") {
                 vec3 normal{comp->value["normal"][0].GetFloat(), comp->value["normal"][1].GetFloat(), comp->value["origin"][2].GetFloat()};
                 float size{comp->value["distance"].GetFloat()};
@@ -502,13 +455,6 @@ void Scene::populateScene(const Document &scene) {
                 // Need rotation matrix here
                 bool isStatic{comp->value["static"].GetBool()};
                 registry->add<Sphere>(id, position, radius, isStatic);
-            } else if (comp->name == "Cylinder") {
-                vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
-                float radius{comp->value["radius"].GetFloat()};
-                float height{comp->value["height"].GetFloat()};
-                // Need rotation matrix here
-                bool isStatic{comp->value["static"].GetBool()};
-                registry->add<Cylinder>(id, position, radius, height, isStatic);
             } else if (comp->name == "AI") {
                 int hp{comp->value["health"].GetInt()};
                 float speed{comp->value["speed"].GetFloat()};

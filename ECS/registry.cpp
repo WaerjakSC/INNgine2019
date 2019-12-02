@@ -194,7 +194,7 @@ void Registry::makeSnapshot() {
         groupSnapshot.push_back(new GroupData(*group));
     }
 
-    mSnapshot = std::make_tuple(groupSnapshot, snapPools);
+    mSnapshot = {groupSnapshot, snapPools};
 }
 
 void Registry::loadSnapshot() {

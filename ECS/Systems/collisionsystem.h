@@ -52,12 +52,6 @@ public slots:
     void setAABBSizeX(double xIn);
     void setAABBSizeY(double yIn);
     void setAABBSizeZ(double zIn);
-    void setOBBPositionX(double xIn);
-    void setOBBPositionY(double yIn);
-    void setOBBPositionZ(double zIn);
-    void setOBBSizeX(double xIn);
-    void setOBBSizeY(double yIn);
-    void setOBBSizeZ(double zIn);
     void setSpherePositionX(double xIn);
     void setSpherePositionY(double yIn);
     void setSpherePositionZ(double zIn);
@@ -66,11 +60,6 @@ public slots:
     void setPlaneNormalY(double yIn);
     void setPlaneNormalZ(double zIn);
     void setPlaneDistance(double radius);
-    void setCylinderPositionX(double xIn);
-    void setCylinderPositionY(double yIn);
-    void setCylinderPositionZ(double zIn);
-    void setCylinderRadius(double radius);
-    void setCylinderHeight(double height);
     void setObjectType(int index);
 signals:
     void updateAABB(GLuint eID);
@@ -152,7 +141,7 @@ private:
     * @param obb
     * @return true if distance less than radius squared ( We have an intersection )
     */
-    bool SphereOBB(const Sphere &sphere, const OBB &obb);
+    //    bool SphereOBB(const Sphere &sphere, const OBB &obb);
     /**
      * @brief calcRayToSphere finds the intersection point between a ray and a sphere collider
      * Not to be confused with raySphere which runs this function for each entity
@@ -186,7 +175,7 @@ private:
      */
     vec3 getPointOnRay(const Raycast &r, double distance);
     // Work in progress this guy
-    bool CylinderCylinder(const Cylinder &cylinder1, const Cylinder &cylinder2);
+    //    bool CylinderCylinder(const Cylinder &cylinder1, const Cylinder &cylinder2);
 
     // Could this be useful later?
     // bool PointInAABB(const vec3& point, const Collision::AABB& aabb);
@@ -207,7 +196,7 @@ private:
     */
     vec3 ClosestPoint(const Sphere &sphere, const vec3 &point);
     // todo
-    vec3 ClosestPoint(const OBB &obb, const vec3 &point);
+    //    vec3 ClosestPoint(const OBB &obb, const vec3 &point);
     /**
      * @brief bothStatic simple bool check to see if both Collision objects have isStatic set to true
      * @param lhs

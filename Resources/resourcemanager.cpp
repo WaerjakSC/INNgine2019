@@ -50,10 +50,8 @@ ResourceManager::ResourceManager() : registry{Registry::instance()} {
 
     // Collision Types
     registry->registerComponent<AABB>();
-    registry->registerComponent<OBB>();
     registry->registerComponent<Sphere>();
     registry->registerComponent<Plane>();
-    registry->registerComponent<Cylinder>();
 
     mSceneLoader = std::make_unique<Scene>();
 }
@@ -353,7 +351,7 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
  */
 GLuint ResourceManager::makeLevelPlane(const QString &name) {
     GLuint eID{registry->makeEntity<Mesh>(name)};
-    registry->add<Transform>(eID,vec3{1.0f, 0.0f, 1.0f});
+    registry->add<Transform>(eID, vec3{1.0f, 0.0f, 1.0f});
     registry->add<AABB>(eID, vec3{0.f, 0.f, 0.f}, vec3{1.0f, 0.1f, 1.0f}, false);
     setMesh("Plane", eID);
     registry->add<Material>(eID, getShader<ColorShader>());

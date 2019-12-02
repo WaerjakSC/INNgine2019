@@ -232,9 +232,6 @@ void MainWindow::createActions() {
     QAction *AABBAction{new QAction(tr("Axis Aligned"), this)};
     boxes->addAction(AABBAction);
     connect(AABBAction, &QAction::triggered, mComponentList, &ComponentList::addAABBCollider);
-    QAction *OBBAction{new QAction(tr("Oriented"), this)};
-    boxes->addAction(OBBAction);
-    connect(OBBAction, &QAction::triggered, mComponentList, &ComponentList::addOBBCollider);
 
     QAction *PlaneAction{new QAction(tr("Plane"), this)};
     collisionMenu->addAction(PlaneAction);
@@ -243,10 +240,6 @@ void MainWindow::createActions() {
     QAction *SphereAction{new QAction(tr("Sphere"), this)};
     collisionMenu->addAction(SphereAction);
     connect(SphereAction, &QAction::triggered, mComponentList, &ComponentList::addSphereCollider);
-
-    QAction *CylinderAction{new QAction(tr("Cylinder"), this)};
-    collisionMenu->addAction(CylinderAction);
-    connect(CylinderAction, &QAction::triggered, mComponentList, &ComponentList::addCylinderCollider);
 
     QAction *lightAction{new QAction(tr("Light"), this)};
     components->addAction(lightAction);
