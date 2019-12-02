@@ -182,10 +182,14 @@ public:
     void onDestroy(const GLuint entityID) {
         for (auto &group : mGroups) {
             if (group->ownsType(type<Type>())) {
+                auto member = getPool<Type>();
+                if (member->has(entityID) && static_cast<size_t>(member->index(entityID)) < group->owned) {
+                    group->owned--;
+                }
                 for (auto &poolName : group->pools) {
                     auto member = getPool(poolName);
                     if (member->has(entityID) && static_cast<size_t>(member->index(entityID)) < group->owned) {
-                        const auto pos = --group->owned;
+                        const auto pos = group->owned;
                         member->swap(member->entities()[pos], entityID);
                     }
                 }

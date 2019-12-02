@@ -9,7 +9,7 @@
 #include "view.h"
 
 RenderSystem::RenderSystem() : registry{Registry::instance()} {
-    //    auto group{registry->group<Transform, Material, Mesh>()};
+    [[maybe_unused]] auto group{registry->group<Transform, Material, Mesh>()}; // Creating a group early reduces initial cost of first-time creation.
 }
 
 void RenderSystem::drawEntities() {
