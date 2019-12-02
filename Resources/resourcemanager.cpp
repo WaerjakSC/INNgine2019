@@ -346,6 +346,11 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
     return eID;
 }
 
+/**
+ * @brief Levelplane prefab
+ * @param name
+ * @return Returns the entity id
+ */
 GLuint ResourceManager::makeLevelPlane(const QString &name) {
     GLuint eID{registry->makeEntity<Mesh>(name)};
     registry->add<Transform>(eID,vec3{1.0f, 0.0f, 1.0f});
@@ -394,6 +399,10 @@ void ResourceManager::makeBillBoardMesh(int eID) {
     glBindVertexArray(0);
 }
 
+/**
+ * @brief Creates the level grid.
+ * @return
+ */
 void ResourceManager::makeLevel() {
     float x{-16};
     float y{0};
