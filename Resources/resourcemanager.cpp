@@ -345,6 +345,16 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["SkinColorMostro_COLOR.png"]->textureUnit()); // probably change textureunit later
     return eID;
 }
+
+GLuint ResourceManager::makeLevelPlane(const QString &name) {
+    GLuint eID{registry->makeEntity<Mesh>(name)};
+    registry->add<Transform>(eID,vec3{1.0f, 0.0f, 1.0f});
+    registry->add<AABB>(eID, vec3{0.f, 0.f, 0.f}, vec3{1.0f, 0.1f, 1.0f}, false);
+    setMesh("Plane.obj", eID);
+    registry->add<Material>(eID, getShader<ColorShader>());
+    return eID;
+}
+
 /**
  * @brief Billboard prefab
  * @return
