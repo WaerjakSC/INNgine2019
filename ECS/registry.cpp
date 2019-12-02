@@ -189,13 +189,17 @@ void Registry::makeSnapshot() {
     for (auto &pool : mPools) {
         snapPools[pool.first] = pool.second->clone();
     }
+    std::vector<GroupData *> groupSnapshot;
+    for (auto &group : mGroups) {
+        groupSnapshot.push_back(new GroupData(*group));
+    }
 
-    mSnapshot = snapPools;
+    mSnapshot = std::make_tuple(groupSnapshot, snapPools);
 }
 
 void Registry::loadSnapshot() {
     std::map<std::string, IPool *> tempPools;
-    tempPools = mSnapshot;
+    std::tie(mGroups, tempPools) = mSnapshot;
     mPools.clear();
     for (auto &pool : tempPools) {
         mPools[pool.first] = std::unique_ptr<IPool>(pool.second);

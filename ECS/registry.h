@@ -354,7 +354,7 @@ private:
     void newGeneration(GLuint id, const QString &text);
 
     GLuint mSelectedEntity;
-    std::map<std::string, IPool *> mSnapshot;
+    std::tuple<std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>
     inline Ref<Type> getSystem() {
