@@ -10,21 +10,29 @@
 #include <memory>
 #include <typeinfo>
 #include <unordered_set>
+template <typename... Member>
+struct GroupHandler {
+    GroupHandler(const std::tuple<Pool<Member> *...> pools)
+        : ownedPools(pools) {}
+    const std::tuple<Pool<Member> *...> ownedPools;
+    size_t owned{};
+};
 struct GroupData {
     size_t extent;
-    std::unordered_set<std::string> ownedPools;
-    template <typename T>
-    bool contains() {
-        std::string type = typeid(T).name();
-        if (ownedPools.find(type) == ownedPools.end())
-            return false;
-        else
-            return true;
-    }
+    bool (*ownsType)(const std::string &);
+    std::unordered_set<std::string> pools;
+    size_t owned{};
 };
-
 class Registry : public QObject {
     Q_OBJECT
+    /**
+     * @brief Simple getter for a type's typeid name
+     */
+    template <typename Type>
+    static std::string type() {
+        return typeid(Type).name();
+    }
+
 public:
     Registry();
     static Registry *instance();
@@ -42,13 +50,35 @@ public:
     }
     template <typename... Owned>
     Group<Owned...> group() {
-        const auto cpools = std::make_tuple(getPool<Owned>()...);
-        const size_t extent[1]{sizeof...(Owned)};
-        if (auto it = std::find_if(mGroupData.cbegin(), mGroupData.cend(), [&extent](const GroupData &groupData) {
-                return std::equal(std::begin(extent), std::end(extent), groupData.extent) && (groupData.contains<Owned>() && ...);
+        const auto cpools{std::make_tuple(getPool<Owned>()...)};
+        const size_t extent{sizeof...(Owned)};
+        GroupData *data{nullptr};
+        if (auto it = std::find_if(mGroups.cbegin(), mGroups.cend(), [&extent](const auto groupData) {
+                return extent == groupData->extent && (groupData->ownsType(type<Owned>()) && ...);
             });
-            it != mGroupData.cend()) {
+            it != mGroups.cend()) {
+            data = *it;
         }
+        if (!data) {
+            data = new GroupData{sizeof...(Owned),
+                                 [](const std::string &ctype) { return ((ctype == type<Owned>()) || ...); }};
+            (data->pools.insert(type<Owned>()), ...);
+            mGroups.emplace_back(std::move(data));
+            // find the smallest pool to use as the sorting "master"
+            const auto *cpool = std::min({static_cast<const IPool *>(std::get<Pool<Owned> *>(cpools))...}, [](const auto lhs, const auto rhs) {
+                return lhs->size() < rhs->size();
+            });
+            // Do the initial swapping to prepare the group -- basically free if done before any entities exist
+            std::for_each(cpool->entities(), cpool->entities() + cpool->size(), [cpools, data](const GLuint entity) {
+                if ((std::get<Pool<Owned> *>(cpools)->has(entity) && ...)) {
+                    if (!(std::get<0>(cpools)->index(entity) < data->owned)) {
+                        const auto pos = data->owned++;
+                        (std::get<Pool<Owned> *>(cpools)->swap(std::get<Pool<Owned> *>(cpools)->entities()[pos], entity), ...);
+                    }
+                }
+            });
+        }
+        return {&data->owned, std::get<Pool<Owned> *>(cpools)...};
     }
     /**
      * @brief Register component type. A component must be registered before it can be used by the ECS.
@@ -81,7 +111,8 @@ public:
         }
     }
     /**
-    * @brief Make a generic entity with no components attached.
+    * @brief Make a generic entity.
+    * Add default state components by writing makeEntity<ComponentType1, ComponentType2, etc...>(name, signal)
     * @param name Name of the entity. Leave blank if no name desired.
     * @return Returns the entity ID for use in adding components or other tasks.
     */
@@ -92,10 +123,10 @@ public:
             newGeneration(eID, name);
         } else
             add<EInfo>(eID, name);
-        assert((typeid(Component) != typeid(EInfo)) && ...);
-        (add<Component>(eID), ...);
         if (signal)
             emit entityCreated(eID);
+        if constexpr (sizeof...(Component) > 0)
+            (add<Component>(eID), ...);
         return eID;
     }
     /**
@@ -106,17 +137,61 @@ public:
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      */
     template <typename Type, typename... Args>
-    inline void add(GLuint entityID, Args... args) {
+    inline void add(const GLuint entityID, Args... args) {
         // Add a component to the array for an entity
         getPool<Type>()->add(entityID, args...);
+
+        onConstruct<Type>(entityID);
+    }
+    void onConstruct(const std::string &type, const GLuint entityID);
+    template <typename Type>
+    void onConstruct(const GLuint entityID) {
+        for (auto &group : mGroups) {
+            if (group->ownsType(type<Type>())) {
+                std::vector<IPool *> pools;
+                size_t num{};
+                for (auto &poolName : group->pools) {
+                    auto member = getPool(poolName);
+                    pools.push_back(member);
+                    if (member->has(entityID) && !(static_cast<size_t>(member->index(entityID)) < group->owned)) {
+                        num++;
+                    }
+                }
+                if (num == pools.size()) {
+                    const auto pos = group->owned++;
+                    for (auto &pool : pools) {
+                        pool->swap(pool->entities()[pos], entityID);
+                    }
+                }
+                break;
+            }
+        }
     }
     /**
      * @brief Remove a component of type Type from the entity with entityID.
      */
     template <typename Type>
     inline void remove(GLuint entityID) {
+        onDestroy<Type>(entityID);
+
         // Remove a component from the array for an entity
         getPool<Type>()->remove(entityID);
+    }
+    void onDestroy(const std::string &type, const GLuint entityID);
+    template <typename Type>
+    void onDestroy(const GLuint entityID) {
+        for (auto &group : mGroups) {
+            if (group->ownsType(type<Type>())) {
+                for (auto &poolName : group->pools) {
+                    auto member = getPool(poolName);
+                    if (member->has(entityID) && static_cast<size_t>(member->index(entityID)) < group->owned) {
+                        const auto pos = --group->owned;
+                        member->swap(member->entities()[pos], entityID);
+                    }
+                }
+                break;
+            }
+        }
     }
     /**
      * @brief Get a reference to the Type component owned by entityID
@@ -150,6 +225,9 @@ public:
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
         for (auto &pool : mPools) {
+            onDestroy(pool.first, entityID);
+        }
+        for (auto &pool : mPools) {
             if (pool.first == typeid(EInfo).name())
                 continue;
             if (pool.second->has(entityID)) {
@@ -165,13 +243,6 @@ public:
         [[maybe_unused]] const auto cpools{std::make_tuple(getPool<Type>()...)};
         return ((std::get<Pool<Type> *>(cpools) ? std::get<Pool<Type> *>(cpools)->has(eID) : false) && ...);
     }
-    /**
-     * @brief Simple getter for a type's typeid name
-     */
-    template <typename Type>
-    inline std::string type() {
-        return typeid(Type).name();
-    }
 
     /**
      * @brief duplicateEntity Creates an entity with the exact same name and components as the duped entity.
@@ -179,7 +250,7 @@ public:
      * @return
      */
     GLuint duplicateEntity(GLuint dupedEntity);
-    inline const std::vector<GLuint> &getEntities() { return getPool<EInfo>()->entities(); }
+    inline const std::vector<GLuint> getEntities() { return getPool<EInfo>()->entityList(); }
     /**
     * @brief Get a pointer to the entity with the specified ID.
     * @param eID
@@ -196,7 +267,7 @@ public:
      * @return
      */
     inline GLuint numEntities() {
-        std::vector<GLuint> entities{getPool<EInfo>()->entities()};
+        std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
         return entities.size();
     }
     /**
@@ -274,7 +345,7 @@ private:
     static Registry *mInstance;
     std::map<std::string, Scope<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
-    std::vector<GroupData> mGroupData{};
+    std::vector<GroupData *> mGroups{};
     std::vector<GLuint> mAvailableSlots;
     void newGeneration(GLuint id, const QString &text);
 
@@ -285,6 +356,9 @@ private:
     inline Ref<Type> getSystem() {
         std::string typeName{type<Type>()};
         return std::static_pointer_cast<Type>(mSystems[typeName]);
+    }
+    IPool *getPool(const std::string &type) {
+        return mPools[type].get();
     }
     // Convenience function to get the statically casted pointer to the Pool of type Type.
     template <typename Type>

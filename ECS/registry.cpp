@@ -10,6 +10,52 @@ Registry *Registry::instance() {
     return mInstance;
 }
 
+void Registry::onConstruct(const std::string &type, const GLuint entityID) {
+    for (auto &group : mGroups) {
+        if (group->ownsType(type)) {
+            std::vector<IPool *> pools;
+            size_t num{};
+            for (auto &poolName : group->pools) {
+                auto member = getPool(poolName);
+                pools.push_back(member);
+                if (member->has(entityID) && !(static_cast<size_t>(member->index(entityID)) < group->owned)) {
+                    num++;
+                }
+            }
+            if (num == pools.size()) {
+                const auto pos = group->owned++;
+                for (auto &pool : pools) {
+                    pool->swap(pool->entities()[pos], entityID);
+                }
+            }
+            break;
+        }
+    }
+}
+
+void Registry::onDestroy(const std::string &type, const GLuint entityID) {
+    for (auto &group : mGroups) {
+        if (group->ownsType(type)) {
+            std::vector<IPool *> pools;
+            size_t num{};
+            for (auto &poolName : group->pools) {
+                auto member = getPool(poolName);
+                pools.push_back(member);
+                if (member->has(entityID) && static_cast<size_t>(member->index(entityID)) < group->owned) {
+                    num++;
+                }
+            }
+            if (num == pools.size()) {
+                const auto pos = --group->owned;
+                for (auto &pool : pools) {
+                    pool->swap(pool->entities()[pos], entityID);
+                }
+            }
+            break;
+        }
+    }
+}
+
 EInfo &Registry::getEntity(GLuint eID) {
     return get<EInfo>(eID);
 }
@@ -32,7 +78,7 @@ void Registry::removeEntity(GLuint eID) {
 }
 // Might be a bottleneck here. Probably better to save the next available entity ID in a vector when an entity is destroyed
 GLuint Registry::nextAvailable() {
-    std::vector<GLuint> entities{getPool<EInfo>()->entities()};
+    std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
     for (auto &entity : entities) {
         EInfo &info{get<EInfo>(entity)};
         if (info.isDestroyed)
@@ -42,7 +88,7 @@ GLuint Registry::nextAvailable() {
 }
 
 void Registry::clearScene() {
-    std::vector<GLuint> entities{getPool<EInfo>()->entities()};
+    std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
     for (auto &entity : entities) {
         if (entity != 0) {
             removeEntity(entity);

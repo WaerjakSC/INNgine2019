@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 using namespace cjk;
+struct GroupData;
 class IPool {
 public:
     class iterator;
@@ -19,6 +20,8 @@ public:
     virtual int find(const GLuint eID) const = 0;
     virtual bool has(const GLuint eID) const = 0;
     //    virtual bool has(const Entity &entity) const = 0;
+    virtual const GLuint *entities() const = 0;
+    virtual const int &index(GLuint entityID) const = 0;
     virtual size_t size() const = 0;
     virtual bool empty() const = 0;
     virtual iterator begin() const = 0;
@@ -149,7 +152,6 @@ public:
     void add(GLuint entityID, Args... args) {
         assert(!has(entityID)); // Make sure the entityID is unique.
         mEntities.insert(entityID);
-
         mComponents.push_back(Type{args...});
     }
     /**
@@ -173,7 +175,6 @@ public:
         if (has(removedEntityID)) {
             GLuint swappedEntity{mEntities.back()};
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
-
             mComponents.pop_back();
             mEntities.remove(removedEntityID);
         }
@@ -205,12 +206,21 @@ public:
      */
     inline std::vector<Type> &data() { return mComponents; }
     /**
+     * @brief Calls mComponents.data()
+     * raw() + size() will return the last member of the vector
+     * @return
+     */
+    inline Type *raw() { return mComponents.data(); }
+    /**
      * @brief Returns a list of every entity that exists in the component array.
      * The index is initially meaningless except as an accessor, the component pool can be sorted
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
-    inline const std::vector<GLuint> &entities() { return mEntities.entities(); }
+    inline const std::vector<GLuint> entityList() { return mEntities.getList(); }
+
+    inline const GLuint *entities() const override { return mEntities.entities(); }
+
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
      * The index location is equal to the entityID.
@@ -219,6 +229,9 @@ public:
      * @return
      */
     inline const std::vector<int> &indices() { return mEntities.getIndices(); }
+    const int &index(GLuint entityID) const {
+        return mEntities.index(entityID);
+    }
     /**
      * @brief get the component belonging to entity with given ID.
      * Some minor additional overhead due to going through mEntities.mIndices first -
@@ -305,6 +318,8 @@ public:
     bool operator<=(Pool<Type2> &other) {
         return size() <= other.size();
     }
+    void onDestroy(int removedEntity);
+    void onConstruct(GLuint entityID);
 
 private:
     // Dense Arrays --  n points to Entity in list[n] and component data in mComponentList[n]

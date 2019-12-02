@@ -1,6 +1,7 @@
 #include "rendersystem.h"
 #include "colorshader.h"
 #include "components.h"
+#include "group.h"
 #include "phongshader.h"
 #include "registry.h"
 #include "skyboxshader.h"
@@ -8,14 +9,15 @@
 #include "view.h"
 
 RenderSystem::RenderSystem() : registry{Registry::instance()} {
+    //    auto group{registry->group<Transform, Material, Mesh>()};
 }
 
 void RenderSystem::drawEntities() {
     initializeOpenGLFunctions();
     // Iterate entities. View returns only the entities that own all the given types so it should be safe to iterate all of them equally.
-    auto view{registry->view<Transform, Material, Mesh>()};
-    for (auto entity : view) {
-        auto [transform, material, mesh]{view.get<Transform, Material, Mesh>(entity)}; // Structured bindings (c++17), creates and assigns from tuple
+    auto group{registry->group<Transform, Material, Mesh>()};
+    for (auto entity : group) {
+        auto [transform, material, mesh]{group.get<Transform, Material, Mesh>(entity)}; // Structured bindings (c++17), creates and assigns from tuple
         if (mesh.mRendered) {
             glUseProgram(material.mShader->getProgram());
             material.mShader->transmitUniformData(transform.modelMatrix, &material);

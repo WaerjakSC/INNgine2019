@@ -73,7 +73,7 @@ public:
      * @param entityID
      * @return
      */
-    inline int &index(GLuint entityID) {
+    inline const int &index(GLuint entityID) const {
         return mIndex[entityID];
     }
     /**
@@ -106,9 +106,11 @@ public:
     std::vector<int> getIndices() const {
         return mIndex;
     }
-
-    const std::vector<GLuint> &entities() const {
+    std::vector<GLuint> getList() const {
         return mList;
+    }
+    const GLuint *entities() const {
+        return mList.data();
     }
     const std::vector<GLuint> *list() const {
         return &mList;

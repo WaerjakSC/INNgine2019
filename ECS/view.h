@@ -165,7 +165,7 @@ public:
     inline std::vector<Component> &data() const {
         return pool->data();
     }
-    inline const std::vector<GLuint> &entities() const {
+    inline const GLuint *entities() const {
         return pool->entities();
     }
     inline int find(const int &entt) const {
