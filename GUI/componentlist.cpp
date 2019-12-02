@@ -450,7 +450,7 @@ void ComponentList::setupAISettings(const AIComponent &ai) {
     health->setRange(0, 5000);
     health->setMaximumWidth(58);
     health->setStyle(fusion);
-    health->setValue(ai.hp);
+    health->setValue(ai.health);
     hpLayout->addWidget(health);
     connect(this, &ComponentList::changeHealth, health, &QSpinBox::setValue);
     AISystem *aiSys{registry->system<AISystem>().get()};

@@ -12,35 +12,44 @@ AISystem::AISystem() {
  */
 void AISystem::update(DeltaTime dt) {
     // Run the eventHandler incase of events
-    eventHandler();
     // draw the bspline curve lines
     draw();
-    // Currently only set up for one entity
-    std::optional<NPCevents> event;
-
-    switch (state) {
-    case MOVE:
-        event = move(dt * 0.1f);
-        if (event) {
-            notification_queue.push(event.value());
+    if (curWaveCD >= 0.f)
+        curWaveCD -= dt;
+    if (curWaveCD <= 0.f) {
+        spawnWave(dt);
+        if (curSpawnDuration >= spawnDuration) {
+            curWaveCD = waveCD;
+            curSpawnDuration = 0.f;
         }
-        break;
-    case LEARN:
-        learn();
-        break;
-    case DEATH:
-        // Whatever happens when gnomes die
-        death();
-        break;
-    case GOAL_REACHED:
-        // implement this for folder
-        goalReached();
-        break;
+    }
+    // Currently only set up for one entity
+    auto view{registry->view<Transform, AIComponent>()};
+    for (auto entity : view) {
+        auto [transform, ai] = view.get<Transform, AIComponent>(entity);
+        eventHandler(ai);
+        std::optional<NPCevents> event;
+        switch (ai.state) {
+        case MOVE:
+            event = move(dt, ai, transform);
+            if (event) {
+                ai.notification_queue.push(event.value());
+            }
+            break;
+        case DEATH:
+            // Whatever happens when gnomes die
+            death(entity);
+            break;
+        case GOAL_REACHED:
+            // implement this for folder
+            goalReached(entity);
+            break;
+        }
     }
 
-    auto view{registry->view<AIComponent>()};
-    for (auto entity : view) {
-        auto &aicomponent{view.get(entity)};
+    auto twrview{registry->view<TowerComponent>()};
+    for (auto entity : twrview) {
+        auto &aicomponent{twrview.get(entity)};
 
         switch (twrstate) {
         case IDLE:
@@ -56,39 +65,138 @@ void AISystem::update(DeltaTime dt) {
             break;
         }
     }
-
-
 }
 
 /**
  * @brief AIsystem::learn, flips the direction and updates path
  */
-void AISystem::learn() {
-    dir = -dir;
-    if (updatePath) {
-        mCurve.updatePath();
-        //            mCurve.updateTrophies();
-        updatePath = false;
+//void AISystem::learn() {
+//    dir = -dir;
+//    if (updatePath) {
+//        mCurve.updatePath();
+//        //            mCurve.updateTrophies();
+//        updatePath = false;
+//    }
+//    state = MOVE;
+//}
+void AISystem::spawnWave(DeltaTime dt) {
+    curSpawnDuration += dt;
+    if (curSpawnCD >= 0.f)
+        curSpawnCD -= dt;
+    if (curSpawnCD <= 0.f) {
+        auto factory{ResourceManager::instance()};
+        factory->makeEnemy();
+        curSpawnCD = spawnCD;
     }
-    state = MOVE;
 }
-
-void AISystem::detectEnemies(AIComponent &ai)
-{
+void AISystem::detectEnemies(TowerComponent &ai) {
     // if(!(list.empty())
-        // pick random from list
-        // save it in targetID
-       // twrstate = ATTACK;
-
-
+    // pick random from list
+    // save it in targetID
+    // twrstate = ATTACK;
 }
 
-void AISystem::attack(AIComponent &ai)
-{
+void AISystem::attack(TowerComponent &ai) {
     // We already have the targetID here
-
 }
 
+/**
+ * @brief AIsystem::eventHandler, event handling
+ */
+void AISystem::eventHandler(AIComponent &ai) {
+    while (!ai.notification_queue.empty()) {
+        auto event = ai.notification_queue.front();
+        switch (event) {
+        case ENDPOINT_ARRIVED:
+            ai.state = GOAL_REACHED;
+            break;
+        case DAMAGE_TAKEN:
+            if (ai.health <= 0) {
+                ai.state = DEATH;
+            }
+            break;
+        default:
+            break;
+        }
+        ai.notification_queue.pop();
+    }
+}
+
+/**
+ * @brief AIsystem::draw
+ */
+void AISystem::draw() {
+    mCurve.draw();
+}
+
+// follow b-spline from start of path to end of path
+// if end of path is reached,
+// remove 1 LP (lifepoint) from player's base
+
+/* position = deBoor(t)
+     * draw NPC
+     * if(endpoint arrived)
+     *  notify(endpoint_arrived)
+     *  state(GOAL_REACHED);
+     * if(AIcomponent.hp >= 0)
+     *  state(DEATH)
+     *
+     *
+     */
+
+/**
+ * @brief AIsystem::move, moves the NPC along the path
+ * @param deltaT
+ * @return
+ */
+std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform &transform) {
+    float &t = ai.pathT; // shortcut
+    t += dt * ai.moveSpeed;
+    bool endPoint{0.98f <= t || t < 0.f};
+
+    if (endPoint)
+        t = gsl::clamp(t, 0.f, 1.f);
+
+    auto p{mCurve.eval(t)};
+    transform.localPosition = p;
+    transform.matrixOutdated = true;
+
+    if (endPoint) {
+        // remove 1 hp from player
+        return ENDPOINT_ARRIVED;
+    }
+
+    return {};
+}
+
+/**
+ * @brief AIsystem::init, initializes NPC and curve
+ * @param eID
+ */
+void AISystem::init() {
+    mCurve.init();
+}
+
+/**
+ * @brief AIsystem::death, todo
+ */
+void AISystem::death(const GLuint entityID) {
+    // hp <= 0
+    // particles
+    // gold++
+    // delete entity
+    registry->removeEntity(entityID);
+}
+
+/**
+ * @brief AIsystem::goalReached, todo
+ */
+void AISystem::goalReached(const GLuint entityID) {
+    // endpoint reached
+    // remove 1LP from player
+    // delete entity
+    registry->removeEntity(entityID);
+}
 /**
  * @brief AIsystem::masterOfCurves, helper function that updates trophies and path
  */
@@ -98,7 +206,7 @@ void AISystem::masterOfCurves() {
 }
 void AISystem::setHealth(int health) {
     auto ai{registry->get<AIComponent>(registry->getSelectedEntity())};
-    ai.hp = health;
+    ai.health = health;
 }
 void AISystem::setBSPlinePointX(double xIn) {
     GLuint entityID{registry->getSelectedEntity()};
@@ -126,110 +234,4 @@ void AISystem::setBSPlinePointZ(double zIn) {
  */
 void AISystem::setControlPoints(std::vector<vec3> cps) {
     mCurve.setControlPoints(cps);
-}
-
-/**
- * @brief AIsystem::eventHandler, event handling
- */
-void AISystem::eventHandler() {
-    auto reg{Registry::instance()};
-    auto view{reg->view<Transform, AIComponent>()};
-    auto &ai{view.get<AIComponent>(NPC)};
-
-    while (!notification_queue.empty()) {
-        auto event = notification_queue.front();
-        switch (event) {
-        case ENDPOINT_ARRIVED:
-            state = LEARN;
-            break;
-        case ITEM_TAKEN:
-            // state = CRY
-            updatePath = true;
-            break;
-        case DAMAGE_TAKEN:
-            // something
-            if (ai.hp <= 0) {
-                state = DEATH;
-            }
-            break;
-        }
-        notification_queue.pop();
-    }
-}
-
-/**
- * @brief AIsystem::draw
- */
-void AISystem::draw() {
-    mCurve.draw();
-}
-
-// follow b-spline from start of path to end of path
-// if end of path is reached,
-// remove 1 LP (lifepoint) from player's base
-
-/* position = deBoor(t)
-     * draw NPC
-     * if(endpoint arrived)
-     *  notify(endpoint_arrived)
-     *  state(GOAL_REACHED);
-     * if(AIcomponent.hp >= 0)
-     *  state(DEATH)
-     *
-     *
-     */
-
-/**
- * @brief AIsystem::move, patrols the NPC along the curve
- * @param deltaT
- * @return
- */
-std::optional<NPCevents> AISystem::move(float deltaT) {
-    auto reg{Registry::instance()};
-    auto view{reg->view<Transform, AIComponent>()};
-    auto &transform{view.get<Transform>(NPC)};
-    t += deltaT * dir;
-    bool endPoint{0.98f <= t || t < 0.f};
-
-    if (endPoint)
-        t = gsl::clamp(t, 0.f, 1.f);
-
-    auto p{mCurve.eval(t)};
-    transform.localPosition = p;
-    transform.matrixOutdated = true;
-
-    if (endPoint) {
-        // remove 1 hp from player
-        return ENDPOINT_ARRIVED;
-    }
-
-    return std::nullopt;
-}
-
-/**
- * @brief AIsystem::init, initializes NPC and curve
- * @param eID
- */
-void AISystem::init(GLuint eID) {
-    NPC = eID;
-    mCurve.init();
-}
-
-/**
- * @brief AIsystem::death, todo
- */
-void AISystem::death() {
-    // hp <= 0
-    // particles
-    // gold++
-    // delete entity
-}
-
-/**
- * @brief AIsystem::goalReached, todo
- */
-void AISystem::goalReached() {
-    // endpoint reached
-    // remove 1LP from player
-    // delete entity
 }

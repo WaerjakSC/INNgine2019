@@ -81,6 +81,7 @@ public:
     GLuint makeLightObject(const QString &name = "Light");
     GLuint make3DObject(std::string name, Ref<Shader> type = std::make_shared<PhongShader>());
     GLuint makeTriangleSurface(std::string fileName, Ref<Shader> type);
+    GLuint makeEnemy(const QString &name = "Gnome");
 
     Scene *getSceneLoader() const;
 

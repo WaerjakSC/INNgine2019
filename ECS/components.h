@@ -10,6 +10,8 @@
 #include <QColor>
 #include <QJSEngine>
 #include <QKeyEvent>
+#include <queue>
+
 #ifdef _WIN32
 #include <al.h>
 #include <alc.h>
@@ -373,7 +375,6 @@ struct BSplinePoint : Component {
 // de kan bevege seg, ta skade, dø
 enum NPCstates { MOVE,
                  DEATH,
-                 LEARN,
                  GOAL_REACHED };
 
 enum NPCevents { ENDPOINT_ARRIVED,
@@ -388,28 +389,29 @@ enum AttackType { SPLASH,
                   PHYSICAL,
                   MAGIC };
 
-// GNOMER
+// GNOMES
 struct AIComponent : public Component {
-    AIComponent(int health = 100, int dmg = 10) : hp(health), damage(dmg) {}
-    int hp = 100;
-    int damage;
-    GLuint targetID;
-    float cd;
+    AIComponent(int hp = 100, float speed = 0.1f) : health(hp), moveSpeed(speed) {}
+    int health;
+    float moveSpeed;
+    float pathT{0};
+    NPCstates state{MOVE};
+    std::queue<NPCevents> notification_queue;
 };
-
-// BASEN
+// Towers
+struct TowerComponent : public Component {
+    TowerComponent(int dmg = 10) : damage(dmg) {}
+    int damage;
+    int range;
+    float attackSpeed;
+    float cooldown;
+    GLuint targetID;
+};
+// BASE
 struct PlayerComponent : public Component {
     PlayerComponent() {}
-    int playerHP = 100;
-    int playerGold = 500;
-    int playerKills = 0;
+    int health = 100;
+    int gold = 500;
+    int kills = 0;
 };
-
-// Towers
-struct TowerComponent : public AIComponent {
-    TowerComponent() {}
-    int range;
-    int attackSpeed;
-};
-
 #endif // COMPONENT_H

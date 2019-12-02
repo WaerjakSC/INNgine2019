@@ -147,12 +147,7 @@ void RenderWindow::init() {
     mMoveSystem->init();
     mScriptSystem->init();
     mInputSystem->init(aspectRatio);
-    auto view{mRegistry->view<AIComponent>()};
-    if (!view.empty()) {
-        GLuint enemy{mRegistry->view<AIComponent>().entities()[0]};
-
-        mAIsystem->init(enemy);
-    }
+    mAIsystem->init();
 
     mLightSystem->init();
     mParticleSystem->init();

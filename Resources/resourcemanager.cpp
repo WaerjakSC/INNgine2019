@@ -205,6 +205,7 @@ GLuint ResourceManager::makePlane(const QString &name) {
 
     return eID;
 }
+
 void ResourceManager::makePlaneMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
@@ -333,6 +334,15 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
     setMesh(fileName, eID);
     glBindVertexArray(0);
 
+    return eID;
+}
+
+GLuint ResourceManager::makeEnemy(const QString &name) {
+    GLuint eID{registry->makeEntity<Mesh, AIComponent>(name)};
+    registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
+    registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false);
+    setMesh("OgreOBJ.obj", eID);
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["SkinColorMostro_COLOR.png"]->textureUnit()); // probably change textureunit later
     return eID;
 }
 /**

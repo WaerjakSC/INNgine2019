@@ -5,7 +5,6 @@
 #include "components.h"
 #include "isystem.h"
 #include "registry.h"
-#include <queue>
 
 // For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
 typedef gsl::Vector2D vec2;
@@ -14,15 +13,11 @@ class AISystem : public QObject, public ISystem {
     Q_OBJECT
 public:
     AISystem();
-    Registry *reg;
 
     virtual void update(DeltaTime dt = 0.016) override;
     void setControlPoints(std::vector<vec3> cps);
-    std::optional<NPCevents> move(float deltaTime);
-    float t{0};
-    int dir{1};
-    void init(GLuint eID);
-    void eventHandler();
+    std::optional<NPCevents> move(DeltaTime dt, AIComponent &ai, Transform &transform);
+    void init();
 
     void draw();
     void masterOfCurves();
@@ -36,27 +31,25 @@ public slots:
 private:
     // FSM npc
     void move();
-    void death();
-    void goalReached();
-    void learn();
+    void death(const GLuint entityID);
+    void goalReached(const GLuint entityID);
+    //    void learn();
+    void eventHandler(AIComponent &ai);
 
-    bool updatePath = false;
     BSplineCurve mCurve;
-    Registry *registry = Registry::instance();
+    Registry *registry{Registry::instance()};
 
     // FSM twr
-    void detectEnemies(AIComponent &ai);
-    void attack(AIComponent &ai);
-
-
-    GLuint NPC;
+    void detectEnemies(TowerComponent &ai);
+    void attack(TowerComponent &ai);
 
     TWRstates twrstate{IDLE};
-    NPCstates state{MOVE};
+
     void notify(int notification);
-    std::queue<int> notification_queue;
 
     float elapsed_time;
+    void spawnWave(DeltaTime dt);
+    float waveCD{7.f}, curWaveCD{1.f}, spawnCD{0.5f}, curSpawnCD{0.f}, spawnDuration{5.f}, curSpawnDuration{0.f};
 };
 
 #endif // AISYSTEM_H
