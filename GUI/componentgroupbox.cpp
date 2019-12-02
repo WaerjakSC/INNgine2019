@@ -35,14 +35,10 @@ void ComponentGroupBox::removeComponent() {
         registry->remove<AIComponent>(entityID);
     if (title() == "AABB Collider")
         registry->remove<AABB>(entityID);
-    if (title() == "OBB Collider")
-        registry->remove<OBB>(entityID);
     if (title() == "Plane Collider")
         registry->remove<Plane>(entityID);
     if (title() == "Sphere Collider")
         registry->remove<Sphere>(entityID);
-    if (title() == "Cylinder Collider")
-        registry->remove<Cylinder>(entityID);
     deleteLater();
 }
 

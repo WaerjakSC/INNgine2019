@@ -41,14 +41,8 @@ void ComponentList::setupComponentList() {
     if (registry->contains<AABB>(eID)) {
         setupAABBSettings(registry->get<AABB>(eID));
     }
-    if (registry->contains<OBB>(eID)) {
-        setupOBBSettings(registry->get<OBB>(eID));
-    }
     if (registry->contains<Sphere>(eID)) {
         setupSphereColliderSettings(registry->get<Sphere>(eID));
-    }
-    if (registry->contains<Cylinder>(eID)) {
-        setupCylinderColliderSettings(registry->get<Cylinder>(eID));
     }
     if (registry->contains<Plane>(eID)) {
         setupPlaneColliderSettings(registry->get<Plane>(eID));
@@ -110,10 +104,6 @@ void ComponentList::addAABBCollider() {
     }
 }
 
-void ComponentList::addOBBCollider() {
-    addCollider<OBB>();
-}
-
 void ComponentList::addSphereCollider() {
     addCollider<Sphere>();
     GLuint selectedEntity{registry->getSelectedEntity()};
@@ -123,10 +113,6 @@ void ComponentList::addSphereCollider() {
 
 void ComponentList::addPlaneCollider() {
     addCollider<Plane>();
-}
-
-void ComponentList::addCylinderCollider() {
-    addCollider<Cylinder>();
 }
 
 void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
@@ -250,56 +236,7 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupOBBSettings(const OBB &col) {
-    ComponentGroupBox *box{new ComponentGroupBox("OBB Collider", this)};
-    QGridLayout *grid{new QGridLayout};
-    grid->setMargin(2);
-    QGroupBox *posBox{new QGroupBox(tr("Position"))};
-    posBox->setStyle(fusion);
-    posBox->setFlat(true);
-    QHBoxLayout *position{new QHBoxLayout};
-    position->setMargin(1);
-    auto [positionX, positionY, positionZ]{makeVectorBox(col.position, position)};
 
-    connect(this, &ComponentList::OBBPositionX, positionX, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::OBBPositionY, positionY, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::OBBPositionZ, positionZ, &QDoubleSpinBox::setValue);
-
-    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
-    connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionX(double)));
-    connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionY(double)));
-    connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBPositionZ(double)));
-    posBox->setLayout(position);
-    grid->addWidget(posBox, 0, 0);
-
-    QGroupBox *hSizeBox{new QGroupBox(tr("Half-Size"))};
-    hSizeBox->setStyle(fusion);
-    hSizeBox->setFlat(true);
-
-    QHBoxLayout *hSize{new QHBoxLayout};
-    hSize->setMargin(1);
-
-    auto [sizeX, sizeY, sizeZ]{makeVectorBox(col.size, hSize)};
-    connect(this, &ComponentList::OBBSizeX, sizeX, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::OBBSizeY, sizeY, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::OBBSizeZ, sizeZ, &QDoubleSpinBox::setValue);
-
-    connect(sizeX, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBSizeX(double)));
-    connect(sizeY, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBSizeY(double)));
-    connect(sizeZ, SIGNAL(valueChanged(double)), colSys, SLOT(setOBBSizeZ(double)));
-
-    // Not sure what to show for the mat3 orientation variable, maybe just convert it to a vec3 with eulers or something?
-
-    hSizeBox->setLayout(hSize);
-    grid->addWidget(hSizeBox, 1, 0);
-
-    QGroupBox *objectTypeBox{new QGroupBox(tr("Object Type"))};
-    makeObjectTypeBox(objectTypeBox, col);
-    grid->addWidget(objectTypeBox, 2, 0);
-
-    box->setLayout(grid);
-    scrollArea->addGroupBox(box);
-}
 void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     ComponentGroupBox *box{new ComponentGroupBox("Sphere Collider", this)};
     QGridLayout *grid{new QGridLayout};
@@ -341,61 +278,7 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupCylinderColliderSettings(const Cylinder &col) {
-    ComponentGroupBox *box{new ComponentGroupBox("Cylinder Collider", this)};
-    QGridLayout *grid{new QGridLayout};
-    grid->setMargin(2);
-    QGroupBox *posBox{new QGroupBox(tr("Position"))};
-    posBox->setStyle(fusion);
-    posBox->setFlat(true);
-    QHBoxLayout *position{new QHBoxLayout};
-    position->setMargin(1);
-    auto [positionX, positionY, positionZ]{makeVectorBox(col.position, position)};
-    connect(this, &ComponentList::cylinderPositionX, positionX, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::cylinderPositionY, positionY, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::cylinderPositionZ, positionZ, &QDoubleSpinBox::setValue);
 
-    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
-    connect(positionX, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionX(double)));
-    connect(positionY, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionY(double)));
-    connect(positionZ, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderPositionZ(double)));
-
-    posBox->setLayout(position);
-    grid->addWidget(posBox, 0, 0);
-
-    QGroupBox *radiusBox{new QGroupBox(tr("Radius"))};
-    radiusBox->setStyle(fusion);
-    radiusBox->setFlat(true);
-
-    QHBoxLayout *radiusLayout{new QHBoxLayout};
-    radiusLayout->setMargin(1);
-    QDoubleSpinBox *radius{makeDoubleSpinBox(col.radius, radiusLayout)};
-    connect(this, &ComponentList::cylinderRadius, radius, &QDoubleSpinBox::setValue);
-    connect(radius, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderRadius(double)));
-
-    radiusBox->setLayout(radiusLayout);
-    grid->addWidget(radiusBox, 1, 0);
-
-    QGroupBox *heightBox{new QGroupBox(tr("Height"))};
-    heightBox->setStyle(fusion);
-    heightBox->setFlat(true);
-
-    QHBoxLayout *heightLayout{new QHBoxLayout};
-    heightLayout->setMargin(1);
-    QDoubleSpinBox *height{makeDoubleSpinBox(col.height, heightLayout)};
-    connect(this, &ComponentList::cylinderHeight, radius, &QDoubleSpinBox::setValue);
-    connect(height, SIGNAL(valueChanged(double)), colSys, SLOT(setCylinderHeight(double)));
-
-    heightBox->setLayout(heightLayout);
-    grid->addWidget(heightBox, 2, 0);
-
-    QGroupBox *objectTypeBox{new QGroupBox(tr("Object Type"))};
-    makeObjectTypeBox(objectTypeBox, col);
-    grid->addWidget(objectTypeBox, 3, 0);
-
-    box->setLayout(grid);
-    scrollArea->addGroupBox(box);
-}
 void ComponentList::setupPlaneColliderSettings(const Plane &col) {
     ComponentGroupBox *box{new ComponentGroupBox("Plane Collider", this)};
     QGridLayout *grid{new QGridLayout};
@@ -840,5 +723,5 @@ std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> 
             }
         }
     }
-    return std::make_tuple(xBox, yBox, zBox);
+    return {xBox, yBox, zBox};
 }

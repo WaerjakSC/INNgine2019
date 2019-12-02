@@ -293,22 +293,6 @@ struct AABB : public Collision {
 };
 
 /**
-  * @brief Oriented Bounding Box
-  */
-struct OBB : public Collision {
-    vec3 position{0};
-    vec3 size;
-    mat3 orientation;
-
-    // default constructor: lager en OBB ved origo
-    inline OBB() : size(vec3{2, 2, 2}) {}
-    // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents)
-    inline OBB(const vec3 &p, const vec3 &s) : position(p), size(s) {}
-    // alternativ constructor: lager en OBB på gitt posisjon og størrelse (half extents) OG rotasjon wiihuu
-    inline OBB(const vec3 &p, const vec3 &s, const mat3 &o) : position(p), size(s), orientation(o) {}
-};
-
-/**
   * @brief Sphere struct
   */
 struct Sphere : public Collision {
@@ -340,19 +324,6 @@ struct Plane : public Collision {
     }
 };
 
-struct Cylinder : public Collision {
-    vec3 position;
-    float radius;
-    float height;
-    // default constructor
-    inline Cylinder(bool stat = true) : radius(3.0f) {
-        isStatic = stat;
-    };
-    // constructor with radius and position params
-    inline Cylinder(const vec3 &pos, const float &r, const float &h, bool stat = true) : position(pos), radius(r), height(h) {
-        isStatic = stat;
-    }
-};
 struct GameCamera : public Component {
     inline GameCamera(vec3 pos = vec3{0}, float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active) {
     }
