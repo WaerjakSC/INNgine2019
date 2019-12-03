@@ -51,6 +51,7 @@ public slots:
     void toggleWireframe();
     void toggleXYZ();
 
+    void togglePlaneDebugMode(bool trigger);
 private slots:
     void render();
 

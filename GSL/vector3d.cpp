@@ -13,13 +13,7 @@ Vector3D::Vector3D(const int v) : x{static_cast<float>(v)}, y{static_cast<float>
 
 Vector3D::Vector3D(const double v) : x{static_cast<float>(v)}, y{static_cast<float>(v)}, z{static_cast<float>(v)} {
 }
-//GLfloat *Vector3D::constData() {
-//    vector[0] = x;
-//    vector[1] = y;
-//    vector[2] = z;
 
-//    return &vector[0];
-//}
 const Vector3D &Vector3D::operator=(const Vector3D &rhs) {
     x = rhs.getX();
     y = rhs.getY();
@@ -57,7 +51,12 @@ Vector3D &Vector3D::operator-=(const Vector3D &rhs) {
 
     return *this;
 }
-
+Vector3D &Vector3D::operator*=(const GLfloat rhs) {
+    x *= rhs;
+    y *= rhs;
+    z *= rhs;
+    return *this;
+}
 Vector3D Vector3D::operator-() const {
     return {-x, -y, -z};
 }

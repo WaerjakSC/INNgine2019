@@ -236,7 +236,10 @@ void RenderWindow::toggleWireframe() {
 void RenderWindow::toggleXYZ() {
     mRenderer->toggleRendered(xyz);
 }
-
+void RenderWindow::togglePlaneDebugMode(bool trigger) {
+    mInputSystem->setPlaneColors(trigger);
+    mInputSystem->setBuildableDebug(trigger);
+}
 //The way this is set up is that we start the clock before doing the draw call,
 //and check the time right after it is finished (done in the render function)
 //This will approximate what framerate we COULD have.
