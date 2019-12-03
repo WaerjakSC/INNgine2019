@@ -52,17 +52,11 @@ signals:
     void scaleY(GLfloat yIn);
     void scaleZ(GLfloat zIn);
     void originX(double xIn);
-    void originY(double xIn);
-    void originZ(double xIn);
+    void originY(double yIn);
+    void originZ(double zIn);
     void AABBSizeX(double xIn);
     void AABBSizeY(double yIn);
     void AABBSizeZ(double zIn);
-    void OBBPositionX(double xIn);
-    void OBBPositionY(double yIn);
-    void OBBPositionZ(double zIn);
-    void OBBSizeX(double xIn);
-    void OBBSizeY(double yIn);
-    void OBBSizeZ(double zIn);
     void spherePositionX(double xIn);
     void spherePositionY(double yIn);
     void spherePositionZ(double zIn);
@@ -71,11 +65,6 @@ signals:
     void planeNormalY(double yIn);
     void planeNormalZ(double zIn);
     void planeDistance(double radius);
-    void cylinderPositionX(double xIn);
-    void cylinderPositionY(double yIn);
-    void cylinderPositionZ(double zIn);
-    void cylinderRadius(double radius);
-    void cylinderHeight(double height);
     void newShader(int entityID, std::string shader);
     void changeHealth(int health);
 

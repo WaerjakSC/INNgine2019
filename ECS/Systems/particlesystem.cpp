@@ -174,3 +174,77 @@ int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter) {
     lastParticle = 0;
     return 0; // All particles are taken, override the first one
 }
+void ParticleSystem::setActiveEmitter(bool state) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.isActive = state;
+}
+void ParticleSystem::setDecayEmitter(bool state) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.shouldDecay = state;
+}
+void ParticleSystem::setNumParticles(int num) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.setNumParticles(num);
+}
+void ParticleSystem::setPPS(int num) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.particlesPerSecond = num;
+}
+void ParticleSystem::setEmitterSpeed(double speed) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.speed = speed;
+}
+
+void ParticleSystem::setEmitterSize(double size) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.size = size;
+}
+void ParticleSystem::setEmitterLifeSpan(double lifespan) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initLifeSpan = lifespan;
+}
+
+void ParticleSystem::setEmitterSpread(double spread) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.spread = spread;
+}
+void ParticleSystem::setInitDirX(double xIn) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initialDirection.x = xIn;
+}
+
+void ParticleSystem::setInitDirY(double yIn) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initialDirection.y = yIn;
+}
+
+void ParticleSystem::setInitDirZ(double zIn) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initialDirection.z = zIn;
+}
+void ParticleSystem::setInitColorRed(int inRed) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initialColor.setRed(inRed);
+}
+void ParticleSystem::setInitColorGreen(int inGreen) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initialColor.setGreen(inGreen);
+}
+void ParticleSystem::setInitColorBlue(int inBlue) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto &emitter{registry->get<ParticleEmitter>(entityID)};
+    emitter.initialColor.setBlue(inBlue);
+}

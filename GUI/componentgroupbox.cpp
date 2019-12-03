@@ -39,6 +39,10 @@ void ComponentGroupBox::removeComponent() {
         registry->remove<Plane>(entityID);
     if (title() == "Sphere Collider")
         registry->remove<Sphere>(entityID);
+    if (title() == "Particle Emitter")
+        registry->remove<ParticleEmitter>(entityID);
+    if (title() == "Game Camera")
+        registry->remove<GameCamera>(entityID);
     deleteLater();
 }
 

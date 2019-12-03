@@ -121,6 +121,7 @@ void RenderWindow::init() {
         "Skybox/front.jpg",
         "Skybox/back.jpg"};
     mFactory->loadCubemap(faces);
+    mFactory->loadMesh("OgreOBJ.obj"); // if a mesh is spawned in during play you'll probably want to load it here first to avoid fps hitches
 
     // Set up the systems.
     mRenderer = mRegistry->registerSystem<RenderSystem>();

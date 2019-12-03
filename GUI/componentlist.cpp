@@ -5,6 +5,7 @@
 #include "components.h"
 #include "constants.h"
 #include "customdoublespinbox.h"
+#include "customspinbox.h"
 #include "hierarchymodel.h"
 #include "hierarchyview.h"
 #include "inputsystem.h"
@@ -58,6 +59,9 @@ void ComponentList::setupComponentList() {
     }
     if (registry->contains<GameCamera>(eID)) {
         setupGameCameraSettings(registry->get<GameCamera>(eID));
+    }
+    if (registry->contains<ParticleEmitter>(eID)) {
+        setupEmitterSettings(registry->get<ParticleEmitter>(eID));
     }
 }
 void ComponentList::addTransformComponent() {
@@ -114,7 +118,6 @@ void ComponentList::addSphereCollider() {
 void ComponentList::addPlaneCollider() {
     addCollider<Plane>();
 }
-
 void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     ComponentGroupBox *box{new ComponentGroupBox{"Game Camera", this}};
     QGridLayout *grid{new QGridLayout};
@@ -167,6 +170,218 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
 }
 
 void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
+    ComponentGroupBox *box{new ComponentGroupBox("Particle Emitter", this)};
+    QGridLayout *grid{new QGridLayout};
+    grid->setMargin(2);
+
+    QGroupBox *boolsBox{new QGroupBox(tr("Particle Data"))};
+    boolsBox->setStyle(fusion);
+    boolsBox->setFlat(true);
+    QHBoxLayout *boolsLayout{new QHBoxLayout};
+    boolsLayout->setMargin(1);
+    QPushButton *active{new QPushButton(tr("Is Active"))};
+    active->setCheckable(true);
+    active->setChecked(emitter.isActive);
+    QPushButton *decay{new QPushButton(tr("Decay"))};
+    decay->setCheckable(true);
+    decay->setChecked(emitter.shouldDecay);
+    ParticleSystem *particleSys{registry->system<ParticleSystem>().get()};
+    connect(active, &QPushButton::clicked, particleSys, &ParticleSystem::setActiveEmitter);
+    connect(decay, &QPushButton::clicked, particleSys, &ParticleSystem::setDecayEmitter);
+    boolsLayout->addWidget(active);
+    boolsLayout->addWidget(decay);
+    grid->addLayout(boolsLayout, 0, 0);
+
+    QGroupBox *dirBox{new QGroupBox(tr("Initial Direction"))};
+    dirBox->setStyle(fusion);
+    dirBox->setFlat(true);
+    QHBoxLayout *initDir{new QHBoxLayout};
+    initDir->setMargin(1);
+
+    auto [initDirX, initDirY, initDirZ]{makeVectorBox(emitter.initialDirection, initDir)};
+
+    connect(initDirX, SIGNAL(valueChanged(double)), particleSys, SLOT(setInitDirX(double)));
+    connect(initDirY, SIGNAL(valueChanged(double)), particleSys, SLOT(setInitDirY(double)));
+    connect(initDirZ, SIGNAL(valueChanged(double)), particleSys, SLOT(setInitDirZ(double)));
+    dirBox->setLayout(initDir);
+    grid->addWidget(dirBox, 1, 0);
+
+    QGroupBox *colorBox{new QGroupBox(tr("Initial Color"))};
+    colorBox->setStyle(fusion);
+    colorBox->setFlat(true);
+    QHBoxLayout *colorLayout{new QHBoxLayout};
+    colorLayout->setMargin(1);
+
+    CustomSpinBox *xBox{new CustomSpinBox};
+    CustomSpinBox *yBox{new CustomSpinBox};
+    CustomSpinBox *zBox{new CustomSpinBox};
+    xBox->setRange(0, 255);
+    yBox->setRange(0, 255);
+    zBox->setRange(0, 255);
+
+    // Set up the Vector Display
+    for (int i = 0; i < 6; i++) {
+        if (i % 2 == 0) {
+            QLabel *label{new QLabel};
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("R:");
+                break;
+            case 2:
+                label->setText("G:");
+                break;
+            case 4:
+                label->setText("B:");
+                break;
+            }
+            colorLayout->addWidget(label);
+        } else {
+            switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
+            case 1:
+                xBox->setValue(emitter.initialColor.red());
+                colorLayout->addWidget(xBox);
+                break;
+            case 3:
+                yBox->setValue(emitter.initialColor.green());
+                colorLayout->addWidget(yBox);
+                break;
+            case 5:
+                zBox->setValue(emitter.initialColor.blue());
+                colorLayout->addWidget(zBox);
+                break;
+            }
+        }
+    }
+
+    connect(xBox, SIGNAL(valueChanged(int)), particleSys, SLOT(setInitColorRed(int)));
+    connect(yBox, SIGNAL(valueChanged(int)), particleSys, SLOT(setInitColorGreen(int)));
+    connect(zBox, SIGNAL(valueChanged(int)), particleSys, SLOT(setInitColorBlue(int)));
+    colorBox->setLayout(colorLayout);
+    grid->addWidget(colorBox, 2, 0);
+
+    QGroupBox *particlesBox{new QGroupBox(tr("Particle Data"))};
+    particlesBox->setStyle(fusion);
+    particlesBox->setFlat(true);
+    QHBoxLayout *particlesLayout{new QHBoxLayout};
+    particlesLayout->setMargin(1);
+    CustomSpinBox *particleNumBox{new CustomSpinBox};
+    CustomSpinBox *ppsBox{new CustomSpinBox};
+    // Set up the Vector Display
+    for (int i = 0; i < 4; i++) {
+        if (i % 2 == 0) {
+            QLabel *label{new QLabel};
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("ParticleNr:");
+                break;
+            case 2:
+                label->setText("PPS:");
+                break;
+            }
+            particlesLayout->addWidget(label);
+        } else {
+            switch (i) {
+            case 1:
+                particleNumBox->setValue(emitter.numParticles);
+                particleNumBox->setRange(1, 1000);
+                particlesLayout->addWidget(particleNumBox);
+                break;
+            case 3:
+                ppsBox->setValue(emitter.particlesPerSecond);
+                ppsBox->setRange(1, 500);
+                particlesLayout->addWidget(ppsBox);
+                break;
+            }
+        }
+    }
+    connect(particleNumBox, SIGNAL(valueChanged(int)), particleSys, SLOT(setNumParticles(int)));
+    connect(ppsBox, SIGNAL(valueChanged(int)), particleSys, SLOT(setPPS(int)));
+    particlesBox->setLayout(particlesLayout);
+    grid->addWidget(particlesBox, 3, 0);
+
+    QGroupBox *sizeSpeedBox{new QGroupBox(tr("Initial Speed and Size"))};
+    sizeSpeedBox->setStyle(fusion);
+    sizeSpeedBox->setFlat(true);
+    QHBoxLayout *sizeSpeedLayout{new QHBoxLayout};
+    sizeSpeedLayout->setMargin(1);
+    CustomDoubleSpinBox *speedBox{new CustomDoubleSpinBox};
+    CustomDoubleSpinBox *sizeBox{new CustomDoubleSpinBox};
+    sizeBox->setSingleStep(0.1);
+    // Set up the Vector Display
+    for (int i = 0; i < 4; i++) {
+        if (i % 2 == 0) {
+            QLabel *label{new QLabel};
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("Speed:");
+                break;
+            case 2:
+                label->setText("Size:");
+                break;
+            }
+            sizeSpeedLayout->addWidget(label);
+        } else {
+            switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
+            case 1:
+                speedBox->setValue(emitter.speed);
+                sizeSpeedLayout->addWidget(speedBox);
+                break;
+            case 3:
+                sizeBox->setValue(emitter.size);
+                sizeSpeedLayout->addWidget(sizeBox);
+                break;
+            }
+        }
+    }
+    connect(speedBox, SIGNAL(valueChanged(double)), particleSys, SLOT(setEmitterSpeed(double)));
+    connect(sizeBox, SIGNAL(valueChanged(double)), particleSys, SLOT(setEmitterSize(double)));
+    sizeSpeedBox->setLayout(sizeSpeedLayout);
+    grid->addWidget(sizeSpeedBox, 4, 0);
+
+    QGroupBox *spreadLifeSpanBox{new QGroupBox(tr("Lifespan and Spread"))};
+    spreadLifeSpanBox->setStyle(fusion);
+    spreadLifeSpanBox->setFlat(true);
+    QHBoxLayout *spreadLifeSpanLayout{new QHBoxLayout};
+    spreadLifeSpanLayout->setMargin(1);
+    CustomDoubleSpinBox *lifespanBox{new CustomDoubleSpinBox};
+    CustomDoubleSpinBox *spreadBox{new CustomDoubleSpinBox};
+    // Set up the Vector Display
+    for (int i = 0; i < 4; i++) {
+        if (i % 2 == 0) {
+            QLabel *label{new QLabel};
+            label->setStyle(fusion);
+            switch (i) {
+            case 0:
+                label->setText("Lifespan:");
+                break;
+            case 2:
+                label->setText("Spread:");
+                break;
+            }
+            spreadLifeSpanLayout->addWidget(label);
+        } else {
+            switch (i) {
+            case 1:
+                lifespanBox->setValue(emitter.initLifeSpan);
+                spreadLifeSpanLayout->addWidget(lifespanBox);
+                break;
+            case 3:
+                spreadBox->setValue(emitter.spread);
+                spreadLifeSpanLayout->addWidget(spreadBox);
+                break;
+            }
+        }
+    }
+    connect(lifespanBox, SIGNAL(valueChanged(double)), particleSys, SLOT(setEmitterLifeSpan(double)));
+    connect(spreadBox, SIGNAL(valueChanged(double)), particleSys, SLOT(setEmitterSpread(double)));
+    spreadLifeSpanBox->setLayout(spreadLifeSpanLayout);
+    grid->addWidget(spreadLifeSpanBox, 5, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
 }
 void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     ComponentGroupBox *box{new ComponentGroupBox("BSpline Point", this)};

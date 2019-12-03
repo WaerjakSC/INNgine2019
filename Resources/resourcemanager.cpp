@@ -725,7 +725,7 @@ void ResourceManager::setMesh(std::string name, GLuint eID) {
  * @param fileName
  * @return
  */
-void ResourceManager::loadMesh(std::string fileName, GLuint eID) {
+void ResourceManager::loadMesh(std::string fileName, int eID) {
     if (!readFile(fileName, eID)) { // Should run readFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return;
@@ -869,7 +869,7 @@ QString ResourceManager::getMeshName(const Mesh &mesh) {
  * @param fileName
  * @return
  */
-bool ResourceManager::readFile(std::string fileName, GLuint eID) {
+bool ResourceManager::readFile(std::string fileName, int eID) {
     //Open File
     std::string fileWithPath{gsl::assetFilePath + "Meshes/" + fileName};
     std::string mtlPath{gsl::assetFilePath + "Meshes/"};
@@ -918,14 +918,18 @@ bool ResourceManager::readFile(std::string fileName, GLuint eID) {
             if (search == mTextures.end()) {
                 textureLoaded = loadTexture(texname);
             }
-            // Currently doesn't support multiple textures
-            if (registry->contains<Material>(eID) && textureLoaded) {
-                auto &mat{registry->get<Material>(eID)};
-                mat.mTextureUnit = mTextures[texname]->textureUnit();
-                mat.mShader = getShader<TextureShader>();
+            if (eID != -1) {
+                // Currently doesn't support multiple textures
+                if (registry->contains<Material>(eID) && textureLoaded) {
+                    auto &mat{registry->get<Material>(eID)};
+                    mat.mTextureUnit = mTextures[texname]->textureUnit();
+                    mat.mShader = getShader<TextureShader>();
+                }
             }
         }
     }
+    if (eID == -1)
+        return true;
 
     auto &mesh{registry->get<Mesh>(eID)};
     mesh.mName = fileName;
@@ -1077,6 +1081,7 @@ void ResourceManager::play() {
                 break;
             }
         }
+        mMainWindow->mRenderWindowContainer->setFocus();
         mIsPlaying = true;
         aisys->masterOfCurves();
 

@@ -163,6 +163,7 @@ struct ParticleEmitter : public Component {
           particles(std::vector<Particle>(numParticles)) {
         initLifeSpan = lifeSpan;
     }
+    void setNumParticles(size_t num);
     bool isActive;
     bool shouldDecay;
 

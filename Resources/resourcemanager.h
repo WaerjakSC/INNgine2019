@@ -102,6 +102,8 @@ public:
 
     bool isPaused() const;
 
+    void loadMesh(std::string fileName, int eID = -1);
+
     void setCurrentCameraController(Ref<CameraController> currentCameraController);
 
     Ref<CameraController> getCurrentCameraController() const;
@@ -175,9 +177,8 @@ private:
 
     void initParticleBuffers(ParticleEmitter &particle);
     // Reads and loads mesh
-    void loadMesh(std::string fileName, GLuint eID);
     void setMesh(std::string name, GLuint eID);
-    bool readFile(std::string fileName, GLuint eID);
+    bool readFile(std::string fileName, int eID = -1);
     bool readTriangleFile(std::string filename, GLuint eID);
     void loadTriangleMesh(std::string fileName, GLuint eID);
 

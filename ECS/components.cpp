@@ -30,3 +30,11 @@ AABB::AABB(bool stat) : size(vec3(1.0f, 1.0f, 1.0f)) {
     ResourceManager::instance()->setColliderMesh(colliderMesh);
     isStatic = stat;
 }
+
+void ParticleEmitter::setNumParticles(size_t num) {
+    numParticles = num;
+    positionData = std::vector<GLfloat>(numParticles * 4);
+    colorData = std::vector<GLubyte>(numParticles * 4);
+    particles = std::vector<Particle>(numParticles);
+    ResourceManager::instance()->initParticleEmitter(*this);
+}
