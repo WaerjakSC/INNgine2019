@@ -33,12 +33,6 @@ void Scene::saveScene(const QString &fileName) {
     mName = fileName;
     writer.StartObject();
 
-    writer.String("controller");
-    writer.StartObject();
-    writer.Key("id");
-    writer.Uint(inputSys->player());
-    writer.EndObject();
-
     for (auto &entity : entities) {
         const EInfo info{registry->get<EInfo>(entity)};
 
@@ -272,6 +266,14 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(ai.moveSpeed);
                 writer.EndObject();
             }
+            if (registry->contains<Buildable>(entity)) {
+                writer.Key("Buildable");
+                writer.StartObject();
+                const Buildable &build{registry->get<Buildable>(entity)};
+                writer.Key("canBuild");
+                writer.Bool(build.isBuildable);
+                writer.EndObject();
+            }
             if (registry->contains<BSplinePoint>(entity)) {
                 writer.Key("BSplinePoint");
                 writer.StartObject();
@@ -339,23 +341,13 @@ void Scene::populateScene(const Document &scene) {
     std::map<int, int> idPairs;
     Registry *registry{Registry::instance()};
     ResourceManager *factory{ResourceManager::instance()};
-    //        Ref<GameCameraController> gameCam = std::make_shared<GameCameraController>();
-    //        registry->getSystem<InputSystem>()->setGameCameraController(gameCam, mGameCamID);
-
-    if (scene.HasMember("controller")) {
-        GLuint controllerID{scene["controller"]["id"].GetUint()};
-        registry->system<InputSystem>()->setPlayer(controllerID);
-    } else
-        registry->system<InputSystem>()->setPlayer(0);
     if (!scene.HasMember("Entity"))
         return;
     // Iterate through each entity in the scene
     for (Value::ConstMemberIterator itr = scene.MemberBegin(); itr != scene.MemberEnd(); ++itr) {
-        // Iterate through each of the members in the entity (name, id, components)
-        if (itr->name == "controller") // Note: Naming an entity "controller" probably fucks with this
-            continue;
         GLuint id{registry->makeEntity(itr->value["name"].GetString())};
         idPairs[itr->value["id"].GetInt()] = id;
+        // Iterate through each of the members in the entity (name, id, components)
         for (Value::ConstMemberIterator comp{itr->value["components"].MemberBegin()}; comp != itr->value["components"].MemberEnd(); ++comp) {
             if (comp->name == "transform") {
                 vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
@@ -435,6 +427,9 @@ void Scene::populateScene(const Document &scene) {
                 int hp{comp->value["health"].GetInt()};
                 float speed{comp->value["speed"].GetFloat()};
                 registry->add<AIComponent>(id, hp, speed);
+            } else if (comp->name == "Buildable") {
+                bool buildable{comp->value["canBuild"].GetBool()};
+                registry->add<Buildable>(id, buildable);
             } else if (comp->name == "BSplinePoint") {
                 vec3 location{comp->value["location"][0].GetFloat(), comp->value["location"][1].GetFloat(), comp->value["location"][2].GetFloat()};
                 registry->add<BSplinePoint>(id, location);

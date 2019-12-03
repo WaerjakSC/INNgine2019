@@ -345,6 +345,15 @@ enum TWRstates { IDLE,
 enum AttackType { SPLASH,
                   PHYSICAL,
                   MAGIC };
+/**
+ * @brief The Buildable struct is merely a tag to let the engine know whether to let the player place an object onto it or not.
+ * Defaults to false in construction, should be set to true for objects that can be built on.
+ */
+struct Buildable : public Component {
+    Buildable(bool canBuild = false) : isBuildable(canBuild) {
+    }
+    bool isBuildable;
+};
 
 // GNOMES
 struct AIComponent : public Component {

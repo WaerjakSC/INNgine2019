@@ -41,6 +41,8 @@ void ComponentGroupBox::removeComponent() {
         registry->remove<ParticleEmitter>(entityID);
     if (title() == "Game Camera")
         registry->remove<GameCamera>(entityID);
+    if (title() == "Buildable")
+        registry->remove<Buildable>(entityID);
     deleteLater();
 }
 

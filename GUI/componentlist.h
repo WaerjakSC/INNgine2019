@@ -37,9 +37,9 @@ public slots:
     void addGameCameraComponent();
     void addParticleEmitter();
     void addAIComponent();
+    void addBuildableComponent();
     void addAABBCollider();
     void addSphereCollider();
-
 signals:
     void posX(GLfloat xIn);
     void posY(GLfloat yIn);
@@ -87,6 +87,7 @@ private:
     void setupTransformSettings(const Transform &component);
     void setupMaterialSettings(const Material &component);
     void setupAISettings(const AIComponent &ai);
+    void setupBuildableSettings(const Buildable &build);
     void setupMeshSettings(const Mesh &mesh);
     void setupAABBSettings(const AABB &col);
     void setupSphereColliderSettings(const Sphere &col);

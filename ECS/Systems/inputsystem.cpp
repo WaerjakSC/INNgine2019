@@ -2,9 +2,11 @@
 #include "camera.h"
 #include "collisionsystem.h"
 #include "movementsystem.h"
+#include "phongshader.h"
 #include "registry.h"
 #include "renderwindow.h"
 #include "resourcemanager.h"
+#include "textureshader.h"
 InputSystem::InputSystem(RenderWindow *window)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},
       mRenderWindow{window} {
@@ -73,7 +75,9 @@ void InputSystem::handleKeyInput() {
     } else if (!mIsConfined)
         mIsConfined = true;
     if (mPlayerController.L) {
-        spawnTower();
+        if (!mIsDragging) {
+            spawnTower();
+        }
         mPlayerController.L = false;
     }
 }
@@ -81,6 +85,27 @@ void InputSystem::handleKeyInput() {
 void InputSystem::spawnTower() {
     draggedEntity = factory->makeCube("FauxTower");
     mIsDragging = true;
+    setPlaneColors(mIsDragging);
+    // Might want to also "pause" the game here, or rather stop all AI and Movement while still allowing the player to move the camera and place the tower.
+}
+void InputSystem::setPlaneColors(bool dragging) {
+    auto view{registry->view<Buildable, Material>()};
+    if (dragging) {
+        for (auto entity : view) {
+            auto [build, mat]{view.get<Buildable, Material>(entity)};
+            // set color according to buildable state -- Red means unbuildable, green means buildable.
+            if (build.isBuildable) {
+                mat.mObjectColor = green * 0.8f; // GREEN'ish
+            } else {
+                mat.mObjectColor = red * 0.8f; // RED'ish
+            }
+        }
+    } else { // set colors back to the original and set shader back to Phong for lighting
+        for (auto entity : view) {
+            auto [build, mat]{view.get<Buildable, Material>(entity)};
+            mat.mObjectColor = origColor; // GREEN'ish
+        }
+    }
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
     if (factory->isPlaying()) { // We don't have a movable character anyway, disabling this.
@@ -126,16 +151,31 @@ void InputSystem::handleMouseInput() {
     if (mPlayerController.LMB) {
         if (mIsDragging) {
             mIsDragging = false;
-            // Maybe add some logic here to place the object in the middle of the AABB
+            auto &towerTransform = registry->get<Transform>(draggedEntity);
+            auto view{registry->view<Transform, Buildable, Material>()};
+            auto [transform, mat]{view.get<Transform, Material>(lastHitEntity)};
+            vec3 topCenterOfTarget{transform.localPosition};
+            topCenterOfTarget.y += 0.1f; // place the tower just slightly above the Plane it's sitting on to avoid clipping.
+            towerTransform.localPosition = topCenterOfTarget;
+            towerTransform.matrixOutdated = true;
+            setPlaneColors(mIsDragging);
         }
     } else if (mPlayerController.RMB) {
         if (mIsDragging) {
             mIsDragging = false;
+            // reset the colors after discarding the tower.
+            setPlaneColors(mIsDragging);
+
+            // remove the dragged entity from play - discarded by the player.
             registry->removeEntity(draggedEntity);
         }
     }
     if (mIsDragging)
         dragEntity(draggedEntity);
+}
+
+void InputSystem::setBuildableDebug(bool value) {
+    buildableDebug = value;
 }
 void InputSystem::confineMouseToScreen(DeltaTime dt) {
     int width{mRenderWindow->width()};
@@ -164,36 +204,58 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
         QCursor::setPos(newPos);
     }
 }
+void InputSystem::setBuildableObject(bool state) {
+    GLuint entityID{registry->getSelectedEntity()};
+    auto view{registry->view<Buildable, Material>()};
+    auto &object{view.get<Buildable>(entityID)};
+    object.isBuildable = state;
+    if (mIsDragging || buildableDebug) {
+        auto &mat = view.get<Material>(entityID);
+        if (object.isBuildable) {
+            mat.mObjectColor = green * 0.8f;
+        } else
+            mat.mObjectColor = red * 0.8f;
+    }
+}
 void InputSystem::dragEntity(GLuint entity) {
     QPoint cursorPos{mRenderWindow->mapFromGlobal(QCursor::pos())};
     // Get the intersection point between the ray and the closest entity as a vector3d
     // make ray
     auto collisionSystem{registry->system<CollisionSystem>()};
-    Raycast ray{collisionSystem->mousePick(cursorPos, mRenderWindow->geometry(), entity, 50.f)};
+    // we pass the dragged entity to mousePick in order to ignore that entity in raycasting
+    Raycast ray{collisionSystem->mousePick(cursorPos, mRenderWindow->geometry(), entity, 100.f)};
     Transform &tf{registry->get<Transform>(entity)};
-    if (ray.hitEntity != -1) {
+
+    // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
+    if (registry->contains<AABB>(ray.hitEntity)) { // We only want to deal with AABB colliders
+        auto view{registry->view<Buildable, Material>()};
+        if (view.contains(lastHitEntity) && static_cast<int>(lastHitEntity) != ray.hitEntity) { // reset the color after hitting another object
+            auto &mat = view.get<Material>(lastHitEntity);
+            if (view.get<Buildable>(lastHitEntity).isBuildable) {
+                mat.mObjectColor = green * 0.8f;
+            } else
+                mat.mObjectColor = red * 0.8f;
+        }
         // compensate for size of collider
-        // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
-        if (registry->contains<AABB>(ray.hitEntity))
-            ray.hitPoint.y += registry->get<AABB>(ray.hitEntity).size.y;
-        else if (registry->contains<Sphere>(ray.hitEntity))
-            ray.hitPoint.y += registry->get<Sphere>(ray.hitEntity).radius;
-        ray.hitPoint.y += tf.localScale.y;
+        ray.hitPoint.y += registry->get<AABB>(ray.hitEntity).size.y;
+        if (view.contains(ray.hitEntity)) {
+            auto &mat = view.get<Material>(ray.hitEntity);
+            lastHitEntity = ray.hitEntity;
+            if (view.get<Buildable>(ray.hitEntity).isBuildable) {
+                mat.mObjectColor = green;
+            } else
+                mat.mObjectColor = red; // slightly increase the color intensity of the object as it's being moused over.
+        }
     }
-    // place the object either on the mouse at 50.f distance or at correct distance for the AABB hit
+    ray.hitPoint.y += tf.localScale.y;
+
+    // place the object either on the mouse at 100.f distance or at correct distance for the AABB hit
     tf.localPosition = ray.hitPoint;
     tf.matrixOutdated = true;
-}
-void InputSystem::setPlayer(const GLuint &player) {
-    mPlayer = player;
 }
 
 void InputSystem::setGameCameraInactive() {
     mActiveGameCamera = false;
-}
-
-GLuint InputSystem::player() const {
-    return mPlayer;
 }
 
 Ref<CameraController> InputSystem::editorCamController() const {

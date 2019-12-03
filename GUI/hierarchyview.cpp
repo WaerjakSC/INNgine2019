@@ -26,17 +26,11 @@ void HierarchyView::createContextActions() {
     QAction *duplicate{new QAction(tr("Duplicate"), this)};
     connect(duplicate, &QAction::triggered, this, &HierarchyView::duplicateEntity);
     addAction(duplicate);
-    QAction *player{new QAction(tr("Make Player Controller"), this)};
-    connect(player, &QAction::triggered, this, &HierarchyView::setController);
-    addAction(player);
     QAction *remove{new QAction(tr("Remove"), this)};
     connect(remove, &QAction::triggered, this, &HierarchyView::removeEntity);
     addAction(remove);
 }
-void HierarchyView::setController() {
-    auto inputsys{Registry::instance()->system<InputSystem>()};
-    inputsys->setPlayer(rightClickEntity);
-}
+
 void HierarchyView::dropEvent(QDropEvent *event) {
     QTreeView::dropEvent(event);
 }

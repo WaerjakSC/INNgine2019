@@ -201,6 +201,10 @@ void MainWindow::createActions() {
     xyz->setChecked(true);
     connect(xyz, &QAction::triggered, mRenderWindow, &RenderWindow::toggleXYZ);
     editor->addAction(xyz);
+    QAction *dragDrop{new QAction(tr("&Debug Drag'n'Drop"))};
+    dragDrop->setCheckable(true);
+    connect(dragDrop, &QAction::triggered, mRenderWindow, &RenderWindow::togglePlaneDebugMode);
+    editor->addAction(dragDrop);
 
     QMenu *entity{ui->menuBar->addMenu(tr("&Entity"))};
     QAction *empty{new QAction(tr("Empty &Entity"), this)};
@@ -259,6 +263,10 @@ void MainWindow::createActions() {
     QAction *bspline{new QAction(tr("BSplinePoint"), this)};
     components->addAction(bspline);
     connect(bspline, &QAction::triggered, mComponentList, &ComponentList::addBSplineComponent);
+
+    QAction *buildable{new QAction(tr("Buildable"), this)};
+    components->addAction(buildable);
+    connect(buildable, &QAction::triggered, mComponentList, &ComponentList::addBuildableComponent);
 
     QAction *cam{new QAction(tr("Game Camera"), this)};
     components->addAction(cam);

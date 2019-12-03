@@ -39,6 +39,9 @@ void ComponentList::setupComponentList() {
     if (registry->contains<AIComponent>(eID)) {
         setupAISettings(registry->get<AIComponent>(eID));
     }
+    if (registry->contains<Buildable>(eID)) {
+        setupBuildableSettings(registry->get<Buildable>(eID));
+    }
     if (registry->contains<AABB>(eID)) {
         setupAABBSettings(registry->get<AABB>(eID));
     }
@@ -85,7 +88,9 @@ void ComponentList::addSoundComponent() {
 void ComponentList::addGameCameraComponent() {
     addComponent<GameCamera>();
 }
-
+void ComponentList::addBuildableComponent() {
+    addComponent<Buildable>();
+}
 void ComponentList::addParticleEmitter() {
     addComponent<ParticleEmitter>();
     registry->system<ParticleSystem>()->initEmitter(registry->getSelectedEntity());
@@ -487,7 +492,24 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
+void ComponentList::setupBuildableSettings(const Buildable &build) {
+    ComponentGroupBox *box{new ComponentGroupBox{"Buildable", this}};
+    QGridLayout *grid{new QGridLayout};
+    grid->setMargin(2);
+    // Check box for showing absolute position instead of local position
+    QHBoxLayout *check{new QHBoxLayout};
+    QPushButton *buildButton{new QPushButton(tr("Is Buildable"))};
+    buildButton->setCheckable(true);
+    buildButton->setChecked(build.isBuildable);
 
+    InputSystem *inputSys{registry->system<InputSystem>().get()};
+    connect(buildButton, &QPushButton::clicked, inputSys, &InputSystem::setBuildableObject);
+    check->addWidget(buildButton);
+    grid->addLayout(check, 0, 0);
+
+    box->setLayout(grid);
+    scrollArea->addGroupBox(box);
+}
 void ComponentList::setupAISettings(const AIComponent &ai) {
     ComponentGroupBox *box{new ComponentGroupBox("AI", this)};
     QGridLayout *grid{new QGridLayout};
@@ -566,6 +588,7 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     colorLabel = new QLabel;
     QPixmap curColor{18, 18};
     vec3 oColor{mat.mObjectColor};
+    oColor.normalize();
     rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
     curColor.fill(rgb);
     colorLabel->setPixmap(curColor);

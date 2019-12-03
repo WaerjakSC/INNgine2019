@@ -47,6 +47,7 @@ ResourceManager::ResourceManager() : registry{Registry::instance()} {
     registry->registerComponent<PlayerComponent>();
     registry->registerComponent<TowerComponent>();
     registry->registerComponent<BillBoard>();
+    registry->registerComponent<Buildable>();
 
     // Collision Types
     registry->registerComponent<AABB>();
@@ -232,7 +233,7 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
 GLuint ResourceManager::makeCube(const QString &name) {
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
-    setMesh("Cube.obj", eID);
+    setMesh("cube.obj", eID);
 
     return eID;
 }
@@ -349,9 +350,9 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
  * @return Returns the entity id
  */
 GLuint ResourceManager::makeLevelPlane(const QString &name) {
-    GLuint eID{registry->makeEntity<Mesh>(name)};
-    registry->add<Transform>(eID, vec3{0}, vec3{}, vec3{4.f, 1.f, 3.f});
-    registry->add<AABB>(eID, vec3{}, vec3{4.f, 0.01f, 3.f}, true);
+    GLuint eID{registry->makeEntity<Mesh, Buildable>(name)};
+    registry->add<Transform>(eID, vec3{0}, vec3{}, vec3{2.5f, 1.f, 2.5f});
+    registry->add<AABB>(eID, vec3{}, vec3{2.5f, 0.01f, 2.5f}, true);
     setMesh("Plane", eID);
     registry->add<Material>(eID, getShader<PhongShader>(), 0u, vec3{.57f, .57f, .57f});
     return eID;

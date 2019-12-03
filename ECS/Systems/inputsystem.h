@@ -34,21 +34,23 @@ public:
     Ref<CameraController> currentCameraController();
 
     void onResize(float aspectRatio);
-    GLuint player() const;
 
-    void setPlayer(const GLuint &player);
     void setGameCameraInactive();
 
     void reset();
+    void setBuildableDebug(bool value);
+
 public slots:
     void setCameraPositionX(double xIn);
     void setCameraPositionY(double yIn);
     void setCameraPositionZ(double zIn);
+    void setPlaneColors(bool state);
 
     void setActiveCamera(bool checked);
 
     void setPitch(double pitch);
     void setYaw(double yaw);
+    void setBuildableObject(bool state);
 signals:
     void rayHitEntity(GLuint entityID);
     void closeEngine();
@@ -74,8 +76,12 @@ private:
     QPoint lastPos;
     bool mEnteredWindow{false};
     bool mIsConfined{false};
+    bool buildableDebug{false};
 
     GLuint draggedEntity{0};
+    GLuint lastHitEntity{0};
+    vec3 red{2.0f, 0, 0}, green{0, 2.0f, 0};
+    vec3 origColor{0.57f, 0.57f, 0.57f};
     bool mIsDragging{false};
 
     Ref<CameraController> mEditorCamController;
@@ -84,7 +90,6 @@ private:
 
     RenderWindow *mRenderWindow;
 
-    GLuint mPlayer{0};
     Input mPlayerController;
     vec3 mDesiredVelocity;
     Input editorInput;
