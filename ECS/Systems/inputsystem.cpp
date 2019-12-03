@@ -45,8 +45,10 @@ void InputSystem::reset() {
 }
 void InputSystem::snapToObject() {
     GLuint eID = registry->getSelectedEntity();
-    MovementSystem *moveSystem{registry->system<MovementSystem>().get()};
-    mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
+    if (registry->contains<Transform>(eID)) {
+        MovementSystem *moveSystem{registry->system<MovementSystem>().get()};
+        mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
+    }
 }
 void InputSystem::handleKeyInput() {
     if (editorInput.ESCAPE) //Shuts down whole program
@@ -174,9 +176,10 @@ void InputSystem::dragEntity(GLuint entity) {
         // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
         if (registry->contains<AABB>(ray.hitEntity))
             ray.hitPoint.y += registry->get<AABB>(ray.hitEntity).size.y;
-        else
+        else if (registry->contains<Sphere>(ray.hitEntity))
             ray.hitPoint.y += registry->get<Sphere>(ray.hitEntity).radius;
-        ray.hitPoint.y += tf.localScale.y;
+        if (!registry->contains<Plane>(ray.hitEntity))
+            ray.hitPoint.y += tf.localScale.y;
     }
     // place the object either on the mouse at 50.f distance or at correct distance for the AABB hit
     tf.localPosition = ray.hitPoint;

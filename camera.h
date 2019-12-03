@@ -32,33 +32,33 @@ public:
       * @brief Frustum struct
       */
 
-    typedef struct Frustum {
+    //    typedef struct Frustum {
 
-        struct {
-            Plane top;
-            Plane bottom;
-            Plane left;
-            Plane right;
-            Plane near;
-            Plane far;
-        } planeType;
+    //        struct {
+    //            Plane top;
+    //            Plane bottom;
+    //            Plane left;
+    //            Plane right;
+    //            Plane near;
+    //            Plane far;
+    //        } planeType;
 
-        Plane planes[6];
+    //        Plane planes[6];
 
-        inline Frustum() {}
-        vec3 Intersection(Plane p1, Plane p2, Plane p3);
-        void GetCorners(const Frustum &f, vec3 *outCorners);
-        bool Intersects(const Frustum &f, const Sphere &s);
-        float Classify(const AABB &aabb, const Plane &plane);
-        //        float Classify(const OBB &obb, const Plane &plane);
-        bool Intersects(const Frustum &f, const AABB &aabb);
-        //        bool Intersects(const Frustum &f, const OBB &obb);
+    //        inline Frustum() {}
+    //        vec3 Intersection(Plane p1, Plane p2, Plane p3);
+    //        void GetCorners(const Frustum &f, vec3 *outCorners);
+    //        bool Intersects(const Frustum &f, const Sphere &s);
+    //        float Classify(const AABB &aabb, const Plane &plane);
+    //        //        float Classify(const OBB &obb, const Plane &plane);
+    //        bool Intersects(const Frustum &f, const AABB &aabb);
+    //        //        bool Intersects(const Frustum &f, const OBB &obb);
 
-    } Frustum;
-    Frustum getFrustum() const {
-        return mFrustum;
-    }
-    void makeFrustum();
+    //    } Frustum;
+    //    Frustum getFrustum() const {
+    //        return mFrustum;
+    //    }
+    //    void makeFrustum();
 
     void setProjectionMatrix(float fov, float aspect, float nearPlane = 0.5f, float farPlane = 200.f);
     void setProjectionMatrix();
@@ -74,7 +74,7 @@ private:
     gsl::Matrix4x4 mYawMatrix;
     gsl::Matrix4x4 mPitchMatrix;
 
-    Frustum mFrustum;
+    //    Frustum mFrustum;
 
     friend class CameraController;
     friend class GameCameraController;

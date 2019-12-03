@@ -352,9 +352,9 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
 GLuint ResourceManager::makeLevelPlane(const QString &name) {
     GLuint eID{registry->makeEntity<Mesh>(name)};
     registry->add<Transform>(eID, vec3{1.0f, 0.0f, 1.0f});
-    registry->add<AABB>(eID, vec3{0.f, 0.f, 0.f}, vec3{1.0f, 0.1f, 1.0f}, false);
+    registry->add<Plane>(eID, vec3{0.f, 1.f, 0.f}, false);
     setMesh("Plane", eID);
-    registry->add<Material>(eID, getShader<ColorShader>());
+    registry->add<Material>(eID, getShader<PhongShader>(), 0, vec3{0});
     return eID;
 }
 
@@ -405,7 +405,7 @@ void ResourceManager::makeLevel() {
     float x{-16};
     float y{0};
     float z{-16};
-    vec3 posVec{x,y,z};
+    vec3 posVec{x, y, z};
     for (int i{0}; i < 16; i++) {
 
         for (int j{0}; j < 16; j++) {
@@ -561,7 +561,7 @@ void ResourceManager::makeLightMesh(int eID) {
 
     glBindVertexArray(0);
 }
-void ResourceManager::setColliderMesh(Mesh &mesh) {
+void ResourceManager::setAABBMesh(Mesh &mesh) {
     mMeshData.Clear();
 
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
@@ -595,6 +595,26 @@ void ResourceManager::setColliderMesh(Mesh &mesh) {
                                    Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}  //Back low
                                });
     mesh.mName = "BoxCollider";
+    mesh.mVerticeCount = mMeshData.mVertices.size();
+    mesh.mIndiceCount = mMeshData.mIndices.size();
+    mesh.mDrawType = GL_LINE_STRIP;
+
+    initVertexBuffers(&mesh);
+    initIndexBuffers(&mesh);
+}
+void ResourceManager::setPlaneMesh(Mesh &mesh) {
+    mMeshData.Clear();
+
+    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
+                               {
+                                   // Top face
+                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}  //Back low
+                               });
+    mesh.mName = "PlaneCollider";
     mesh.mVerticeCount = mMeshData.mVertices.size();
     mesh.mIndiceCount = mMeshData.mIndices.size();
     mesh.mDrawType = GL_LINE_STRIP;
@@ -867,6 +887,7 @@ bool ResourceManager::readFile(std::string fileName, int eID) {
     if (!ret)
         return false;
     mMeshData.Clear();
+    mMeshData.mName = fileName;
     // Append `default` material
     materials.push_back(tinyobj::material_t{});
     std::unordered_map<Vertex, GLuint> uniqueVertices;
@@ -911,18 +932,16 @@ bool ResourceManager::readFile(std::string fileName, int eID) {
             }
         }
     }
-    if (eID == -1)
+    Mesh temp{GL_TRIANGLES, mMeshData};
+    initializeOpenGLFunctions();
+    initVertexBuffers(&temp);
+    initIndexBuffers(&temp);
+    if (eID == -1) {
+        mMeshMap[fileName] = temp;
         return true;
+    }
 
-    auto &mesh{registry->get<Mesh>(eID)};
-    mesh.mName = fileName;
-    mesh.mVerticeCount = mMeshData.mVertices.size();
-    mesh.mIndiceCount = mMeshData.mIndices.size();
-    mesh.mDrawType = GL_TRIANGLES;
-
-    initVertexBuffers(&mesh);
-    initIndexBuffers(&mesh);
-
+    registry->get<Mesh>(eID) = temp;
     qDebug() << "Obj file read: " << QString::fromStdString(fileName);
     return true;
 }
@@ -1056,7 +1075,7 @@ void ResourceManager::play() {
             mIsPaused = false;
         } else
             Registry::instance()->makeSnapshot();
-        auto [aisys, sound, input]{registry->system<AISystem, SoundSystem, InputSystem>()};
+        auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
         sound->playAll();
         for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
@@ -1066,7 +1085,6 @@ void ResourceManager::play() {
         }
         mMainWindow->mRenderWindowContainer->setFocus();
         mIsPlaying = true;
-        aisys->masterOfCurves();
 
         emit disableActions(true);
         emit disablePlay(true);

@@ -255,8 +255,6 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Double(plane.normal.y);
                 writer.Double(plane.normal.z);
                 writer.EndArray();
-                writer.Key("distance");
-                writer.Double(plane.distance);
                 writer.Key("static");
                 writer.Bool(plane.isStatic);
                 writer.EndObject();
@@ -445,14 +443,11 @@ void Scene::populateScene(const Document &scene) {
                 registry->add<AABB>(id, origin, size, isStatic);
             } else if (comp->name == "Plane") {
                 vec3 normal{comp->value["normal"][0].GetFloat(), comp->value["normal"][1].GetFloat(), comp->value["origin"][2].GetFloat()};
-                float size{comp->value["distance"].GetFloat()};
-                // Need rotation matrix here
                 bool isStatic{comp->value["static"].GetBool()};
-                registry->add<Plane>(id, normal, size, isStatic);
+                registry->add<Plane>(id, normal, isStatic);
             } else if (comp->name == "Sphere") {
                 vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
                 float radius{comp->value["radius"].GetFloat()};
-                // Need rotation matrix here
                 bool isStatic{comp->value["static"].GetBool()};
                 registry->add<Sphere>(id, position, radius, isStatic);
             } else if (comp->name == "AI") {

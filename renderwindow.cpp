@@ -135,7 +135,7 @@ void RenderWindow::init() {
     connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
     connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
 
-    mAIsystem = mRegistry->registerSystem<AISystem>();
+    mAISystem = mRegistry->registerSystem<AISystem>();
     mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
     mParticleSystem = mRegistry->registerSystem<ParticleSystem>(mFactory->getShader<ParticleShader>());
 
@@ -149,8 +149,7 @@ void RenderWindow::init() {
     mMoveSystem->init();
     mScriptSystem->init();
     mInputSystem->init(aspectRatio);
-    mAIsystem->init();
-
+    mAISystem->init();
     mLightSystem->init();
     mParticleSystem->init();
 
@@ -174,7 +173,7 @@ void RenderWindow::render() {
         mInputSystem->update(dt);
         mSoundSystem->update(dt);
         if (mFactory->isPlaying()) {
-            mAIsystem->update(dt);
+            mAISystem->update(dt);
             mMoveSystem->update(dt);
             mCollisionSystem->update(dt);
             mParticleSystem->update(dt);
@@ -301,17 +300,17 @@ void RenderWindow::startOpenGLDebugger() {
  * @brief RenderWindow::Cull, Cull furries right now
  * @param f, the frustum
  */
-void RenderWindow::Cull(const Camera::Frustum &f) {
-    auto view{mRegistry->view<Mesh, AABB>()};
-    Camera &cam{mInputSystem->editorCamController()->getCamera()};
-    for (auto entity : view) {
-        auto &collider{view.get<AABB>(entity)};
-        if (cam.getFrustum().Intersects(f, collider)) {
-            view.get<Mesh>(entity).mRendered = true;
-        } else
-            view.get<Mesh>(entity).mRendered = false;
-    }
-}
+//void RenderWindow::Cull(const Camera::Frustum &f) {
+//    auto view{mRegistry->view<Mesh, AABB>()};
+//    Camera &cam{mInputSystem->editorCamController()->getCamera()};
+//    for (auto entity : view) {
+//        auto &collider{view.get<AABB>(entity)};
+//        if (cam.getFrustum().Intersects(f, collider)) {
+//            view.get<Mesh>(entity).mRendered = true;
+//        } else
+//            view.get<Mesh>(entity).mRendered = false;
+//    }
+//}
 
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
     if (mInputSystem)

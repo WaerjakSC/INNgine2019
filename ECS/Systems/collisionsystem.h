@@ -107,6 +107,8 @@ private:
      */
     void raySphere(Raycast &ray, int ignoredEntity = -1);
 
+    void rayPlane(Raycast &ray, int ignoredEntity = -1);
+
     /**
     * @brief AABBAABB returns true if an intersection between given AABB's occur
     * @param AABB1
@@ -120,7 +122,7 @@ private:
     * @param plane
     * @return
      */
-    bool AABBPlane(const AABB &aabb, const Plane &plane);
+    bool AABBPlane(const AABB &aabb, Plane &plane);
     /**
     * @brief SphereAABB collision between a Sphere and AABB
     * @param sphere
@@ -204,6 +206,9 @@ private:
      * @return if both are static objects, return true
      */
     bool bothStatic(const Collision &lhs, const Collision &rhs);
+    bool calcRayToPlane(Raycast &r, Plane &plane);
+    float distanceToPoint(const Plane &plane, const vec3 &point) const;
+    float calcDistance(Plane &plane);
 };
 
 #endif // COLLISIONSYSTEM_H

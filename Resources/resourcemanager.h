@@ -21,9 +21,6 @@ class CameraController;
 using namespace cjk;
 class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {
     Q_OBJECT
-
-    friend class Scene;
-
 public:
     static ResourceManager *instance();
     virtual ~ResourceManager();
@@ -35,7 +32,7 @@ public:
      * @param geometryPath
      */
     template <typename ShaderType>
-    inline void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr) {
+    void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr) {
         std::string shaderName{typeid(ShaderType).name()};
         if (mShaders.find(shaderName) == mShaders.end()) {
             mShaders[shaderName] = std::make_shared<ShaderType>(camController, geometryPath);
@@ -117,7 +114,8 @@ public:
     bool loadWave(std::string filePath, Sound &sound);
 
     void initParticleEmitter(ParticleEmitter &emitter);
-    void setColliderMesh(Mesh &mesh);
+    void setAABBMesh(Mesh &mesh);
+    void setPlaneMesh(Mesh &mesh);
     void newScene(const QString &text);
     std::map<std::string, Ref<Texture>> getTextures() const;
 
@@ -196,6 +194,7 @@ private:
     // void makeLevel(GLuint eID);
     void makeTowerMesh(GLuint eID);
     friend class ComponentList;
+    friend class Scene;
 };
 
 #endif // RESOURCEMANAGER_H

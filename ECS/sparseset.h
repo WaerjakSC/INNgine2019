@@ -17,12 +17,12 @@ public:
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
-    inline int find(const GLuint eID) const {
+    int find(const GLuint eID) const {
         if (eID < mIndex.size())
             return mIndex[eID];
         return -1;
     }
-    inline bool contains(const GLuint eID) const {
+    bool contains(const GLuint eID) const {
         if (find(eID) != -1)
             return true;
         return false;
@@ -31,15 +31,15 @@ public:
      * @brief Actual number of entities with owned components in the pool.
      * @return
      */
-    inline size_t size() const { return mList.size(); }
-    inline bool empty() const { return mList.empty(); }
+    size_t size() const { return mList.size(); }
+    bool empty() const { return mList.empty(); }
     /**
      * @brief Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
-    inline size_t extent() { return mIndex.size(); }
-    inline void remove(int removedEntityID) {
+    size_t extent() { return mIndex.size(); }
+    void remove(int removedEntityID) {
         mList.pop_back();
         mIndex[removedEntityID] = -1; // Set entity location to an invalid value.
         if (mList.empty())
@@ -48,7 +48,7 @@ public:
     /**
      * @brief Reset the arrays to empty.
      */
-    inline void clear() {
+    void clear() {
         mIndex.clear();
         mList.clear();
     }
@@ -57,7 +57,7 @@ public:
      * @param index
      * @return
      */
-    inline GLuint get(GLuint entityID) const {
+    GLuint get(GLuint entityID) const {
         return mList[find(entityID)];
     }
     /**
@@ -65,7 +65,7 @@ public:
      * @param index
      * @return
      */
-    inline GLuint &get(GLuint entityID) {
+    GLuint &get(GLuint entityID) {
         return mList[index(entityID)];
     }
     /**
@@ -73,14 +73,14 @@ public:
      * @param entityID
      * @return
      */
-    inline const int &index(GLuint entityID) const {
+    const int &index(GLuint entityID) const {
         return mIndex[entityID];
     }
     /**
      * @brief back returns a read-write reference to the last element in mList.
      * @return
      */
-    inline GLuint &back() {
+    GLuint &back() {
         return mList.back();
     }
     void swap(GLuint eID, GLuint other) {

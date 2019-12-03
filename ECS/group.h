@@ -11,21 +11,21 @@ class Group {
 public:
     using iterator = typename IPool::iterator;
     template <typename Comp>
-    inline size_t size() const {
+    size_t size() const {
         return std::get<Pool<Comp> *>(pools)->size();
     }
     template <typename Comp>
-    inline std::vector<Comp> &data() {
+    std::vector<Comp> &data() {
         return std::get<Pool<Comp>>(pools).data();
     }
     template <typename Comp>
-    inline const GLuint *entities() const {
+    const GLuint *entities() const {
         return std::get<Pool<Comp>>(pools)->entities();
     }
-    inline int find(const int &entt) const {
+    int find(const int &entt) const {
         return std::get<0>(pools)->find(entt);
     }
-    inline bool contains(const int &entt) const {
+    bool contains(const int &entt) const {
         if (entt < 0)
             return false;
         return find(entt) != -1;
@@ -40,7 +40,7 @@ public:
      * @brief Checks whether the view is empty.
      * @return True if the view is empty, false otherwise.
      */
-    inline bool empty() const {
+    bool empty() const {
         return std::get<0>(pools)->empty();
     }
     /**
@@ -50,7 +50,7 @@ public:
      * @example auto [trans, mat, mesh] = view.get<Transform, Material, Mesh>(entity);
      */
     template <typename... Comp>
-    inline decltype(auto) get(const int &entt) const {
+    decltype(auto) get(const int &entt) const {
         assert(contains(entt));
         if constexpr (sizeof...(Comp) == 1) {
             return (std::get<Pool<Comp> *>(pools)->get(entt), ...);

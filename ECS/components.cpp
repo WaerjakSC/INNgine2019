@@ -27,7 +27,7 @@ Material::Material(Ref<Shader> shader, GLuint textureUnit, vec3 color, GLfloat s
 }
 
 AABB::AABB(bool stat) : size(vec3(1.0f, 1.0f, 1.0f)) {
-    ResourceManager::instance()->setColliderMesh(colliderMesh);
+    ResourceManager::instance()->setAABBMesh(colliderMesh);
     isStatic = stat;
 }
 
@@ -37,4 +37,9 @@ void ParticleEmitter::setNumParticles(size_t num) {
     colorData = std::vector<GLubyte>(numParticles * 4);
     particles = std::vector<Particle>(numParticles);
     ResourceManager::instance()->initParticleEmitter(*this);
+}
+
+Plane::Plane(const vec3 &n, bool stat) : normal(n) {
+    ResourceManager::instance()->setPlaneMesh(colliderMesh);
+    isStatic = stat;
 }

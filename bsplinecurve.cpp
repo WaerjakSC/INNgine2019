@@ -144,7 +144,6 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
  * @brief BSplineCurve::draw
  */
 void BSplineCurve::draw() {
-
     if (debugLine) {
         glUseProgram(debugShader->getProgram());
         glPointSize(3.f);

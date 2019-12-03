@@ -118,12 +118,27 @@ void CollisionSystem::raySphere(Raycast &ray, int ignoredEntity) {
         }
     }
 }
+void CollisionSystem::rayPlane(Raycast &ray, int ignoredEntity) {
+    auto view{registry->view<Plane>()};
+    for (auto entity : view) {
+        if ((int)entity == ignoredEntity)
+            continue;
+        auto &plane{view.get(entity)};
+        if (calcRayToPlane(ray, plane)) {
+            if (ray.intersectionDistance < ray.closestTarget) {
+                ray.closestTarget = ray.intersectionDistance;
+                ray.hitEntity = entity;
+            }
+        }
+    }
+}
 Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, int ignoredEntity, float range) {
     Raycast raycast{range};
     raycast.ray = getRayFromMouse(mousePos, rect);
 
+    rayPlane(raycast, ignoredEntity);
     rayAABB(raycast, ignoredEntity);
-    raySphere(raycast, ignoredEntity);
+    //    raySphere(raycast, ignoredEntity); // we probably don't care about sphere mouse picking.
     raycast.hitPoint = getPointOnRay(raycast, raycast.closestTarget);
 
     if (raycast.hitEntity == -1)
@@ -187,17 +202,25 @@ bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2)
     // compare
     return dist < (rs * rs);
 }
-
-bool CollisionSystem::AABBPlane(const AABB &aabb, const Plane &plane) { // WIP - not sure if this works
+//signed distance from the plane to a point along
+//the unit normal
+float CollisionSystem::distanceToPoint(const Plane &plane, const vec3 &point) const {
+    return vec3::dot(plane.normal, point);
+}
+float CollisionSystem::calcDistance(Plane &plane) {
+    const vec3 planePos{plane.transform.modelMatrix.getPosition()};
+    plane.distance = -vec3::dot(plane.normal, planePos);
+    return plane.distance;
+}
+bool CollisionSystem::AABBPlane(const AABB &aabb, Plane &plane) {
     float mHalfExtent{aabb.size.x * fabsf(plane.normal.x) +
                       aabb.size.y * fabsf(plane.normal.y) +
                       aabb.size.z * fabsf(plane.normal.z)};
     vec3 aabbPos{aabb.transform.modelMatrix.getPosition()};
     // Distance from center of AABB to plane
-    float dotProduct{vec3::dot(plane.normal, aabbPos)};
-    float dist{dotProduct - plane.distance};
+    float distance = distanceToPoint(plane, aabbPos) - calcDistance(plane);
 
-    return fabsf(dist) <= mHalfExtent;
+    return fabsf(distance) <= mHalfExtent;
 }
 
 bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
@@ -241,43 +264,6 @@ vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point) {
 
     return result;
 }
-/**
- * @brief CollisionSystem::ClosestPoint finds the point in an OBB closest to a given point
- * @param obb
- * @param point
- * @return
- */
-//vec3 CollisionSystem::ClosestPoint(const OBB &obb, const vec3 &point) {
-//    vec3 result{obb.position};
-//    //     move the point relative to the OBB
-//    vec3 dir{point - obb.position};
-
-//    // Loops three times, once for each axis: #0 for the X-axis, #1 for the Y-axis, #2 for the Z-axis
-//    // projects the point onto each of the axes of the box,
-//    // and compares the distance to the extent of the box
-//    for (int i = 0; i < 3; ++i) {
-//        const float *orientation{&obb.orientation.matrix[i * 3]};
-//        // vector that holds the different axis
-//        vec3 axis{orientation[0],
-//                  orientation[1],
-//                  orientation[2]};
-//        // projects the point onto that axis and stores the distance
-//        float dist{vec3::dot(dir, axis)};
-
-//        // clamp
-//        if (dist > obb.size[i]) {
-//            dist = obb.size[i];
-//        }
-//        if (dist < -obb.size[i]) {
-//            dist = -obb.size[i];
-//        }
-
-//        // adjust the point by the axis and the distance
-//        result = result + (axis * dist);
-//    }
-
-//    return result;
-//}
 
 vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
     vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
@@ -287,7 +273,18 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
 
     return sphereCenterToPoint + spherePos;
 }
+bool CollisionSystem::calcRayToPlane(Raycast &r, Plane &plane) {
+    vec3 planePos{plane.transform.modelMatrix.getPosition()};
+    // assuming vectors are all normalized
+    float denom = vec3::dot(plane.normal, r.ray.direction);
+    if (fabs(denom) > 1e-6) {
+        float t = vec3::dot(planePos - r.ray.origin, plane.normal) / denom;
+        qDebug() << t;
+        return (t >= 0);
+    }
 
+    return false;
+}
 bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere) {
     vec3 center{sphere.transform.modelMatrix.getPosition() + sphere.position};
     vec3 originToCenter{r.ray.origin - center};

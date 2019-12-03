@@ -171,7 +171,7 @@ public:
      * mEntities.mIndices[swappedEntity] now holds the swapped location of the entityID/component.
      * @param removedEntityID
      */
-    inline void remove(int removedEntityID) {
+    void remove(int removedEntityID) {
         if (has(removedEntityID)) {
             GLuint swappedEntity{mEntities.back()};
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
@@ -179,7 +179,7 @@ public:
             mEntities.remove(removedEntityID);
         }
     }
-    inline void swap(GLuint eID, GLuint other) {
+    void swap(GLuint eID, GLuint other) {
         assert(has(eID));
         assert(has(other));
         std::swap(mComponents[mEntities.find(eID)], mComponents[mEntities.find(other)]); // Swap the components to keep the dense set up to date
@@ -190,7 +190,7 @@ public:
      * @brief sort the pool according to a different index
      * @param otherIndex
      */
-    inline void sort(std::vector<int> otherIndex) {
+    void sort(std::vector<int> otherIndex) {
         for (size_t i{0}; i < mEntities.size(); i++) {
             if (has(i)) {
                 swap(mEntities.get(i), mEntities.get(otherIndex[i]));
@@ -204,22 +204,22 @@ public:
      * @return std::vector containing the component type. Use operator[] to access a component if you know the component exists (isn't out of range) --
      * it's faster than .at() BUT doesn't give an out_of_range exception like .at() does, so it can be harder to debug
      */
-    inline std::vector<Type> &data() { return mComponents; }
+    std::vector<Type> &data() { return mComponents; }
     /**
      * @brief Calls mComponents.data()
      * raw() + size() will return the last member of the vector
      * @return
      */
-    inline Type *raw() { return mComponents.data(); }
+    Type *raw() { return mComponents.data(); }
     /**
      * @brief Returns a list of every entity that exists in the component array.
      * The index is initially meaningless except as an accessor, the component pool can be sorted
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
-    inline const std::vector<GLuint> entityList() { return mEntities.getList(); }
+    const std::vector<GLuint> entityList() { return mEntities.getList(); }
 
-    inline const GLuint *entities() const override { return mEntities.entities(); }
+    const GLuint *entities() const override { return mEntities.entities(); }
 
     /**
      * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
@@ -228,7 +228,7 @@ public:
      * Both IDs and arrays begin at 0.
      * @return
      */
-    inline const std::vector<int> &indices() { return mEntities.getIndices(); }
+    const std::vector<int> &indices() { return mEntities.getIndices(); }
     const int &index(GLuint entityID) const {
         return mEntities.index(entityID);
     }
@@ -239,7 +239,7 @@ public:
      * @param eID
      * @return
      */
-    inline Type &get(int eID) {
+    Type &get(int eID) {
         assert(has(eID));
         return mComponents[mEntities.index(eID)];
     }
@@ -247,14 +247,14 @@ public:
      * @brief back get the last component in the pool, aka the latest creation
      * @return
      */
-    inline Type &back() {
+    Type &back() {
         return mComponents.back();
     }
-    inline iterator begin() const {
+    iterator begin() const {
         const int32_t pos{static_cast<int32_t>(mEntities.size())};
         return iterator{mEntities.list(), pos};
     }
-    inline iterator end() const {
+    iterator end() const {
         return iterator{mEntities.list(), {}};
     }
     /**
@@ -262,7 +262,7 @@ public:
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
-    inline int find(const GLuint eID) const override {
+    int find(const GLuint eID) const override {
         return mEntities.find(eID);
     }
     /**
@@ -270,7 +270,7 @@ public:
      * @param eID
      * @return
      */
-    inline bool has(GLuint eID) const override {
+    bool has(GLuint eID) const override {
         return find(eID) != -1;
     }
     /**
@@ -278,7 +278,7 @@ public:
      * @param entity actual entity object
      * @return
      */
-    //    inline bool has(const Entity &entity) const override {
+    //     bool has(const Entity &entity) const override {
     //        return find(entity.id()) != -1;
     //    }
 
@@ -286,18 +286,18 @@ public:
      * @brief Actual number of entities with owned components in the pool.
      * @return
      */
-    inline size_t size() const override { return mEntities.size(); }
-    inline bool empty() const override { return mEntities.empty(); }
+    size_t size() const override { return mEntities.size(); }
+    bool empty() const override { return mEntities.empty(); }
     /**
      * @brief Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
-    inline size_t extent() { return mEntities.extent(); }
+    size_t extent() { return mEntities.extent(); }
     /**
      * @brief Reset the arrays to empty.
      */
-    inline void clear() {
+    void clear() {
         mEntities.clear();
         mComponents.clear();
     }

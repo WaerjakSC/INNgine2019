@@ -45,7 +45,7 @@ public:
      * @tparam List of the component types you want the view to contain.
      */
     template <typename... Comp>
-    inline View<Comp...> view() {
+    View<Comp...> view() {
         return View{getPool<Comp>()...};
     }
     template <typename... Owned>
@@ -84,7 +84,7 @@ public:
      * @brief Register component type. A component must be registered before it can be used by the ECS.
      */
     template <typename Type>
-    inline void registerComponent() {
+    void registerComponent() {
         std::string typeName{typeid(Type).name()};
 
         if (mPools.find(typeName) != mPools.end()) {
@@ -98,7 +98,7 @@ public:
      * @brief Register a system with the ECS. Not strictly required, but will allow you to use the registry to get a reference to the system.
      */
     template <typename Type, class... Args>
-    inline Ref<Type> registerSystem(Args... args) {
+    Ref<Type> registerSystem(Args... args) {
         std::string typeName{typeid(Type).name()};
 
         if (mSystems.find(typeName) != mSystems.end() && mSystems[typeName]) {
@@ -137,7 +137,7 @@ public:
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      */
     template <typename Type, typename... Args>
-    inline void add(const GLuint entityID, Args... args) {
+    void add(const GLuint entityID, Args... args) {
         // Add a component to the array for an entity
         getPool<Type>()->add(entityID, args...);
 
@@ -171,7 +171,7 @@ public:
      * @brief Remove a component of type Type from the entity with entityID.
      */
     template <typename Type>
-    inline void remove(GLuint entityID) {
+    void remove(GLuint entityID) {
         onDestroy<Type>(entityID);
 
         // Remove a component from the array for an entity
@@ -201,12 +201,12 @@ public:
      * @brief Get a reference to the Type component owned by entityID
      */
     template <typename Type>
-    inline Type &get(GLuint entityID) {
+    Type &get(GLuint entityID) {
         // Get a reference to a component from the array for an entity
         return getPool<Type>()->get(entityID);
     }
     template <typename... Type>
-    inline decltype(auto) system() {
+    decltype(auto) system() {
         if constexpr (sizeof...(Type) == 1) {
             return (getSystem<Type>(), ...);
         } else
@@ -216,7 +216,7 @@ public:
      * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
      */
     template <typename Type>
-    inline Type &getLastComponent() {
+    Type &getLastComponent() {
         // Get a reference to a component from the array for an entity
         return getPool<Type>()->back();
     }
@@ -225,7 +225,7 @@ public:
      * Iterates through all the Pools, and if they contain a component owned by entityID, delete and re-arrange the Pool.
      * @param entityID
      */
-    inline void entityDestroyed(GLuint entityID) {
+    void entityDestroyed(GLuint entityID) {
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
         for (auto &pool : mPools) {
@@ -243,7 +243,7 @@ public:
      * @brief Checks if an entity owns the given component types.
      */
     template <typename... Type>
-    inline bool contains(GLuint eID) {
+    bool contains(GLuint eID) {
         [[maybe_unused]] const auto cpools{std::make_tuple(getPool<Type>()...)};
         return ((std::get<Pool<Type> *>(cpools) ? std::get<Pool<Type> *>(cpools)->has(eID) : false) && ...);
     }
@@ -254,7 +254,7 @@ public:
      * @return
      */
     GLuint duplicateEntity(GLuint dupedEntity);
-    inline const std::vector<GLuint> getEntities() { return getPool<EInfo>()->entityList(); }
+    const std::vector<GLuint> getEntities() { return getPool<EInfo>()->entityList(); }
     /**
     * @brief Get a pointer to the entity with the specified ID.
     * @param eID
@@ -270,7 +270,7 @@ public:
      * @brief numEntities size of the mEntities map
      * @return
      */
-    inline GLuint numEntities() {
+    GLuint numEntities() {
         std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
         return entities.size();
     }
@@ -357,7 +357,7 @@ private:
     std::tuple<std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>
-    inline Ref<Type> getSystem() {
+    Ref<Type> getSystem() {
         std::string typeName{type<Type>()};
         return std::static_pointer_cast<Type>(mSystems[typeName]);
     }
@@ -366,7 +366,7 @@ private:
     }
     // Convenience function to get the statically casted pointer to the Pool of type Type.
     template <typename Type>
-    inline Pool<Type> *getPool() {
+    Pool<Type> *getPool() {
         std::string typeName{type<Type>()};
         return static_cast<Pool<Type> *>(mPools[typeName].get());
     }

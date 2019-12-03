@@ -68,7 +68,7 @@ private:
     Ref<InputSystem> mInputSystem;
     Ref<CollisionSystem> mCollisionSystem;
     Ref<ScriptSystem> mScriptSystem;
-    Ref<AISystem> mAIsystem;
+    Ref<AISystem> mAISystem;
 
     ResourceManager *mFactory;
     Registry *mRegistry;
@@ -98,7 +98,7 @@ private:
     std::chrono::high_resolution_clock::time_point mLastTime;
     friend class MainWindow;
 
-    void Cull(const Camera::Frustum &f);
+    //    void Cull(const Camera::Frustum &f);
     Camera mCamera;
 
     friend class MainWindow;

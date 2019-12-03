@@ -12,7 +12,6 @@ AISystem::AISystem() {
  */
 void AISystem::update(DeltaTime dt) {
     // Run the eventHandler incase of events
-    // draw the bspline curve lines
     draw();
     if (curWaveCD >= 0.f)
         curWaveCD -= dt;
@@ -175,6 +174,7 @@ std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform
  */
 void AISystem::init() {
     mCurve.init();
+    masterOfCurves();
 }
 
 /**
