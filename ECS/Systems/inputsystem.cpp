@@ -150,15 +150,18 @@ void InputSystem::handleMouseInput() {
     }
     if (mPlayerController.LMB) {
         if (mIsDragging) {
-            mIsDragging = false;
-            auto &towerTransform = registry->get<Transform>(draggedEntity);
-            auto view{registry->view<Transform, Buildable, Material>()};
-            auto [transform, mat]{view.get<Transform, Material>(lastHitEntity)};
-            vec3 topCenterOfTarget{transform.localPosition};
-            topCenterOfTarget.y += 0.1f; // place the tower just slightly above the Plane it's sitting on to avoid clipping.
-            towerTransform.localPosition = topCenterOfTarget;
-            towerTransform.matrixOutdated = true;
-            setPlaneColors(mIsDragging);
+            auto view{registry->view<Transform, Buildable>()};
+            if (view.contains(lastHitEntity))
+                if (view.get<Buildable>(lastHitEntity).isBuildable) {
+                    mIsDragging = false;
+                    auto &towerTransform = registry->get<Transform>(draggedEntity);
+                    auto &transform{view.get<Transform>(lastHitEntity)};
+                    vec3 topCenterOfTarget{transform.localPosition};
+                    topCenterOfTarget.y += 0.1f; // place the tower just slightly above the Plane it's sitting on to avoid clipping.
+                    towerTransform.localPosition = topCenterOfTarget;
+                    towerTransform.matrixOutdated = true;
+                    setPlaneColors(mIsDragging);
+                }
         }
     } else if (mPlayerController.RMB) {
         if (mIsDragging) {
