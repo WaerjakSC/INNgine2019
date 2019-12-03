@@ -1,7 +1,9 @@
 #include "rendersystem.h"
+#include "cameracontroller.h"
 #include "colorshader.h"
 #include "components.h"
 #include "group.h"
+#include "inputsystem.h"
 #include "phongshader.h"
 #include "registry.h"
 #include "skyboxshader.h"
@@ -59,7 +61,22 @@ void RenderSystem::drawColliders() {
         glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
     }
 }
-
+/**
+ * @brief RenderWindow::Cull, Cull furries right now
+ * @param f, the frustum
+ */
+void RenderSystem::Cull(const Camera::Frustum &f) {
+    auto view{registry->view<Mesh, AABB>()};
+    auto inputSystem{registry->system<InputSystem>()};
+    Camera &cam{inputSystem->editorCamController()->getCamera()};
+    for (auto entity : view) {
+        auto &collider{view.get<AABB>(entity)};
+        if (cam.getFrustum().Intersects(f, collider)) {
+            view.get<Mesh>(entity).mRendered = true;
+        } else
+            view.get<Mesh>(entity).mRendered = false;
+    }
+}
 void RenderSystem::setSkyBoxID(const GLuint &skyBoxID) {
     mSkyBoxID = skyBoxID;
 }

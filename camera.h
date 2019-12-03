@@ -29,36 +29,45 @@ public:
     gsl::Matrix4x4 getProjectionMatrix() const;
 
     /**
+    * @brief Plane struct for use with Frustum
+    */
+    struct Plane : public Collision {
+        vec3 normal;
+        float distance{0};
+        // a plane is defined by a normal and distance from origo
+        Plane(const vec3 &n = vec3{1, 0, 0}, bool stat = true) : normal(n) {
+            isStatic = stat;
+        }
+    };
+
+    /**
       * @brief Frustum struct
       */
+    typedef struct Frustum {
 
-    //    typedef struct Frustum {
+        struct {
+            Plane top;
+            Plane bottom;
+            Plane left;
+            Plane right;
+            Plane near;
+            Plane far;
+        } plane;
 
-    //        struct {
-    //            Plane top;
-    //            Plane bottom;
-    //            Plane left;
-    //            Plane right;
-    //            Plane near;
-    //            Plane far;
-    //        } planeType;
+        Plane planes[6];
 
-    //        Plane planes[6];
+        inline Frustum() {}
+        vec3 Intersection(Plane p1, Plane p2, Plane p3);
+        void GetCorners(const Frustum &f, std::vector<vec3> &outCorners);
+        float Classify(const AABB &aabb, const Plane &plane);
+        bool Intersects(const Frustum &f, const Sphere &s);
+        bool Intersects(const Frustum &f, const AABB &aabb);
 
-    //        inline Frustum() {}
-    //        vec3 Intersection(Plane p1, Plane p2, Plane p3);
-    //        void GetCorners(const Frustum &f, vec3 *outCorners);
-    //        bool Intersects(const Frustum &f, const Sphere &s);
-    //        float Classify(const AABB &aabb, const Plane &plane);
-    //        //        float Classify(const OBB &obb, const Plane &plane);
-    //        bool Intersects(const Frustum &f, const AABB &aabb);
-    //        //        bool Intersects(const Frustum &f, const OBB &obb);
-
-    //    } Frustum;
-    //    Frustum getFrustum() const {
-    //        return mFrustum;
-    //    }
-    //    void makeFrustum();
+    } Frustum;
+    Frustum getFrustum() const {
+        return mFrustum;
+    }
+    void makeFrustum();
 
     void setProjectionMatrix(float fov, float aspect, float nearPlane = 0.5f, float farPlane = 200.f);
     void setProjectionMatrix();
@@ -74,7 +83,7 @@ private:
     gsl::Matrix4x4 mYawMatrix;
     gsl::Matrix4x4 mPitchMatrix;
 
-    //    Frustum mFrustum;
+    Frustum mFrustum;
 
     friend class CameraController;
     friend class GameCameraController;

@@ -1,12 +1,14 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
+#include "camera.h"
 #include "core.h"
 #include "isystem.h"
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
 using namespace cjk;
 class Registry;
+
 class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
@@ -43,6 +45,7 @@ private:
 
     GLuint mSkyBoxID;
     void drawSkybox();
+    void Cull(const Camera::Frustum &f);
 };
 
 #endif // RENDERSYSTEM_H

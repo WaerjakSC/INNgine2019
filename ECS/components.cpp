@@ -38,8 +38,3 @@ void ParticleEmitter::setNumParticles(size_t num) {
     particles = std::vector<Particle>(numParticles);
     ResourceManager::instance()->initParticleEmitter(*this);
 }
-
-Plane::Plane(const vec3 &n, bool stat) : normal(n) {
-    ResourceManager::instance()->setPlaneMesh(colliderMesh);
-    isStatic = stat;
-}

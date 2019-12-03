@@ -227,15 +227,10 @@ void MainWindow::createActions() {
     connect(meshAction, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
     QMenu *collisionMenu{components->addMenu(tr("&Colliders"))};
-    QMenu *boxes{collisionMenu->addMenu("Box Colliders")};
 
-    QAction *AABBAction{new QAction(tr("Axis Aligned"), this)};
-    boxes->addAction(AABBAction);
+    QAction *AABBAction{new QAction(tr("AABB"), this)};
+    collisionMenu->addAction(AABBAction);
     connect(AABBAction, &QAction::triggered, mComponentList, &ComponentList::addAABBCollider);
-
-    QAction *PlaneAction{new QAction(tr("Plane"), this)};
-    collisionMenu->addAction(PlaneAction);
-    connect(PlaneAction, &QAction::triggered, mComponentList, &ComponentList::addPlaneCollider);
 
     QAction *SphereAction{new QAction(tr("Sphere"), this)};
     collisionMenu->addAction(SphereAction);

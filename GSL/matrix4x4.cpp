@@ -501,6 +501,9 @@ bool Matrix4x4::operator==(const Matrix4x4 &other) {
     return true;
 }
 
+GLfloat Matrix4x4::operator[](const int num) {
+    return matrix[num];
+}
 Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
     return {
         matrix[0] * other.matrix[0] + matrix[1] * other.matrix[4] + matrix[2] * other.matrix[8] + matrix[3] * other.matrix[12],
@@ -522,10 +525,6 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
         matrix[12] * other.matrix[1] + matrix[13] * other.matrix[5] + matrix[14] * other.matrix[9] + matrix[15] * other.matrix[13],
         matrix[12] * other.matrix[2] + matrix[13] * other.matrix[6] + matrix[14] * other.matrix[10] + matrix[15] * other.matrix[14],
         matrix[12] * other.matrix[3] + matrix[13] * other.matrix[7] + matrix[14] * other.matrix[11] + matrix[15] * other.matrix[15]};
-}
-
-GLfloat Matrix4x4::getFloat(int space) {
-    return matrix[space];
 }
 
 Vector4D Matrix4x4::operator*(const Vector4D &v) {

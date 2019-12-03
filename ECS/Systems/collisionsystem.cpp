@@ -118,25 +118,11 @@ void CollisionSystem::raySphere(Raycast &ray, int ignoredEntity) {
         }
     }
 }
-void CollisionSystem::rayPlane(Raycast &ray, int ignoredEntity) {
-    auto view{registry->view<Plane>()};
-    for (auto entity : view) {
-        if ((int)entity == ignoredEntity)
-            continue;
-        auto &plane{view.get(entity)};
-        if (calcRayToPlane(ray, plane)) {
-            if (ray.intersectionDistance < ray.closestTarget) {
-                ray.closestTarget = ray.intersectionDistance;
-                ray.hitEntity = entity;
-            }
-        }
-    }
-}
+
 Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, int ignoredEntity, float range) {
     Raycast raycast{range};
     raycast.ray = getRayFromMouse(mousePos, rect);
 
-    rayPlane(raycast, ignoredEntity);
     rayAABB(raycast, ignoredEntity);
     //    raySphere(raycast, ignoredEntity); // we probably don't care about sphere mouse picking.
     raycast.hitPoint = getPointOnRay(raycast, raycast.closestTarget);
@@ -180,18 +166,6 @@ vec3 CollisionSystem::getMax(const AABB &aabb) {
                 fmaxf(p1.y, p2.y),
                 fmaxf(p1.z, p2.z)};
 }
-
-//bool CollisionSystem::SphereOBB(const Sphere &sphere, const OBB &obb) {
-
-//    // Finner først nærmeste punktet i OBB til sphere center
-//    vec3 p{ClosestPoint(obb, sphere.position)};
-//    // Finner avstanden mellom sphere center og punktet i OBB
-//    float dist{(sphere.position - p).length()};
-//    float radiusSq{sphere.radius * sphere.radius};
-//    // Hvis avstanden er mindre enn radius^2, har vi en intersection mellom Sphere og OBB
-//    return dist < radiusSq;
-//}
-
 bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2) {
     vec3 sphere1Pos{sphere1.transform.modelMatrix.getPosition()};
     vec3 sphere2Pos{sphere2.transform.modelMatrix.getPosition()};
@@ -202,27 +176,6 @@ bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2)
     // compare
     return dist < (rs * rs);
 }
-//signed distance from the plane to a point along
-//the unit normal
-float CollisionSystem::distanceToPoint(const Plane &plane, const vec3 &point) const {
-    return vec3::dot(plane.normal, point);
-}
-float CollisionSystem::calcDistance(Plane &plane) {
-    const vec3 planePos{plane.transform.modelMatrix.getPosition()};
-    plane.distance = -vec3::dot(plane.normal, planePos);
-    return plane.distance;
-}
-bool CollisionSystem::AABBPlane(const AABB &aabb, Plane &plane) {
-    float mHalfExtent{aabb.size.x * fabsf(plane.normal.x) +
-                      aabb.size.y * fabsf(plane.normal.y) +
-                      aabb.size.z * fabsf(plane.normal.z)};
-    vec3 aabbPos{aabb.transform.modelMatrix.getPosition()};
-    // Distance from center of AABB to plane
-    float distance = distanceToPoint(plane, aabbPos) - calcDistance(plane);
-
-    return fabsf(distance) <= mHalfExtent;
-}
-
 bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
     // Get the actual position of the sphere - sphere.position only holds the offset from the entity it belongs to
     vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
@@ -272,18 +225,6 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
     sphereCenterToPoint = sphereCenterToPoint * sphere.radius;
 
     return sphereCenterToPoint + spherePos;
-}
-bool CollisionSystem::calcRayToPlane(Raycast &r, Plane &plane) {
-    vec3 planePos{plane.transform.modelMatrix.getPosition()};
-    // assuming vectors are all normalized
-    float denom = vec3::dot(plane.normal, r.ray.direction);
-    if (fabs(denom) > 1e-6) {
-        float t = vec3::dot(planePos - r.ray.origin, plane.normal) / denom;
-        qDebug() << t;
-        return (t >= 0);
-    }
-
-    return false;
 }
 bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere) {
     vec3 center{sphere.transform.modelMatrix.getPosition() + sphere.position};
@@ -416,22 +357,6 @@ void CollisionSystem::setSphereRadius(double radius) {
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
-void CollisionSystem::setPlaneNormalX(double xIn) {
-    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
-    plane.normal.x = xIn;
-}
-void CollisionSystem::setPlaneNormalY(double yIn) {
-    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
-    plane.normal.y = yIn;
-}
-void CollisionSystem::setPlaneNormalZ(double zIn) {
-    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
-    plane.normal.z = zIn;
-}
-void CollisionSystem::setPlaneDistance(double distance) {
-    auto &plane{registry->get<Plane>(registry->getSelectedEntity())};
-    plane.distance = distance;
-}
 void CollisionSystem::setObjectType(int index) {
     bool isStatic;
     if (index == 0)
@@ -447,9 +372,5 @@ void CollisionSystem::setObjectType(int index) {
     if (registry->contains<Sphere>(entityID)) {
         auto &sphere{registry->get<Sphere>(entityID)};
         sphere.isStatic = isStatic;
-    }
-    if (registry->contains<Plane>(entityID)) {
-        auto &plane{registry->get<Plane>(entityID)};
-        plane.isStatic = isStatic;
     }
 }

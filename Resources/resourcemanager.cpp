@@ -51,7 +51,6 @@ ResourceManager::ResourceManager() : registry{Registry::instance()} {
     // Collision Types
     registry->registerComponent<AABB>();
     registry->registerComponent<Sphere>();
-    registry->registerComponent<Plane>();
 
     mSceneLoader = std::make_unique<Scene>();
 }
@@ -351,10 +350,10 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
  */
 GLuint ResourceManager::makeLevelPlane(const QString &name) {
     GLuint eID{registry->makeEntity<Mesh>(name)};
-    registry->add<Transform>(eID, vec3{1.0f, 0.0f, 1.0f});
-    registry->add<Plane>(eID, vec3{0.f, 1.f, 0.f}, false);
+    registry->add<Transform>(eID, vec3{0}, vec3{}, vec3{4.f, 1.f, 3.f});
+    registry->add<AABB>(eID, vec3{}, vec3{4.f, 0.01f, 3.f}, true);
     setMesh("Plane", eID);
-    registry->add<Material>(eID, getShader<PhongShader>(), 0, vec3{0});
+    registry->add<Material>(eID, getShader<PhongShader>(), 0u, vec3{.57f, .57f, .57f});
     return eID;
 }
 
@@ -405,17 +404,20 @@ void ResourceManager::makeLevel() {
     float x{-16};
     float y{0};
     float z{-16};
-    vec3 posVec{x, y, z};
+    vec3 pos{x, y, z};
+    int numPlanes{1};
     for (int i{0}; i < 16; i++) {
 
         for (int j{0}; j < 16; j++) {
-            GLuint entityID = makeLevelPlane();
+            GLuint entityID = makeLevelPlane("Plane" + QString::number(numPlanes++));
             Transform &transform{registry->view<Transform>().get(entityID)};
-            transform.localPosition = posVec;
-            posVec.x = posVec.x + 2;
+            transform.localPosition = pos;
+            transform.localPosition.x *= transform.localScale.x;
+            transform.localPosition.z *= transform.localScale.z;
+            pos.x = pos.x + 2;
         }
-        posVec.z = posVec.z + 2;
-        posVec.x = -16;
+        pos.z = pos.z + 2;
+        pos.x = -16;
     }
 }
 
@@ -602,26 +604,7 @@ void ResourceManager::setAABBMesh(Mesh &mesh) {
     initVertexBuffers(&mesh);
     initIndexBuffers(&mesh);
 }
-void ResourceManager::setPlaneMesh(Mesh &mesh) {
-    mMeshData.Clear();
 
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {
-                                   // Top face
-                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
-                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
-                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}  //Back low
-                               });
-    mesh.mName = "PlaneCollider";
-    mesh.mVerticeCount = mMeshData.mVertices.size();
-    mesh.mIndiceCount = mMeshData.mIndices.size();
-    mesh.mDrawType = GL_LINE_STRIP;
-
-    initVertexBuffers(&mesh);
-    initIndexBuffers(&mesh);
-}
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */

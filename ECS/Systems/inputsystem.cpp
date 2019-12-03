@@ -83,24 +83,24 @@ void InputSystem::spawnTower() {
     mIsDragging = true;
 }
 void InputSystem::handlePlayerController(DeltaTime dt) {
-    if (factory->isPlaying()) { // No point going through this if you won't use it anyway
-        gsl::Vector3D desiredVelocity{0};
-        if (mPlayerController.W)
-            desiredVelocity.z -= mCameraSpeed;
-        if (mPlayerController.S)
-            desiredVelocity.z += mCameraSpeed;
-        if (mPlayerController.D)
-            desiredVelocity.x += mCameraSpeed;
-        if (mPlayerController.A)
-            desiredVelocity.x -= mCameraSpeed;
-        if (mPlayerController.Q)
-            desiredVelocity.y += mCameraSpeed;
-        if (mPlayerController.E)
-            desiredVelocity.y -= mCameraSpeed;
-        mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
-        if (mPlayer != 0) {
-            registry->system<MovementSystem>()->move(mPlayer, mDesiredVelocity);
-        }
+    if (factory->isPlaying()) { // We don't have a movable character anyway, disabling this.
+                                //        gsl::Vector3D desiredVelocity{0};
+                                //        if (mPlayerController.W)
+                                //            desiredVelocity.z -= mCameraSpeed;
+                                //        if (mPlayerController.S)
+                                //            desiredVelocity.z += mCameraSpeed;
+                                //        if (mPlayerController.D)
+                                //            desiredVelocity.x += mCameraSpeed;
+                                //        if (mPlayerController.A)
+                                //            desiredVelocity.x -= mCameraSpeed;
+                                //        if (mPlayerController.Q)
+                                //            desiredVelocity.y += mCameraSpeed;
+                                //        if (mPlayerController.E)
+                                //            desiredVelocity.y -= mCameraSpeed;
+                                //        mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
+                                //        if (mPlayer != 0) {
+                                //            registry->system<MovementSystem>()->move(mPlayer, mDesiredVelocity);
+                                //        }
     }
 }
 void InputSystem::handleMouseInput() {
@@ -178,8 +178,7 @@ void InputSystem::dragEntity(GLuint entity) {
             ray.hitPoint.y += registry->get<AABB>(ray.hitEntity).size.y;
         else if (registry->contains<Sphere>(ray.hitEntity))
             ray.hitPoint.y += registry->get<Sphere>(ray.hitEntity).radius;
-        if (!registry->contains<Plane>(ray.hitEntity))
-            ray.hitPoint.y += tf.localScale.y;
+        ray.hitPoint.y += tf.localScale.y;
     }
     // place the object either on the mouse at 50.f distance or at correct distance for the AABB hit
     tf.localPosition = ray.hitPoint;

@@ -61,8 +61,8 @@ public:
 private:
     Group(const size_t *extent, Pool<Owned> *... owned) : pools{owned...}, length(extent) {
     }
-    const size_t *length;
     const std::tuple<Pool<Owned> *...> pools;
+    const size_t *length;
     friend class Registry;
 };
 

@@ -7,6 +7,7 @@
 #include "view.h"
 
 #include "resourcemanager.h"
+#include <functional>
 #include <memory>
 #include <typeinfo>
 #include <unordered_set>
@@ -18,6 +19,9 @@ struct GroupHandler {
     size_t owned{};
 };
 struct GroupData {
+    template <typename Func>
+    GroupData(size_t ext, Func const &ownedType)
+        : extent(ext), ownsType(ownedType) {}
     size_t extent;
     bool (*ownsType)(const std::string &);
     std::unordered_set<std::string> pools;

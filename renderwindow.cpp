@@ -100,7 +100,7 @@ void RenderWindow::init() {
     //********************** Set up camera **********************
     float aspectRatio = static_cast<float>(width()) / height();
     mEditorCameraController = std::make_shared<CameraController>(aspectRatio);
-    mEditorCameraController->setPosition(vec3(0.f, 8.f, 15.0f));
+    mEditorCameraController->setPosition(vec3(0.f, 20.f, 23.0f));
     mFactory->setCurrentCameraController(mEditorCameraController);
 
     //Compile shaders - init them with reference to current camera:
@@ -142,7 +142,7 @@ void RenderWindow::init() {
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
-    mFactory->makeLevel();
+    //    mFactory->makeLevel();
 
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mSoundSystem->init();
@@ -295,22 +295,6 @@ void RenderWindow::startOpenGLDebugger() {
             mOpenGLDebugLogger->disableMessages(QOpenGLDebugMessage::APISource, QOpenGLDebugMessage::OtherType, QOpenGLDebugMessage::NotificationSeverity);
     }
 }
-
-/**
- * @brief RenderWindow::Cull, Cull furries right now
- * @param f, the frustum
- */
-//void RenderWindow::Cull(const Camera::Frustum &f) {
-//    auto view{mRegistry->view<Mesh, AABB>()};
-//    Camera &cam{mInputSystem->editorCamController()->getCamera()};
-//    for (auto entity : view) {
-//        auto &collider{view.get<AABB>(entity)};
-//        if (cam.getFrustum().Intersects(f, collider)) {
-//            view.get<Mesh>(entity).mRendered = true;
-//        } else
-//            view.get<Mesh>(entity).mRendered = false;
-//    }
-//}
 
 void RenderWindow::keyPressEvent(QKeyEvent *event) {
     if (mInputSystem)

@@ -57,7 +57,7 @@ protected:
 protected:
     Camera mCamera;
 
-    float mPitch{-25.f};
+    float mPitch{-50.f};
     float mYaw{0.f};
     bool mOutDated{true};
 };

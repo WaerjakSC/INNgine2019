@@ -244,21 +244,6 @@ void Scene::saveScene(const QString &fileName) {
                 writer.Bool(aabb.isStatic);
                 writer.EndObject();
             }
-            if (registry->contains<Plane>(entity)) {
-                writer.Key("Plane");
-                writer.StartObject();
-                const Plane &plane{registry->get<Plane>(entity)};
-
-                writer.Key("normal");
-                writer.StartArray();
-                writer.Double(plane.normal.x);
-                writer.Double(plane.normal.y);
-                writer.Double(plane.normal.z);
-                writer.EndArray();
-                writer.Key("static");
-                writer.Bool(plane.isStatic);
-                writer.EndObject();
-            }
             if (registry->contains<Sphere>(entity)) {
                 writer.Key("Sphere");
                 writer.StartObject();
@@ -441,10 +426,6 @@ void Scene::populateScene(const Document &scene) {
                 vec3 size{comp->value["size"][0].GetFloat(), comp->value["size"][1].GetFloat(), comp->value["size"][2].GetFloat()};
                 bool isStatic{comp->value["static"].GetBool()};
                 registry->add<AABB>(id, origin, size, isStatic);
-            } else if (comp->name == "Plane") {
-                vec3 normal{comp->value["normal"][0].GetFloat(), comp->value["normal"][1].GetFloat(), comp->value["origin"][2].GetFloat()};
-                bool isStatic{comp->value["static"].GetBool()};
-                registry->add<Plane>(id, normal, isStatic);
             } else if (comp->name == "Sphere") {
                 vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
                 float radius{comp->value["radius"].GetFloat()};

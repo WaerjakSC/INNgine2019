@@ -56,10 +56,6 @@ public slots:
     void setSpherePositionY(double yIn);
     void setSpherePositionZ(double zIn);
     void setSphereRadius(double radius);
-    void setPlaneNormalX(double xIn);
-    void setPlaneNormalY(double yIn);
-    void setPlaneNormalZ(double zIn);
-    void setPlaneDistance(double radius);
     void setObjectType(int index);
 signals:
     void updateAABB(GLuint eID);
@@ -116,13 +112,7 @@ private:
     * @return true if all axis overlap (we have an intersection)
     */
     bool AABBAABB(const AABB &aabb1, const AABB &aabb2);
-    /**
-    * @brief AABBPlane returns true if an intersection between an AABB and a plane occurs
-    * @param aabb
-    * @param plane
-    * @return
-     */
-    bool AABBPlane(const AABB &aabb, Plane &plane);
+
     /**
     * @brief SphereAABB collision between a Sphere and AABB
     * @param sphere
@@ -206,9 +196,6 @@ private:
      * @return if both are static objects, return true
      */
     bool bothStatic(const Collision &lhs, const Collision &rhs);
-    bool calcRayToPlane(Raycast &r, Plane &plane);
-    float distanceToPoint(const Plane &plane, const vec3 &point) const;
-    float calcDistance(Plane &plane);
 };
 
 #endif // COLLISIONSYSTEM_H

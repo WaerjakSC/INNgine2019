@@ -115,7 +115,6 @@ public:
 
     void initParticleEmitter(ParticleEmitter &emitter);
     void setAABBMesh(Mesh &mesh);
-    void setPlaneMesh(Mesh &mesh);
     void newScene(const QString &text);
     std::map<std::string, Ref<Texture>> getTextures() const;
 

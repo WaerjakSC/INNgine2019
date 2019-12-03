@@ -72,8 +72,6 @@ void MovementSystem::updateColliders(GLuint eID) {
         registry->get<AABB>(eID).transform.matrixOutdated = true;
     else if (registry->contains<Sphere>(eID))
         registry->get<Sphere>(eID).transform.matrixOutdated = true;
-    else if (registry->contains<Plane>(eID))
-        registry->get<Plane>(eID).transform.matrixOutdated = true;
 }
 void MovementSystem::updateAABBTransform(GLuint entity) {
     auto view{registry->view<Transform, AABB>()};

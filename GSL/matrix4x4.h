@@ -63,6 +63,7 @@ public:
     GLfloat &operator()(const int &y, const int &x);
     GLfloat operator()(const int &y, const int &x) const;
     bool operator==(const Matrix4x4 &other);
+    GLfloat operator[](const int num);
 
     Matrix4x4 operator*(const Matrix4x4 &other) const;
 
@@ -75,7 +76,6 @@ public:
                << "{" << mIn.matrix[3] << "\t, " << mIn.matrix[7] << "\t, " << mIn.matrix[11] << "\t, " << mIn.matrix[15] << "}\n";
         return output;
     }
-    GLfloat getFloat(int space);
 
 private:
     GLfloat matrix[16];

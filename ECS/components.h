@@ -100,7 +100,7 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = vec3{1, 0, 0}, GLfloat specStr = 0.3f, GLint specExp = 4);
+    Material(Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
 
     GLfloat mSpecularStrength;
     GLint mSpecularExponent;
@@ -308,16 +308,6 @@ struct Sphere : public Collision {
     inline Sphere(const vec3 &pos, const float &r, bool stat = true) : position(pos), radius(r) {
         isStatic = stat;
     }
-};
-
-/**
-  * @brief Plane struct
-  */
-struct Plane : public Collision {
-    vec3 normal;
-    float distance{0};
-    // a plane is defined by a normal and distance from origo
-    Plane(const vec3 &n = vec3{1, 0, 0}, bool stat = true);
 };
 
 struct GameCamera : public Component {

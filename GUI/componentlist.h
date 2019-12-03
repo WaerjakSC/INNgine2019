@@ -39,7 +39,6 @@ public slots:
     void addAIComponent();
     void addAABBCollider();
     void addSphereCollider();
-    void addPlaneCollider();
 
 signals:
     void posX(GLfloat xIn);
@@ -61,10 +60,6 @@ signals:
     void spherePositionY(double yIn);
     void spherePositionZ(double zIn);
     void sphereRadius(double radius);
-    void planeNormalX(double xIn);
-    void planeNormalY(double yIn);
-    void planeNormalZ(double zIn);
-    void planeDistance(double radius);
     void newShader(int entityID, std::string shader);
     void changeHealth(int health);
 
@@ -95,7 +90,6 @@ private:
     void setupMeshSettings(const Mesh &mesh);
     void setupAABBSettings(const AABB &col);
     void setupSphereColliderSettings(const Sphere &col);
-    void setupPlaneColliderSettings(const Plane &col);
     void setupGameCameraSettings(const GameCamera &cam);
     void setupEmitterSettings(const ParticleEmitter &emitter);
     void setupBSplinePointSettings(const BSplinePoint &point);

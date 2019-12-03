@@ -45,9 +45,6 @@ void ComponentList::setupComponentList() {
     if (registry->contains<Sphere>(eID)) {
         setupSphereColliderSettings(registry->get<Sphere>(eID));
     }
-    if (registry->contains<Plane>(eID)) {
-        setupPlaneColliderSettings(registry->get<Plane>(eID));
-    }
     if (registry->contains<Material>(eID)) {
         setupMaterialSettings(registry->get<Material>(eID));
     }
@@ -115,9 +112,6 @@ void ComponentList::addSphereCollider() {
     registry->system<MovementSystem>()->updateSphereTransform(selectedEntity);
 }
 
-void ComponentList::addPlaneCollider() {
-    addCollider<Plane>();
-}
 void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     ComponentGroupBox *box{new ComponentGroupBox{"Game Camera", this}};
     QGridLayout *grid{new QGridLayout};
@@ -494,45 +488,6 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     scrollArea->addGroupBox(box);
 }
 
-void ComponentList::setupPlaneColliderSettings(const Plane &col) {
-    ComponentGroupBox *box{new ComponentGroupBox("Plane Collider", this)};
-    QGridLayout *grid{new QGridLayout};
-    grid->setMargin(2);
-    QGroupBox *normalBox{new QGroupBox(tr("Normal"))};
-    normalBox->setStyle(fusion);
-    normalBox->setFlat(true);
-    QHBoxLayout *normal{new QHBoxLayout};
-    normal->setMargin(1);
-    auto [normalX, normalY, normalZ]{makeVectorBox(col.normal, normal)};
-
-    connect(this, &ComponentList::planeNormalX, normalX, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::planeNormalY, normalY, &QDoubleSpinBox::setValue);
-    connect(this, &ComponentList::planeNormalZ, normalZ, &QDoubleSpinBox::setValue);
-
-    CollisionSystem *colSys{registry->system<CollisionSystem>().get()};
-    connect(normalX, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalX(double)));
-    connect(normalY, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalY(double)));
-    connect(normalZ, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneNormalZ(double)));
-
-    normalBox->setLayout(normal);
-    grid->addWidget(normalBox, 0, 0);
-
-    QGroupBox *distanceBox{new QGroupBox(tr("Distance"))};
-    distanceBox->setStyle(fusion);
-    distanceBox->setFlat(true);
-
-    QHBoxLayout *distanceLayout{new QHBoxLayout};
-    distanceLayout->setMargin(1);
-    QDoubleSpinBox *distance{makeDoubleSpinBox(col.distance, distanceLayout)};
-    connect(this, &ComponentList::planeDistance, distance, &QDoubleSpinBox::setValue);
-    connect(distance, SIGNAL(valueChanged(double)), colSys, SLOT(setPlaneDistance(double)));
-
-    distanceBox->setLayout(distanceLayout);
-    grid->addWidget(distanceBox, 1, 0);
-
-    box->setLayout(grid);
-    scrollArea->addGroupBox(box);
-}
 void ComponentList::setupAISettings(const AIComponent &ai) {
     ComponentGroupBox *box{new ComponentGroupBox("AI", this)};
     QGridLayout *grid{new QGridLayout};
