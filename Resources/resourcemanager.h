@@ -130,6 +130,7 @@ public slots:
     void saveAs();
     void saveProject();
     void loadProject();
+    void makeLevel();
 
     void newProject();
 
@@ -192,7 +193,7 @@ private:
     void makePlaneMesh(GLuint eID);
     void makeBallMesh(GLuint eID, int n = 3);
     void makeBillBoardMesh(int eID);
-    void makeLevelMesh(GLuint eID);
+    // void makeLevel(GLuint eID);
     void makeTowerMesh(GLuint eID);
     friend class ComponentList;
 };

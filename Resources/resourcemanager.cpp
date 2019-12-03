@@ -208,12 +208,12 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Plane";
-    mMeshData.mVertices.push_back(Vertex{0.8, 0, -0.8, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{-0.8, 0, -0.8, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{-0.8, 0, 0.8, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{-0.8, 0, 0.8, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{0.8, 0, 0.8, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{0.8, 0, -0.8, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{1.0, 0, -1.0, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{-1.0, 0, -1.0, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{-1.0, 0, 1.0, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{-1.0, 0, 1.0, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{1.0, 0, 1.0, 0, 1, 0});
+    mMeshData.mVertices.push_back(Vertex{1.0, 0, -1.0, 0, 1, 0});
 
     // Once VAO and VBO have been generated, mMeshData can be discarded.
     if (!registry->contains<Mesh>(eID))
@@ -344,11 +344,16 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
     return eID;
 }
 
+/**
+ * @brief Levelplane prefab
+ * @param name
+ * @return Returns the entity id
+ */
 GLuint ResourceManager::makeLevelPlane(const QString &name) {
     GLuint eID{registry->makeEntity<Mesh>(name)};
     registry->add<Transform>(eID, vec3{1.0f, 0.0f, 1.0f});
     registry->add<AABB>(eID, vec3{0.f, 0.f, 0.f}, vec3{1.0f, 0.1f, 1.0f}, false);
-    setMesh("Plane.obj", eID);
+    setMesh("Plane", eID);
     registry->add<Material>(eID, getShader<ColorShader>());
     return eID;
 }
@@ -391,50 +396,28 @@ void ResourceManager::makeBillBoardMesh(int eID) {
 
     glBindVertexArray(0);
 }
-/*
-void ResourceManager::makeLevelMesh(GLuint eID) {
-    float x{-8};
+
+/**
+ * @brief Creates the level grid.
+ * @return
+ */
+void ResourceManager::makeLevel() {
+    float x{-16};
     float y{0};
-    float z{-8};
+    float z{-16};
+    vec3 posVec{x,y,z};
     for (int i{0}; i < 16; i++) {
 
         for (int j{0}; j < 16; j++) {
-            vertices.push_back(Vertex{vec3{x, y, z}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.333f}});        //v0
-            vertices.push_back(Vertex{vec3{x + 1, y, z + 1}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.333f}}); //v1
-            vertices.push_back(Vertex{vec3{x + 1, y, z}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.666f}});    //v2
-            vertices.push_back(Vertex{vec3{x, y, z + 1}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.666f}});     // v4
-
-            x = x + 1;
+            GLuint entityID = makeLevelPlane();
+            Transform &transform{registry->view<Transform>().get(entityID)};
+            transform.localPosition = posVec;
+            posVec.x = posVec.x + 2;
         }
-        z = z + 1;
+        posVec.z = posVec.z + 2;
+        posVec.x = -16;
     }
-    mMeshData.mVertices = vertices;
-    std::vector<GLuint> indices;
-    GLuint v{0};
-    for (int k{0}; k < 256; k++) {
-        indices.push_back(v);
-        indices.push_back(v + 2);
-        indices.push_back(v + 1);
-        indices.push_back(v + 1);
-        indices.push_back(v + 2);
-        indices.push_back(v + 3);
-
-        v = v + 4;
-    }
-    mMeshData.mIndices = indices;
-
-    if (!registry->contains<Mesh>(eID))
-        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
-    else
-        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
-
-    auto &levelMesh{registry->get<Mesh>(eID)};
-
-    initVertexBuffers(&levelMesh);
-    initIndexBuffers(&levelMesh);
-
-    glBindVertexArray(0);
-} */
+}
 
 void ResourceManager::makeTowerMesh(GLuint eID) {
     initializeOpenGLFunctions();

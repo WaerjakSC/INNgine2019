@@ -142,6 +142,7 @@ void RenderWindow::init() {
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
     mFactory->loadLastProject();
+    mFactory->makeLevel();
 
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
     mSoundSystem->init();
