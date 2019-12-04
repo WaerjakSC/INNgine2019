@@ -11,31 +11,37 @@
 
 namespace gsl {
 
-Matrix4x4::Matrix4x4(bool isIdentity) {
+Matrix4x4::Matrix4x4(bool isIdentity)
+{
     if (isIdentity) {
         identity();
-    } else {
+    }
+    else {
         for (int i = 0; i < 16; i++)
             matrix[i] = 0.f;
     }
 }
 
-Matrix4x4::Matrix4x4(std::initializer_list<GLfloat> values) {
+Matrix4x4::Matrix4x4(std::initializer_list<GLfloat> values)
+{
     //Initializing the matrix class the same way as a 2d array
     int i = 0;
     for (auto value : values)
         matrix[i++] = value;
 }
 
-Matrix4x4 Matrix4x4::identity() {
+Matrix4x4 Matrix4x4::identity()
+{
     setToIdentity();
 
     return *this;
 }
-bool Matrix4x4::isIdentity() {
+bool Matrix4x4::isIdentity()
+{
     return Matrix4x4(true) == *this;
 }
-void Matrix4x4::setToIdentity() {
+void Matrix4x4::setToIdentity()
+{
     *this =
         {
             1, 0, 0, 0,
@@ -44,7 +50,8 @@ void Matrix4x4::setToIdentity() {
             0, 0, 0, 1};
 }
 
-bool Matrix4x4::inverse() {
+bool Matrix4x4::inverse()
+{
     GLfloat inv[16], det;
     GLfloat invOut[16];
 
@@ -177,7 +184,8 @@ bool Matrix4x4::inverse() {
     return true;
 }
 
-std::tuple<vec3, vec3, vec3> Matrix4x4::decomposed(const Matrix4x4 &matrix) {
+std::tuple<Vector3D, Vector3D, Vector3D> Matrix4x4::decomposed(const Matrix4x4 &matrix)
+{
     Matrix4x4 transform = matrix;
     vec3 position, scale, rotation;
     position.x = transform.matrix[3];
@@ -220,28 +228,34 @@ std::tuple<vec3, vec3, vec3> Matrix4x4::decomposed(const Matrix4x4 &matrix) {
     return std::tuple<vec3, vec3, vec3>(position, scale, rotation);
 }
 
-void Matrix4x4::translateX(GLfloat x) {
+void Matrix4x4::translateX(GLfloat x)
+{
     translate(x, 0.f, 0.f);
 }
 
-void Matrix4x4::translateY(GLfloat y) {
+void Matrix4x4::translateY(GLfloat y)
+{
     translate(0.f, y, 0.f);
 }
 
-void Matrix4x4::translateZ(GLfloat z) {
+void Matrix4x4::translateZ(GLfloat z)
+{
     translate(0.f, 0.f, z);
 }
 
-void Matrix4x4::setPosition(GLfloat x, GLfloat y, GLfloat z) {
+void Matrix4x4::setPosition(GLfloat x, GLfloat y, GLfloat z)
+{
     matrix[3] = x;
     matrix[7] = y;
     matrix[11] = z;
 }
 
-Vector3D Matrix4x4::getPosition() const {
+Vector3D Matrix4x4::getPosition() const
+{
     return gsl::Vector3D(matrix[3], matrix[7], matrix[11]);
 }
-Vector3D Matrix4x4::getScale() {
+Vector3D Matrix4x4::getScale()
+{
     vec3 scaleX = vec3(matrix[0], matrix[4], matrix[8]);  // 0 - 4 - 8
     vec3 scaleY = vec3(matrix[1], matrix[5], matrix[9]);  // 1 - 5 - 9
     vec3 scaleZ = vec3(matrix[2], matrix[6], matrix[10]); // 2 - 6 - 10
@@ -253,7 +267,8 @@ Vector3D Matrix4x4::getScale() {
     scale.z = scaleZ.length();
     return scale;
 }
-void Matrix4x4::rotateX(GLfloat degrees) {
+void Matrix4x4::rotateX(GLfloat degrees)
+{
     GLfloat rad = deg2radf(degrees);
 
     Matrix4x4 temp =
@@ -266,7 +281,8 @@ void Matrix4x4::rotateX(GLfloat degrees) {
     *this = (*this) * temp;
 }
 
-void Matrix4x4::rotateY(GLfloat degrees) {
+void Matrix4x4::rotateY(GLfloat degrees)
+{
     GLfloat rad = deg2radf(degrees);
 
     Matrix4x4 temp =
@@ -279,7 +295,8 @@ void Matrix4x4::rotateY(GLfloat degrees) {
     *this = (*this) * temp;
 }
 
-void Matrix4x4::rotateZ(GLfloat degrees) {
+void Matrix4x4::rotateZ(GLfloat degrees)
+{
     GLfloat rad = deg2radf(degrees);
 
     Matrix4x4 temp =
@@ -292,7 +309,8 @@ void Matrix4x4::rotateZ(GLfloat degrees) {
     *this = (*this) * temp;
 }
 
-void Matrix4x4::rotate(Vector3D vector) {
+void Matrix4x4::rotate(Vector3D vector)
+{
     rotateX(vector.x);
     rotateY(vector.y);
     rotateZ(vector.z);
@@ -315,15 +333,18 @@ void Matrix4x4::rotate(Vector3D vector) {
 //    rotate(angle, Vector3D(xIn, yIn, zIn));
 //}
 
-void Matrix4x4::scale(Vector3D s) {
+void Matrix4x4::scale(Vector3D s)
+{
     scale(s.getX(), s.getY(), s.getZ());
 }
 
-void Matrix4x4::scale(GLfloat uniformScale) {
+void Matrix4x4::scale(GLfloat uniformScale)
+{
     scale(uniformScale, uniformScale, uniformScale);
 }
 
-void Matrix4x4::scale(GLfloat scaleX, GLfloat scaleY, GLfloat scaleZ) {
+void Matrix4x4::scale(GLfloat scaleX, GLfloat scaleY, GLfloat scaleZ)
+{
     Matrix4x4 temp =
         {
             scaleX, 0.f, 0.f, 0.f,
@@ -334,11 +355,13 @@ void Matrix4x4::scale(GLfloat scaleX, GLfloat scaleY, GLfloat scaleZ) {
     *this = (*this) * temp;
 }
 
-GLfloat *Matrix4x4::constData() {
+GLfloat *Matrix4x4::constData()
+{
     return &matrix[0];
 }
 
-void Matrix4x4::transpose() {
+void Matrix4x4::transpose()
+{
     std::swap(matrix[1], matrix[4]);
     std::swap(matrix[2], matrix[8]);
     std::swap(matrix[3], matrix[12]);
@@ -348,7 +371,8 @@ void Matrix4x4::transpose() {
     std::swap(matrix[11], matrix[14]);
 }
 
-void Matrix4x4::ortho(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat nearPlane, GLfloat farPlane) {
+void Matrix4x4::ortho(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat nearPlane, GLfloat farPlane)
+{
     *this =
         {
             2.f / (r - l), 0.f, 0.f, 0.f,
@@ -358,7 +382,8 @@ void Matrix4x4::ortho(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat nearPl
 }
 
 //From Interactive Computer Graphics ch. 5
-void Matrix4x4::frustum(float left, float right, float bottom, float top, float nearPlane, float farPlane) {
+void Matrix4x4::frustum(float left, float right, float bottom, float top, float nearPlane, float farPlane)
+{
     *this =
         {
             2 * nearPlane / (right - left), 0.f, (right + left) / (right - left), 0.f,
@@ -367,7 +392,8 @@ void Matrix4x4::frustum(float left, float right, float bottom, float top, float 
             0.f, 0.f, -1.0f, 0.0f};
 }
 
-void Matrix4x4::perspective(GLfloat fieldOfView, GLfloat aspectRatio, GLfloat nearPlane, GLfloat farPlane) {
+void Matrix4x4::perspective(GLfloat fieldOfView, GLfloat aspectRatio, GLfloat nearPlane, GLfloat farPlane)
+{
     /* General form of the Projection Matrix
     //
     // uh = Cot( fov/2 ) == 1/Tan(fov/2)
@@ -416,7 +442,8 @@ void Matrix4x4::perspective(GLfloat fieldOfView, GLfloat aspectRatio, GLfloat ne
     */
 }
 
-void Matrix4x4::lookAt(const Vector3D &eye, const Vector3D &center, const Vector3D &up_axis) {
+void Matrix4x4::lookAt(const Vector3D &eye, const Vector3D &center, const Vector3D &up_axis)
+{
     Vector3D f = center - eye; //forward
     f.normalize();
     Vector3D s = Vector3D::cross(f, up_axis); //sideways
@@ -431,7 +458,8 @@ void Matrix4x4::lookAt(const Vector3D &eye, const Vector3D &center, const Vector
             0.f, 0.f, 0.f, 1.f};
 }
 
-void Matrix4x4::setRotationToVector(const Vector3D &direction, Vector3D up) {
+void Matrix4x4::setRotationToVector(const Vector3D &direction, Vector3D up)
+{
     Vector3D xaxis = Vector3D::cross(up, direction);
     xaxis.normalize();
 
@@ -451,7 +479,8 @@ void Matrix4x4::setRotationToVector(const Vector3D &direction, Vector3D up) {
     matrix[10] = direction.z;
 }
 
-void Matrix4x4::translate(GLfloat x, GLfloat y, GLfloat z) {
+void Matrix4x4::translate(GLfloat x, GLfloat y, GLfloat z)
+{
     Matrix4x4 mat =
         {
             1.f, 0.f, 0.f, x,
@@ -462,7 +491,8 @@ void Matrix4x4::translate(GLfloat x, GLfloat y, GLfloat z) {
     *this = (*this) * mat;
 }
 
-void Matrix4x4::translate(Vector3D positionIn) {
+void Matrix4x4::translate(Vector3D positionIn)
+{
     Matrix4x4 mat =
         {
             1.f, 0.f, 0.f, positionIn.getX(),
@@ -473,38 +503,45 @@ void Matrix4x4::translate(Vector3D positionIn) {
     *this = (*this) * mat;
 }
 
-Matrix2x2 Matrix4x4::toMatrix2() {
+Matrix2x2 Matrix4x4::toMatrix2()
+{
     return {
         matrix[0], matrix[1],
         matrix[4], matrix[5]};
 }
 
-Matrix3x3 Matrix4x4::toMatrix3() const {
+Matrix3x3 Matrix4x4::toMatrix3() const
+{
     return {
         matrix[0], matrix[1], matrix[2],
         matrix[4], matrix[5], matrix[6],
         matrix[8], matrix[9], matrix[10]};
 }
 
-GLfloat &Matrix4x4::operator()(const int &y, const int &x) {
+GLfloat &Matrix4x4::operator()(const int &y, const int &x)
+{
     return matrix[y * 4 + x];
 }
 
-GLfloat Matrix4x4::operator()(const int &y, const int &x) const {
+GLfloat Matrix4x4::operator()(const int &y, const int &x) const
+{
     return matrix[y * 4 + x];
 }
 
-bool Matrix4x4::operator==(const Matrix4x4 &other) {
+bool Matrix4x4::operator==(const Matrix4x4 &other)
+{
     for (size_t i = 0; i < 16; i++)
         if (matrix[i] != other.matrix[i])
             return false;
     return true;
 }
 
-GLfloat Matrix4x4::operator[](const int num) {
+GLfloat Matrix4x4::operator[](const int num)
+{
     return matrix[num];
 }
-Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
+Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const
+{
     return {
         matrix[0] * other.matrix[0] + matrix[1] * other.matrix[4] + matrix[2] * other.matrix[8] + matrix[3] * other.matrix[12],
         matrix[0] * other.matrix[1] + matrix[1] * other.matrix[5] + matrix[2] * other.matrix[9] + matrix[3] * other.matrix[13],
@@ -527,7 +564,8 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
         matrix[12] * other.matrix[3] + matrix[13] * other.matrix[7] + matrix[14] * other.matrix[11] + matrix[15] * other.matrix[15]};
 }
 
-Vector4D Matrix4x4::operator*(const Vector4D &v) {
+Vector4D Matrix4x4::operator*(const Vector4D &v)
+{
     return Vector4D(matrix[0] * v.getX() + matrix[1] * v.getY() + matrix[2] * v.getZ() + matrix[3] * v.getW(),
                     matrix[4] * v.getX() + matrix[5] * v.getY() + matrix[6] * v.getZ() + matrix[7] * v.getW(),
                     matrix[8] * v.getX() + matrix[9] * v.getY() + matrix[10] * v.getZ() + matrix[11] * v.getW(),

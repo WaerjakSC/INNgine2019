@@ -7,9 +7,10 @@
 #include "camera.h"
 #include "cameracontroller.h"
 #include "matrix4x4.h"
-
+namespace cjk {
 Shader::Shader(cjk::Ref<CameraController> camController, const std::string shaderName, const GLchar *geometryPath)
-    : mName{shaderName}, mCameraController{camController} {
+    : mName{shaderName}, mCameraController{camController}
+{
     initializeOpenGLFunctions(); //must do this to get access to OpenGL functions in QOpenGLFunctions
 
     std::string vertexName{shaderName + ".vert"};
@@ -131,33 +132,42 @@ Shader::Shader(cjk::Ref<CameraController> camController, const std::string shade
     std::cout << "Shader read: " << shaderName << std::endl;
 }
 
-Shader::~Shader() {
+Shader::~Shader()
+{
     qDebug() << "Shader program " << program;
     glDeleteProgram(program);
 }
 
-void Shader::use() {
+void Shader::use()
+{
     glUseProgram(this->program);
 }
 
-GLuint Shader::getProgram() const {
+GLuint Shader::getProgram() const
+{
     return program;
 }
 
-void Shader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
+void Shader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material)
+{
     Q_UNUSED(material);
     glUniformMatrix4fv(vMatrixUniform, 1, GL_TRUE, mCameraController->getCamera().mViewMatrix.constData());
     glUniformMatrix4fv(pMatrixUniform, 1, GL_TRUE, mCameraController->getCamera().mProjectionMatrix.constData());
     glUniformMatrix4fv(mMatrixUniform, 1, GL_TRUE, modelMatrix.constData());
 }
-void Shader::setCameraController(cjk::Ref<CameraController> currentController) {
+void Shader::setCameraController(cjk::Ref<CameraController> currentController)
+{
     mCameraController = currentController;
 }
 
-cjk::Ref<CameraController> Shader::getCameraController() const {
+cjk::Ref<CameraController> Shader::getCameraController() const
+{
     return mCameraController;
 }
 
-std::string Shader::getName() const {
+std::string Shader::getName() const
+{
     return mName;
 }
+
+} // namespace cjk

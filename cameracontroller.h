@@ -2,7 +2,7 @@
 #define CAMERACONTROLLER_H
 #include "camera.h"
 #include "core.h"
-using namespace cjk;
+namespace cjk {
 class CameraController {
 public:
     CameraController(float aspectRatio);
@@ -41,6 +41,8 @@ public:
     const vec3 getCameraRotation() const;
 
 protected:
+    using vec3 = gsl::Vector3D;
+    using mat4 = gsl::Matrix4x4;
     float mNearPlane{0.5f};
     float mFarPlane{500.f};
     float mFieldOfView{45.f};
@@ -90,5 +92,6 @@ public:
 private:
     GLuint mControllerID;
 };
+} // namespace cjk
 
 #endif // CAMERACONTROLLER_H

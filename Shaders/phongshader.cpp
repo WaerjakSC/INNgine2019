@@ -5,9 +5,10 @@
 #include "components.h"
 #include "innpch.h"
 #include "registry.h"
-
+namespace cjk {
 PhongShader::PhongShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
-    : Shader{camController, "PhongShader", geometryPath} {
+    : Shader{camController, "PhongShader", geometryPath}
+{
     mMatrixUniform = glGetUniformLocation(program, "mMatrix");
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
@@ -24,10 +25,12 @@ PhongShader::PhongShader(cjk::Ref<CameraController> camController, const GLchar 
     mCameraPositionUniform = glGetUniformLocation(program, "cameraPosition");
 }
 
-PhongShader::~PhongShader() {
+PhongShader::~PhongShader()
+{
     qDebug() << "Deleting PhongShader";
 }
-void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material) {
+void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *material)
+{
     Shader::transmitUniformData(modelMatrix);
     auto view{Registry::instance()->view<Transform, Light>()};
     if (view.contains(mLightID)) {
@@ -45,6 +48,8 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
     glUniform3f(mObjectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
     glUniform3f(mCameraPositionUniform, mCameraController->getCamera().position().x, mCameraController->getCamera().position().y, mCameraController->getCamera().position().z);
 }
-void PhongShader::setLight(GLuint entt) {
+void PhongShader::setLight(GLuint entt)
+{
     mLightID = entt;
 }
+} // namespace cjk

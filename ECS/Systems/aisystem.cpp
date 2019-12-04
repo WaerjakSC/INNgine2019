@@ -3,14 +3,17 @@
 #include "gsl_math.h"
 #include "movementsystem.h"
 #include "registry.h"
-AISystem::AISystem() {
+namespace cjk {
+AISystem::AISystem()
+{
 }
 
 /**
  * @brief AIsystem::update, runs the highly sofisticated AI cortex
  * @param dt
  */
-void AISystem::update(DeltaTime dt) {
+void AISystem::update(DeltaTime dt)
+{
     // Run the eventHandler incase of events
     draw();
     if (curWaveCD >= 0.f)
@@ -78,7 +81,8 @@ void AISystem::update(DeltaTime dt) {
 //    }
 //    state = MOVE;
 //}
-void AISystem::spawnWave(DeltaTime dt) {
+void AISystem::spawnWave(DeltaTime dt)
+{
     curSpawnDuration += dt;
     if (curSpawnCD >= 0.f)
         curSpawnCD -= dt;
@@ -88,21 +92,24 @@ void AISystem::spawnWave(DeltaTime dt) {
         curSpawnCD = spawnCD;
     }
 }
-void AISystem::detectEnemies(TowerComponent &ai) {
+void AISystem::detectEnemies(TowerComponent &ai)
+{
     // if(!(list.empty())
     // pick random from list
     // save it in targetID
     // twrstate = ATTACK;
 }
 
-void AISystem::attack(TowerComponent &ai) {
+void AISystem::attack(TowerComponent &ai)
+{
     // We already have the targetID here
 }
 
 /**
  * @brief AIsystem::eventHandler, event handling
  */
-void AISystem::eventHandler(AIComponent &ai) {
+void AISystem::eventHandler(AIComponent &ai)
+{
     while (!ai.notification_queue.empty()) {
         auto event = ai.notification_queue.front();
         switch (event) {
@@ -124,7 +131,8 @@ void AISystem::eventHandler(AIComponent &ai) {
 /**
  * @brief AIsystem::draw
  */
-void AISystem::draw() {
+void AISystem::draw()
+{
     mCurve.draw();
 }
 
@@ -148,7 +156,8 @@ void AISystem::draw() {
  * @param deltaT
  * @return
  */
-std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform &transform) {
+std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform &transform)
+{
     float &t = ai.pathT; // shortcut
     t += dt * ai.moveSpeed;
     bool endPoint{0.98f <= t || t < 0.f};
@@ -172,7 +181,8 @@ std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform
  * @brief AIsystem::init, initializes NPC and curve
  * @param eID
  */
-void AISystem::init() {
+void AISystem::init()
+{
     mCurve.init();
     masterOfCurves();
 }
@@ -180,7 +190,8 @@ void AISystem::init() {
 /**
  * @brief AIsystem::death, todo
  */
-void AISystem::death(const GLuint entityID) {
+void AISystem::death(const GLuint entityID)
+{
     // hp <= 0
     // particles
     // gold++
@@ -191,7 +202,8 @@ void AISystem::death(const GLuint entityID) {
 /**
  * @brief AIsystem::goalReached, todo
  */
-void AISystem::goalReached(const GLuint entityID) {
+void AISystem::goalReached(const GLuint entityID)
+{
     // endpoint reached
     // remove 1LP from player
     // delete entity
@@ -200,29 +212,34 @@ void AISystem::goalReached(const GLuint entityID) {
 /**
  * @brief AIsystem::masterOfCurves, helper function that updates trophies and path
  */
-void AISystem::masterOfCurves() {
+void AISystem::masterOfCurves()
+{
     mCurve.updateTrophies();
     mCurve.updatePath();
 }
-void AISystem::setHealth(int health) {
+void AISystem::setHealth(int health)
+{
     auto ai{registry->get<AIComponent>(registry->getSelectedEntity())};
     ai.health = health;
 }
-void AISystem::setBSPlinePointX(double xIn) {
+void AISystem::setBSPlinePointX(double xIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &bspline{registry->get<BSplinePoint>(entityID)};
     bspline.location.x = xIn;
     masterOfCurves();
 }
 
-void AISystem::setBSPlinePointY(double yIn) {
+void AISystem::setBSPlinePointY(double yIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &bspline{registry->get<BSplinePoint>(entityID)};
     bspline.location.y = yIn;
     masterOfCurves();
 }
 
-void AISystem::setBSPlinePointZ(double zIn) {
+void AISystem::setBSPlinePointZ(double zIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &bspline{registry->get<BSplinePoint>(entityID)};
     bspline.location.z = zIn;
@@ -232,6 +249,9 @@ void AISystem::setBSPlinePointZ(double zIn) {
  * @brief AIsystem::setControlPoints
  * @param cps
  */
-void AISystem::setControlPoints(std::vector<vec3> cps) {
+void AISystem::setControlPoints(std::vector<vec3> cps)
+{
     mCurve.setControlPoints(cps);
 }
+
+} // namespace cjk

@@ -1,7 +1,8 @@
 #include "camera.h"
-#include "innpch.h"
 
-Camera::Camera(float fov, float aspectRatio, float near, float far) {
+namespace cjk {
+Camera::Camera(float fov, float aspectRatio, float near, float far)
+{
     mViewMatrix.setToIdentity();
     mProjectionMatrix.setToIdentity();
 
@@ -10,25 +11,31 @@ Camera::Camera(float fov, float aspectRatio, float near, float far) {
     setProjectionMatrix(fov, aspectRatio, near, far);
 }
 
-gsl::Matrix4x4 Camera::getProjectionMatrix() const {
+Camera::mat4 Camera::getProjectionMatrix() const
+{
     return mProjectionMatrix;
 }
 
-gsl::Matrix4x4 Camera::getViewMatrix() const {
+Camera::mat4 Camera::getViewMatrix() const
+{
     return mViewMatrix;
 }
-void Camera::setProjectionMatrix(float fov, float aspect, float nearPlane, float farPlane) {
+void Camera::setProjectionMatrix(float fov, float aspect, float nearPlane, float farPlane)
+{
     mProjectionMatrix.perspective(fov, aspect, nearPlane, farPlane);
 }
 
-void Camera::setPosition(const vec3 &position) {
+void Camera::setPosition(const vec3 &position)
+{
     mPosition = -position;
 }
-const vec3 Camera::getRotation() const {
+const vec3 Camera::getRotation() const
+{
     return std::get<2>(gsl::Matrix4x4::decomposed(mViewMatrix));
 }
 
-void Camera::setRotation(float pitch, float yaw) {
+void Camera::setRotation(float pitch, float yaw)
+{
     mPitch = -pitch;
     mYaw = -yaw;
 
@@ -38,16 +45,19 @@ void Camera::setRotation(float pitch, float yaw) {
     mPitchMatrix.rotateX(mPitch);
     mYawMatrix.rotateY(mYaw);
 }
-void Camera::calculateViewMatrix() {
+void Camera::calculateViewMatrix()
+{
     mViewMatrix = mPitchMatrix * mYawMatrix;
     mViewMatrix.translate(mPosition);
     makeFrustum();
 }
-vec3 Camera::position() const {
+vec3 Camera::position() const
+{
     return mPosition;
 }
 
-vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width) {
+vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width)
+{
     vec3 rayNDC{getNormalizedDeviceCoords(viewportPoint, height, width)};
 
     vec4 rayClip{rayNDC.x, rayNDC.y, -1.0, 1.0};
@@ -65,14 +75,16 @@ vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width)
 
     return rayWorld;
 }
-vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width) {
+vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
+{
     float x{(2.0f * mouse.x) / width - 1.0f};
     float y{1.0f - (2.0f * mouse.y) / height};
     float z{mouse.z};
     return vec3{x, y, z}; // Normalised Device Coordinates range [-1:1, -1:1, -1:1]
 }
 
-void Camera::makeFrustum() {
+void Camera::makeFrustum()
+{
     Frustum result;
     mat4 vp{getViewMatrix() * getProjectionMatrix()};
 
@@ -103,7 +115,8 @@ void Camera::makeFrustum() {
     mFrustum = result;
 }
 // Finds the corners where the planes p1, p2 and p3 intersect.
-vec3 Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3) {
+vec3 Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3)
+{
     mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
            p1.normal.y, p2.normal.y, p3.normal.y,
            p1.normal.z, p2.normal.z, p3.normal.z};
@@ -134,7 +147,8 @@ vec3 Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3) {
 }
 
 // Calls Intersection function 8 times to find all corners in near & far plane of frustum.
-void Camera::Frustum::GetCorners(const Frustum &f, std::vector<vec3> &outCorners) {
+void Camera::Frustum::GetCorners(const Frustum &f, std::vector<vec3> &outCorners)
+{
     outCorners[0] = Intersection(f.plane.near, f.plane.top, f.plane.left);
     outCorners[1] = Intersection(f.plane.near, f.plane.top, f.plane.right);
     outCorners[2] = Intersection(f.plane.near, f.plane.bottom, f.plane.left);
@@ -145,7 +159,8 @@ void Camera::Frustum::GetCorners(const Frustum &f, std::vector<vec3> &outCorners
     outCorners[7] = Intersection(f.plane.far, f.plane.bottom, f.plane.right);
 }
 
-float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
+float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane)
+{
     // maximum extent in direction of plane normal
     float r{fabsf(aabb.size.x * plane.normal.x) + fabsf(aabb.size.y * plane.normal.y) + fabsf(aabb.size.z * plane.normal.z)};
     vec3 center{aabb.transform.modelMatrix.getPosition() + aabb.origin};
@@ -153,12 +168,14 @@ float Camera::Frustum::Classify(const AABB &aabb, const Plane &plane) {
     float d{vec3::dot(plane.normal, center) + plane.distance};
     if (fabsf(d) < r) {
         return 0.0f;
-    } else if (d < 0.0f) {
+    }
+    else if (d < 0.0f) {
         return d + r;
     }
     return d - r;
 }
-bool Camera::Frustum::Intersects(const Frustum &f, const Sphere &s) {
+bool Camera::Frustum::Intersects(const Frustum &f, const Sphere &s)
+{
     vec3 sPosition{s.transform.modelMatrix.getPosition()};
     for (int i{0}; i < 6; i++) {
         vec3 normal{f.planes[i].normal};
@@ -170,7 +187,8 @@ bool Camera::Frustum::Intersects(const Frustum &f, const Sphere &s) {
     }
     return true;
 }
-bool Camera::Frustum::Intersects(const Frustum &f, const AABB &aabb) {
+bool Camera::Frustum::Intersects(const Frustum &f, const AABB &aabb)
+{
     for (int i{0}; i < 6; ++i) {
         if (Classify(aabb, f.planes[i]) < 0) {
             return false;
@@ -178,3 +196,5 @@ bool Camera::Frustum::Intersects(const Frustum &f, const AABB &aabb) {
     }
     return true;
 }
+
+} // namespace cjk

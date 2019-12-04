@@ -2,9 +2,9 @@
 #define PHONGSHADER_H
 
 #include "shader.h"
+namespace cjk {
 struct LightData;
 struct Light;
-class Entity;
 class PhongShader : public Shader {
 public:
     PhongShader(cjk::Ref<CameraController> camController = nullptr, const GLchar *geometryPath = nullptr);
@@ -29,5 +29,7 @@ private:
 
     GLuint mLightID;
 };
+
+} // namespace cjk
 
 #endif // PHONGSHADER_H

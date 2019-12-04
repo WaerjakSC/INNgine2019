@@ -2,7 +2,7 @@
 #define PARTICLESHADER_H
 
 #include "shader.h"
-
+namespace cjk {
 struct ParticleEmitter;
 
 class ParticleShader : public Shader {
@@ -14,5 +14,6 @@ public:
 private:
     GLuint textureUniform{0}, cameraRightUniform{0}, cameraUpUniform{0};
 };
+} // namespace cjk
 
 #endif // PARTICLESHADER_H

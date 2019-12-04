@@ -3,8 +3,9 @@
 
 #include "vector2d.h"
 #include "vector3d.h"
-typedef gsl::Vector3D vec3;
 class Vertex {
+    using vec3 = gsl::Vector3D;
+
 public:
     Vertex();
     Vertex(float x, float y, float z, float r, float g, float b);
@@ -29,7 +30,8 @@ public:
     void set_st(GLfloat *st);
     void set_st(GLfloat s, GLfloat t);
 
-    bool operator==(const Vertex &other) const {
+    bool operator==(const Vertex &other) const
+    {
         return mXYZ == other.mXYZ && mNormal == other.mNormal && mST == other.mST;
     }
 
@@ -40,7 +42,8 @@ public:
 namespace std {
 template <>
 struct hash<Vertex> {
-    size_t operator()(Vertex const &vertex) const {
+    size_t operator()(Vertex const &vertex) const
+    {
         return ((hash<gsl::Vector3D>()(vertex.mXYZ) ^
                  (hash<gsl::Vector3D>()(vertex.mNormal) << 1)) >>
                 1) ^

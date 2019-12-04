@@ -2,11 +2,13 @@
 #include "cameracontroller.h"
 #include "registry.h"
 #include "resourcemanager.h"
-
-SoundSystem::SoundSystem() : reg{Registry::instance()} {
+namespace cjk {
+SoundSystem::SoundSystem() : reg{Registry::instance()}
+{
 }
 
-bool SoundSystem::createContext() {
+bool SoundSystem::createContext()
+{
     qDebug() << "Intializing OpenAL!\n";
     mDevice = alcOpenDevice(NULL);
     if (mDevice) {
@@ -19,11 +21,13 @@ bool SoundSystem::createContext() {
 
     if (!mDevice) {
         qDebug() << "Device not made!\n";
-    } else
+    }
+    else
         qDebug() << "Intialization complete!\n";
     return true;
 }
-void SoundSystem::cleanUp() {
+void SoundSystem::cleanUp()
+{
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
         Sound &sound{view.get(entity)};
@@ -42,7 +46,8 @@ void SoundSystem::cleanUp() {
     alcDestroyContext(mContext);
     alcCloseDevice(mDevice);
 }
-void SoundSystem::init() {
+void SoundSystem::init()
+{
     auto view{reg->view<Sound, Transform>()};
     for (auto entity : view) {
         auto [trans, sound]{view.get<Transform, Sound>(entity)};
@@ -63,7 +68,8 @@ void SoundSystem::init() {
     //ALboolean bReturn = AL_FALSE;
 }
 
-void SoundSystem::update(DeltaTime) {
+void SoundSystem::update(DeltaTime)
+{
     updateListener();
     auto view{reg->view<Transform, Sound>()};
     for (auto entity : view) {
@@ -72,7 +78,8 @@ void SoundSystem::update(DeltaTime) {
             if (sound.mPlaying) {
                 play(sound);
                 //            sound.mPlay = false; ???
-            } else if (sound.mPaused)
+            }
+            else if (sound.mPaused)
                 pause(sound);
             else
                 stop(sound);
@@ -81,63 +88,75 @@ void SoundSystem::update(DeltaTime) {
         setPosition(entity, transform.position);
     }
 }
-void SoundSystem::play(Sound &sound) {
+void SoundSystem::play(Sound &sound)
+{
     alSourcePlay(sound.mSource);
 }
-void SoundSystem::pause(Sound &sound) {
+void SoundSystem::pause(Sound &sound)
+{
     alSourcePause(sound.mSource);
 }
-void SoundSystem::stop(Sound &sound) {
+void SoundSystem::stop(Sound &sound)
+{
     alSourceStop(sound.mSource);
 }
-void SoundSystem::playAll() {
+void SoundSystem::playAll()
+{
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
         play(entity);
     }
 }
-void SoundSystem::pauseAll() {
+void SoundSystem::pauseAll()
+{
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
         pause(entity);
     }
 }
-void SoundSystem::stopAll() {
+void SoundSystem::stopAll()
+{
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
         stop(entity);
     }
 }
-void SoundSystem::play(GLuint eID) {
+void SoundSystem::play(GLuint eID)
+{
     Sound &sound{reg->get<Sound>(eID)};
     sound.mPlaying = true;
     sound.mPaused = false;
     sound.mOutDated = true;
 }
-void SoundSystem::pause(GLuint eID) {
+void SoundSystem::pause(GLuint eID)
+{
     Sound &sound{reg->get<Sound>(eID)};
     sound.mPlaying = false;
     sound.mPaused = true;
     sound.mOutDated = true;
 }
-void SoundSystem::stop(GLuint eID) {
+void SoundSystem::stop(GLuint eID)
+{
     Sound &sound{reg->get<Sound>(eID)};
     sound.mPlaying = false;
     sound.mPaused = false;
     sound.mOutDated = true;
 }
-void SoundSystem::setPosition(GLuint eID, vec3 newPos) {
+void SoundSystem::setPosition(GLuint eID, vec3 newPos)
+{
     Sound &sound{reg->get<Sound>(eID)};
     ALfloat temp[3] = {newPos.x, newPos.y, newPos.z};
     alSourcefv(sound.mSource, AL_POSITION, temp);
 }
-void SoundSystem::setVelocity(GLuint eID, vec3 newVel) {
+void SoundSystem::setVelocity(GLuint eID, vec3 newVel)
+{
     Sound &sound{reg->get<Sound>(eID)};
     sound.mVelocity = newVel;
     ALfloat temp[3] = {newVel.x, newVel.y, newVel.z};
     alSourcefv(sound.mSource, AL_VELOCITY, temp);
 }
-void SoundSystem::updateListener() {
+void SoundSystem::updateListener()
+{
     ALfloat posVec[3];
     ALfloat velVec[3];
     ALfloat headVec[6];
@@ -162,7 +181,8 @@ void SoundSystem::updateListener() {
     alListenerfv(AL_VELOCITY, velVec);
     alListenerfv(AL_ORIENTATION, headVec);
 }
-bool SoundSystem::checkError(std::string name) {
+bool SoundSystem::checkError(std::string name)
+{
     QString qname{QString::fromStdString(name)};
     switch (alGetError()) {
     case AL_NO_ERROR:
@@ -187,3 +207,4 @@ bool SoundSystem::checkError(std::string name) {
     }
     return true;
 }
+} // namespace cjk

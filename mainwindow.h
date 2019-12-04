@@ -8,17 +8,20 @@
 #include <QMainWindow>
 #include <QStringListModel>
 
-using namespace cjk;
 class QWidget;
 class RenderWindow;
-class Entity;
 class QStandardItem;
+class QToolButton;
+namespace cjk {
 class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
-class QToolButton;
+class ComponentGroupBox;
 class ComponentList;
 class Registry;
+class ResourceManager;
+} // namespace cjk
+
 namespace Ui {
 class MainWindow;
 }
@@ -66,25 +69,26 @@ private:
     void init();
     Ui::MainWindow *ui;
 
-    HierarchyModel *hierarchy;
-    HierarchyView *hView;
-    VerticalScrollArea *scrollArea;
+    cjk::HierarchyModel *hierarchy;
+    cjk::HierarchyView *hView;
+    cjk::VerticalScrollArea *scrollArea;
+    cjk::ComponentList *mComponentList;
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
-    ComponentList *mComponentList;
+
     quint32 unnamedEntityCount{0};
 
-    Registry *registry;
+    cjk::Registry *registry;
 
     bool mShowingMsg{false};
 
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void playButtons();
-    friend class ComponentList;
-    friend class ComponentGroupBox;
-    friend class HierarchyView;
-    friend class ResourceManager;
+    friend class cjk::ComponentList;
+    friend class cjk::ComponentGroupBox;
+    friend class cjk::HierarchyView;
+    friend class cjk::ResourceManager;
     friend class RenderWindow;
 };
 

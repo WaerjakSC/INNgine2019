@@ -4,12 +4,12 @@
 #include "core.h"
 #include "isystem.h"
 #include "pool.h"
-using namespace cjk;
+namespace cjk {
 class Registry;
-class Transform;
 class MovementSystem : public QObject, public ISystem {
     Q_OBJECT
     friend class RenderWindow;
+    using vec3 = gsl::Vector3D;
 
 private:
     Registry *registry;
@@ -175,5 +175,6 @@ signals:
     void scaleChanged(GLuint eID, vec3 newScale);
     void rotationChanged(GLuint eID, vec3 newRot);
 };
+} // namespace cjk
 
 #endif // MOVEMENTSYSTEM_H

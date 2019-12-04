@@ -5,12 +5,11 @@
 #include "components.h"
 #include "isystem.h"
 #include "registry.h"
-
-// For øyeblikket trenger vi FSM og bsplinecurve relevant stuff her
-typedef gsl::Vector2D vec2;
-
+namespace cjk {
 class AISystem : public QObject, public ISystem {
     Q_OBJECT
+    using vec2 = gsl::Vector2D;
+
 public:
     AISystem();
 
@@ -51,5 +50,6 @@ private:
     void spawnWave(DeltaTime dt);
     float waveCD{7.f}, curWaveCD{1.f}, spawnCD{0.5f}, curSpawnCD{0.f}, spawnDuration{5.f}, curSpawnDuration{0.f};
 };
+} // namespace cjk
 
 #endif // AISYSTEM_H

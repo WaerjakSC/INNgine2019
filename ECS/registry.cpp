@@ -1,16 +1,20 @@
 #include "registry.h"
 #include <optional>
+namespace cjk {
 Registry *Registry::mInstance = nullptr;
 
-Registry::Registry() {
+Registry::Registry()
+{
 }
-Registry *Registry::instance() {
+Registry *Registry::instance()
+{
     if (!mInstance)
         mInstance = new Registry();
     return mInstance;
 }
 
-void Registry::onConstruct(const std::string &type, const GLuint entityID) {
+void Registry::onConstruct(const std::string &type, const GLuint entityID)
+{
     for (auto &group : mGroups) {
         if (group->ownsType(type)) {
             std::vector<IPool *> pools;
@@ -33,7 +37,8 @@ void Registry::onConstruct(const std::string &type, const GLuint entityID) {
     }
 }
 
-void Registry::onDestroy(const std::string &type, const GLuint entityID) {
+void Registry::onDestroy(const std::string &type, const GLuint entityID)
+{
     for (auto &group : mGroups) {
         if (group->ownsType(type)) {
             std::vector<IPool *> pools;
@@ -56,11 +61,13 @@ void Registry::onDestroy(const std::string &type, const GLuint entityID) {
     }
 }
 
-EInfo &Registry::getEntity(GLuint eID) {
+EInfo &Registry::getEntity(GLuint eID)
+{
     return get<EInfo>(eID);
 }
 
-void Registry::removeEntity(GLuint eID) {
+void Registry::removeEntity(GLuint eID)
+{
     EInfo &info{get<EInfo>(eID)};
 
     if (info.isDestroyed)
@@ -77,7 +84,8 @@ void Registry::removeEntity(GLuint eID) {
     emit entityRemoved(eID);
 }
 // Might be a bottleneck here. Probably better to save the next available entity ID in a vector when an entity is destroyed
-GLuint Registry::nextAvailable() {
+GLuint Registry::nextAvailable()
+{
     std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
     for (auto &entity : entities) {
         EInfo &info{get<EInfo>(entity)};
@@ -87,7 +95,8 @@ GLuint Registry::nextAvailable() {
     return numEntities();
 }
 
-void Registry::clearScene() {
+void Registry::clearScene()
+{
     std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
     for (auto &entity : entities) {
         if (entity != 0) {
@@ -96,7 +105,8 @@ void Registry::clearScene() {
     }
 }
 
-GLuint Registry::duplicateEntity(GLuint dupedEntity) {
+GLuint Registry::duplicateEntity(GLuint dupedEntity)
+{
     // Remember it also needs to be at the same parent level
     QString dupeName{get<EInfo>(dupedEntity).name};
     GLuint entityID{makeEntity(dupeName)};
@@ -116,7 +126,8 @@ GLuint Registry::duplicateEntity(GLuint dupedEntity) {
     return entityID;
 }
 
-void Registry::setParent(GLuint childID, int newParentID, bool fromEditor) {
+void Registry::setParent(GLuint childID, int newParentID, bool fromEditor)
+{
     Transform &trans{get<Transform>(childID)};
     if (hasParent(childID)) // Make sure to remove the child from its old parent if it had one
         removeChild(trans.parentID, childID);
@@ -127,31 +138,38 @@ void Registry::setParent(GLuint childID, int newParentID, bool fromEditor) {
         emit parentChanged(childID);
 }
 
-Transform &Registry::getParent(GLuint eID) {
+Transform &Registry::getParent(GLuint eID)
+{
     GLuint parentID{static_cast<GLuint>(get<Transform>(eID).parentID)};
     return get<Transform>(parentID);
 }
-bool Registry::hasParent(GLuint eID) {
+bool Registry::hasParent(GLuint eID)
+{
     return get<Transform>(eID).parentID != -1;
 }
-std::vector<GLuint> Registry::getChildren(GLuint eID) {
+std::vector<GLuint> Registry::getChildren(GLuint eID)
+{
     return get<Transform>(eID).children;
 }
 
-GLuint Registry::getSelectedEntity() const {
+GLuint Registry::getSelectedEntity() const
+{
     return mSelectedEntity;
 }
 
-void Registry::setSelectedEntity(const GLuint selectedEntity) {
+void Registry::setSelectedEntity(const GLuint selectedEntity)
+{
     mSelectedEntity = selectedEntity;
 }
 
-void Registry::addChild(const GLuint parentID, const GLuint childID) {
+void Registry::addChild(const GLuint parentID, const GLuint childID)
+{
     auto &parent{get<Transform>(parentID)};
     parent.children.emplace_back(childID);
     get<Transform>(childID).matrixOutdated = true;
 }
-void Registry::removeChild(const GLuint eID, const GLuint childID) {
+void Registry::removeChild(const GLuint eID, const GLuint childID)
+{
     std::vector<GLuint> &children{get<Transform>(eID).children};
     for (auto &child : children) {
         if (child == childID) {
@@ -162,7 +180,8 @@ void Registry::removeChild(const GLuint eID, const GLuint childID) {
     }
 }
 
-void Registry::updateChildParent() {
+void Registry::updateChildParent()
+{
     for (auto &entity : getEntities()) // For every entity
     {
         if (contains<Transform>(entity)) {
@@ -173,18 +192,21 @@ void Registry::updateChildParent() {
         }
     }
 }
-void Registry::newGeneration(GLuint entityID, const QString &text) {
+void Registry::newGeneration(GLuint entityID, const QString &text)
+{
     EInfo &info{get<EInfo>(entityID)};
     info.name = text;
     info.isDestroyed = false;
 }
 
-bool Registry::isDestroyed(GLuint entityID) {
+bool Registry::isDestroyed(GLuint entityID)
+{
     EInfo &info{get<EInfo>(entityID)};
     return info.isDestroyed;
 }
 
-void Registry::makeSnapshot() {
+void Registry::makeSnapshot()
+{
     std::map<std::string, IPool *> snapPools;
     for (auto &pool : mPools) {
         snapPools[pool.first] = pool.second->clone();
@@ -197,7 +219,8 @@ void Registry::makeSnapshot() {
     mSnapshot = {groupSnapshot, snapPools};
 }
 
-void Registry::loadSnapshot() {
+void Registry::loadSnapshot()
+{
     std::map<std::string, IPool *> tempPools;
     std::tie(mGroups, tempPools) = mSnapshot;
     mPools.clear();
@@ -208,3 +231,5 @@ void Registry::loadSnapshot() {
         transform.matrixOutdated = true;
     }
 }
+
+} // namespace cjk

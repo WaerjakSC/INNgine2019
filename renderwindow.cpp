@@ -13,7 +13,6 @@
 
 #include "aisystem.h"
 #include "collisionsystem.h"
-#include "deltaTime.h"
 #include "inputsystem.h"
 #include "lightsystem.h"
 #include "movementsystem.h"
@@ -28,14 +27,17 @@
 #include "skyboxshader.h"
 #include "textureshader.h"
 
+#include "cameracontroller.h"
+#include "deltaTime.h"
 #include "registry.h"
 #include "resourcemanager.h"
 #include "scene.h"
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext{nullptr}, mInitialized{false},
-      mFactory{ResourceManager::instance()}, mRegistry{Registry::instance()},
-      mMainWindow{mainWindow} {
+      mFactory{cjk::ResourceManager::instance()}, mRegistry{cjk::Registry::instance()},
+      mMainWindow{mainWindow}
+{
     //This is sent to QWindow:
     setSurfaceType(QWindow::OpenGLSurface);
     setFormat(format);
@@ -52,12 +54,14 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     mRenderTimer = new QTimer(this);
 }
 
-RenderWindow::~RenderWindow() {
+RenderWindow::~RenderWindow()
+{
     mSoundSystem->cleanUp();
 }
 
 /// Sets up the general OpenGL stuff and the buffers needed to render a triangle
-void RenderWindow::init() {
+void RenderWindow::init()
+{
     //Connect the gameloop timer to the render function:
     connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(render()));
 
@@ -99,16 +103,16 @@ void RenderWindow::init() {
 
     //********************** Set up camera **********************
     float aspectRatio = static_cast<float>(width()) / height();
-    mEditorCameraController = std::make_shared<CameraController>(aspectRatio);
+    mEditorCameraController = std::make_shared<cjk::CameraController>(aspectRatio);
     mEditorCameraController->setPosition(vec3(0.f, 20.f, 23.0f));
     mFactory->setCurrentCameraController(mEditorCameraController);
 
     //Compile shaders - init them with reference to current camera:
-    mFactory->loadShader<ColorShader>(mEditorCameraController);
-    mFactory->loadShader<TextureShader>(mEditorCameraController);
-    mFactory->loadShader<PhongShader>(mEditorCameraController);
-    mFactory->loadShader<SkyboxShader>(mEditorCameraController);
-    mFactory->loadShader<ParticleShader>(mEditorCameraController);
+    mFactory->loadShader<cjk::ColorShader>(mEditorCameraController);
+    mFactory->loadShader<cjk::TextureShader>(mEditorCameraController);
+    mFactory->loadShader<cjk::PhongShader>(mEditorCameraController);
+    mFactory->loadShader<cjk::SkyboxShader>(mEditorCameraController);
+    mFactory->loadShader<cjk::ParticleShader>(mEditorCameraController);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
@@ -124,20 +128,20 @@ void RenderWindow::init() {
     mFactory->loadMesh("OgreOBJ.obj"); // if a mesh is spawned in during play you'll probably want to load it here first to avoid fps hitches
 
     // Set up the systems.
-    mRenderer = mRegistry->registerSystem<RenderSystem>();
-    mMoveSystem = mRegistry->registerSystem<MovementSystem>();
-    mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
-    mInputSystem = mRegistry->registerSystem<InputSystem>(this);
+    mRenderer = mRegistry->registerSystem<cjk::RenderSystem>();
+    mMoveSystem = mRegistry->registerSystem<cjk::MovementSystem>();
+    mLightSystem = mRegistry->registerSystem<cjk::LightSystem>(mFactory->getShader<cjk::PhongShader>());
+    mInputSystem = mRegistry->registerSystem<cjk::InputSystem>(this);
     mInputSystem->setEditorCamController(mEditorCameraController);
-    mSoundSystem = mRegistry->registerSystem<SoundSystem>();
+    mSoundSystem = mRegistry->registerSystem<cjk::SoundSystem>();
     mSoundSystem->createContext();
-    mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
-    connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
-    connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
+    mCollisionSystem = mRegistry->registerSystem<cjk::CollisionSystem>();
+    connect(mCollisionSystem.get(), &cjk::CollisionSystem::updateAABB, mMoveSystem.get(), &cjk::MovementSystem::updateAABBTransform);
+    connect(mCollisionSystem.get(), &cjk::CollisionSystem::updateSphere, mMoveSystem.get(), &cjk::MovementSystem::updateSphereTransform);
 
-    mAISystem = mRegistry->registerSystem<AISystem>();
-    mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
-    mParticleSystem = mRegistry->registerSystem<ParticleSystem>(mFactory->getShader<ParticleShader>());
+    mAISystem = mRegistry->registerSystem<cjk::AISystem>();
+    mScriptSystem = mRegistry->registerSystem<cjk::ScriptSystem>();
+    mParticleSystem = mRegistry->registerSystem<cjk::ParticleSystem>(mFactory->getShader<cjk::ParticleShader>());
 
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
@@ -153,15 +157,16 @@ void RenderWindow::init() {
     mLightSystem->init();
     mParticleSystem->init();
 
-    connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
-    connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
+    connect(mInputSystem.get(), &cjk::InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
+    connect(mInputSystem.get(), &cjk::InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
 }
 
 ///Called each frame - doing the rendering
-void RenderWindow::render() {
+void RenderWindow::render()
+{
 
     float time{static_cast<float>(mTime.elapsed()) / 1000.f};
-    DeltaTime dt{time - mLastFrameTime};
+    cjk::DeltaTime dt{time - mLastFrameTime};
     mLastFrameTime = time;
 
     mTimeStart.restart();        //restart FPS clock
@@ -169,7 +174,7 @@ void RenderWindow::render() {
 
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (!ResourceManager::instance()->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
+    if (!mFactory->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
         mInputSystem->update(dt);
         mSoundSystem->update(dt);
         if (mFactory->isPlaying()) {
@@ -198,7 +203,8 @@ void RenderWindow::render() {
 //This function is called from Qt when window is exposed (shown)
 //and when it is resized
 //exposeEvent is a overridden function from QWindow that we inherit from
-void RenderWindow::exposeEvent(QExposeEvent *) {
+void RenderWindow::exposeEvent(QExposeEvent *)
+{
     if (!mInitialized) {
         init();
         mTime.start();
@@ -222,21 +228,25 @@ void RenderWindow::exposeEvent(QExposeEvent *) {
 //Simple way to turn on/off wireframe mode
 //Not totally accurate, but draws the objects with
 //lines instead of filled polygons
-void RenderWindow::toggleWireframe() {
+void RenderWindow::toggleWireframe()
+{
     mWireframe = !mWireframe;
     if (mWireframe) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //turn on wireframe mode
         glDisable(GL_CULL_FACE);
-    } else {
+    }
+    else {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //turn off wireframe mode
         glEnable(GL_CULL_FACE);
     }
 }
 // Whether something should be rendered or not is handled in RenderSystem
-void RenderWindow::toggleXYZ() {
+void RenderWindow::toggleXYZ()
+{
     mRenderer->toggleRendered(xyz);
 }
-void RenderWindow::togglePlaneDebugMode(bool trigger) {
+void RenderWindow::togglePlaneDebugMode(bool trigger)
+{
     mInputSystem->setPlaneColors(trigger);
     mInputSystem->setBuildableDebug(trigger);
 }
@@ -244,7 +254,8 @@ void RenderWindow::togglePlaneDebugMode(bool trigger) {
 //and check the time right after it is finished (done in the render function)
 //This will approximate what framerate we COULD have.
 //The actual frame rate on your monitor is limited by the vsync and is probably 60Hz
-void RenderWindow::calculateFramerate() {
+void RenderWindow::calculateFramerate()
+{
     long long nsecElapsed{mTimeStart.nsecsElapsed()};
     static int frameCount{0}; //counting actual frames for a quick "timer" for the statusbar
 
@@ -266,12 +277,14 @@ void RenderWindow::calculateFramerate() {
 
 /// Uses QOpenGLDebugLogger if this is present
 /// Reverts to glGetError() if not
-void RenderWindow::checkForGLerrors() {
+void RenderWindow::checkForGLerrors()
+{
     if (mOpenGLDebugLogger) {
         const QList<QOpenGLDebugMessage> messages{mOpenGLDebugLogger->loggedMessages()};
         for (const QOpenGLDebugMessage &message : messages)
             qDebug() << message;
-    } else {
+    }
+    else {
         GLenum err{GL_NO_ERROR};
         while ((err = glGetError()) != GL_NO_ERROR) {
             qDebug() << "glGetError returns " << err;
@@ -280,7 +293,8 @@ void RenderWindow::checkForGLerrors() {
 }
 
 /// Tries to start the extended OpenGL debugger that comes with Qt
-void RenderWindow::startOpenGLDebugger() {
+void RenderWindow::startOpenGLDebugger()
+{
     QOpenGLContext *temp{this->context()};
     if (temp) {
         QSurfaceFormat format{temp->format()};
@@ -299,30 +313,36 @@ void RenderWindow::startOpenGLDebugger() {
     }
 }
 
-void RenderWindow::keyPressEvent(QKeyEvent *event) {
+void RenderWindow::keyPressEvent(QKeyEvent *event)
+{
     if (mInputSystem)
         mInputSystem->keyPressEvent(event);
 }
 
-void RenderWindow::keyReleaseEvent(QKeyEvent *event) {
+void RenderWindow::keyReleaseEvent(QKeyEvent *event)
+{
     if (mInputSystem)
         mInputSystem->keyReleaseEvent(event);
 }
 
-void RenderWindow::mousePressEvent(QMouseEvent *event) {
+void RenderWindow::mousePressEvent(QMouseEvent *event)
+{
     if (mInputSystem)
         mInputSystem->mousePressEvent(event);
 }
 
-void RenderWindow::mouseReleaseEvent(QMouseEvent *event) {
+void RenderWindow::mouseReleaseEvent(QMouseEvent *event)
+{
     if (mInputSystem)
         mInputSystem->mouseReleaseEvent(event);
 }
-void RenderWindow::mouseMoveEvent(QMouseEvent *event) {
+void RenderWindow::mouseMoveEvent(QMouseEvent *event)
+{
     if (mInputSystem)
         mInputSystem->mouseMoveEvent(event);
 }
-void RenderWindow::wheelEvent(QWheelEvent *event) {
+void RenderWindow::wheelEvent(QWheelEvent *event)
+{
     if (mInputSystem)
         mInputSystem->wheelEvent(event);
 }

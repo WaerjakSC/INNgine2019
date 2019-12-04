@@ -11,6 +11,7 @@
 #include <memory>
 #include <typeinfo>
 #include <unordered_set>
+namespace cjk {
 template <typename... Member>
 struct GroupHandler {
     GroupHandler(const std::tuple<Pool<Member> *...> pools)
@@ -20,7 +21,7 @@ struct GroupHandler {
 };
 struct GroupData {
     template <typename Func>
-    GroupData(size_t ext, Func const &ownedType)
+    GroupData(size_t ext, const Func &ownedType)
         : extent(ext), ownsType(ownedType) {}
     size_t extent;
     bool (*ownsType)(const std::string &);
@@ -33,7 +34,8 @@ class Registry : public QObject {
      * @brief Simple getter for a type's typeid name
      */
     template <typename Type>
-    static std::string type() {
+    static std::string type()
+    {
         return typeid(Type).name();
     }
 
@@ -49,11 +51,13 @@ public:
      * @tparam List of the component types you want the view to contain.
      */
     template <typename... Comp>
-    View<Comp...> view() {
+    View<Comp...> view()
+    {
         return View{getPool<Comp>()...};
     }
     template <typename... Owned>
-    Group<Owned...> group() {
+    Group<Owned...> group()
+    {
         const auto cpools{std::make_tuple(getPool<Owned>()...)};
         const size_t extent{sizeof...(Owned)};
         GroupData *data{nullptr};
@@ -88,12 +92,14 @@ public:
      * @brief Register component type. A component must be registered before it can be used by the ECS.
      */
     template <typename Type>
-    void registerComponent() {
+    void registerComponent()
+    {
         std::string typeName{typeid(Type).name()};
 
         if (mPools.find(typeName) != mPools.end()) {
             return;
-        } else {
+        }
+        else {
             // Create a ComponentArray pointer and add it to the component arrays map
             mPools.emplace(typeName, std::make_unique<Pool<Type>>());
         }
@@ -102,12 +108,14 @@ public:
      * @brief Register a system with the ECS. Not strictly required, but will allow you to use the registry to get a reference to the system.
      */
     template <typename Type, class... Args>
-    Ref<Type> registerSystem(Args... args) {
+    Ref<Type> registerSystem(Args... args)
+    {
         std::string typeName{typeid(Type).name()};
 
         if (mSystems.find(typeName) != mSystems.end() && mSystems[typeName]) {
             return system<Type>();
-        } else {
+        }
+        else {
             // Create a ComponentArray pointer and add it to the component arrays map
             Ref<Type> newSystem = std::make_shared<Type>(args...);
             mSystems.insert({typeName, newSystem});
@@ -121,11 +129,13 @@ public:
     * @return Returns the entity ID for use in adding components or other tasks.
     */
     template <typename... Component>
-    GLuint makeEntity(const QString &name = "", bool signal = true) {
+    GLuint makeEntity(const QString &name = "", bool signal = true)
+    {
         GLuint eID{nextAvailable()};
         if (contains<EInfo>(eID)) {
             newGeneration(eID, name);
-        } else
+        }
+        else
             add<EInfo>(eID, name);
         if (signal)
             emit entityCreated(eID);
@@ -141,7 +151,8 @@ public:
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
      */
     template <typename Type, typename... Args>
-    void add(const GLuint entityID, Args... args) {
+    void add(const GLuint entityID, Args... args)
+    {
         // Add a component to the array for an entity
         getPool<Type>()->add(entityID, args...);
 
@@ -149,7 +160,8 @@ public:
     }
     void onConstruct(const std::string &type, const GLuint entityID);
     template <typename Type>
-    void onConstruct(const GLuint entityID) {
+    void onConstruct(const GLuint entityID)
+    {
         for (auto &group : mGroups) {
             if (group->ownsType(type<Type>())) {
                 std::vector<IPool *> pools;
@@ -175,7 +187,8 @@ public:
      * @brief Remove a component of type Type from the entity with entityID.
      */
     template <typename Type>
-    void remove(GLuint entityID) {
+    void remove(GLuint entityID)
+    {
         onDestroy<Type>(entityID);
 
         // Remove a component from the array for an entity
@@ -183,7 +196,8 @@ public:
     }
     void onDestroy(const std::string &type, const GLuint entityID);
     template <typename Type>
-    void onDestroy(const GLuint entityID) {
+    void onDestroy(const GLuint entityID)
+    {
         for (auto &group : mGroups) {
             if (group->ownsType(type<Type>())) {
                 auto member = getPool<Type>();
@@ -205,22 +219,26 @@ public:
      * @brief Get a reference to the Type component owned by entityID
      */
     template <typename Type>
-    Type &get(GLuint entityID) {
+    Type &get(GLuint entityID)
+    {
         // Get a reference to a component from the array for an entity
         return getPool<Type>()->get(entityID);
     }
     template <typename... Type>
-    decltype(auto) system() {
+    decltype(auto) system()
+    {
         if constexpr (sizeof...(Type) == 1) {
             return (getSystem<Type>(), ...);
-        } else
+        }
+        else
             return std::tuple<decltype(getSystem<Type>())...>{getSystem<Type>()...};
     }
     /**
      * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
      */
     template <typename Type>
-    Type &getLastComponent() {
+    Type &getLastComponent()
+    {
         // Get a reference to a component from the array for an entity
         return getPool<Type>()->back();
     }
@@ -229,7 +247,8 @@ public:
      * Iterates through all the Pools, and if they contain a component owned by entityID, delete and re-arrange the Pool.
      * @param entityID
      */
-    void entityDestroyed(GLuint entityID) {
+    void entityDestroyed(GLuint entityID)
+    {
         // Notify each component array that an entity has been destroyed.
         // If it has a component for that entity, it will remove it.
         for (auto &pool : mPools) {
@@ -247,7 +266,8 @@ public:
      * @brief Checks if an entity owns the given component types.
      */
     template <typename... Type>
-    bool contains(GLuint eID) {
+    bool contains(GLuint eID)
+    {
         [[maybe_unused]] const auto cpools{std::make_tuple(getPool<Type>()...)};
         return ((std::get<Pool<Type> *>(cpools) ? std::get<Pool<Type> *>(cpools)->has(eID) : false) && ...);
     }
@@ -274,7 +294,8 @@ public:
      * @brief numEntities size of the mEntities map
      * @return
      */
-    GLuint numEntities() {
+    GLuint numEntities()
+    {
         std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
         return entities.size();
     }
@@ -361,19 +382,23 @@ private:
     std::tuple<std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>
-    Ref<Type> getSystem() {
+    Ref<Type> getSystem()
+    {
         std::string typeName{type<Type>()};
         return std::static_pointer_cast<Type>(mSystems[typeName]);
     }
-    IPool *getPool(const std::string &type) {
+    IPool *getPool(const std::string &type)
+    {
         return mPools[type].get();
     }
     // Convenience function to get the statically casted pointer to the Pool of type Type.
     template <typename Type>
-    Pool<Type> *getPool() {
+    Pool<Type> *getPool()
+    {
         std::string typeName{type<Type>()};
         return static_cast<Pool<Type> *>(mPools[typeName].get());
     }
 };
+} // namespace cjk
 
 #endif // REGISTRY_H

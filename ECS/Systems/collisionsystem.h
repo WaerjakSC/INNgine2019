@@ -5,9 +5,12 @@
 #include "deltaTime.h"
 #include "isystem.h"
 #include <QOpenGLFunctions_4_1_Core>
+namespace cjk {
 struct Ray {
+    using vec3 = gsl::Vector3D;
     Ray() {}
-    Ray(const vec3 &orig, const vec3 &dir) : origin{orig}, direction{dir} {
+    Ray(const vec3 &orig, const vec3 &dir) : origin{orig}, direction{dir}
+    {
         invDir = direction.divide(1.f);
         sign[0] = (invDir.x < 0);
         sign[1] = (invDir.y < 0);
@@ -19,7 +22,8 @@ struct Ray {
     int sign[3];
 };
 struct Raycast {
-    Raycast(float range) : rayRange(range), closestTarget(range) {
+    Raycast(float range) : rayRange(range), closestTarget(range)
+    {
     }
 
     Ray ray;
@@ -27,11 +31,13 @@ struct Raycast {
     double intersectionDistance;
     double closestTarget;
     int hitEntity{-1};
-    vec3 hitPoint;
+    gsl::Vector3D hitPoint;
 };
 class Registry;
 class CollisionSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
+    using vec3 = gsl::Vector3D;
+
 public:
     CollisionSystem();
 
@@ -166,13 +172,6 @@ private:
      * @return
      */
     vec3 getPointOnRay(const Raycast &r, double distance);
-    // Work in progress this guy
-    //    bool CylinderCylinder(const Cylinder &cylinder1, const Cylinder &cylinder2);
-
-    // Could this be useful later?
-    // bool PointInAABB(const vec3& point, const Collision::AABB& aabb);
-    // bool PointInSphere(const vec3& point, const Collision::Sphere& sphere);
-    // bool PointInOBB(const vec3& point, const Collision::OBB& obb);
     /**
     * @brief ClosestPoint finds the point in an AABB closest to a given point
     * @param Collider aabb
@@ -197,5 +196,6 @@ private:
      */
     bool bothStatic(const Collision &lhs, const Collision &rhs);
 };
+} // namespace cjk
 
 #endif // COLLISIONSYSTEM_H

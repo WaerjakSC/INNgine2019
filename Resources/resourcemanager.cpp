@@ -27,10 +27,11 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <skyboxshader.h>
-
+namespace cjk {
 ResourceManager *ResourceManager::mInstance = nullptr;
 
-ResourceManager::ResourceManager() : registry{Registry::instance()} {
+ResourceManager::ResourceManager() : registry{Registry::instance()}
+{
 
     registry->registerComponent<EInfo>();
     registry->registerComponent<Transform>();
@@ -56,48 +57,59 @@ ResourceManager::ResourceManager() : registry{Registry::instance()} {
     mSceneLoader = std::make_unique<Scene>();
 }
 
-std::map<std::string, Ref<Texture>> ResourceManager::getTextures() const {
+std::map<std::string, Ref<Texture>> ResourceManager::getTextures() const
+{
     return mTextures;
 }
 
-Ref<CameraController> ResourceManager::getCurrentCameraController() const {
+Ref<CameraController> ResourceManager::getCurrentCameraController() const
+{
     return mCurrentCameraController;
 }
 
-void ResourceManager::setCurrentCameraController(Ref<CameraController> currentCameraController) {
+void ResourceManager::setCurrentCameraController(Ref<CameraController> currentCameraController)
+{
     mCurrentCameraController = currentCameraController;
 }
 
-void ResourceManager::setCurrentScene(const QString &currentScene) {
+void ResourceManager::setCurrentScene(const QString &currentScene)
+{
     mCurrentScene = currentScene;
 }
 
-QString ResourceManager::getProjectName() const {
+QString ResourceManager::getProjectName() const
+{
     return mCurrentProject;
 }
 
-QString ResourceManager::getCurrentScene() const {
+QString ResourceManager::getCurrentScene() const
+{
     return mCurrentScene;
 }
 
-Scene *ResourceManager::getSceneLoader() const {
+Scene *ResourceManager::getSceneLoader() const
+{
     return mSceneLoader.get();
 }
 
-bool ResourceManager::isLoading() const {
+bool ResourceManager::isLoading() const
+{
     return mLoading;
 }
 
 // Do resource manager stuff -- Aka actually delete the pointers after application end
-ResourceManager::~ResourceManager() {
+ResourceManager::~ResourceManager()
+{
 }
-ResourceManager *ResourceManager::instance() {
+ResourceManager *ResourceManager::instance()
+{
     if (!mInstance)
         mInstance = new ResourceManager();
     return mInstance;
 }
 
-void ResourceManager::saveProjectSettings(const QString &fileName) {
+void ResourceManager::saveProjectSettings(const QString &fileName)
+{
     if (fileName.isEmpty())
         return;
     QFileInfo file{fileName};
@@ -121,7 +133,8 @@ void ResourceManager::saveProjectSettings(const QString &fileName) {
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
-void ResourceManager::loadProject(const QString &fileName) {
+void ResourceManager::loadProject(const QString &fileName)
+{
     QFileInfo file{fileName};
     std::ifstream fileStream{gsl::settingsFilePath + file.fileName().toStdString()};
     if (!fileStream.good()) {
@@ -142,7 +155,8 @@ void ResourceManager::loadProject(const QString &fileName) {
         mSceneLoader->loadScene(mDefaultScene + ".json");
     }
 }
-void ResourceManager::loadLastProject() {
+void ResourceManager::loadLastProject()
+{
     std::ifstream fileStream{gsl::settingsFilePath + "EngineSettings/settings.json"};
     if (!fileStream.good()) {
         qDebug() << "Can't read the JSON settings file!";
@@ -158,7 +172,8 @@ void ResourceManager::loadLastProject() {
     mCurrentProject = project.MemberBegin()->value.GetString();
     loadProject(QString::fromStdString(gsl::settingsFilePath) + mCurrentProject + ".json");
 }
-void ResourceManager::onExit() {
+void ResourceManager::onExit()
+{
     StringBuffer buf;
     PrettyWriter<StringBuffer> writer{buf};
 
@@ -178,7 +193,8 @@ void ResourceManager::onExit() {
  * @param type
  * @return The entity ID of the entity.
  */
-GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
+GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type)
+{
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
     else {
@@ -192,19 +208,22 @@ GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type) {
  * @brief Plane prefab -- should fix coloring at some point
  * @return
  */
-GLuint ResourceManager::makePlane(const QString &name) {
+GLuint ResourceManager::makePlane(const QString &name)
+{
     GLuint eID{registry->makeEntity<Transform>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
     auto search = mMeshMap.find("Plane");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
-    } else
+    }
+    else
         makePlaneMesh(eID);
 
     return eID;
 }
 
-void ResourceManager::makePlaneMesh(GLuint eID) {
+void ResourceManager::makePlaneMesh(GLuint eID)
+{
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Plane";
@@ -230,7 +249,8 @@ void ResourceManager::makePlaneMesh(GLuint eID) {
  * @brief Cube prefab
  * @return
  */
-GLuint ResourceManager::makeCube(const QString &name) {
+GLuint ResourceManager::makeCube(const QString &name)
+{
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
     setMesh("cube.obj", eID);
@@ -240,14 +260,16 @@ GLuint ResourceManager::makeCube(const QString &name) {
 /**
  * @brief Creates basic XYZ lines
  */
-GLuint ResourceManager::makeXYZ(const QString &name) {
+GLuint ResourceManager::makeXYZ(const QString &name)
+{
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
     makeXYZMesh(eID);
 
     return eID;
 }
-void ResourceManager::makeXYZMesh(GLuint eID) {
+void ResourceManager::makeXYZMesh(GLuint eID)
+{
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "XYZ";
@@ -273,17 +295,20 @@ void ResourceManager::makeXYZMesh(GLuint eID) {
  * @brief Prefab skybox for editor
  * @return
  */
-GLuint ResourceManager::makeSkyBox(const QString &name) {
+GLuint ResourceManager::makeSkyBox(const QString &name)
+{
     GLuint eID{registry->makeEntity(name)};
     registry->add<Material>(eID, getShader<SkyboxShader>(), mTextures["Skybox"]->textureUnit());
     auto search = mMeshMap.find("Skybox");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
-    } else
+    }
+    else
         makeSkyBoxMesh(eID);
     return eID;
 }
-void ResourceManager::makeSkyBoxMesh(GLuint eID) {
+void ResourceManager::makeSkyBoxMesh(GLuint eID)
+{
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Skybox";
@@ -323,7 +348,8 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID) {
  * @param fileName
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> type) {
+GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> type)
+{
     GLuint eID{registry->makeEntity<Transform, Mesh>(QString::fromStdString(fileName))};
 
     initializeOpenGLFunctions();
@@ -335,7 +361,8 @@ GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> ty
     return eID;
 }
 
-GLuint ResourceManager::makeEnemy(const QString &name) {
+GLuint ResourceManager::makeEnemy(const QString &name)
+{
     GLuint eID{registry->makeEntity<Mesh, AIComponent>(name)};
     registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
     registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false);
@@ -349,7 +376,8 @@ GLuint ResourceManager::makeEnemy(const QString &name) {
  * @param name
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeLevelPlane(const QString &name) {
+GLuint ResourceManager::makeLevelPlane(const QString &name)
+{
     GLuint eID{registry->makeEntity<Mesh, Buildable>(name)};
     registry->add<Transform>(eID, vec3{0}, vec3{}, vec3{2.5f, 1.f, 2.5f});
     registry->add<AABB>(eID, vec3{}, vec3{2.5f, 0.01f, 2.5f}, true);
@@ -362,19 +390,22 @@ GLuint ResourceManager::makeLevelPlane(const QString &name) {
  * @brief Billboard prefab
  * @return
  */
-GLuint ResourceManager::makeBillBoard(const QString &name) {
+GLuint ResourceManager::makeBillBoard(const QString &name)
+{
     GLuint eID{registry->makeEntity<BillBoard>(name)};
     registry->add<Transform>(eID, vec3{4.f, 0.f, -3.5f});
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["gnome.bmp"]->textureUnit());
     auto search = mMeshMap.find("BillBoard");
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
-    } else
+    }
+    else
         makeBillBoardMesh(eID);
 
     return eID;
 }
-void ResourceManager::makeBillBoardMesh(int eID) {
+void ResourceManager::makeBillBoardMesh(int eID)
+{
     initializeOpenGLFunctions();
 
     mMeshData.Clear();
@@ -401,7 +432,8 @@ void ResourceManager::makeBillBoardMesh(int eID) {
  * @brief Creates the level grid.
  * @return
  */
-void ResourceManager::makeLevel() {
+void ResourceManager::makeLevel()
+{
     float x{-16};
     float y{0};
     float z{-16};
@@ -422,7 +454,8 @@ void ResourceManager::makeLevel() {
     }
 }
 
-void ResourceManager::makeTowerMesh(GLuint eID) {
+void ResourceManager::makeTowerMesh(GLuint eID)
+{
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Tower";
@@ -486,19 +519,22 @@ void ResourceManager::makeTowerMesh(GLuint eID) {
  * @param n - number of recursions. Increase number for "rounder" sphere
  * @return
  */
-GLuint ResourceManager::makeOctBall(const QString &name, int n) {
+GLuint ResourceManager::makeOctBall(const QString &name, int n)
+{
     GLuint eID{registry->makeEntity<Transform>(name)};
 
     registry->add<Material>(eID, getShader<ColorShader>());
     auto search{mMeshMap.find("Ball")};
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
-    } else
+    }
+    else
         makeBallMesh(eID, n);
 
     return eID;
 }
-void ResourceManager::makeBallMesh(GLuint eID, int n) {
+void ResourceManager::makeBallMesh(GLuint eID, int n)
+{
     initializeOpenGLFunctions();
     mMeshData.Clear();
     mMeshData.mName = "Ball";
@@ -522,18 +558,21 @@ void ResourceManager::makeBallMesh(GLuint eID, int n) {
  * @brief Light object prefab -- not fully implemented yet
  * @return
  */
-GLuint ResourceManager::makeLightObject(const QString &name) {
+GLuint ResourceManager::makeLightObject(const QString &name)
+{
     GLuint eID{registry->makeEntity<Light>(name)};
     registry->add<Transform>(eID, vec3(2.5f, 3.f, 0.f), vec3(0.0f, 180.f, 0.0f));
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["white.bmp"]->textureUnit(), vec3(0.1f, 0.1f, 0.8f));
     auto search{mMeshMap.find("Pyramid")};
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
-    } else
+    }
+    else
         makeLightMesh(eID);
     return eID;
 }
-void ResourceManager::makeLightMesh(int eID) {
+void ResourceManager::makeLightMesh(int eID)
+{
     initializeOpenGLFunctions();
 
     mMeshData.Clear();
@@ -564,7 +603,8 @@ void ResourceManager::makeLightMesh(int eID) {
 
     glBindVertexArray(0);
 }
-void ResourceManager::setAABBMesh(Mesh &mesh) {
+void ResourceManager::setAABBMesh(Mesh &mesh)
+{
     mMeshData.Clear();
 
     mMeshData.mVertices.insert(mMeshData.mVertices.end(),
@@ -609,7 +649,8 @@ void ResourceManager::setAABBMesh(Mesh &mesh) {
 /**
  * @brief opengl init - initialize the given mesh's buffers and arrays
  */
-void ResourceManager::initVertexBuffers(Mesh *mesh) {
+void ResourceManager::initVertexBuffers(Mesh *mesh)
+{
     //Vertex Array Object - VAO
     glGenVertexArrays(1, &mesh->mVAO);
     glBindVertexArray(mesh->mVAO);
@@ -636,13 +677,15 @@ void ResourceManager::initVertexBuffers(Mesh *mesh) {
  * @brief opengl init for glDrawElements - initialize the given mesh's index buffer
  * @param mesh
  */
-void ResourceManager::initIndexBuffers(Mesh *mesh) {
+void ResourceManager::initIndexBuffers(Mesh *mesh)
+{
     glGenBuffers(1, &mesh->mEAB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
 }
 
-void ResourceManager::initParticleBuffers(ParticleEmitter &emitter) {
+void ResourceManager::initParticleBuffers(ParticleEmitter &emitter)
+{
     // The VBO containing the 4 vertices of the particles.
     // Thanks to instancing, they will be shared by all particles.
     static std::vector<vec3> vertexBufferData = {{-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}};
@@ -677,22 +720,26 @@ void ResourceManager::initParticleBuffers(ParticleEmitter &emitter) {
  * @param name - name of the file you want to read
  * @param eID - entityID
  */
-void ResourceManager::addMeshComponent(std::string name, GLuint eID) {
+void ResourceManager::addMeshComponent(std::string name, GLuint eID)
+{
     registry->add<Mesh>(eID);
     setMesh(name, eID);
 }
-void ResourceManager::setMesh(std::string name, GLuint eID) {
+void ResourceManager::setMesh(std::string name, GLuint eID)
+{
     if (name.empty())
         return;
     auto search{mMeshMap.find(name)};
     if (search != mMeshMap.end()) {
         registry->get<Mesh>(eID) = search->second;
         return;
-    } else if (name == "Skybox")
+    }
+    else if (name == "Skybox")
         makeSkyBoxMesh(eID);
     else if (name == "BillBoard") {
         makeBillBoardMesh(eID);
-    } else if (name == "Pyramid") // Light just refers to the pyramid mesh, probably not needed in the end
+    }
+    else if (name == "Pyramid") // Light just refers to the pyramid mesh, probably not needed in the end
         makeLightMesh(eID);
     else if (name == "Plane")
         makePlaneMesh(eID);
@@ -712,21 +759,24 @@ void ResourceManager::setMesh(std::string name, GLuint eID) {
  * @param fileName
  * @return
  */
-void ResourceManager::loadMesh(std::string fileName, int eID) {
+void ResourceManager::loadMesh(std::string fileName, int eID)
+{
     if (!readFile(fileName, eID)) { // Should run readFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return;
     }
 }
 
-void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID) {
+void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID)
+{
     if (!readTriangleFile(fileName, eID)) { // Should run readTriangleFile and add the mesh to the Meshes map if it can be found
         qDebug() << "ResourceManager: Failed to find " << QString::fromStdString(fileName);
         return;
     }
 }
 
-bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
+bool ResourceManager::loadWave(std::string filePath, Sound &sound)
+{
     ALuint frequency{};
     ALenum format{};
     wave_t *waveData{new wave_t()};
@@ -793,7 +843,8 @@ bool ResourceManager::loadWave(std::string filePath, Sound &sound) {
     return true;
 }
 
-void ResourceManager::initParticleEmitter(ParticleEmitter &emitter) {
+void ResourceManager::initParticleEmitter(ParticleEmitter &emitter)
+{
     initParticleBuffers(emitter);
 }
 
@@ -802,7 +853,8 @@ void ResourceManager::initParticleEmitter(ParticleEmitter &emitter) {
  * @param fileName
  * @param textureUnit
  */
-bool ResourceManager::loadTexture(std::string fileName) {
+bool ResourceManager::loadTexture(std::string fileName)
+{
     if (mTextures.find(fileName) == mTextures.end()) {
         Ref<Texture> tex{std::make_shared<Texture>(fileName, mTextures.size())};
         if (tex->isValid) {
@@ -819,7 +871,8 @@ bool ResourceManager::loadTexture(std::string fileName) {
  * @param faces List of filenames for the cubemap
  * @return success
  */
-bool ResourceManager::loadCubemap(std::vector<std::string> faces) {
+bool ResourceManager::loadCubemap(std::vector<std::string> faces)
+{
     if (mTextures.find("Skybox") == mTextures.end()) {
         Ref<Texture> tex{std::make_shared<Texture>(faces, mTextures.size())};
         if (tex->isValid) {
@@ -831,11 +884,13 @@ bool ResourceManager::loadCubemap(std::vector<std::string> faces) {
     }
     return false;
 }
-Ref<Texture> ResourceManager::getTexture(std::string fileName) {
+Ref<Texture> ResourceManager::getTexture(std::string fileName)
+{
     return mTextures[fileName];
 }
 
-QString ResourceManager::getTextureName(GLuint textureUnit) {
+QString ResourceManager::getTextureName(GLuint textureUnit)
+{
     for (auto it{mTextures.begin()}; it != mTextures.end(); ++it) {
         if (it->second->textureUnit() == textureUnit) {
             return QString::fromStdString(it->first);
@@ -843,7 +898,8 @@ QString ResourceManager::getTextureName(GLuint textureUnit) {
     }
     return QString();
 }
-QString ResourceManager::getMeshName(const Mesh &mesh) {
+QString ResourceManager::getMeshName(const Mesh &mesh)
+{
     for (auto it{mMeshMap.begin()}; it != mMeshMap.end(); ++it) {
         if (it->second == mesh) {
             return QString::fromStdString(it->first);
@@ -856,7 +912,8 @@ QString ResourceManager::getMeshName(const Mesh &mesh) {
  * @param fileName
  * @return
  */
-bool ResourceManager::readFile(std::string fileName, int eID) {
+bool ResourceManager::readFile(std::string fileName, int eID)
+{
     //Open File
     std::string fileWithPath{gsl::assetFilePath + "Meshes/" + fileName};
     std::string mtlPath{gsl::assetFilePath + "Meshes/"};
@@ -930,7 +987,8 @@ bool ResourceManager::readFile(std::string fileName, int eID) {
     return true;
 }
 
-bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
+bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID)
+{
     std::ifstream inn;
     std::string fileWithPath{gsl::assetFilePath + "Meshes/" + fileName};
     mMeshData.Clear();
@@ -955,33 +1013,40 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID) {
         mesh.mDrawType = GL_TRIANGLES;
         initVertexBuffers(&mesh);
         return true;
-    } else {
+    }
+    else {
         qDebug() << "Could not open file for reading: " << QString::fromStdString(fileName);
         return false;
     }
 }
 
-std::map<std::string, Ref<Shader>> ResourceManager::getShaders() const {
+std::map<std::string, Ref<Shader>> ResourceManager::getShaders() const
+{
     return mShaders;
 }
-void ResourceManager::showMessage(const QString &message) {
+void ResourceManager::showMessage(const QString &message)
+{
     mMainWindow->statusBar()->showMessage(message, 1000);
     mMainWindow->mShowingMsg = true;
     QTimer::singleShot(1000, this, &ResourceManager::changeMsg);
 }
 
-bool ResourceManager::isPaused() const {
+bool ResourceManager::isPaused() const
+{
     return mIsPaused;
 }
 
-bool ResourceManager::isPlaying() const {
+bool ResourceManager::isPlaying() const
+{
     return mIsPlaying;
 }
-void ResourceManager::changeMsg() {
+void ResourceManager::changeMsg()
+{
     bool &msg = mMainWindow->mShowingMsg;
     msg = !msg;
 }
-void ResourceManager::newScene(const QString &text) {
+void ResourceManager::newScene(const QString &text)
+{
     setCurrentScene(text);
     stop(); // Stop the editor if it's in play
     mMainWindow->clearEditor();
@@ -989,7 +1054,8 @@ void ResourceManager::newScene(const QString &text) {
     save();
     getSceneLoader()->loadScene(getCurrentScene() + ".json");
 }
-void ResourceManager::newScene() {
+void ResourceManager::newScene()
+{
     QString text{QInputDialog::getText(mMainWindow, tr("New Scene"), tr("Scene name:"),
                                        QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint)};
     if (text.isEmpty()) {
@@ -997,11 +1063,13 @@ void ResourceManager::newScene() {
     }
     newScene(text);
 }
-void ResourceManager::save() {
+void ResourceManager::save()
+{
     getSceneLoader()->saveScene(getCurrentScene());
     showMessage("Saved Scene!");
 }
-void ResourceManager::saveAs() {
+void ResourceManager::saveAs()
+{
     QFileInfo file{QFileDialog::getSaveFileName(mMainWindow, tr("Save Scene"),
                                                 QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)"))};
     if (file.fileName().isEmpty())
@@ -1010,7 +1078,8 @@ void ResourceManager::saveAs() {
     save();
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
 }
-void ResourceManager::load() {
+void ResourceManager::load()
+{
     QFileInfo file{QFileDialog::getOpenFileName(mMainWindow, tr("Load Scene"),
                                                 QString::fromStdString(gsl::sceneFilePath), tr("JSON files (*.json)"))};
     if (file.fileName().isEmpty())
@@ -1023,7 +1092,8 @@ void ResourceManager::load() {
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
     showMessage("Loaded Scene!");
 }
-void ResourceManager::loadProject() {
+void ResourceManager::loadProject()
+{
     QFileInfo file{QFileDialog::getOpenFileName(mMainWindow, tr("Load Project"),
                                                 QString::fromStdString(gsl::settingsFilePath), tr("JSON files (*.json)"))};
     if (file.fileName().isEmpty())
@@ -1035,12 +1105,14 @@ void ResourceManager::loadProject() {
     Registry::instance()->system<MovementSystem>()->init();
     showMessage("Loaded Project: " + getProjectName());
 }
-void ResourceManager::saveProject() {
+void ResourceManager::saveProject()
+{
     saveProjectSettings(QString::fromStdString(gsl::settingsFilePath + getProjectName().toStdString()));
     showMessage("Saved Project!");
 }
 
-void ResourceManager::newProject() {
+void ResourceManager::newProject()
+{
     QString text{QInputDialog::getText(mMainWindow, tr("New Project"), tr("Project name:"),
                                        QLineEdit::Normal, QString(), nullptr, Qt::MSWindowsFixedSizeDialogHint)};
     if (text.isEmpty()) {
@@ -1053,11 +1125,13 @@ void ResourceManager::newProject() {
     mMainWindow->setWindowTitle(getProjectName() + " - Current Scene: " + getCurrentScene());
     saveProject();
 }
-void ResourceManager::play() {
+void ResourceManager::play()
+{
     if (!mIsPlaying) {
         if (mIsPaused) { // Only make snapshot if not resuming from pause
             mIsPaused = false;
-        } else
+        }
+        else
             Registry::instance()->makeSnapshot();
         auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
         sound->playAll();
@@ -1076,7 +1150,8 @@ void ResourceManager::play() {
         emit disableStop(false);
     }
 }
-void ResourceManager::pause() {
+void ResourceManager::pause()
+{
     if (mIsPlaying) {
         mIsPlaying = false;
         mIsPaused = true;
@@ -1089,7 +1164,8 @@ void ResourceManager::pause() {
         emit disablePause(true);
     }
 }
-void ResourceManager::stop() {
+void ResourceManager::stop()
+{
     if (mIsPlaying || mIsPaused) {
         registry->loadSnapshot();
         auto [movement, sound, input]{registry->system<MovementSystem, SoundSystem, InputSystem>()};
@@ -1107,19 +1183,22 @@ void ResourceManager::stop() {
         emit disableStop(true);
     }
 }
-void ResourceManager::setActiveCameraController(Ref<CameraController> controller) {
+void ResourceManager::setActiveCameraController(Ref<CameraController> controller)
+{
     for (auto shader : mShaders) {
         shader.second->setCameraController(controller);
     }
 }
 //=========================== Octahedron Functions =========================== //
-void ResourceManager::makeTriangle(const vec3 &v1, const vec3 &v2, const vec3 &v3) {
+void ResourceManager::makeTriangle(const vec3 &v1, const vec3 &v2, const vec3 &v3)
+{
     mMeshData.mVertices.push_back(Vertex{v1, v1, gsl::Vector2D{0.f, 0.f}});
     mMeshData.mVertices.push_back(Vertex{v2, v2, gsl::Vector2D{1.f, 0.f}});
     mMeshData.mVertices.push_back(Vertex{v3, v3, gsl::Vector2D{0.5f, 1.f}});
 }
 
-void ResourceManager::subDivide(const vec3 &a, const vec3 &b, const vec3 &c, GLint n) {
+void ResourceManager::subDivide(const vec3 &a, const vec3 &b, const vec3 &c, GLint n)
+{
     if (n > 0) {
         vec3 v1{a + b};
         v1.normalize();
@@ -1133,13 +1212,14 @@ void ResourceManager::subDivide(const vec3 &a, const vec3 &b, const vec3 &c, GLi
         subDivide(c, v2, v3, n - 1);
         subDivide(b, v3, v1, n - 1);
         subDivide(v3, v2, v1, n - 1);
-
-    } else {
+    }
+    else {
         makeTriangle(a, b, c);
     }
 }
 
-void ResourceManager::makeUnitOctahedron(GLint recursions) {
+void ResourceManager::makeUnitOctahedron(GLint recursions)
+{
     vec3 v0{0.f, 0.f, 1.f};
     vec3 v1{1.f, 0.f, 0.f};
     vec3 v2{0.f, 1.f, 0.f};
@@ -1156,3 +1236,5 @@ void ResourceManager::makeUnitOctahedron(GLint recursions) {
     subDivide(v5, v4, v3, recursions);
     subDivide(v5, v1, v4, recursions);
 }
+
+} // namespace cjk

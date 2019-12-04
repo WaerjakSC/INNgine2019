@@ -20,18 +20,15 @@
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
 #endif
-// must undefine for Frustum.
-#undef near
-#undef far
-using namespace cjk;
-typedef gsl::Matrix3x3 mat3;
-typedef gsl::Matrix4x4 mat4;
+
+namespace cjk {
 struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
     std::string mName;
-    void Clear() {
+    void Clear()
+    {
         mVertices.clear();
         mIndices.clear();
         mName.clear();
@@ -41,8 +38,9 @@ struct meshData {
  * @brief The Component class is the base class for all components.
  */
 class Component {
-
 public:
+    using vec3 = gsl::Vector3D;
+
     Component() = default;
     virtual ~Component() {}
 };
@@ -63,7 +61,9 @@ struct BillBoard : Component {
     bool mNormalVersion{false}; //flip between two ways to calculate forward direction
 };
 struct Transform : Component {
-    Transform() {
+
+    Transform()
+    {
         modelMatrix.setToIdentity();
         //calculate matrix from position, scale, rotation
         translationMatrix.setToIdentity();
@@ -77,7 +77,8 @@ struct Transform : Component {
         scaleMatrix.setToIdentity();
         scaleMatrix.scale(localScale);
     }
-    Transform(vec3 pos, vec3 rot = 0, vec3 newScale = 1) : Transform() {
+    Transform(vec3 pos, vec3 rot = 0, vec3 newScale = 1) : Transform()
+    {
         localPosition = pos;
         localRotation = rot;
         localScale = newScale;
@@ -110,12 +111,15 @@ struct Material : public Component {
 };
 
 struct Mesh : public Component {
-    Mesh() {
+    Mesh()
+    {
     }
     Mesh(GLenum drawType, std::string name, GLuint verticeCount = 0, GLuint indiceCount = 0)
-        : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name) {
+        : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name)
+    {
     }
-    Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size()) {
+    Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size())
+    {
     }
     //    Mesh(const Mesh &other) {
     //        *this = other;
@@ -143,7 +147,8 @@ struct Mesh : public Component {
     //        mDrawType = other.mDrawType;
     //        return *this;
     //    }
-    bool operator==(const Mesh &other) {
+    bool operator==(const Mesh &other)
+    {
         return mName == other.mName; // name of the obj/txt file should be enough to verify if they're the same.
     }
 };
@@ -160,7 +165,8 @@ struct ParticleEmitter : public Component {
         : isActive(active), shouldDecay(decay), numParticles(nrParticles), particlesPerSecond(pps), initialDirection(initDir), initialColor(initColor),
           speed(inSpeed), size(inSize), spread(inSpread), lifeSpan(inLifeSpan), textureUnit(texUnit),
           positionData(std::vector<GLfloat>(numParticles * 4)), colorData(std::vector<GLubyte>(numParticles * 4)),
-          particles(std::vector<Particle>(numParticles)) {
+          particles(std::vector<Particle>(numParticles))
+    {
         initLifeSpan = lifeSpan;
     }
     void setNumParticles(size_t num);
@@ -195,7 +201,8 @@ struct Light : public Component {
           GLfloat lightStr = 0.7f, vec3 lightColor = vec3{0.3f, 0.3f, 0.3f},
           vec3 color = vec3{1.f, 1.f, 1.f})
         : mAmbientStrength(ambStr), mAmbientColor(ambColor), mLightStrength(lightStr),
-          mLightColor(lightColor), mObjectColor(color) {
+          mLightColor(lightColor), mObjectColor(color)
+    {
     }
 
     GLfloat mAmbientStrength;
@@ -206,7 +213,8 @@ struct Light : public Component {
     vec3 mObjectColor;
 };
 struct Input : public Component {
-    Input() {
+    Input()
+    {
     }
 
     bool W{false};
@@ -287,7 +295,8 @@ struct AABB : public Collision {
     vec3 size; // Half size
 
     AABB(bool stat = true);
-    inline AABB(const vec3 &o, const vec3 &s, bool stat = true) : AABB(stat) {
+    inline AABB(const vec3 &o, const vec3 &s, bool stat = true) : AABB(stat)
+    {
         origin = o;
         size = s;
     }
@@ -301,17 +310,20 @@ struct Sphere : public Collision {
     float radius;
 
     // default constructor
-    inline Sphere(bool stat = true) : radius(1.0f) {
+    inline Sphere(bool stat = true) : radius(1.0f)
+    {
         isStatic = stat;
     };
     // constructor with radius and position params
-    inline Sphere(const vec3 &pos, const float &r, bool stat = true) : position(pos), radius(r) {
+    inline Sphere(const vec3 &pos, const float &r, bool stat = true) : position(pos), radius(r)
+    {
         isStatic = stat;
     }
 };
 
 struct GameCamera : public Component {
-    inline GameCamera(vec3 pos = vec3{0}, float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active) {
+    inline GameCamera(vec3 pos = vec3{0}, float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active)
+    {
     }
     vec3 mCameraPosition;
     float mPitch, mYaw;
@@ -323,7 +335,8 @@ struct GameCamera : public Component {
  * @brief The BSplineCurve struct
  */
 struct BSplinePoint : Component {
-    BSplinePoint(vec3 loc = vec3{0}) : location(loc) {
+    BSplinePoint(vec3 loc = vec3{0}) : location(loc)
+    {
     }
     vec3 location{0};
 };
@@ -350,7 +363,8 @@ enum AttackType { SPLASH,
  * Defaults to false in construction, should be set to true for objects that can be built on.
  */
 struct Buildable : public Component {
-    Buildable(bool canBuild = false) : isBuildable(canBuild) {
+    Buildable(bool canBuild = false) : isBuildable(canBuild)
+    {
     }
     bool isBuildable;
 };
@@ -380,4 +394,6 @@ struct PlayerComponent : public Component {
     int gold = 500;
     int kills = 0;
 };
+} // namespace cjk
+
 #endif // COMPONENT_H

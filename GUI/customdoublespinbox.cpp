@@ -1,8 +1,9 @@
 #include "customdoublespinbox.h"
 #include <QStyleFactory>
 #include <QWheelEvent>
-
-CustomDoubleSpinBox::CustomDoubleSpinBox(const std::optional<float> &minRange, const std::optional<float> &maxRange) {
+namespace cjk {
+CustomDoubleSpinBox::CustomDoubleSpinBox(const std::optional<float> &minRange, const std::optional<float> &maxRange)
+{
     QStyle *fusion{QStyleFactory::create("fusion")};
     setDecimals(1);
     setRange(minRange.value_or(-5000), maxRange.value_or(5000));
@@ -11,10 +12,14 @@ CustomDoubleSpinBox::CustomDoubleSpinBox(const std::optional<float> &minRange, c
     setFocusPolicy(Qt::StrongFocus);
 }
 
-void CustomDoubleSpinBox::wheelEvent(QWheelEvent *event) {
+void CustomDoubleSpinBox::wheelEvent(QWheelEvent *event)
+{
     if (!hasFocus()) {
         event->ignore();
-    } else {
+    }
+    else {
         QDoubleSpinBox::wheelEvent(event);
     }
 }
+
+} // namespace cjk

@@ -18,8 +18,9 @@
 #include <rapidjson/stringbuffer.h>
 #include <rendersystem.h>
 #include <sstream>
-
-void Scene::saveScene(const QString &fileName) {
+namespace cjk {
+void Scene::saveScene(const QString &fileName)
+{
     if (fileName.isEmpty())
         return;
 
@@ -316,7 +317,8 @@ void Scene::saveScene(const QString &fileName) {
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
-void Scene::loadScene(const QString &fileName) {
+void Scene::loadScene(const QString &fileName)
+{
     if (fileName.isEmpty()) {
         return;
     }
@@ -336,7 +338,8 @@ void Scene::loadScene(const QString &fileName) {
     registry->updateChildParent();
     factory->setLoading(false);
 }
-void Scene::populateScene(const Document &scene) {
+void Scene::populateScene(const Document &scene)
+{
     std::map<int, int> parentID;
     std::map<int, int> idPairs;
     Registry *registry{Registry::instance()};
@@ -361,7 +364,8 @@ void Scene::populateScene(const Document &scene) {
                         parentID[id] = comp->value["parent"].GetInt(); // if not, add it to the list of parent/child pairs that must be updated after the loop
                 }
                 registry->system<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
-            } else if (comp->name == "material") {
+            }
+            else if (comp->name == "material") {
                 vec3 color{comp->value["color"][0].GetFloat(), comp->value["color"][1].GetFloat(), comp->value["color"][2].GetFloat()};
                 GLfloat specStr{comp->value["specstr"].GetFloat()};
                 GLint specExp{comp->value["specexp"].GetInt()};
@@ -377,12 +381,14 @@ void Scene::populateScene(const Document &scene) {
                 else if (shaderName == "SkyboxShader")
                     shader = factory->getShader<SkyboxShader>();
                 registry->add<Material>(id, shader, comp->value["textureunit"].GetUint(), color, specStr, specExp);
-            } else if (comp->name == "mesh") {
+            }
+            else if (comp->name == "mesh") {
                 std::string meshName{comp->value["name"].GetString()};
                 factory->addMeshComponent(meshName, id);
                 if (meshName == "Skybox")
                     registry->system<RenderSystem>()->setSkyBoxID(id);
-            } else if (comp->name == "light") { // Again, temporary, very static functionality atm
+            }
+            else if (comp->name == "light") { // Again, temporary, very static functionality atm
                 GLfloat ambStr{comp->value["ambstr"].GetFloat()};
                 vec3 ambColor{comp->value["ambcolor"][0].GetFloat(), comp->value["ambcolor"][1].GetFloat(), comp->value["ambcolor"][2].GetFloat()};
                 GLfloat lightStr{comp->value["lightstr"].GetFloat()};
@@ -390,12 +396,14 @@ void Scene::populateScene(const Document &scene) {
                 vec3 color{comp->value["color"][0].GetFloat(), comp->value["color"][1].GetFloat(), comp->value["color"][2].GetFloat()};
                 registry->add<Light>(id, ambStr, ambColor, lightStr, lightColor, color);
                 factory->getShader<PhongShader>()->setLight(id);
-            } else if (comp->name == "sound") {
+            }
+            else if (comp->name == "sound") {
                 std::string filename{comp->value["filename"].GetString()};
                 bool looping{comp->value["loop"].GetBool()};
                 float gain{comp->value["gain"].GetFloat()};
                 registry->add<Sound>(id, filename, looping, gain);
-            } else if (comp->name == "particleemitter") {
+            }
+            else if (comp->name == "particleemitter") {
                 bool active{comp->value["isactive"].GetBool()};
                 bool decay{comp->value["decay"].GetBool()};
                 size_t numParticles{static_cast<size_t>(comp->value["numparticles"].GetInt())};
@@ -409,31 +417,38 @@ void Scene::populateScene(const Document &scene) {
                 float lifespan{comp->value["lifespan"].GetFloat()};
                 GLuint textureUnit{comp->value["textureunit"].GetUint()};
                 registry->add<ParticleEmitter>(id, active, decay, numParticles, pps, initDir, initColor, speed, size, spread, lifespan, textureUnit);
-            } else if (comp->name == "billboard") {
+            }
+            else if (comp->name == "billboard") {
                 bool constantYUp{comp->value["y-up"].GetBool()};
                 bool normalVersion{comp->value["normalversion"].GetBool()};
                 registry->add<BillBoard>(id, constantYUp, normalVersion);
-            } else if (comp->name == "AABB") {
+            }
+            else if (comp->name == "AABB") {
                 vec3 origin{comp->value["origin"][0].GetFloat(), comp->value["origin"][1].GetFloat(), comp->value["origin"][2].GetFloat()};
                 vec3 size{comp->value["size"][0].GetFloat(), comp->value["size"][1].GetFloat(), comp->value["size"][2].GetFloat()};
                 bool isStatic{comp->value["static"].GetBool()};
                 registry->add<AABB>(id, origin, size, isStatic);
-            } else if (comp->name == "Sphere") {
+            }
+            else if (comp->name == "Sphere") {
                 vec3 position{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
                 float radius{comp->value["radius"].GetFloat()};
                 bool isStatic{comp->value["static"].GetBool()};
                 registry->add<Sphere>(id, position, radius, isStatic);
-            } else if (comp->name == "AI") {
+            }
+            else if (comp->name == "AI") {
                 int hp{comp->value["health"].GetInt()};
                 float speed{comp->value["speed"].GetFloat()};
                 registry->add<AIComponent>(id, hp, speed);
-            } else if (comp->name == "Buildable") {
+            }
+            else if (comp->name == "Buildable") {
                 bool buildable{comp->value["canBuild"].GetBool()};
                 registry->add<Buildable>(id, buildable);
-            } else if (comp->name == "BSplinePoint") {
+            }
+            else if (comp->name == "BSplinePoint") {
                 vec3 location{comp->value["location"][0].GetFloat(), comp->value["location"][1].GetFloat(), comp->value["location"][2].GetFloat()};
                 registry->add<BSplinePoint>(id, location);
-            } else if (comp->name == "GameCamera") {
+            }
+            else if (comp->name == "GameCamera") {
                 vec3 camPos{comp->value["position"][0].GetFloat(), comp->value["position"][1].GetFloat(), comp->value["position"][2].GetFloat()};
                 float pitch{comp->value["pitch"].GetFloat()};
                 float yaw{comp->value["yaw"].GetFloat()};
@@ -448,7 +463,8 @@ void Scene::populateScene(const Document &scene) {
         registry->get<Transform>(pair.first).parentID = idPairs[pair.second];
     }
 }
-void Scene::loadSceneFromFile(const QString &fileName) {
+void Scene::loadSceneFromFile(const QString &fileName)
+{
     std::ifstream file{gsl::sceneFilePath + fileName.toStdString()};
     if (!file.good()) {
         qDebug() << "Can't read the JSON scene file!";
@@ -463,6 +479,9 @@ void Scene::loadSceneFromFile(const QString &fileName) {
     populateScene(sceneDoc);
     mScenes[fileName] = fileCopy;
 }
-QString Scene::name() const {
+QString Scene::name() const
+{
     return mName;
 }
+
+} // namespace cjk

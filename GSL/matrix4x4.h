@@ -6,12 +6,14 @@
 #include "vector4d.h"
 #include <iomanip>
 #include <iostream>
-typedef gsl::Vector3D vec3;
+
 namespace gsl {
 class Matrix2x2;
 class Matrix3x3;
 
 class Matrix4x4 {
+    using vec3 = Vector3D;
+
 public:
     Matrix4x4(bool isIdentity = false);
     Matrix4x4(std::initializer_list<GLfloat> values);
@@ -28,7 +30,7 @@ public:
     void translateZ(GLfloat z = 0.f);
 
     void setPosition(GLfloat x = 0.f, GLfloat y = 0.f, GLfloat z = 0.f);
-    gsl::Vector3D getPosition() const;
+    Vector3D getPosition() const;
 
     //Rotate using EulerMatrix
     void rotateX(GLfloat degrees = 0.f);
@@ -69,7 +71,8 @@ public:
 
     Vector4D operator*(const Vector4D &other);
 
-    friend std::ostream &operator<<(std::ostream &output, const Matrix4x4 &mIn) {
+    friend std::ostream &operator<<(std::ostream &output, const Matrix4x4 &mIn)
+    {
         output << std::setprecision(4) << "{" << mIn.matrix[0] << "\t, " << mIn.matrix[4] << "\t, " << mIn.matrix[8] << "\t, " << mIn.matrix[12] << "}\n"
                << "{" << mIn.matrix[1] << "\t, " << mIn.matrix[5] << "\t, " << mIn.matrix[9] << "\t, " << mIn.matrix[13] << "}\n"
                << "{" << mIn.matrix[2] << "\t, " << mIn.matrix[6] << "\t, " << mIn.matrix[10] << "\t, " << mIn.matrix[14] << "}\n"

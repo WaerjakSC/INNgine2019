@@ -2,8 +2,9 @@
 #define HIERARCHYMODEL_H
 #include "gsl_math.h"
 #include <QStandardItemModel>
-
 class QMimeData;
+
+namespace cjk {
 class HierarchyModel : public QStandardItemModel {
     Q_OBJECT
 public:
@@ -18,5 +19,6 @@ signals:
 protected:
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
 };
+} // namespace cjk
 
 #endif // HIERARCHYMODEL_H

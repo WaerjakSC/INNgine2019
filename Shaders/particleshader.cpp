@@ -1,8 +1,10 @@
 #include "particleshader.h"
 #include "cameracontroller.h"
 #include "registry.h"
+namespace cjk {
 ParticleShader::ParticleShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
-    : Shader{camController, "ParticleShader", geometryPath} {
+    : Shader{camController, "ParticleShader", geometryPath}
+{
     vMatrixUniform = glGetUniformLocation(program, "vMatrix");
     pMatrixUniform = glGetUniformLocation(program, "pMatrix");
 
@@ -10,7 +12,8 @@ ParticleShader::ParticleShader(cjk::Ref<CameraController> camController, const G
     cameraRightUniform = glGetUniformLocation(program, "cameraRight");
     cameraUpUniform = glGetUniformLocation(program, "cameraUp");
 }
-void ParticleShader::transmitParticleUniformData(const ParticleEmitter &emitter) {
+void ParticleShader::transmitParticleUniformData(const ParticleEmitter &emitter)
+{
     glUniformMatrix4fv(vMatrixUniform, 1, GL_TRUE, mCameraController->getCamera().mViewMatrix.constData());
     glUniformMatrix4fv(pMatrixUniform, 1, GL_TRUE, mCameraController->getCamera().mProjectionMatrix.constData());
 
@@ -20,3 +23,5 @@ void ParticleShader::transmitParticleUniformData(const ParticleEmitter &emitter)
     const vec3 &up = mCameraController->up();
     glUniform3f(cameraUpUniform, up.x, up.y, up.z);
 }
+
+} // namespace cjk

@@ -2,11 +2,13 @@
 #include "registry.h"
 #include <QDebug>
 #include <QMimeData>
-
-HierarchyModel::HierarchyModel() {
+namespace cjk {
+HierarchyModel::HierarchyModel()
+{
 }
 
-bool HierarchyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) {
+bool HierarchyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
     bool success{QStandardItemModel::dropMimeData(data, action, row, column, parent)};
     emit parentChanged(parent);
     return success;
@@ -16,7 +18,8 @@ bool HierarchyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, 
  * @brief Slot to remove an item from the tree view if it's removed for any reason. Untested but should update the parent/child relationships as it happens
  * @param eID
  */
-void HierarchyModel::removeEntity(GLuint eID) {
+void HierarchyModel::removeEntity(GLuint eID)
+{
     for (int i = 0; i < rowCount(); i++) {
         QModelIndex idx{this->index(i, 0)};
         QStandardItem *item{itemFromIndex(idx)};
@@ -36,7 +39,8 @@ void HierarchyModel::removeEntity(GLuint eID) {
     }
 }
 
-QStandardItem *HierarchyModel::itemFromEntityID(GLuint eID) {
+QStandardItem *HierarchyModel::itemFromEntityID(GLuint eID)
+{
     for (int i = 0; i < rowCount(); i++) {
         QModelIndex idx{this->index(i, 0)};
         QStandardItem *item{itemFromIndex(idx)};
@@ -46,3 +50,5 @@ QStandardItem *HierarchyModel::itemFromEntityID(GLuint eID) {
     }
     return nullptr;
 }
+
+} // namespace cjk

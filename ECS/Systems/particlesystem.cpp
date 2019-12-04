@@ -5,12 +5,15 @@
 #include "particleshader.h"
 #include "registry.h"
 #include <QColor>
+namespace cjk {
 ParticleSystem::ParticleSystem(Ref<ParticleShader> shader)
-    : registry{Registry::instance()}, mShader{shader} {
+    : registry{Registry::instance()}, mShader{shader}
+{
     rng = std::mt19937(std::random_device()());
 }
 
-void ParticleSystem::init() {
+void ParticleSystem::init()
+{
     auto view{registry->view<ParticleEmitter, Transform>()};
     for (auto entity : view) {
         auto &emitter{view.get<ParticleEmitter>(entity)};
@@ -19,12 +22,14 @@ void ParticleSystem::init() {
         }
     }
 }
-void ParticleSystem::initEmitter(GLuint entityID) {
+void ParticleSystem::initEmitter(GLuint entityID)
+{
     auto view{registry->view<ParticleEmitter, Transform>()};
     auto &emitter{view.get<ParticleEmitter>(entityID)};
     ResourceManager::instance()->initParticleEmitter(emitter);
 }
-void ParticleSystem::update(DeltaTime deltaTime) {
+void ParticleSystem::update(DeltaTime deltaTime)
+{
     auto view{registry->view<ParticleEmitter, Transform>()};
     initializeOpenGLFunctions();
     for (auto entity : view) {
@@ -44,7 +49,8 @@ void ParticleSystem::update(DeltaTime deltaTime) {
     }
 }
 
-void ParticleSystem::generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform) {
+void ParticleSystem::generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform)
+{
     int newParticles{static_cast<int>(deltaTime * 10 * emitter.particlesPerSecond)}; // Have to multiply by four because otherwise deltaTime is too small to cast to 1+
     for (int i{0}; i < newParticles; i++) {
         int particleIndex{findUnusedParticle(emitter)};
@@ -73,7 +79,8 @@ void ParticleSystem::generateParticles(DeltaTime deltaTime, ParticleEmitter &emi
         // could do something like change the color with an affector or something here
     }
 }
-void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter) {
+void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter)
+{
 
     int particleCount{0};
     for (size_t i{0}; i < emitter.numParticles; i++) {
@@ -97,7 +104,8 @@ void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emi
                 emitter.colorData[4 * particleCount + 2] = particle.b;
                 if (emitter.shouldDecay) {
                     emitter.colorData[4 * particleCount + 3] = particle.a * gsl::clamp(particle.life, 0, 1);
-                } else {
+                }
+                else {
                     emitter.colorData[4 * particleCount + 3] = particle.a;
                 }
                 std::swap(emitter.particles[i], emitter.particles[particleCount]);
@@ -109,7 +117,8 @@ void ParticleSystem::simulateParticles(DeltaTime deltaTime, ParticleEmitter &emi
     // could sort the particles here for better particle transparency but not a priority and it takes too much performance
 }
 
-void ParticleSystem::renderParticles(ParticleEmitter &emitter) {
+void ParticleSystem::renderParticles(ParticleEmitter &emitter)
+{
     glBindBuffer(GL_ARRAY_BUFFER, emitter.positionBuffer);
     glBufferData(GL_ARRAY_BUFFER, emitter.numParticles * 4 * sizeof(GLfloat), nullptr, GL_STREAM_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, emitter.activeParticles * sizeof(GLfloat) * 4, emitter.positionData.data());
@@ -127,7 +136,8 @@ void ParticleSystem::renderParticles(ParticleEmitter &emitter) {
     drawElements(emitter);
 }
 
-void ParticleSystem::drawElements(ParticleEmitter &emitter) {
+void ParticleSystem::drawElements(ParticleEmitter &emitter)
+{
     glBindVertexArray(emitter.VAO);
 
     glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
@@ -156,7 +166,8 @@ void ParticleSystem::drawElements(ParticleEmitter &emitter) {
     glDisable(GL_BLEND);
 }
 
-int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter) {
+int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter)
+{
     int &lastParticle{emitter.lastUsedParticle};
     for (size_t i{static_cast<size_t>(lastParticle)}; i < emitter.numParticles; i++) {
         if (emitter.particles[i].life <= 0) {
@@ -174,77 +185,92 @@ int ParticleSystem::findUnusedParticle(ParticleEmitter &emitter) {
     lastParticle = 0;
     return 0; // All particles are taken, override the first one
 }
-void ParticleSystem::setActiveEmitter(bool state) {
+void ParticleSystem::setActiveEmitter(bool state)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.isActive = state;
 }
-void ParticleSystem::setDecayEmitter(bool state) {
+void ParticleSystem::setDecayEmitter(bool state)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.shouldDecay = state;
 }
-void ParticleSystem::setNumParticles(int num) {
+void ParticleSystem::setNumParticles(int num)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.setNumParticles(num);
 }
-void ParticleSystem::setPPS(int num) {
+void ParticleSystem::setPPS(int num)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.particlesPerSecond = num;
 }
-void ParticleSystem::setEmitterSpeed(double speed) {
+void ParticleSystem::setEmitterSpeed(double speed)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.speed = speed;
 }
 
-void ParticleSystem::setEmitterSize(double size) {
+void ParticleSystem::setEmitterSize(double size)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.size = size;
 }
-void ParticleSystem::setEmitterLifeSpan(double lifespan) {
+void ParticleSystem::setEmitterLifeSpan(double lifespan)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initLifeSpan = lifespan;
 }
 
-void ParticleSystem::setEmitterSpread(double spread) {
+void ParticleSystem::setEmitterSpread(double spread)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.spread = spread;
 }
-void ParticleSystem::setInitDirX(double xIn) {
+void ParticleSystem::setInitDirX(double xIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialDirection.x = xIn;
 }
 
-void ParticleSystem::setInitDirY(double yIn) {
+void ParticleSystem::setInitDirY(double yIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialDirection.y = yIn;
 }
 
-void ParticleSystem::setInitDirZ(double zIn) {
+void ParticleSystem::setInitDirZ(double zIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialDirection.z = zIn;
 }
-void ParticleSystem::setInitColorRed(int inRed) {
+void ParticleSystem::setInitColorRed(int inRed)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialColor.setRed(inRed);
 }
-void ParticleSystem::setInitColorGreen(int inGreen) {
+void ParticleSystem::setInitColorGreen(int inGreen)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialColor.setGreen(inGreen);
 }
-void ParticleSystem::setInitColorBlue(int inBlue) {
+void ParticleSystem::setInitColorBlue(int inBlue)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialColor.setBlue(inBlue);
 }
+} // namespace cjk

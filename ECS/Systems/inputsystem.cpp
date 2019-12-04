@@ -1,5 +1,6 @@
 #include "inputsystem.h"
 #include "camera.h"
+#include "cameracontroller.h"
 #include "collisionsystem.h"
 #include "movementsystem.h"
 #include "phongshader.h"
@@ -7,12 +8,16 @@
 #include "renderwindow.h"
 #include "resourcemanager.h"
 #include "textureshader.h"
+
+namespace cjk {
 InputSystem::InputSystem(RenderWindow *window)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},
-      mRenderWindow{window} {
+      mRenderWindow{window}
+{
 }
 
-void InputSystem::update(DeltaTime dt) {
+void InputSystem::update(DeltaTime dt)
+{
     if (factory->isPlaying()) {
         for (auto &camera : mGameCameraControllers) {
             if (camera->isActive()) {
@@ -30,13 +35,15 @@ void InputSystem::update(DeltaTime dt) {
     handleMouseInput();
 }
 
-void InputSystem::init(float aspectRatio) {
+void InputSystem::init(float aspectRatio)
+{
     auto view{registry->view<GameCamera>()};
     for (auto entity : view) {
         mGameCameraControllers.push_back(std::make_shared<GameCameraController>(aspectRatio, entity));
     }
 }
-void InputSystem::reset() {
+void InputSystem::reset()
+{
     mEnteredWindow = false;
     mIsConfined = false;
     playerController().F1 = false;
@@ -45,14 +52,16 @@ void InputSystem::reset() {
         controller->setupController();
     }
 }
-void InputSystem::snapToObject() {
+void InputSystem::snapToObject()
+{
     GLuint eID = registry->getSelectedEntity();
     if (registry->contains<Transform>(eID)) {
         MovementSystem *moveSystem{registry->system<MovementSystem>().get()};
         mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
     }
 }
-void InputSystem::handleKeyInput() {
+void InputSystem::handleKeyInput()
+{
     if (editorInput.ESCAPE) //Shuts down whole program
     {
         emit closeEngine();
@@ -72,7 +81,8 @@ void InputSystem::handleKeyInput() {
     if (mPlayerController.F1) {
         mIsConfined = false;
         mEnteredWindow = false;
-    } else if (!mIsConfined)
+    }
+    else if (!mIsConfined)
         mIsConfined = true;
     if (mPlayerController.L) {
         if (!mIsDragging) {
@@ -82,13 +92,15 @@ void InputSystem::handleKeyInput() {
     }
 }
 // !!! Temporary proof of concept function, replace with makeTower or something and whatever other logic is wanted.
-void InputSystem::spawnTower() {
+void InputSystem::spawnTower()
+{
     draggedEntity = factory->makeCube("FauxTower");
     mIsDragging = true;
     setPlaneColors(mIsDragging);
     // Might want to also "pause" the game here, or rather stop all AI and Movement while still allowing the player to move the camera and place the tower.
 }
-void InputSystem::setPlaneColors(bool dragging) {
+void InputSystem::setPlaneColors(bool dragging)
+{
     auto view{registry->view<Buildable, Material>()};
     if (dragging) {
         for (auto entity : view) {
@@ -96,44 +108,49 @@ void InputSystem::setPlaneColors(bool dragging) {
             // set color according to buildable state -- Red means unbuildable, green means buildable.
             if (build.isBuildable) {
                 mat.mObjectColor = green * 0.8f; // GREEN'ish
-            } else {
+            }
+            else {
                 mat.mObjectColor = red * 0.8f; // RED'ish
             }
         }
-    } else { // set colors back to the original and set shader back to Phong for lighting
+    }
+    else { // set colors back to the original and set shader back to Phong for lighting
         for (auto entity : view) {
             auto [build, mat]{view.get<Buildable, Material>(entity)};
             mat.mObjectColor = origColor; // GREEN'ish
         }
     }
 }
-void InputSystem::handlePlayerController(DeltaTime dt) {
+void InputSystem::handlePlayerController(DeltaTime dt)
+{
     if (factory->isPlaying()) { // We don't have a movable character anyway, disabling this.
-                                //        gsl::Vector3D desiredVelocity{0};
-                                //        if (mPlayerController.W)
-                                //            desiredVelocity.z -= mCameraSpeed;
-                                //        if (mPlayerController.S)
-                                //            desiredVelocity.z += mCameraSpeed;
-                                //        if (mPlayerController.D)
-                                //            desiredVelocity.x += mCameraSpeed;
-                                //        if (mPlayerController.A)
-                                //            desiredVelocity.x -= mCameraSpeed;
-                                //        if (mPlayerController.Q)
-                                //            desiredVelocity.y += mCameraSpeed;
-                                //        if (mPlayerController.E)
-                                //            desiredVelocity.y -= mCameraSpeed;
-                                //        mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
-                                //        if (mPlayer != 0) {
-                                //            registry->system<MovementSystem>()->move(mPlayer, mDesiredVelocity);
-                                //        }
+        //        gsl::Vector3D desiredVelocity{0};
+        //        if (mPlayerController.W)
+        //            desiredVelocity.z -= mCameraSpeed;
+        //        if (mPlayerController.S)
+        //            desiredVelocity.z += mCameraSpeed;
+        //        if (mPlayerController.D)
+        //            desiredVelocity.x += mCameraSpeed;
+        //        if (mPlayerController.A)
+        //            desiredVelocity.x -= mCameraSpeed;
+        //        if (mPlayerController.Q)
+        //            desiredVelocity.y += mCameraSpeed;
+        //        if (mPlayerController.E)
+        //            desiredVelocity.y -= mCameraSpeed;
+        //        mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
+        //        if (mPlayer != 0) {
+        //            registry->system<MovementSystem>()->move(mPlayer, mDesiredVelocity);
+        //        }
     }
 }
-void InputSystem::handleMouseInput() {
+void InputSystem::handleMouseInput()
+{
     if (editorInput.LMB) {
         auto collisionSystem{registry->system<CollisionSystem>()};
         Raycast ray{collisionSystem->mousePick(mRenderWindow->mapFromGlobal(QCursor::pos()), mRenderWindow->geometry())};
         emit rayHitEntity(ray.hitEntity);
-    } else if (editorInput.RMB) {
+    }
+    else if (editorInput.RMB) {
         if (editorInput.W)
             mEditorCamController->moveForward(mCameraSpeed);
         if (editorInput.S)
@@ -163,7 +180,8 @@ void InputSystem::handleMouseInput() {
                     setPlaneColors(mIsDragging);
                 }
         }
-    } else if (mPlayerController.RMB) {
+    }
+    else if (mPlayerController.RMB) {
         if (mIsDragging) {
             mIsDragging = false;
             // reset the colors after discarding the tower.
@@ -177,10 +195,12 @@ void InputSystem::handleMouseInput() {
         dragEntity(draggedEntity);
 }
 
-void InputSystem::setBuildableDebug(bool value) {
+void InputSystem::setBuildableDebug(bool value)
+{
     buildableDebug = value;
 }
-void InputSystem::confineMouseToScreen(DeltaTime dt) {
+void InputSystem::confineMouseToScreen(DeltaTime dt)
+{
     int width{mRenderWindow->width()};
     int height{mRenderWindow->height()};
     QPoint pos{mRenderWindow->mapFromGlobal(QCursor::pos())};
@@ -192,14 +212,16 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
         if (pos.x() >= width) {
             newPos.rx() = width;
             currentCameraController()->moveRight(dt);
-        } else if (pos.x() <= 0) {
+        }
+        else if (pos.x() <= 0) {
             newPos.rx() = 0;
             currentCameraController()->moveRight(-dt);
         }
         if (pos.y() >= height) {
             newPos.ry() = height;
             currentCameraController()->moveForward(-dt);
-        } else if (pos.y() <= 0) {
+        }
+        else if (pos.y() <= 0) {
             newPos.ry() = 0;
             currentCameraController()->moveForward(dt);
         }
@@ -207,7 +229,8 @@ void InputSystem::confineMouseToScreen(DeltaTime dt) {
         QCursor::setPos(newPos);
     }
 }
-void InputSystem::setBuildableObject(bool state) {
+void InputSystem::setBuildableObject(bool state)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto view{registry->view<Buildable, Material>()};
     auto &object{view.get<Buildable>(entityID)};
@@ -216,11 +239,13 @@ void InputSystem::setBuildableObject(bool state) {
         auto &mat = view.get<Material>(entityID);
         if (object.isBuildable) {
             mat.mObjectColor = green * 0.8f;
-        } else
+        }
+        else
             mat.mObjectColor = red * 0.8f;
     }
 }
-void InputSystem::dragEntity(GLuint entity) {
+void InputSystem::dragEntity(GLuint entity)
+{
     QPoint cursorPos{mRenderWindow->mapFromGlobal(QCursor::pos())};
     // Get the intersection point between the ray and the closest entity as a vector3d
     // make ray
@@ -236,7 +261,8 @@ void InputSystem::dragEntity(GLuint entity) {
             auto &mat = view.get<Material>(lastHitEntity);
             if (view.get<Buildable>(lastHitEntity).isBuildable) {
                 mat.mObjectColor = green * 0.8f;
-            } else
+            }
+            else
                 mat.mObjectColor = red * 0.8f;
         }
         // compensate for size of collider
@@ -246,7 +272,8 @@ void InputSystem::dragEntity(GLuint entity) {
             lastHitEntity = ray.hitEntity;
             if (view.get<Buildable>(ray.hitEntity).isBuildable) {
                 mat.mObjectColor = green;
-            } else
+            }
+            else
                 mat.mObjectColor = red; // slightly increase the color intensity of the object as it's being moused over.
         }
     }
@@ -257,23 +284,28 @@ void InputSystem::dragEntity(GLuint entity) {
     tf.matrixOutdated = true;
 }
 
-void InputSystem::setGameCameraInactive() {
+void InputSystem::setGameCameraInactive()
+{
     mActiveGameCamera = false;
 }
 
-Ref<CameraController> InputSystem::editorCamController() const {
+Ref<CameraController> InputSystem::editorCamController() const
+{
     return mEditorCamController;
 }
 
-void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController) {
+void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController)
+{
     mEditorCamController = editorCamController;
 }
 
-std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() const {
+std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() const
+{
     return mGameCameraControllers;
 }
 
-Ref<CameraController> InputSystem::currentCameraController() {
+Ref<CameraController> InputSystem::currentCameraController()
+{
     if (factory->isPlaying()) {
         for (auto controller : mGameCameraControllers) {
             if (controller->isActive()) {
@@ -284,14 +316,17 @@ Ref<CameraController> InputSystem::currentCameraController() {
     return mEditorCamController;
 }
 
-Input &InputSystem::playerController() {
+Input &InputSystem::playerController()
+{
     return mPlayerController;
 }
-Input InputSystem::playerController() const {
+Input InputSystem::playerController() const
+{
     return mPlayerController;
 }
 
-void InputSystem::setCameraSpeed(float value) {
+void InputSystem::setCameraSpeed(float value)
+{
     mCameraSpeed += value;
     //Keep within min and max values
     if (mCameraSpeed < 0.01f)
@@ -299,7 +334,8 @@ void InputSystem::setCameraSpeed(float value) {
     if (mCameraSpeed > 0.3f)
         mCameraSpeed = 0.3f;
 }
-void InputSystem::keyPressEvent(QKeyEvent *event) {
+void InputSystem::keyPressEvent(QKeyEvent *event)
+{
     if (factory->isPlaying() && mActiveGameCamera)
         inputKeyPress(event, mPlayerController);
     if (!mActiveGameCamera) {
@@ -307,13 +343,15 @@ void InputSystem::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-void InputSystem::keyReleaseEvent(QKeyEvent *event) {
+void InputSystem::keyReleaseEvent(QKeyEvent *event)
+{
     if (factory->isPlaying() && mActiveGameCamera)
         inputKeyRelease(event, mPlayerController);
     if (!mActiveGameCamera)
         inputKeyRelease(event, editorInput);
 }
-void InputSystem::inputKeyPress(QKeyEvent *event, Input &input) {
+void InputSystem::inputKeyPress(QKeyEvent *event, Input &input)
+{
     switch (event->key()) {
     case Qt::Key_L:
         input.L = true;
@@ -364,7 +402,8 @@ void InputSystem::inputKeyPress(QKeyEvent *event, Input &input) {
         break;
     }
 }
-void InputSystem::inputKeyRelease(QKeyEvent *event, Input &input) {
+void InputSystem::inputKeyRelease(QKeyEvent *event, Input &input)
+{
     switch (event->key()) {
     case Qt::Key_L:
         input.L = false;
@@ -409,7 +448,8 @@ void InputSystem::inputKeyRelease(QKeyEvent *event, Input &input) {
         break;
     }
 }
-void InputSystem::wheelEvent(QWheelEvent *event) {
+void InputSystem::wheelEvent(QWheelEvent *event)
+{
     QPoint numDegrees{event->angleDelta() / 8};
 
     //if RMB, change the speed of the camera
@@ -422,7 +462,8 @@ void InputSystem::wheelEvent(QWheelEvent *event) {
     event->accept();
 }
 
-void InputSystem::mouseMoveEvent(QMouseEvent *event) {
+void InputSystem::mouseMoveEvent(QMouseEvent *event)
+{
     if (editorInput.RMB) {
         mRenderWindow->setCursor(Qt::BlankCursor);
         QPoint mid{QPoint(mRenderWindow->width() / 2, mRenderWindow->height() / 2)};
@@ -445,14 +486,16 @@ void InputSystem::mouseMoveEvent(QMouseEvent *event) {
         firstRMB = true;
     }
 }
-void InputSystem::onResize(float aspectRatio) {
+void InputSystem::onResize(float aspectRatio)
+{
     mEditorCamController->resize(aspectRatio);
     for (auto camera : mGameCameraControllers) {
         if (camera->isActive())
             camera->resize(aspectRatio);
     }
 }
-void InputSystem::inputMousePress(QMouseEvent *event, Input &input) {
+void InputSystem::inputMousePress(QMouseEvent *event, Input &input)
+{
     switch (event->button()) {
     case Qt::RightButton:
         input.RMB = true;
@@ -466,7 +509,8 @@ void InputSystem::inputMousePress(QMouseEvent *event, Input &input) {
         break;
     }
 }
-void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input) {
+void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input)
+{
     switch (event->button()) {
     case Qt::RightButton:
         input.RMB = false;
@@ -480,43 +524,50 @@ void InputSystem::inputMouseRelease(QMouseEvent *event, Input &input) {
         break;
     }
 }
-void InputSystem::mouseReleaseEvent(QMouseEvent *event) {
+void InputSystem::mouseReleaseEvent(QMouseEvent *event)
+{
     if (factory->isPlaying() && mActiveGameCamera)
         inputMouseRelease(event, mPlayerController);
     if (!mActiveGameCamera)
         inputMouseRelease(event, editorInput);
 }
-void InputSystem::mousePressEvent(QMouseEvent *event) {
+void InputSystem::mousePressEvent(QMouseEvent *event)
+{
     if (factory->isPlaying() && mActiveGameCamera)
         inputMousePress(event, mPlayerController);
     if (!mActiveGameCamera)
         inputMousePress(event, editorInput);
 }
-void InputSystem::setCameraPositionX(double xIn) {
+void InputSystem::setCameraPositionX(double xIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &cam{registry->get<GameCamera>(entityID)};
     cam.mCameraPosition.x = xIn;
     cam.mOutDated = true;
 }
-void InputSystem::setCameraPositionY(double yIn) {
+void InputSystem::setCameraPositionY(double yIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &cam{registry->get<GameCamera>(entityID)};
     cam.mCameraPosition.y = yIn;
     cam.mOutDated = true;
 }
-void InputSystem::setCameraPositionZ(double zIn) {
+void InputSystem::setCameraPositionZ(double zIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &cam{registry->get<GameCamera>(entityID)};
     cam.mCameraPosition.z = zIn;
     cam.mOutDated = true;
 }
-void InputSystem::setYaw(double yaw) {
+void InputSystem::setYaw(double yaw)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &cam{registry->get<GameCamera>(entityID)};
     cam.mYaw = yaw;
     cam.mOutDated = true;
 }
-void InputSystem::setActiveCamera(bool checked) {
+void InputSystem::setActiveCamera(bool checked)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto view{registry->view<GameCamera>()};
     GameCamera &selectedCam{view.get(entityID)};
@@ -532,7 +583,8 @@ void InputSystem::setActiveCamera(bool checked) {
         }
         if (factory->isPlaying())
             factory->setActiveCameraController(currentCameraController());
-    } else {
+    }
+    else {
         selectedCam.mIsActive = false;
         selectedCam.mOutDated = true;
         setGameCameraInactive();
@@ -540,9 +592,11 @@ void InputSystem::setActiveCamera(bool checked) {
         factory->setActiveCameraController(editorCamController());
     }
 }
-void InputSystem::setPitch(double pitch) {
+void InputSystem::setPitch(double pitch)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &cam{registry->get<GameCamera>(entityID)};
     cam.mPitch = pitch;
     cam.mOutDated = true;
 }
+} // namespace cjk

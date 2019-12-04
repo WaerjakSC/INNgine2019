@@ -5,7 +5,9 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QStyleFactory>
-ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox{parent} {
+namespace cjk {
+ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox{parent}
+{
     setTitle(name);
     QStyle *fusion = QStyleFactory::create("fusion");
     setAlignment(Qt::AlignCenter);
@@ -14,7 +16,8 @@ ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGr
     createActions();
 }
 
-void ComponentGroupBox::removeComponent() {
+void ComponentGroupBox::removeComponent()
+{
     Registry *registry{Registry::instance()};
     GLuint entityID{registry->getSelectedEntity()};
     if (title() == "Transform")
@@ -46,9 +49,12 @@ void ComponentGroupBox::removeComponent() {
     deleteLater();
 }
 
-void ComponentGroupBox::createActions() {
+void ComponentGroupBox::createActions()
+{
     QString removeString = "Remove " + title() + " Component";
     QAction *remove{new QAction(tr(removeString.toStdString().c_str()))};
     connect(remove, &QAction::triggered, this, &ComponentGroupBox::removeComponent);
     addAction(remove);
 }
+
+} // namespace cjk

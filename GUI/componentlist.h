@@ -6,20 +6,21 @@
 #include "resourcemanager.h"
 #include <QColor>
 #include <QWidget>
-class Transform;
-class Material;
-class Mesh;
-class Entity;
 class QLabel;
 class QCheckBox;
+class QComboBox;
+class QGroupBox;
+class MainWindow;
 class QHBoxLayout;
+namespace cjk {
+struct Transform;
+struct Material;
+struct Mesh;
+
 class CustomDoubleSpinBox;
 class HierarchyModel;
-class QComboBox;
 class HierarchyView;
-class QGroupBox;
 class VerticalScrollArea;
-class MainWindow;
 class ComponentList : public QWidget {
     Q_OBJECT
 public:
@@ -95,7 +96,8 @@ private:
     void setupEmitterSettings(const ParticleEmitter &emitter);
     void setupBSplinePointSettings(const BSplinePoint &point);
     template <typename CompType>
-    inline void addComponent() {
+    inline void addComponent()
+    {
         GLuint selectedEntity{registry->getSelectedEntity()};
         if (selectedEntity != 0) {
             if (!registry->contains<CompType>(selectedEntity))
@@ -104,7 +106,8 @@ private:
         }
     }
     template <typename ColliderType>
-    inline void addCollider() {
+    inline void addCollider()
+    {
         GLuint selectedEntity{registry->getSelectedEntity()};
         if (selectedEntity != 0) {
             if (!registry->contains<ColliderType>(selectedEntity)) {
@@ -127,5 +130,6 @@ private:
     QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
     friend class MainWindow;
 };
+} // namespace cjk
 
 #endif // COMPONENTLIST_H

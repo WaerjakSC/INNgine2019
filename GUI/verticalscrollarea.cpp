@@ -1,6 +1,7 @@
 #include "verticalscrollarea.h"
-
-VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea{parent} {
+namespace cjk {
+VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea{parent}
+{
     setWidgetResizable(true);
     contentWidget = new QWidget(this);
     setWidget(contentWidget);
@@ -9,18 +10,23 @@ VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea{parent} {
     setMaximumWidth(260);
 }
 
-void VerticalScrollArea::addGroupBox(QGroupBox *component) {
+void VerticalScrollArea::addGroupBox(QGroupBox *component)
+{
     componentListLayout->addWidget(component);
 }
 /**
  * @brief Delete all the children in the Layout and re-make it with new content and connections.
  */
-void VerticalScrollArea::clearLayout() {
+void VerticalScrollArea::clearLayout()
+{
     qDeleteAll(contentWidget->children());
     setupLayout();
 }
-void VerticalScrollArea::setupLayout() {
+void VerticalScrollArea::setupLayout()
+{
     componentListLayout = new QVBoxLayout(contentWidget);
     componentListLayout->setAlignment(Qt::AlignTop);
     componentListLayout->setMargin(2);
 }
+
+} // namespace cjk

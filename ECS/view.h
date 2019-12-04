@@ -1,6 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 #include "pool.h"
+namespace cjk {
 /**
  * @brief Multi-Component View.
  * Searches for the smallest pool of components and uses this pool
@@ -21,7 +22,8 @@ private:
      * @brief Returns the smallest pool of components for use with begin() and end() functions
      * @return
      */
-    const IPool *candidate() const {
+    const IPool *candidate() const
+    {
         return std::min({static_cast<const IPool *>(std::get<Pool<Component> *>(pools))...}, [](const auto lhs, const auto rhs) {
             return lhs->size() < rhs->size();
         });
@@ -35,13 +37,15 @@ private:
         iterator(unchecked_type other, underlying_iterator_type first, underlying_iterator_type last)
             : unchecked{other},
               begin{first},
-              end{last} {
+              end{last}
+        {
             if (begin != end && !valid()) {
                 ++(*this);
             }
         }
 
-        bool valid() const {
+        bool valid() const
+        {
             return std::all_of(unchecked.cbegin(), unchecked.cend(), [this](const IPool *view) {
                 return view->has(*begin);
             });
@@ -55,28 +59,34 @@ private:
 
         iterator() = default;
 
-        iterator &operator++() {
+        iterator &operator++()
+        {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
 
-        iterator operator++(int) {
+        iterator operator++(int)
+        {
             iterator orig = *this;
             return ++(*this), orig;
         }
 
-        bool operator==(const iterator &other) const {
+        bool operator==(const iterator &other) const
+        {
             return other.begin == begin;
         }
 
-        bool operator!=(const iterator &other) const {
+        bool operator!=(const iterator &other) const
+        {
             return !(*this == other);
         }
 
-        pointer operator->() const {
+        pointer operator->() const
+        {
             return begin.operator->();
         }
 
-        reference operator*() const {
+        reference operator*() const
+        {
             return *operator->();
         }
 
@@ -85,7 +95,8 @@ private:
         underlying_iterator_type begin;
         underlying_iterator_type end;
     };
-    unchecked_type unchecked(const IPool *view) const {
+    unchecked_type unchecked(const IPool *view) const
+    {
         unchecked_type other{};
         typename unchecked_type::size_type pos{};
         ((std::get<Pool<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<Pool<Component> *>(pools))), ...);
@@ -94,29 +105,36 @@ private:
 
 public:
     template <typename Comp>
-    size_t size() const {
+    size_t size() const
+    {
         return std::get<Pool<Comp> *>(pools)->size();
     }
-    iterator begin() const {
+    iterator begin() const
+    {
         const auto view{candidate()};
         return iterator{unchecked(view), view->begin(), view->end()};
     }
-    iterator end() const {
+    iterator end() const
+    {
         const auto view{candidate()};
         return iterator{unchecked(view), view->end(), view->end()};
     }
     template <typename Comp>
-    std::vector<Comp> &data() {
+    std::vector<Comp> &data()
+    {
         return std::get<Pool<Comp>>(pools).data();
     }
     template <typename Comp>
-    std::vector<int> &entities() const {
+    std::vector<int> &entities() const
+    {
         return std::get<Pool<Comp>>(pools)->entities();
     }
-    int find(const int &entt) const {
+    int find(const int &entt) const
+    {
         return candidate()->find(entt);
     }
-    bool contains(const int &entt) const {
+    bool contains(const int &entt) const
+    {
         if (entt < 0)
             return false;
         return find(entt) != -1;
@@ -128,17 +146,20 @@ public:
      * @example auto [trans, mat, mesh] = view.get<Transform, Material, Mesh>(entity);
      */
     template <typename... Comp>
-    decltype(auto) get(const int &entt) const {
+    decltype(auto) get(const int &entt) const
+    {
         assert(contains(entt));
         if constexpr (sizeof...(Comp) == 1) {
             return (std::get<Pool<Comp> *>(pools)->get(entt), ...);
-        } else
+        }
+        else
             return std::tuple<decltype(get<Comp>(entt))...>{get<Comp>(entt)...};
     }
 
 private:
     View(Pool<Component> *... ref)
-        : pools{ref...} {
+        : pools{ref...}
+    {
     }
     const std::tuple<Pool<Component> *...> pools;
 };
@@ -153,38 +174,47 @@ template <typename Component>
 class View<Component> {
 public:
     using iterator_type = typename IPool::iterator;
-    size_t size() const {
+    size_t size() const
+    {
         return pool->size();
     }
-    iterator_type begin() const {
+    iterator_type begin() const
+    {
         return pool->begin();
     }
-    iterator_type end() const {
+    iterator_type end() const
+    {
         return pool->end();
     }
-    std::vector<Component> &data() const {
+    std::vector<Component> &data() const
+    {
         return pool->data();
     }
-    const GLuint *entities() const {
+    const GLuint *entities() const
+    {
         return pool->entities();
     }
-    int find(const int &entt) const {
+    int find(const int &entt) const
+    {
         return pool->find(entt);
     }
-    bool contains(const int &entt) const {
+    bool contains(const int &entt) const
+    {
         return find(entt) != -1;
     }
     /**
      * @brief Checks whether the view is empty.
      * @return True if the view is empty, false otherwise.
      */
-    bool empty() const {
+    bool empty() const
+    {
         return pool->empty();
     }
     /**
     * @brief same as the multi-component view, but here you don't need to enter a component type since it's implicitly discovered
     */
-    decltype(auto) get(const int &entt) const {
+    decltype(auto) get(const int &entt) const
+    {
         assert(contains(entt));
         return pool->get(entt);
     }
@@ -195,4 +225,6 @@ private:
     Pool<Component> *pool;
     friend class Registry;
 };
+} // namespace cjk
+
 #endif // VIEW_H

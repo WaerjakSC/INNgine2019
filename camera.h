@@ -3,16 +3,22 @@
 
 #include "components.h"
 #include "innpch.h"
-typedef gsl::Vector3D vec3;
-typedef gsl::Vector4D vec4;
-typedef gsl::Matrix4x4 mat4;
+// must undefine for Frustum.
+#undef near
+#undef far
+namespace cjk {
 class Camera {
+    using vec3 = gsl::Vector3D;
+    using vec4 = gsl::Vector4D;
+    using mat4 = gsl::Matrix4x4;
+    using mat3 = gsl::Matrix3x3;
+
 public:
     Camera() {}
     Camera(float fov, float aspectRatio, float near, float far);
 
-    gsl::Matrix4x4 mViewMatrix;
-    gsl::Matrix4x4 mProjectionMatrix;
+    mat4 mViewMatrix;
+    mat4 mProjectionMatrix;
 
     void setPosition(const vec3 &position);
 
@@ -25,8 +31,8 @@ public:
     vec3 getNormalizedDeviceCoords(const vec3 &viewportPoint, int height, int width);
     vec3 calculateMouseRay(const vec3 &viewportPoint, int height, int width);
 
-    gsl::Matrix4x4 getViewMatrix() const;
-    gsl::Matrix4x4 getProjectionMatrix() const;
+    mat4 getViewMatrix() const;
+    mat4 getProjectionMatrix() const;
 
     /**
     * @brief Plane struct for use with Frustum
@@ -35,7 +41,8 @@ public:
         vec3 normal;
         float distance{0};
         // a plane is defined by a normal and distance from origo
-        Plane(const vec3 &n = vec3{1, 0, 0}, bool stat = true) : normal(n) {
+        Plane(const vec3 &n = vec3{1, 0, 0}, bool stat = true) : normal(n)
+        {
             isStatic = stat;
         }
     };
@@ -64,7 +71,8 @@ public:
         bool Intersects(const Frustum &f, const AABB &aabb);
 
     } Frustum;
-    Frustum getFrustum() const {
+    Frustum getFrustum() const
+    {
         return mFrustum;
     }
     void makeFrustum();
@@ -80,8 +88,8 @@ private:
     vec3 mPosition{0.f, 0.f, 0.f};
     float mPitch, mYaw;
 
-    gsl::Matrix4x4 mYawMatrix;
-    gsl::Matrix4x4 mPitchMatrix;
+    mat4 mYawMatrix;
+    mat4 mPitchMatrix;
 
     Frustum mFrustum;
 
@@ -89,5 +97,6 @@ private:
     friend class GameCameraController;
     void calculateViewMatrix();
 };
+} // namespace cjk
 
 #endif // CAMERA_H

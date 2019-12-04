@@ -7,7 +7,7 @@
 #include <QObject>
 #include <memory>
 #include <vector>
-using namespace cjk;
+namespace cjk {
 struct GroupData;
 class IPool {
 public:
@@ -40,80 +40,98 @@ public:
 
         iterator() = default;
 
-        iterator &operator++() {
+        iterator &operator++()
+        {
             return --index, *this;
         }
 
-        iterator operator++(int) {
+        iterator operator++(int)
+        {
             iterator orig = *this;
             return ++(*this), orig;
         }
 
-        iterator &operator--() {
+        iterator &operator--()
+        {
             return ++index, *this;
         }
 
-        iterator operator--(int) {
+        iterator operator--(int)
+        {
             iterator orig = *this;
             return --(*this), orig;
         }
 
-        iterator &operator+=(const difference_type value) {
+        iterator &operator+=(const difference_type value)
+        {
             index -= value;
             return *this;
         }
 
-        iterator operator+(const difference_type value) const {
+        iterator operator+(const difference_type value) const
+        {
             return iterator{direct, index - value};
         }
 
-        iterator &operator-=(const difference_type value) {
+        iterator &operator-=(const difference_type value)
+        {
             return (*this += -value);
         }
 
-        iterator operator-(const difference_type value) const {
+        iterator operator-(const difference_type value) const
+        {
             return (*this + -value);
         }
 
-        difference_type operator-(const iterator &other) const {
+        difference_type operator-(const iterator &other) const
+        {
             return other.index - index;
         }
 
-        reference operator[](const difference_type value) const {
+        reference operator[](const difference_type value) const
+        {
             const auto pos = size_t(index - value - 1);
             return (*direct)[pos];
         }
 
-        bool operator==(const iterator &other) const {
+        bool operator==(const iterator &other) const
+        {
             return other.index == index;
         }
 
-        bool operator!=(const iterator &other) const {
+        bool operator!=(const iterator &other) const
+        {
             return !(*this == other);
         }
 
-        bool operator<(const iterator &other) const {
+        bool operator<(const iterator &other) const
+        {
             return index > other.index;
         }
 
-        bool operator>(const iterator &other) const {
+        bool operator>(const iterator &other) const
+        {
             return index < other.index;
         }
 
-        bool operator<=(const iterator &other) const {
+        bool operator<=(const iterator &other) const
+        {
             return !(*this > other);
         }
 
-        bool operator>=(const iterator &other) const {
+        bool operator>=(const iterator &other) const
+        {
             return !(*this < other);
         }
 
-        pointer operator->() const {
+        pointer operator->() const
+        {
             const auto pos = size_t(index - 1);
             return &(*direct)[pos];
         }
 
-        reference operator*() const {
+        reference operator*() const
+        {
             return *operator->();
         }
 
@@ -127,17 +145,20 @@ template <typename Type>
 class Pool : public IPool {
 public:
     Pool() = default;
-    Pool(const Pool &other) {
+    Pool(const Pool &other)
+    {
         mEntities = other.mEntities;
         mComponents = other.mComponents;
     }
-    Pool(IPool *copyFrom) {
+    Pool(IPool *copyFrom)
+    {
         auto temp = static_cast<Pool<Type> *>(copyFrom);
         mEntities = temp->mEntities;
         mComponents = temp->mComponents;
     }
     ~Pool() {}
-    virtual IPool *clone() override {
+    virtual IPool *clone() override
+    {
         return new Pool<Type>{*this};
     }
 
@@ -149,7 +170,8 @@ public:
      * @param entityID
      */
     template <class... Args>
-    void add(GLuint entityID, Args... args) {
+    void add(GLuint entityID, Args... args)
+    {
         assert(!has(entityID)); // Make sure the entityID is unique.
         mEntities.insert(entityID);
         mComponents.push_back(Type{args...});
@@ -159,7 +181,8 @@ public:
      * @param cloneFrom Entity being cloned
      * @param cloneTo Entity receiving the new component
      */
-    void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override {
+    void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override
+    {
         assert(!has(cloneTo));
         assert(has(cloneFrom));
         mEntities.insert(cloneTo);
@@ -171,7 +194,8 @@ public:
      * mEntities.mIndices[swappedEntity] now holds the swapped location of the entityID/component.
      * @param removedEntityID
      */
-    void remove(int removedEntityID) {
+    void remove(int removedEntityID)
+    {
         if (has(removedEntityID)) {
             GLuint swappedEntity{mEntities.back()};
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
@@ -179,7 +203,8 @@ public:
             mEntities.remove(removedEntityID);
         }
     }
-    void swap(GLuint eID, GLuint other) {
+    void swap(GLuint eID, GLuint other)
+    {
         assert(has(eID));
         assert(has(other));
         std::swap(mComponents[mEntities.find(eID)], mComponents[mEntities.find(other)]); // Swap the components to keep the dense set up to date
@@ -190,7 +215,8 @@ public:
      * @brief sort the pool according to a different index
      * @param otherIndex
      */
-    void sort(std::vector<int> otherIndex) {
+    void sort(std::vector<int> otherIndex)
+    {
         for (size_t i{0}; i < mEntities.size(); i++) {
             if (has(i)) {
                 swap(mEntities.get(i), mEntities.get(otherIndex[i]));
@@ -229,7 +255,8 @@ public:
      * @return
      */
     const std::vector<int> &indices() { return mEntities.getIndices(); }
-    const int &index(GLuint entityID) const {
+    const int &index(GLuint entityID) const
+    {
         return mEntities.index(entityID);
     }
     /**
@@ -239,7 +266,8 @@ public:
      * @param eID
      * @return
      */
-    Type &get(int eID) {
+    Type &get(int eID)
+    {
         assert(has(eID));
         return mComponents[mEntities.index(eID)];
     }
@@ -247,14 +275,17 @@ public:
      * @brief back get the last component in the pool, aka the latest creation
      * @return
      */
-    Type &back() {
+    Type &back()
+    {
         return mComponents.back();
     }
-    iterator begin() const {
+    iterator begin() const
+    {
         const int32_t pos{static_cast<int32_t>(mEntities.size())};
         return iterator{mEntities.list(), pos};
     }
-    iterator end() const {
+    iterator end() const
+    {
         return iterator{mEntities.list(), {}};
     }
     /**
@@ -262,7 +293,8 @@ public:
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
-    int find(const GLuint eID) const override {
+    int find(const GLuint eID) const override
+    {
         return mEntities.find(eID);
     }
     /**
@@ -270,7 +302,8 @@ public:
      * @param eID
      * @return
      */
-    bool has(GLuint eID) const override {
+    bool has(GLuint eID) const override
+    {
         return find(eID) != -1;
     }
     /**
@@ -297,25 +330,30 @@ public:
     /**
      * @brief Reset the arrays to empty.
      */
-    void clear() {
+    void clear()
+    {
         mEntities.clear();
         mComponents.clear();
     }
     // Comparison operator overloads
     template <typename Type2>
-    bool operator>(Pool<Type2> &other) {
+    bool operator>(Pool<Type2> &other)
+    {
         return size() > other.size();
     }
     template <typename Type2>
-    bool operator<(Pool<Type2> &other) {
+    bool operator<(Pool<Type2> &other)
+    {
         return size() < other.size();
     }
     template <typename Type2>
-    bool operator>=(Pool<Type2> &other) {
+    bool operator>=(Pool<Type2> &other)
+    {
         return size() >= other.size();
     }
     template <typename Type2>
-    bool operator<=(Pool<Type2> &other) {
+    bool operator<=(Pool<Type2> &other)
+    {
         return size() <= other.size();
     }
     void onDestroy(int removedEntity);
@@ -327,5 +365,7 @@ private:
     std::vector<Type> mComponents;
     SparseSet mEntities;
 };
+
+} // namespace cjk
 
 #endif // POOL_H

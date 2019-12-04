@@ -22,15 +22,18 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QStyleFactory>
+namespace cjk {
 ComponentList::ComponentList(VerticalScrollArea *inScrollArea)
-    : registry{Registry::instance()}, scrollArea{inScrollArea} {
+    : registry{Registry::instance()}, scrollArea{inScrollArea}
+{
     fusion = QStyleFactory::create("fusion");
 }
 /**
  * @brief When an entity is selected, show all its components in separate groupboxes in the rightmost panel.
  * Order of if-statements is the order the component list will show each component
  */
-void ComponentList::setupComponentList() {
+void ComponentList::setupComponentList()
+{
     scrollArea->clearLayout();
     GLuint eID{registry->getSelectedEntity()};
     if (registry->contains<Transform>(eID)) {
@@ -64,42 +67,54 @@ void ComponentList::setupComponentList() {
         setupEmitterSettings(registry->get<ParticleEmitter>(eID));
     }
 }
-void ComponentList::addTransformComponent() {
+void ComponentList::addTransformComponent()
+{
     addComponent<Transform>();
 }
-void ComponentList::addMaterialComponent() {
+void ComponentList::addMaterialComponent()
+{
     addComponent<Material>();
 }
-void ComponentList::addMeshComponent() {
+void ComponentList::addMeshComponent()
+{
     addComponent<Mesh>();
 }
-void ComponentList::addBSplineComponent() {
+void ComponentList::addBSplineComponent()
+{
     addComponent<BSplinePoint>();
 }
-void ComponentList::addLightComponent() {
+void ComponentList::addLightComponent()
+{
     addComponent<Light>();
 }
-void ComponentList::addPhysicsComponent() {
+void ComponentList::addPhysicsComponent()
+{
     addComponent<Physics>();
 }
-void ComponentList::addSoundComponent() {
+void ComponentList::addSoundComponent()
+{
     addComponent<Sound>();
 }
-void ComponentList::addGameCameraComponent() {
+void ComponentList::addGameCameraComponent()
+{
     addComponent<GameCamera>();
 }
-void ComponentList::addBuildableComponent() {
+void ComponentList::addBuildableComponent()
+{
     addComponent<Buildable>();
 }
-void ComponentList::addParticleEmitter() {
+void ComponentList::addParticleEmitter()
+{
     addComponent<ParticleEmitter>();
     registry->system<ParticleSystem>()->initEmitter(registry->getSelectedEntity());
 }
-void ComponentList::addAIComponent() {
+void ComponentList::addAIComponent()
+{
     addComponent<AIComponent>();
 }
 
-void ComponentList::addAABBCollider() {
+void ComponentList::addAABBCollider()
+{
     addCollider<AABB>();
     GLuint selectedEntity{registry->getSelectedEntity()};
     if (registry->contains<Transform>(selectedEntity)) {
@@ -110,14 +125,16 @@ void ComponentList::addAABBCollider() {
     }
 }
 
-void ComponentList::addSphereCollider() {
+void ComponentList::addSphereCollider()
+{
     addCollider<Sphere>();
     GLuint selectedEntity{registry->getSelectedEntity()};
 
     registry->system<MovementSystem>()->updateSphereTransform(selectedEntity);
 }
 
-void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
+void ComponentList::setupGameCameraSettings(const GameCamera &cam)
+{
     ComponentGroupBox *box{new ComponentGroupBox{"Game Camera", this}};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -168,7 +185,8 @@ void ComponentList::setupGameCameraSettings(const GameCamera &cam) {
     scrollArea->addGroupBox(box);
 }
 
-void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
+void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter)
+{
     ComponentGroupBox *box{new ComponentGroupBox("Particle Emitter", this)};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -235,7 +253,8 @@ void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
                 break;
             }
             colorLayout->addWidget(label);
-        } else {
+        }
+        else {
             switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
             case 1:
                 xBox->setValue(emitter.initialColor.red());
@@ -280,7 +299,8 @@ void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
                 break;
             }
             particlesLayout->addWidget(label);
-        } else {
+        }
+        else {
             switch (i) {
             case 1:
                 particleNumBox->setValue(emitter.numParticles);
@@ -322,7 +342,8 @@ void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
                 break;
             }
             sizeSpeedLayout->addWidget(label);
-        } else {
+        }
+        else {
             switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
             case 1:
                 speedBox->setValue(emitter.speed);
@@ -361,7 +382,8 @@ void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
                 break;
             }
             spreadLifeSpanLayout->addWidget(label);
-        } else {
+        }
+        else {
             switch (i) {
             case 1:
                 lifespanBox->setValue(emitter.initLifeSpan);
@@ -382,7 +404,8 @@ void ComponentList::setupEmitterSettings(const ParticleEmitter &emitter) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
+void ComponentList::setupBSplinePointSettings(const BSplinePoint &point)
+{
     ComponentGroupBox *box{new ComponentGroupBox("BSpline Point", this)};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -403,7 +426,8 @@ void ComponentList::setupBSplinePointSettings(const BSplinePoint &point) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupAABBSettings(const AABB &col) {
+void ComponentList::setupAABBSettings(const AABB &col)
+{
     ComponentGroupBox *box{new ComponentGroupBox("AABB Collider", this)};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -451,7 +475,8 @@ void ComponentList::setupAABBSettings(const AABB &col) {
     scrollArea->addGroupBox(box);
 }
 
-void ComponentList::setupSphereColliderSettings(const Sphere &col) {
+void ComponentList::setupSphereColliderSettings(const Sphere &col)
+{
     ComponentGroupBox *box{new ComponentGroupBox("Sphere Collider", this)};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -492,7 +517,8 @@ void ComponentList::setupSphereColliderSettings(const Sphere &col) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupBuildableSettings(const Buildable &build) {
+void ComponentList::setupBuildableSettings(const Buildable &build)
+{
     ComponentGroupBox *box{new ComponentGroupBox{"Buildable", this}};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -510,7 +536,8 @@ void ComponentList::setupBuildableSettings(const Buildable &build) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupAISettings(const AIComponent &ai) {
+void ComponentList::setupAISettings(const AIComponent &ai)
+{
     ComponentGroupBox *box{new ComponentGroupBox("AI", this)};
     QGridLayout *grid{new QGridLayout};
     grid->setMargin(2);
@@ -537,7 +564,8 @@ void ComponentList::setupAISettings(const AIComponent &ai) {
     box->setLayout(grid);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupMeshSettings(const Mesh &mesh) {
+void ComponentList::setupMeshSettings(const Mesh &mesh)
+{
     ComponentGroupBox *box{new ComponentGroupBox("Mesh", this)};
 
     objFileLabel = new QLabel(box);
@@ -552,7 +580,8 @@ void ComponentList::setupMeshSettings(const Mesh &mesh) {
     box->setLayout(meshLayout);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupMaterialSettings(const Material &mat) {
+void ComponentList::setupMaterialSettings(const Material &mat)
+{
     ComponentGroupBox *box{new ComponentGroupBox("Material", this)};
 
     QVBoxLayout *shader{new QVBoxLayout};
@@ -605,7 +634,8 @@ void ComponentList::setupMaterialSettings(const Material &mat) {
     box->setLayout(shader);
     scrollArea->addGroupBox(box);
 }
-void ComponentList::setupTransformSettings(const Transform &trans) {
+void ComponentList::setupTransformSettings(const Transform &trans)
+{
     ComponentGroupBox *box{new ComponentGroupBox("Transform", this)};
 
     QGridLayout *grid{new QGridLayout};
@@ -678,7 +708,8 @@ void ComponentList::setupTransformSettings(const Transform &trans) {
     scrollArea->addGroupBox(box);
 }
 
-void ComponentList::setNewTextureFile() {
+void ComponentList::setNewTextureFile()
+{
     QString directory{QString::fromStdString(gsl::assetFilePath) + "Textures"};
     QString fileName{QFileDialog::getOpenFileName(this, tr("Open Image"), directory,
                                                   tr("Image Files (*.bmp *.jpg *.png)"))};
@@ -691,7 +722,8 @@ void ComponentList::setNewTextureFile() {
         texFileLabel->setText(fileName);
     }
 }
-void ComponentList::setNewMesh() {
+void ComponentList::setNewMesh()
+{
     QString directory{QString::fromStdString(gsl::assetFilePath) + "Meshes"};
     QString fileName{QFileDialog::getOpenFileName(this, tr("Open Mesh File"), directory,
                                                   tr("OBJ Files (*.obj)"))};
@@ -706,7 +738,8 @@ void ComponentList::setNewMesh() {
 /**
  * @brief Not sure why this gives a geometry warning, ask Ole?
  */
-void ComponentList::setColor() {
+void ComponentList::setColor()
+{
     const QColor color{QColorDialog::getColor(rgb, this, "Select Color")};
     if (color.isValid()) {
         QPixmap newRgb{18, 18};
@@ -716,7 +749,8 @@ void ComponentList::setColor() {
     registry->get<Material>(registry->getSelectedEntity()).mObjectColor = vec3{static_cast<GLfloat>(color.redF()), static_cast<GLfloat>(color.greenF()), static_cast<GLfloat>(color.blueF())};
 }
 
-void ComponentList::updatePosSpinBoxes(int state) {
+void ComponentList::updatePosSpinBoxes(int state)
+{
     disconnect(xVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionX(double)));
     disconnect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
     disconnect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
@@ -741,7 +775,8 @@ void ComponentList::updatePosSpinBoxes(int state) {
     connect(yVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionY(double)));
     connect(zVal, SIGNAL(valueChanged(double)), this, SLOT(setPositionZ(double)));
 }
-void ComponentList::updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal) {
+void ComponentList::updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal)
+{
     if (abs->isChecked() != isGlobal) // if absolute position is checked but the signal is local, don't do anything, and vice versa
         return;
     if (eID == registry->getSelectedEntity()) {
@@ -750,14 +785,16 @@ void ComponentList::updatePositionVals(GLuint eID, vec3 newPos, bool isGlobal) {
         emit posZ(newPos.z);
     }
 }
-void ComponentList::updateRotationVals(GLuint eID, vec3 newRot) {
+void ComponentList::updateRotationVals(GLuint eID, vec3 newRot)
+{
     if (eID == registry->getSelectedEntity()) {
         emit rotX(newRot.x);
         emit rotY(newRot.y);
         emit rotZ(newRot.z);
     }
 }
-void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
+void ComponentList::updateScaleVals(GLuint eID, vec3 newScale)
+{
     if (eID == registry->getSelectedEntity()) {
         emit scaleX(newScale.x);
         emit scaleY(newScale.y);
@@ -765,7 +802,8 @@ void ComponentList::updateScaleVals(GLuint eID, vec3 newScale) {
     }
 }
 
-void ComponentList::setPositionX(double xIn) {
+void ComponentList::setPositionX(double xIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     if (abs->isChecked())
@@ -776,7 +814,8 @@ void ComponentList::setPositionX(double xIn) {
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setPositionY(double yIn) {
+void ComponentList::setPositionY(double yIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     if (abs->isChecked())
@@ -786,7 +825,8 @@ void ComponentList::setPositionY(double yIn) {
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setPositionZ(double zIn) {
+void ComponentList::setPositionZ(double zIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     if (abs->isChecked())
@@ -796,42 +836,48 @@ void ComponentList::setPositionZ(double zIn) {
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setRotationX(double xIn) {
+void ComponentList::setRotationX(double xIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setRotationY(double yIn) {
+void ComponentList::setRotationY(double yIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setRotationZ(double zIn) {
+void ComponentList::setRotationZ(double zIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationZ(entityID, zIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setScaleX(double xIn) {
+void ComponentList::setScaleX(double xIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleX(entityID, xIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setScaleY(double yIn) {
+void ComponentList::setScaleY(double yIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleY(entityID, yIn, false);
     if (!ResourceManager::instance()->isPlaying())
         movement->updateEntity(entityID);
 }
-void ComponentList::setScaleZ(double zIn) {
+void ComponentList::setScaleZ(double zIn)
+{
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleZ(entityID, zIn, false);
@@ -839,7 +885,8 @@ void ComponentList::setScaleZ(double zIn) {
         movement->updateEntity(entityID);
 }
 
-QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col) {
+QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col)
+{
     QHBoxLayout *objectType{new QHBoxLayout};
     objectType->setMargin(1);
     QComboBox *staticBox{new QComboBox};
@@ -857,7 +904,8 @@ QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Coll
     return staticBox;
 }
 CustomDoubleSpinBox *ComponentList::makeDoubleSpinBox(const double &num, QHBoxLayout *layout,
-                                                      const std::optional<float> &minRange, const std::optional<float> &maxRange) {
+                                                      const std::optional<float> &minRange, const std::optional<float> &maxRange)
+{
     layout->setMargin(1);
     CustomDoubleSpinBox *distance{new CustomDoubleSpinBox(minRange, maxRange)};
     distance->setValue(num);
@@ -875,7 +923,8 @@ CustomDoubleSpinBox *ComponentList::makeDoubleSpinBox(const double &num, QHBoxLa
  */
 std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> ComponentList::makeVectorBox(const vec3 &vector,
                                                                                                              QHBoxLayout *layout,
-                                                                                                             const std::optional<float> &minRange, const std::optional<float> &maxRange) {
+                                                                                                             const std::optional<float> &minRange, const std::optional<float> &maxRange)
+{
     layout->setMargin(1);
 
     CustomDoubleSpinBox *xBox{new CustomDoubleSpinBox(minRange, maxRange)};
@@ -899,7 +948,8 @@ std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> 
                 break;
             }
             layout->addWidget(label);
-        } else {
+        }
+        else {
             switch (i) { // Atm shows relative position if parented to something, global if not. Should probably give the user the option to choose which to show.
             case 1:
                 xBox->setValue(vector.x);
@@ -918,3 +968,4 @@ std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> 
     }
     return {xBox, yBox, zBox};
 }
+} // namespace cjk

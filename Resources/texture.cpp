@@ -1,21 +1,26 @@
 #include "texture.h"
 #include "innpch.h"
-
-Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit} {
+namespace cjk {
+Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit}
+{
     isValid = textureFromFile(filename);
 }
 
-Texture::Texture(std::vector<std::string> faces, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit} {
+Texture::Texture(std::vector<std::string> faces, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit}
+{
     isValid = cubeMapFromFile(faces);
 }
 
-GLuint Texture::id() const {
+GLuint Texture::id() const
+{
     return mId;
 }
-GLuint Texture::textureUnit() const {
+GLuint Texture::textureUnit() const
+{
     return mTextureUnit;
 }
-bool Texture::cubeMapFromFile(std::vector<std::string> faces) {
+bool Texture::cubeMapFromFile(std::vector<std::string> faces)
+{
     initializeOpenGLFunctions();
 
     glGenTextures(1, &mId);
@@ -31,7 +36,8 @@ bool Texture::cubeMapFromFile(std::vector<std::string> faces) {
         if (data) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
-        } else {
+        }
+        else {
             qDebug() << "Cubemap texture failed to load at path: " << QString::fromStdString(faces[i]);
             stbi_image_free(data);
             return false;
@@ -44,7 +50,8 @@ bool Texture::cubeMapFromFile(std::vector<std::string> faces) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     return true;
 }
-bool Texture::textureFromFile(const std::string &filename /*, bool gamma*/) {
+bool Texture::textureFromFile(const std::string &filename /*, bool gamma*/)
+{
     initializeOpenGLFunctions();
     std::string fileWithPath{gsl::assetFilePath + "Textures/" + filename};
     glGenTextures(1, &mId);
@@ -72,7 +79,8 @@ bool Texture::textureFromFile(const std::string &filename /*, bool gamma*/) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
-    } else {
+    }
+    else {
         qDebug() << "Unable to read " << QString(fileWithPath.c_str());
         stbi_image_free(data);
         return false;
@@ -80,3 +88,5 @@ bool Texture::textureFromFile(const std::string &filename /*, bool gamma*/) {
 
     return true;
 }
+
+} // namespace cjk

@@ -11,14 +11,13 @@
 #ifndef TINYOBJLOADER_IMPLEMENTATION
 #define TINYOBJLOADER_IMPLEMENTATION
 #endif
-class LightSystem;
-class Entity;
-class Registry;
 class MainWindow;
+namespace cjk {
+class LightSystem;
+class Registry;
 class Scene;
 class Script;
 class CameraController;
-using namespace cjk;
 class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {
     Q_OBJECT
 public:
@@ -32,18 +31,21 @@ public:
      * @param geometryPath
      */
     template <typename ShaderType>
-    void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr) {
+    void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr)
+    {
         std::string shaderName{typeid(ShaderType).name()};
         if (mShaders.find(shaderName) == mShaders.end()) {
             mShaders[shaderName] = std::make_shared<ShaderType>(camController, geometryPath);
             qDebug() << "ResourceManager: Added shader " << QString::fromStdString(mShaders[shaderName]->getName());
-        } else {
+        }
+        else {
             qDebug() << "ResourceManager: Shader already loaded, ignoring...";
         }
     }
     // Gets stored shader
     template <typename Type>
-    inline Ref<Type> getShader() {
+    inline Ref<Type> getShader()
+    {
         std::string type{typeid(Type).name()};
         return std::static_pointer_cast<Type>(mShaders[type]);
     }
@@ -195,5 +197,6 @@ private:
     friend class ComponentList;
     friend class Scene;
 };
+} // namespace cjk
 
 #endif // RESOURCEMANAGER_H

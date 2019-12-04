@@ -1,7 +1,8 @@
 #include "bsplinecurve.h"
 #include "registry.h"
-
-BSplineCurve::BSplineCurve(int degree) : d{degree} {
+namespace cjk {
+BSplineCurve::BSplineCurve(int degree) : d{degree}
+{
     debugShader = ResourceManager::instance()->getShader<ColorShader>();
 }
 
@@ -9,7 +10,8 @@ BSplineCurve::BSplineCurve(int degree) : d{degree} {
  * @brief BSplineCurve::setControlPoints
  * @param cp
  */
-void BSplineCurve::setControlPoints(const std::vector<vec3> &cp) {
+void BSplineCurve::setControlPoints(const std::vector<vec3> &cp)
+{
     std::size_t oldSize{b.size()};
 
     b = cp;
@@ -22,7 +24,8 @@ void BSplineCurve::setControlPoints(const std::vector<vec3> &cp) {
  * @brief BSplineCurve::findKnots
  * @return
  */
-std::vector<float> BSplineCurve::findKnots() const {
+std::vector<float> BSplineCurve::findKnots() const
+{
 
     auto startEndSize{static_cast<unsigned int>(d + 1)};
     auto n{b.size() + startEndSize};
@@ -52,7 +55,8 @@ std::vector<float> BSplineCurve::findKnots() const {
  * @param x
  * @return
  */
-int BSplineCurve::getMy(float x) const {
+int BSplineCurve::getMy(float x) const
+{
     for (unsigned int i{0}; !t.empty() && i < t.size() - 1; ++i)
         if (t[i] <= x && x < t[i + 1])
             return static_cast<int>(i);
@@ -63,7 +67,8 @@ int BSplineCurve::getMy(float x) const {
 /**
  * @brief updateTrophies call this when a trophy is taken
  */
-void BSplineCurve::updateTrophies() {
+void BSplineCurve::updateTrophies()
+{
     std::vector<vec3> controlPoints;
     auto view{Registry::instance()->view<BSplinePoint>()}; // Get every entity with these two components
     for (auto entity : view) {
@@ -77,7 +82,8 @@ void BSplineCurve::updateTrophies() {
 /**
  * @brief BSplineCurve::updatePath, updates the bspline, called from AIsystem.
  */
-void BSplineCurve::updatePath(bool init) {
+void BSplineCurve::updatePath(bool init)
+{
     std::vector<Vertex> vertices;
 
     vertices.reserve(splineResolution + b.size());
@@ -121,7 +127,8 @@ void BSplineCurve::updatePath(bool init) {
  * @param x parameterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
-vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
+vec3 BSplineCurve::evaluateBSpline(int my, float x) const
+{
     std::vector<vec3> a;
     a.resize(t.size() + d + 1);
 
@@ -143,7 +150,8 @@ vec3 BSplineCurve::evaluateBSpline(int my, float x) const {
 /**
  * @brief BSplineCurve::draw
  */
-void BSplineCurve::draw() {
+void BSplineCurve::draw()
+{
     if (debugLine) {
         glUseProgram(debugShader->getProgram());
         glPointSize(3.f);
@@ -156,7 +164,8 @@ void BSplineCurve::draw() {
 /**
  * @brief BSplineCurve::init
  */
-void BSplineCurve::init() {
+void BSplineCurve::init()
+{
     initializeOpenGLFunctions();
     updateTrophies();
 
@@ -180,10 +189,12 @@ void BSplineCurve::init() {
  * @param x
  * @return
  */
-vec3 BSplineCurve::eval(float x) const {
+vec3 BSplineCurve::eval(float x) const
+{
     auto my{getMy(x)};
     if (my > -1)
         return evaluateBSpline(my, x);
 
     return {0.f, 0.f, 0.f};
 }
+} // namespace cjk

@@ -2,17 +2,22 @@
 #include "constants.h"
 #include "resourcemanager.h"
 #include <QFileInfo>
-ScriptSystem::ScriptSystem() : factory{ResourceManager::instance()} {
+namespace cjk {
+ScriptSystem::ScriptSystem() : factory{ResourceManager::instance()}
+{
 }
 
-void ScriptSystem::update(DeltaTime) {
+void ScriptSystem::update(DeltaTime)
+{
 }
 
-void ScriptSystem::init() {
+void ScriptSystem::init()
+{
     readScript(QString::fromStdString(gsl::assetFilePath) + "Scripts/testscript.js");
 }
 
-bool ScriptSystem::readScript(const QString &fileName) {
+bool ScriptSystem::readScript(const QString &fileName)
+{
     //Make the Script engine itself
     QJSEngine engine;
 
@@ -44,10 +49,13 @@ bool ScriptSystem::readScript(const QString &fileName) {
     qDebug() << func.toString();
     return true;
 }
-QString ScriptSystem::checkError(QJSValue value) {
+QString ScriptSystem::checkError(QJSValue value)
+{
     QString lineNumber{QString::number(value.property("lineNumber").toInt())};
     QString valueString{value.toString()};
     QString error{"Uncaught exception at line" + lineNumber + ":" + valueString};
     qDebug() << error;
     return error;
 }
+
+} // namespace cjk

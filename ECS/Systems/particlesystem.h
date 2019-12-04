@@ -4,10 +4,9 @@
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <random>
-
-struct Particle;
+namespace cjk {
 struct ParticleEmitter;
-struct ParticleShader;
+class ParticleShader;
 class Registry;
 class ParticleSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
@@ -47,5 +46,6 @@ private:
     void renderParticles(ParticleEmitter &emitter);
     void drawElements(ParticleEmitter &emitter);
 };
+} // namespace cjk
 
 #endif // PARTICLESYSTEM_H

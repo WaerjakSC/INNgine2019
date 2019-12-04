@@ -5,20 +5,25 @@
 #include "inputsystem.h"
 #include "registry.h"
 #include <cmath>
-CollisionSystem::CollisionSystem() : registry{Registry::instance()} {
+namespace cjk {
+CollisionSystem::CollisionSystem() : registry{Registry::instance()}
+{
 }
-void CollisionSystem::update(DeltaTime dt) {
+void CollisionSystem::update(DeltaTime dt)
+{
     delta += dt;
     if (delta >= fixedDelta) {
         delta = 0.f;
         runSimulations();
     }
 }
-void CollisionSystem::runSimulations() {
+void CollisionSystem::runSimulations()
+{
     runAABBSimulations();
     runSphereSimulations();
 }
-void CollisionSystem::runAABBSimulations() {
+void CollisionSystem::runAABBSimulations()
+{
     auto view{registry->view<EInfo, AABB>()};
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
@@ -69,7 +74,8 @@ void CollisionSystem::runAABBSimulations() {
         }
     }
 }
-void CollisionSystem::runSphereSimulations() {
+void CollisionSystem::runSphereSimulations()
+{
     auto view{registry->view<EInfo, Sphere>()};
     for (auto entity : view) {
         auto &sphere{view.get<Sphere>(entity)};
@@ -90,7 +96,8 @@ void CollisionSystem::runSphereSimulations() {
         }
     }
 }
-void CollisionSystem::rayAABB(Raycast &ray, int ignoredEntity) {
+void CollisionSystem::rayAABB(Raycast &ray, int ignoredEntity)
+{
     auto view{registry->view<AABB>()};
     for (auto entity : view) {
         if ((int)entity == ignoredEntity)
@@ -104,7 +111,8 @@ void CollisionSystem::rayAABB(Raycast &ray, int ignoredEntity) {
         }
     }
 }
-void CollisionSystem::raySphere(Raycast &ray, int ignoredEntity) {
+void CollisionSystem::raySphere(Raycast &ray, int ignoredEntity)
+{
     auto view{registry->view<Sphere>()};
     for (auto entity : view) {
         if ((int)entity == ignoredEntity)
@@ -119,7 +127,8 @@ void CollisionSystem::raySphere(Raycast &ray, int ignoredEntity) {
     }
 }
 
-Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, int ignoredEntity, float range) {
+Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, int ignoredEntity, float range)
+{
     Raycast raycast{range};
     raycast.ray = getRayFromMouse(mousePos, rect);
 
@@ -132,10 +141,12 @@ Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, in
     return raycast;
 }
 
-vec3 CollisionSystem::getPointOnRay(const Raycast &r, double distance) {
+vec3 CollisionSystem::getPointOnRay(const Raycast &r, double distance)
+{
     return r.ray.origin + (r.ray.direction * distance);
 }
-Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect) {
+Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect)
+{
     vec3 mousePoint{static_cast<GLfloat>(mousePos.x()), static_cast<GLfloat>(mousePos.y()), 0.0f};
     auto inputSystem{registry->system<InputSystem>()};
     CameraController *curController{inputSystem->currentCameraController().get()};
@@ -143,11 +154,13 @@ Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect) 
     vec3 origin{curController->cameraPosition()};
     return Ray{origin, direction};
 }
-inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs) {
+inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs)
+{
     return (lhs.isStatic == rhs.isStatic) == true;
 }
 
-vec3 CollisionSystem::getMin(const AABB &aabb) {
+vec3 CollisionSystem::getMin(const AABB &aabb)
+{
     vec3 origin{aabb.transform.modelMatrix.getPosition()};
     vec3 p1{origin + aabb.size};
     vec3 p2{origin - aabb.size};
@@ -157,7 +170,8 @@ vec3 CollisionSystem::getMin(const AABB &aabb) {
                 fminf(p1.z, p2.z)};
 }
 
-vec3 CollisionSystem::getMax(const AABB &aabb) {
+vec3 CollisionSystem::getMax(const AABB &aabb)
+{
     vec3 origin{aabb.transform.modelMatrix.getPosition()};
     vec3 p1{origin + aabb.size};
     vec3 p2{origin - aabb.size};
@@ -166,7 +180,8 @@ vec3 CollisionSystem::getMax(const AABB &aabb) {
                 fmaxf(p1.y, p2.y),
                 fmaxf(p1.z, p2.z)};
 }
-bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2) {
+bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2)
+{
     vec3 sphere1Pos{sphere1.transform.modelMatrix.getPosition()};
     vec3 sphere2Pos{sphere2.transform.modelMatrix.getPosition()};
     // sum of radius
@@ -176,7 +191,8 @@ bool CollisionSystem::SphereSphere(const Sphere &sphere1, const Sphere &sphere2)
     // compare
     return dist < (rs * rs);
 }
-bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
+bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb)
+{
     // Get the actual position of the sphere - sphere.position only holds the offset from the entity it belongs to
     vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
     // Not sure what ClosestPoint aims to achieve, previously I think it was sending a vec3(sphere.radius, 0,0) due to how vector3d works
@@ -190,7 +206,8 @@ bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb) {
     return dist < radiusSq;
 }
 
-bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
+bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2)
+{
     vec3 aMin{getMin(AABB1)};
     vec3 aMax{getMax(AABB1)};
 
@@ -200,7 +217,8 @@ bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2) {
     return aMin <= bMax && aMax >= bMin;
 }
 
-vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point) {
+vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point)
+{
     vec3 result{point};
     vec3 min{getMin(aabb)};
     vec3 max{getMax(aabb)};
@@ -218,7 +236,8 @@ vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point) {
     return result;
 }
 
-vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
+vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point)
+{
     vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
     vec3 sphereCenterToPoint{point - spherePos};
     sphereCenterToPoint.normalize();
@@ -226,7 +245,8 @@ vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point) {
 
     return sphereCenterToPoint + spherePos;
 }
-bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere) {
+bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere)
+{
     vec3 center{sphere.transform.modelMatrix.getPosition() + sphere.position};
     vec3 originToCenter{r.ray.origin - center};
 
@@ -246,7 +266,8 @@ bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere) {
         if (t_a < 0.0f) {
             if (t_b < 0.0f)
                 return false;
-        } else if (t_b < 0.0f)
+        }
+        else if (t_b < 0.0f)
             r.intersectionDistance = t_a;
         return true;
     }
@@ -262,7 +283,8 @@ bool CollisionSystem::calcRayToSphere(Raycast &r, const Sphere &sphere) {
     return false;
 }
 
-bool CollisionSystem::calcRayToAABB(Raycast &r, const AABB &aabb) {
+bool CollisionSystem::calcRayToAABB(Raycast &r, const AABB &aabb)
+{
     vec3 AABBmin{getMin(aabb)};
     vec3 AABBmax{getMax(aabb)};
 
@@ -287,77 +309,88 @@ bool CollisionSystem::calcRayToAABB(Raycast &r, const AABB &aabb) {
     return false;
 }
 // ************* Collider update slots *************
-void CollisionSystem::setOriginX(double xIn) {
+void CollisionSystem::setOriginX(double xIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.x = xIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
-void CollisionSystem::setOriginY(double yIn) {
+void CollisionSystem::setOriginY(double yIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.y = yIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
-void CollisionSystem::setOriginZ(double zIn) {
+void CollisionSystem::setOriginZ(double zIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.z = zIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
-void CollisionSystem::setAABBSizeX(double xIn) {
+void CollisionSystem::setAABBSizeX(double xIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.x = xIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
-void CollisionSystem::setAABBSizeY(double yIn) {
+void CollisionSystem::setAABBSizeY(double yIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.y = yIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
-void CollisionSystem::setAABBSizeZ(double zIn) {
+void CollisionSystem::setAABBSizeZ(double zIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.z = zIn;
     aabb.transform.matrixOutdated = true;
     emit updateAABB(entityID);
 }
-void CollisionSystem::setSpherePositionX(double xIn) {
+void CollisionSystem::setSpherePositionX(double xIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.x = xIn;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
-void CollisionSystem::setSpherePositionY(double yIn) {
+void CollisionSystem::setSpherePositionY(double yIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.y = yIn;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
-void CollisionSystem::setSpherePositionZ(double zIn) {
+void CollisionSystem::setSpherePositionZ(double zIn)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.z = zIn;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
-void CollisionSystem::setSphereRadius(double radius) {
+void CollisionSystem::setSphereRadius(double radius)
+{
     GLuint entityID{registry->getSelectedEntity()};
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.radius = radius;
     sphere.transform.matrixOutdated = true;
     emit updateSphere(entityID);
 }
-void CollisionSystem::setObjectType(int index) {
+void CollisionSystem::setObjectType(int index)
+{
     bool isStatic;
     if (index == 0)
         isStatic = true;
@@ -374,3 +407,4 @@ void CollisionSystem::setObjectType(int index) {
         sphere.isStatic = isStatic;
     }
 }
+} // namespace cjk

@@ -6,7 +6,7 @@
 #include "isystem.h"
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
-using namespace cjk;
+namespace cjk {
 class Registry;
 
 class RenderSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
@@ -47,5 +47,6 @@ private:
     void drawSkybox();
     void Cull(const Camera::Frustum &f);
 };
+} // namespace cjk
 
 #endif // RENDERSYSTEM_H

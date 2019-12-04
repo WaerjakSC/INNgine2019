@@ -4,8 +4,10 @@
 #include "components.h"
 #include "isystem.h"
 #include <QJSValueList>
+namespace cjk {
 struct Script {
-    Script() {
+    Script()
+    {
         engine = new QJSEngine;
         engine->installExtensions(QJSEngine::ConsoleExtension);
     }
@@ -29,5 +31,6 @@ private:
     ResourceManager *factory;
     Script script;
 };
+} // namespace cjk
 
 #endif // SCRIPTSYSTEM_H

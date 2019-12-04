@@ -3,8 +3,8 @@
 #include "core.h"
 #include "isystem.h"
 #include "pool.h"
-using namespace cjk;
 class RenderWindow;
+namespace cjk {
 class Registry;
 class ResourceManager;
 class MovementSystem;
@@ -12,6 +12,8 @@ class CameraController;
 class GameCameraController;
 class InputSystem : public QObject, public ISystem {
     Q_OBJECT
+    using vec3 = gsl::Vector3D;
+
 public:
     InputSystem(RenderWindow *window);
     void update(DeltaTime dt = 0.016) override;
@@ -124,5 +126,7 @@ private:
     void dragEntity(GLuint entity);
     void spawnTower();
 };
+
+} // namespace cjk
 
 #endif // INPUTSYSTEM_H
