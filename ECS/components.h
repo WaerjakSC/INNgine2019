@@ -260,6 +260,7 @@ struct Sound : public Component {
     bool mPlaying{false}; // Might want to change this, but atm it will just be playing by default immediately
     bool mPaused{false};
     bool mOutDated{true};
+    bool initialized{false};
 
     std::string mName; ///< The name of the sound source.
     ALuint mSource;    ///< The sound source.

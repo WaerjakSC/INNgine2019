@@ -20,7 +20,7 @@ class SoundSystem : public ISystem {
 public:
     SoundSystem();
     void cleanUp();
-    void init();
+    void init(GLuint entity);
     void update(DeltaTime = 0.016) override;
 
     void setPosition(GLuint eID, vec3 newPos);

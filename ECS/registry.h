@@ -255,8 +255,10 @@ public:
             onDestroy(pool.first, entityID);
         }
         for (auto &pool : mPools) {
-            if (pool.first == typeid(EInfo).name())
+            if (pool.first == typeid(EInfo).name()) {
+                mAvailableIDs.push_back(entityID);
                 continue;
+            }
             if (pool.second->has(entityID)) {
                 pool.second->remove(entityID);
             }
@@ -296,8 +298,7 @@ public:
      */
     GLuint numEntities()
     {
-        std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
-        return entities.size();
+        return getPool<EInfo>()->entityList().size();
     }
     /**
      * @brief nextAvailable get the next available ID. In a scenario with no destroyed IDs, this will simply return the size of the mEntities map.
@@ -374,12 +375,12 @@ private:
     static Registry *mInstance;
     std::map<std::string, Scope<IPool>> mPools{};
     std::map<std::string, Ref<ISystem>> mSystems{};
+    std::vector<uint> mAvailableIDs;
     std::vector<GroupData *> mGroups{};
-    std::vector<GLuint> mAvailableSlots;
     void newGeneration(GLuint id, const QString &text);
 
     GLuint mSelectedEntity;
-    std::tuple<std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
+    std::tuple<std::vector<GLuint>, std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>
     Ref<Type> getSystem()

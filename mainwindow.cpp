@@ -427,7 +427,7 @@ void MainWindow::insertEntities()
 {
     hierarchy->clear();
     QStandardItem *parentItem{hierarchy->invisibleRootItem()};
-    for (auto &entity : registry->getEntities()) {
+    for (auto entity : registry->getEntities()) {
         auto &info{registry->get<cjk::EInfo>(entity)};
         if (info.isDestroyed)
             continue;

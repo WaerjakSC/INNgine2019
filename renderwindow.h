@@ -100,8 +100,6 @@ private:
     void startOpenGLDebugger();
 
     std::chrono::high_resolution_clock::time_point mLastTime;
-    friend class MainWindow;
-
     //    void Cull(const Camera::Frustum &f);
     cjk::Camera mCamera;
 

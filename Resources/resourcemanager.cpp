@@ -366,6 +366,7 @@ GLuint ResourceManager::makeEnemy(const QString &name)
     GLuint eID{registry->makeEntity<Mesh, AIComponent>(name)};
     registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
     registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false);
+    registry->add<Sound>(eID, "gnomed.wav", true);
     setMesh("OgreOBJ.obj", eID);
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["SkinColorMostro_COLOR.png"]->textureUnit()); // probably change textureunit later
     return eID;
@@ -775,12 +776,18 @@ void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID)
     }
 }
 
-bool ResourceManager::loadWave(std::string filePath, Sound &sound)
+bool ResourceManager::loadWave(Sound &sound)
 {
+    auto search = mSounds.find(sound.mName);
+    if (search != mSounds.end()) {
+        sound = search->second;
+        sound.mOutDated = true;
+        return true;
+    }
     ALuint frequency{};
     ALenum format{};
     wave_t *waveData{new wave_t()};
-    if (!WavFileHandler::loadWave(filePath, waveData)) {
+    if (!WavFileHandler::loadWave(gsl::soundFilePath + sound.mName, waveData)) {
         qDebug() << "Error loading wave file!\n";
         return false; // error loading wave file data
     }

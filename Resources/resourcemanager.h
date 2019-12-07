@@ -113,7 +113,7 @@ public:
         Calls the wave loader from the FileHandler class, parses the wave data and buffers it.
         \param The file path relative to execution directory.
     **/
-    bool loadWave(std::string filePath, Sound &sound);
+    bool loadWave(Sound &sound);
 
     void initParticleEmitter(ParticleEmitter &emitter);
     void setAABBMesh(Mesh &mesh);
@@ -159,6 +159,7 @@ private:
     std::map<std::string, Ref<Shader>> mShaders;
     std::map<std::string, Ref<Texture>> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
+    std::map<std::string, Sound> mSounds;
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;

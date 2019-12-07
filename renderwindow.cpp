@@ -149,7 +149,6 @@ void RenderWindow::init()
     //    mFactory->makeLevel();
 
     mMainWindow->setWindowTitle("Project: " + mFactory->getProjectName() + " - Current Scene: " + mFactory->getCurrentScene());
-    mSoundSystem->init();
     mMoveSystem->init();
     mScriptSystem->init();
     mInputSystem->init(aspectRatio);

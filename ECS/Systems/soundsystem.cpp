@@ -46,19 +46,18 @@ void SoundSystem::cleanUp()
     alcDestroyContext(mContext);
     alcCloseDevice(mDevice);
 }
-void SoundSystem::init()
+void SoundSystem::init(GLuint entity)
 {
-    auto view{reg->view<Sound, Transform>()};
-    for (auto entity : view) {
-        auto [trans, sound]{view.get<Transform, Sound>(entity)};
-        ALfloat temp[3] = {trans.position.x, trans.position.y, trans.position.z};
-        alSourcefv(sound.mSource, AL_POSITION, temp);
-        ALfloat temp2[3] = {sound.mVelocity.x, sound.mVelocity.y, sound.mVelocity.z};
-        alSourcefv(sound.mSource, AL_VELOCITY, temp2);
+    auto view{reg->view<Transform, Sound>()};
+    auto [trans, sound]{view.get<Transform, Sound>(entity)};
+    ALfloat temp[3] = {trans.position.x, trans.position.y, trans.position.z};
+    alSourcefv(sound.mSource, AL_POSITION, temp);
+    ALfloat temp2[3] = {sound.mVelocity.x, sound.mVelocity.y, sound.mVelocity.z};
+    alSourcefv(sound.mSource, AL_VELOCITY, temp2);
 
-        alSourcei(sound.mSource, AL_LOOPING, sound.mLooping);
-        ResourceManager::instance()->loadWave(gsl::soundFilePath + sound.mName, sound);
-    }
+    alSourcei(sound.mSource, AL_LOOPING, sound.mLooping);
+    ResourceManager::instance()->loadWave(sound);
+    sound.initialized = true;
     //Start listing of found sound devices:
     //Not jet implemented
     //ALDeviceList *pDeviceList = NULL;
@@ -74,6 +73,9 @@ void SoundSystem::update(DeltaTime)
     auto view{reg->view<Transform, Sound>()};
     for (auto entity : view) {
         auto [transform, sound]{view.get<Transform, Sound>(entity)};
+        if (!sound.initialized) {
+            init(entity);
+        }
         if (sound.mOutDated) {
             if (sound.mPlaying) {
                 play(sound);

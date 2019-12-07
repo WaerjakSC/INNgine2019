@@ -116,12 +116,12 @@ void InputSystem::setPlaneColors(bool dragging)
     }
     else { // set colors back to the original and set shader back to Phong for lighting
         for (auto entity : view) {
-            auto [build, mat]{view.get<Buildable, Material>(entity)};
-            mat.mObjectColor = origColor; // GREEN'ish
+            auto &mat{view.get<Material>(entity)};
+            mat.mObjectColor = origColor;
         }
     }
 }
-void InputSystem::handlePlayerController(DeltaTime dt)
+void InputSystem::handlePlayerController([[maybe_unused]] DeltaTime dt)
 {
     if (factory->isPlaying()) { // We don't have a movable character anyway, disabling this.
         //        gsl::Vector3D desiredVelocity{0};

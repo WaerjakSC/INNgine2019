@@ -86,13 +86,14 @@ void Registry::removeEntity(GLuint eID)
 // Might be a bottleneck here. Probably better to save the next available entity ID in a vector when an entity is destroyed
 GLuint Registry::nextAvailable()
 {
-    std::vector<GLuint> entities{getPool<EInfo>()->entityList()};
-    for (auto &entity : entities) {
-        EInfo &info{get<EInfo>(entity)};
-        if (info.isDestroyed)
-            return entity;
+    if (mAvailableIDs.empty()) {
+        return numEntities();
     }
-    return numEntities();
+    else {
+        GLuint newID = mAvailableIDs.back();
+        mAvailableIDs.pop_back();
+        return newID;
+    }
 }
 
 void Registry::clearScene()
@@ -215,14 +216,15 @@ void Registry::makeSnapshot()
     for (auto &group : mGroups) {
         groupSnapshot.push_back(new GroupData(*group));
     }
+    std::vector<GLuint> temp = mAvailableIDs;
 
-    mSnapshot = {groupSnapshot, snapPools};
+    mSnapshot = {temp, groupSnapshot, snapPools};
 }
 
 void Registry::loadSnapshot()
 {
     std::map<std::string, IPool *> tempPools;
-    std::tie(mGroups, tempPools) = mSnapshot;
+    std::tie(mAvailableIDs, mGroups, tempPools) = mSnapshot;
     mPools.clear();
     for (auto &pool : tempPools) {
         mPools[pool.first] = std::unique_ptr<IPool>(pool.second);

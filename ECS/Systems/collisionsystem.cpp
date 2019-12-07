@@ -24,6 +24,7 @@ void CollisionSystem::runSimulations()
 }
 void CollisionSystem::runAABBSimulations()
 {
+    // possible groups - AABB + AIComponent, do two passes, one for Buildable + AABB, another for AABB + Bullet or whatever
     auto view{registry->view<EInfo, AABB>()};
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
