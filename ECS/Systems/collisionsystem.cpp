@@ -9,19 +9,19 @@ namespace cjk {
 CollisionSystem::CollisionSystem() : registry{Registry::instance()}
 {
 }
-void CollisionSystem::update(DeltaTime dt)
+void CollisionSystem::update(DeltaTime)
 {
-    delta += dt;
+}
+void CollisionSystem::updatePlayOnly(DeltaTime deltaTime)
+{
+    delta += deltaTime;
     if (delta >= fixedDelta) {
         delta = 0.f;
-        runSimulations();
+        runAABBSimulations();
+        runSphereSimulations();
     }
 }
-void CollisionSystem::runSimulations()
-{
-    runAABBSimulations();
-    runSphereSimulations();
-}
+
 void CollisionSystem::runAABBSimulations()
 {
     // possible groups - AABB + AIComponent, do two passes, one for Buildable + AABB, another for AABB + Bullet or whatever
@@ -59,15 +59,10 @@ void CollisionSystem::runAABBSimulations()
                                 aabb.overlappedEntities.insert(otherEntity);
                             }
                         }
-                        if (registry->contains<BSplinePoint>(entity)) {
-                            registry->removeEntity(entity);
-                            registry->system<AISystem>()->masterOfCurves();
-                        }
                         qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         if (entity1 == "Enemy" && entity2 == "Player") {
                             qDebug() << "oops you got hit by the red ogre!";
                         }
-                        //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }
@@ -85,11 +80,9 @@ void CollisionSystem::runSphereSimulations()
                 auto &otherSphere{view.get<Sphere>(otherEntity)};
                 if (!bothStatic(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
-                        //                sphereAIcomponent.hp -= otherSphereAIcomponent.damage;
                         QString entity1{view.get<EInfo>(entity).name};
                         QString entity2{view.get<EInfo>(otherEntity).name};
 
-                        //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
                         collisions++;
                         // notify FSM if needed
                     }

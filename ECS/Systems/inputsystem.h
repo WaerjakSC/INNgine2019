@@ -17,6 +17,7 @@ class InputSystem : public QObject, public ISystem {
 public:
     InputSystem(RenderWindow *window);
     void update(DeltaTime dt = 0.016) override;
+    void updatePlayOnly(DeltaTime deltaTime = 0.016);
     void init(float aspectRatio = 1.92f);
     void keyPressEvent(QKeyEvent *event);
 

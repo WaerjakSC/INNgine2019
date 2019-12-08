@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include "movementsystem.h"
 #include "registry.h"
+#include "rendersystem.h"
 #include "scene.h"
 #include "scriptsystem.h"
 #include "soundsystem.h"
@@ -1185,14 +1186,16 @@ void ResourceManager::play()
         }
         else
             Registry::instance()->makeSnapshot();
-        auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
+        auto [sound, input, renderer, ai]{registry->system<SoundSystem, InputSystem, RenderSystem, AISystem>()};
         sound->playAll();
+        ai->resetTimers();
         for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
                 setActiveCameraController(controller);
                 break;
             }
         }
+        renderer->toggleRendered(0); // disables the XYZ indicators
         mMainWindow->mRenderWindowContainer->setFocus();
         mIsPlaying = true;
 
@@ -1221,7 +1224,9 @@ void ResourceManager::stop()
     if (mIsPlaying || mIsPaused) {
         auto [movement, sound, input]{registry->system<MovementSystem, SoundSystem, InputSystem>()};
         sound->stopAll();
+        sound->refreshSounds();
         registry->loadSnapshot();
+
         movement->init();
         input->setGameCameraInactive();
         input->reset();

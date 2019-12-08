@@ -15,6 +15,7 @@ public:
     RenderSystem();
 
     void update(DeltaTime = 0.016) override;
+    void updateEditorOnly();
 
     void setSkyBoxID(const GLuint &skyBoxID);
 

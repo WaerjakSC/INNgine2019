@@ -37,10 +37,13 @@ void RenderSystem::drawEntities()
 void RenderSystem::update(DeltaTime)
 {
     drawEntities();
-    if (!ResourceManager::instance()->isPlaying()) {
-        drawColliders();
-    }
 }
+
+void RenderSystem::updateEditorOnly()
+{
+    drawColliders();
+}
+
 void RenderSystem::drawSkybox()
 {
     auto skyBoxview{registry->view<Material, Mesh>()};

@@ -26,17 +26,13 @@ public:
     void setPosition(GLuint eID, vec3 newPos);
     void setVelocity(GLuint eID, vec3 newVel);
 
-    void play(GLuint eID);
-    void pause(GLuint eID);
-    void stop(GLuint eID);
-
-    bool createContext();
-
     void playAll();
     void pauseAll();
     void stopAll();
 
     void deleteSound(Sound &sound);
+
+    void updatePlayOnly();
 
 private:
     Registry *reg;
@@ -45,6 +41,7 @@ private:
     void pause(Sound &sound);
     void stop(Sound &sound);
     void updateListener();
+    void refreshSounds();
     bool checkError(std::string name);
     friend class Sound;
     friend class ResourceManager;

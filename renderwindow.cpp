@@ -173,16 +173,25 @@ void RenderWindow::render()
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!mFactory->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
-        mInputSystem->update(dt);
-        mSoundSystem->update(dt);
-        if (mFactory->isPlaying()) {
-            mAISystem->update(dt);
-            mMoveSystem->update(dt);
-            mCollisionSystem->update(dt);
-            mParticleSystem->update(dt);
-        }
-        mLightSystem->update(dt);
         mRenderer->update(dt);
+        mSoundSystem->update(dt);
+        mInputSystem->update(dt);
+        mLightSystem->update(dt);
+        mAISystem->update(dt);
+        mParticleSystem->update(dt);
+        if (mFactory->isPaused() || !mFactory->isPlaying()) {
+            mAISystem->updateEditorOnly(dt);
+            mRenderer->updateEditorOnly();
+        }
+        else {
+            mInputSystem->updatePlayOnly(dt);
+            mAISystem->updatePlayOnly(dt);
+            mCollisionSystem->updatePlayOnly(dt);
+            mParticleSystem->updatePlayOnly(dt);
+            mSoundSystem->updatePlayOnly();
+        }
+        mMoveSystem->update(dt);
+        mCollisionSystem->update(dt);
     }
     //Calculate framerate before
     // checkForGLerrors() because that takes a long time

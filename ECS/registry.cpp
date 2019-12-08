@@ -1,4 +1,5 @@
 #include "registry.h"
+#include "soundsystem.h"
 #include <optional>
 namespace cjk {
 Registry *Registry::mInstance = nullptr;
@@ -74,6 +75,9 @@ void Registry::removeEntity(GLuint eID)
         return;
     if (contains<Transform>(eID)) {
         setParent(eID, -1);
+    }
+    if (contains<Sound>(eID)) {
+        system<SoundSystem>()->deleteSound(get<Sound>(eID));
     }
     info.isDestroyed = true;
     info.name.clear();

@@ -52,10 +52,27 @@ void SoundSystem::update(DeltaTime)
     updateListener();
     auto view{reg->view<Transform, Sound>()};
     for (auto entity : view) {
-        auto [transform, sound]{view.get<Transform, Sound>(entity)};
+        auto &sound{view.get<Sound>(entity)};
         if (!sound.initialized) {
             init(entity);
         }
+        refreshSounds();
+    }
+}
+void SoundSystem::updatePlayOnly()
+{
+    auto view{reg->view<Transform, Sound>()};
+    for (auto entity : view) {
+        const auto &transform{view.get<Transform>(entity)};
+        if (transform.matrixOutdated) // keep in mind this check only works if soundsystem's "updatePlayOnly" function runs before movesystem
+            setPosition(entity, transform.position);
+    }
+}
+void SoundSystem::refreshSounds()
+{
+    auto view{reg->view<Transform, Sound>()};
+    for (auto entity : view) {
+        auto &sound{view.get<Sound>(entity)};
         if (sound.outDated) {
             if (sound.playing) {
                 play(sound);
@@ -66,7 +83,6 @@ void SoundSystem::update(DeltaTime)
                 stop(sound);
             sound.outDated = false;
         }
-        setPosition(entity, transform.position);
     }
 }
 void SoundSystem::play(Sound &sound)
@@ -85,44 +101,33 @@ void SoundSystem::playAll()
 {
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
-        play(entity);
+        Sound &sound{reg->get<Sound>(entity)};
+        sound.playing = true;
+        sound.paused = false;
+        sound.outDated = true;
     }
 }
 void SoundSystem::pauseAll()
 {
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
-        pause(entity);
+        Sound &sound{reg->get<Sound>(entity)};
+        sound.playing = false;
+        sound.paused = true;
+        sound.outDated = true;
     }
 }
 void SoundSystem::stopAll()
 {
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
-        stop(entity);
+        Sound &sound{reg->get<Sound>(entity)};
+        sound.playing = false;
+        sound.paused = false;
+        sound.outDated = true;
     }
 }
-void SoundSystem::play(GLuint eID)
-{
-    Sound &sound{reg->get<Sound>(eID)};
-    sound.playing = true;
-    sound.paused = false;
-    sound.outDated = true;
-}
-void SoundSystem::pause(GLuint eID)
-{
-    Sound &sound{reg->get<Sound>(eID)};
-    sound.playing = false;
-    sound.paused = true;
-    sound.outDated = true;
-}
-void SoundSystem::stop(GLuint eID)
-{
-    Sound &sound{reg->get<Sound>(eID)};
-    sound.playing = false;
-    sound.paused = false;
-    sound.outDated = true;
-}
+
 void SoundSystem::setPosition(GLuint eID, vec3 newPos)
 {
     Sound &sound{reg->get<Sound>(eID)};

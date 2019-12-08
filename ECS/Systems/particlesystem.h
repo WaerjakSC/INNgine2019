@@ -15,7 +15,8 @@ public:
     void init();
     void initEmitter(GLuint entityID);
 
-    void update(DeltaTime deltaTime = 0.016) override;
+    void update(DeltaTime = 0.016) override;
+    void updatePlayOnly(DeltaTime deltaTime = 0.016);
 public slots:
     void setInitDirX(double xIn);
     void setInitDirY(double yIn);

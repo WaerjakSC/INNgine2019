@@ -28,7 +28,11 @@ void ParticleSystem::initEmitter(GLuint entityID)
     auto &emitter{view.get<ParticleEmitter>(entityID)};
     ResourceManager::instance()->initParticleEmitter(emitter);
 }
-void ParticleSystem::update(DeltaTime deltaTime)
+void ParticleSystem::update(DeltaTime)
+{
+}
+
+void ParticleSystem::updatePlayOnly(DeltaTime deltaTime)
 {
     auto view{registry->view<ParticleEmitter, Transform>()};
     initializeOpenGLFunctions();

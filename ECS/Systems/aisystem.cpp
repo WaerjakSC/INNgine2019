@@ -9,13 +9,16 @@ AISystem::AISystem()
 }
 
 /**
- * @brief AIsystem::update, runs the highly sofisticated AI cortex
+ * @brief AIsystem::update, runs the highly sophisticated AI cortex
  * @param dt
  */
-void AISystem::update(DeltaTime dt)
+void AISystem::update(DeltaTime)
+{
+}
+
+void AISystem::updatePlayOnly(DeltaTime dt)
 {
     // Run the eventHandler incase of events
-    draw();
     if (curWaveCD >= 0.f)
         curWaveCD -= dt;
     if (curWaveCD <= 0.f) {
@@ -69,6 +72,16 @@ void AISystem::update(DeltaTime dt)
     }
 }
 
+void AISystem::updateEditorOnly(DeltaTime)
+{
+    draw();
+}
+void AISystem::resetTimers()
+{
+    curWaveCD = 1.f;
+    curSpawnCD = 0.f;
+    curSpawnDuration = 0.f;
+}
 /**
  * @brief AIsystem::learn, flips the direction and updates path
  */

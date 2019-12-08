@@ -18,21 +18,23 @@ InputSystem::InputSystem(RenderWindow *window)
 
 void InputSystem::update(DeltaTime dt)
 {
-    if (factory->isPlaying()) {
-        for (auto &camera : mGameCameraControllers) {
-            if (camera->isActive()) {
-                camera->update();
-                mActiveGameCamera = true;
-            }
-        }
-        if (mIsConfined)
-            confineMouseToScreen(dt);
-    }
     if (!mActiveGameCamera)
         editorCamController()->update();
     handlePlayerController(dt);
     handleKeyInput();
     handleMouseInput();
+}
+
+void InputSystem::updatePlayOnly(DeltaTime deltaTime)
+{
+    for (auto &camera : mGameCameraControllers) {
+        if (camera->isActive()) {
+            camera->update();
+            mActiveGameCamera = true;
+        }
+    }
+    if (mIsConfined)
+        confineMouseToScreen(deltaTime);
 }
 
 void InputSystem::init(float aspectRatio)

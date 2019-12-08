@@ -42,6 +42,8 @@ public:
     CollisionSystem();
 
     void update(DeltaTime dt = 0.016) override;
+    void updatePlayOnly(DeltaTime dt = 0.016);
+
     /**
      * @brief mousePick creates a raycast object with the given range parameter and tries to pick a point in the viewpoint Rect from mousePos (x, y).
      * @param mousePos
@@ -72,10 +74,6 @@ private:
     float delta{0};
     int collisions{0};
     Registry *registry;
-    /**
-     * @brief runSimulations simple function to run all the "Simulation" type functions in CollisionSystem
-     */
-    void runSimulations();
     /**
      * @brief runAABBSimulations runs the collision simulations for AABB types
      */

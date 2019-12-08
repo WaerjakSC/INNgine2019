@@ -14,6 +14,8 @@ public:
     AISystem();
 
     virtual void update(DeltaTime dt = 0.016) override;
+    void updatePlayOnly(DeltaTime dt = 0.016);
+    void updateEditorOnly(DeltaTime dt = 0.016);
     void setControlPoints(std::vector<vec3> cps);
     std::optional<NPCevents> move(DeltaTime dt, AIComponent &ai, Transform &transform);
     void init();
@@ -21,6 +23,7 @@ public:
     void draw();
     void masterOfCurves();
 
+    void resetTimers();
 public slots:
     void setBSPlinePointX(double xIn);
     void setBSPlinePointY(double yIn);
