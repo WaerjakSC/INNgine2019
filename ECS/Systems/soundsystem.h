@@ -36,10 +36,11 @@ public:
     void pauseAll();
     void stopAll();
 
+    void deleteSound(Sound &sound);
+
 private:
     Registry *reg;
-    ALCdevice *mDevice{nullptr};   ///< Pointer to the ALC Device.
-    ALCcontext *mContext{nullptr}; ///< Pointer to the ALC Context.
+
     void play(Sound &sound);
     void pause(Sound &sound);
     void stop(Sound &sound);
