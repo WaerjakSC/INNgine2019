@@ -167,7 +167,7 @@ void InputSystem::handleMouseInput()
     }
     if (mPlayerController.LMB) {
         if (mIsDragging) {
-            auto view{registry->view<Transform, Buildable>()};
+            auto view{registry->view<Transform, Buildable, AABB>()};
             if (view.contains(lastHitEntity)) {
                 auto &build{view.get<Buildable>(lastHitEntity)};
                 if (build.isBuildable) {
@@ -175,8 +175,9 @@ void InputSystem::handleMouseInput()
                     build.isBuildable = false;
                     auto &towerTransform = registry->get<Transform>(draggedEntity);
                     auto &transform{view.get<Transform>(lastHitEntity)};
+                    const auto &aabb{view.get<AABB>(draggedEntity)};
                     vec3 topCenterOfTarget{transform.localPosition};
-                    topCenterOfTarget.y += 0.1f; // place the tower just slightly above the Plane it's sitting on to avoid clipping.
+                    topCenterOfTarget.y += (0.1f + aabb.size.y); // place the tower just slightly above the Plane it's sitting on to avoid clipping.
                     towerTransform.localPosition = topCenterOfTarget;
                     towerTransform.matrixOutdated = true;
                     setPlaneColors(mIsDragging);
