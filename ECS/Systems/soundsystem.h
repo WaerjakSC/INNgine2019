@@ -22,6 +22,7 @@ public:
     void cleanUp();
     void init(GLuint entity);
     void update(DeltaTime = 0.016) override;
+    void updatePlayOnly();
 
     void setPosition(GLuint eID, vec3 newPos);
     void setVelocity(GLuint eID, vec3 newVel);
@@ -31,8 +32,6 @@ public:
     void stopAll();
 
     void deleteSound(Sound &sound);
-
-    void updatePlayOnly();
 
 private:
     Registry *reg;

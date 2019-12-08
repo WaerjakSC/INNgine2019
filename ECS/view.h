@@ -13,21 +13,8 @@ namespace cjk {
  */
 template <typename... Component>
 class View {
-private:
     using underlying_iterator_type = typename IPool::iterator;
     using unchecked_type = std::array<const IPool *, (sizeof...(Component) - 1)>;
-    friend class Registry;
-
-    /**
-     * @brief Returns the smallest pool of components for use with begin() and end() functions
-     * @return
-     */
-    const IPool *candidate() const
-    {
-        return std::min({static_cast<const IPool *>(std::get<Pool<Component> *>(pools))...}, [](const auto lhs, const auto rhs) {
-            return lhs->size() < rhs->size();
-        });
-    }
     /**
      * @brief The iterator class is a custom iterator for use with views to allow the use of for-loops
      */
@@ -95,13 +82,6 @@ private:
         underlying_iterator_type begin;
         underlying_iterator_type end;
     };
-    unchecked_type unchecked(const IPool *view) const
-    {
-        unchecked_type other{};
-        typename unchecked_type::size_type pos{};
-        ((std::get<Pool<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<Pool<Component> *>(pools))), ...);
-        return other;
-    }
 
 public:
     template <typename Comp>
@@ -162,6 +142,25 @@ private:
     {
     }
     const std::tuple<Pool<Component> *...> pools;
+
+    /**
+     * @brief Returns the smallest pool of components for use with begin() and end() functions
+     * @return
+     */
+    const IPool *candidate() const
+    {
+        return std::min({static_cast<const IPool *>(std::get<Pool<Component> *>(pools))...}, [](const auto lhs, const auto rhs) {
+            return lhs->size() < rhs->size();
+        });
+    }
+    unchecked_type unchecked(const IPool *view) const
+    {
+        unchecked_type other{};
+        typename unchecked_type::size_type pos{};
+        ((std::get<Pool<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<Pool<Component> *>(pools))), ...);
+        return other;
+    }
+    friend class Registry;
 };
 /**
  *@brief Single component view type.
@@ -172,8 +171,9 @@ private:
  */
 template <typename Component>
 class View<Component> {
-public:
     using iterator_type = typename IPool::iterator;
+
+public:
     size_t size() const
     {
         return pool->size();

@@ -11,42 +11,6 @@ class MovementSystem : public QObject, public ISystem {
     friend class RenderWindow;
     using vec3 = gsl::Vector3D;
 
-private:
-    Registry *registry;
-    /**
-     * @brief updateModelMatrix Update the entity's model matrix if it's outdated, otherwise does nothing
-     * @param eID
-     */
-    void updateModelMatrix(GLuint eID);
-    void updateModelMatrix(Transform &comp);
-    void updateColliders(GLuint eID);
-
-    /**
-     * @brief getTRMatrix Get the Translation and Rotation matrices of a component,
-     * multiplied by its parent TR matrices if it has a parent.
-     * We don't want to inherit the scale of the parent, since that can lead to wrong scaling for the child object.
-     * @param comp
-     * @return
-     */
-    gsl::Matrix4x4 getTRMatrix(const Transform &comp);
-
-    void updateTRS(Transform &comp);
-    /**
-     * @brief updateTS Update the transform component belonging to the AABB component given
-     * @param comp
-     */
-    void updateTS(AABB &comp);
-    /**
-     * @brief updateTS Update the transform component belonging to the Sphere component given
-     * @param comp
-     */
-    void updateTS(Sphere &comp);
-
-    void updateBillBoardTransform(GLuint entity);
-    void updateColliderTransformPrivate(Collision &col, const Transform &trans);
-
-    void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
-
 public:
     MovementSystem();
 
@@ -174,6 +138,42 @@ signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);
     void scaleChanged(GLuint eID, vec3 newScale);
     void rotationChanged(GLuint eID, vec3 newRot);
+
+private:
+    Registry *registry;
+    /**
+     * @brief updateModelMatrix Update the entity's model matrix if it's outdated, otherwise does nothing
+     * @param eID
+     */
+    void updateModelMatrix(GLuint eID);
+    void updateModelMatrix(Transform &comp);
+    void updateColliders(GLuint eID);
+
+    /**
+     * @brief getTRMatrix Get the Translation and Rotation matrices of a component,
+     * multiplied by its parent TR matrices if it has a parent.
+     * We don't want to inherit the scale of the parent, since that can lead to wrong scaling for the child object.
+     * @param comp
+     * @return
+     */
+    gsl::Matrix4x4 getTRMatrix(const Transform &comp);
+
+    void updateTRS(Transform &comp);
+    /**
+     * @brief updateTS Update the transform component belonging to the AABB component given
+     * @param comp
+     */
+    void updateTS(AABB &comp);
+    /**
+     * @brief updateTS Update the transform component belonging to the Sphere component given
+     * @param comp
+     */
+    void updateTS(Sphere &comp);
+
+    void updateBillBoardTransform(GLuint entity);
+    void updateColliderTransformPrivate(Collision &col, const Transform &trans);
+
+    void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
 };
 } // namespace cjk
 
