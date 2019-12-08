@@ -173,11 +173,11 @@ void InputSystem::handleMouseInput()
                 if (build.isBuildable) {
                     mIsDragging = false;
                     build.isBuildable = false;
-                    auto &towerTransform = registry->get<Transform>(draggedEntity);
-                    auto &transform{view.get<Transform>(lastHitEntity)};
-                    const auto &aabb{view.get<AABB>(draggedEntity)};
+                    auto draggedView{registry->view<Transform, AABB>()};
+                    auto [towerTransform, aabb]{draggedView.get<Transform, AABB>(draggedEntity)};
+                    const auto &transform{view.get<Transform>(lastHitEntity)};
                     vec3 topCenterOfTarget{transform.localPosition};
-                    topCenterOfTarget.y += (0.1f + aabb.size.y); // place the tower just slightly above the Plane it's sitting on to avoid clipping.
+                    topCenterOfTarget.y += aabb.size.y; // place the tower just slightly above the Plane it's sitting on to avoid clipping.
                     towerTransform.localPosition = topCenterOfTarget;
                     towerTransform.matrixOutdated = true;
                     setPlaneColors(mIsDragging);

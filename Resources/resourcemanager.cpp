@@ -273,6 +273,7 @@ GLuint ResourceManager::makeCube(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
+    registry->add<AABB>(eID, vec3{}, vec3{0.5f, 0.5f, 0.5f});
     setMesh("cube.obj", eID);
 
     return eID;
