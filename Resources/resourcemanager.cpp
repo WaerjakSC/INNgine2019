@@ -1141,7 +1141,8 @@ void ResourceManager::play()
         }
         else
             Registry::instance()->makeSnapshot();
-        auto input{registry->system<InputSystem>()};
+        auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
+        sound->playAll();
         for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
                 setActiveCameraController(controller);
