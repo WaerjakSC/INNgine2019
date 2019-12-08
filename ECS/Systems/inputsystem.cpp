@@ -168,9 +168,11 @@ void InputSystem::handleMouseInput()
     if (mPlayerController.LMB) {
         if (mIsDragging) {
             auto view{registry->view<Transform, Buildable>()};
-            if (view.contains(lastHitEntity))
-                if (view.get<Buildable>(lastHitEntity).isBuildable) {
+            if (view.contains(lastHitEntity)) {
+                auto &build{view.get<Buildable>(lastHitEntity)};
+                if (build.isBuildable) {
                     mIsDragging = false;
+                    build.isBuildable = false;
                     auto &towerTransform = registry->get<Transform>(draggedEntity);
                     auto &transform{view.get<Transform>(lastHitEntity)};
                     vec3 topCenterOfTarget{transform.localPosition};
@@ -179,6 +181,7 @@ void InputSystem::handleMouseInput()
                     towerTransform.matrixOutdated = true;
                     setPlaneColors(mIsDragging);
                 }
+            }
         }
     }
     else if (mPlayerController.RMB) {
