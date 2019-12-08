@@ -367,6 +367,7 @@ GLuint ResourceManager::makeEnemy(const QString &name)
     registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
     registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false);
     registry->add<Sound>(eID, "gnomed.wav", true);
+    registry->get<Sound>(eID).playing = true;
     setMesh("OgreOBJ.obj", eID);
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["SkinColorMostro_COLOR.png"]->textureUnit()); // probably change textureunit later
     return eID;
@@ -778,16 +779,17 @@ void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID)
 
 bool ResourceManager::loadWave(Sound &sound)
 {
-    auto search = mSounds.find(sound.mName);
+
+    auto search = mSounds.find(sound.name);
     if (search != mSounds.end()) {
-        sound = search->second;
-        sound.mOutDated = true;
+        sound.buffer = search->second.buffer;
+        sound.outDated = true;
         return true;
     }
     ALuint frequency{};
     ALenum format{};
     wave_t *waveData{new wave_t()};
-    if (!WavFileHandler::loadWave(gsl::soundFilePath + sound.mName, waveData)) {
+    if (!WavFileHandler::loadWave(gsl::soundFilePath + sound.name, waveData)) {
         qDebug() << "Error loading wave file!\n";
         return false; // error loading wave file data
     }
@@ -833,16 +835,15 @@ bool ResourceManager::loadWave(Sound &sound)
 
     std::ostringstream i2s;
     i2s << waveData->dataSize;
-    //    qDebug() << "DataSize: " << QString::fromStdString(i2s.str()) << " bytes\n";
 
     alGetError();
-    alBufferData(sound.mBuffer, format, waveData->buffer, waveData->dataSize, frequency);
+    alBufferData(sound.buffer, format, waveData->buffer, waveData->dataSize, frequency);
     SoundSystem *soundSys{registry->system<SoundSystem>().get()};
     soundSys->checkError("alBufferData");
-    alSourcei(sound.mSource, AL_BUFFER, sound.mBuffer);
+    alSourcei(sound.source, AL_BUFFER, sound.buffer);
     soundSys->checkError("alSourcei (loadWave)");
+    mSounds[sound.name] = sound;
 
-    //    qDebug() << "Loading complete!\n";
     if (waveData->buffer)
         delete waveData->buffer;
     if (waveData)
@@ -1140,8 +1141,7 @@ void ResourceManager::play()
         }
         else
             Registry::instance()->makeSnapshot();
-        auto [sound, input]{registry->system<SoundSystem, InputSystem>()};
-        sound->playAll();
+        auto input{registry->system<InputSystem>()};
         for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
                 setActiveCameraController(controller);

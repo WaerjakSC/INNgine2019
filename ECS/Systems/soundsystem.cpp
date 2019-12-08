@@ -33,11 +33,11 @@ void SoundSystem::cleanUp()
         Sound &sound{view.get(entity)};
         stop(sound);
         alGetError();
-        alSourcei(sound.mSource, AL_BUFFER, 0);
+        alSourcei(sound.source, AL_BUFFER, 0);
         checkError("alSourcei");
-        alDeleteSources(1, &sound.mSource);
+        alDeleteSources(1, &sound.source);
         checkError("alDeleteSources");
-        alDeleteBuffers(1, &sound.mBuffer);
+        alDeleteBuffers(1, &sound.buffer);
         checkError("alDeleteBuffers");
     }
     mContext = alcGetCurrentContext();
@@ -50,21 +50,21 @@ void SoundSystem::init(GLuint entity)
 {
     auto view{reg->view<Transform, Sound>()};
     auto [trans, sound]{view.get<Transform, Sound>(entity)};
+    alGetError();
+    alGenBuffers(1, &sound.buffer);
+    checkError("alGenBuffers");
+    alGenSources(1, &sound.source);
+    checkError("alGenSources");
+    alSourcef(sound.source, AL_PITCH, 1.0f);
+    alSourcef(sound.source, AL_GAIN, sound.gain);
     ALfloat temp[3] = {trans.position.x, trans.position.y, trans.position.z};
-    alSourcefv(sound.mSource, AL_POSITION, temp);
-    ALfloat temp2[3] = {sound.mVelocity.x, sound.mVelocity.y, sound.mVelocity.z};
-    alSourcefv(sound.mSource, AL_VELOCITY, temp2);
+    alSourcefv(sound.source, AL_POSITION, temp);
+    ALfloat temp2[3] = {sound.velocity.x, sound.velocity.y, sound.velocity.z};
+    alSourcefv(sound.source, AL_VELOCITY, temp2);
+    alSourcei(sound.source, AL_LOOPING, sound.looping);
 
-    alSourcei(sound.mSource, AL_LOOPING, sound.mLooping);
     ResourceManager::instance()->loadWave(sound);
     sound.initialized = true;
-    //Start listing of found sound devices:
-    //Not jet implemented
-    //ALDeviceList *pDeviceList = NULL;
-    //ALCcontext *pContext = NULL;
-    //ALCdevice *pDevice = NULL;
-    //ALint i;	//will hold the number of the preferred device
-    //ALboolean bReturn = AL_FALSE;
 }
 
 void SoundSystem::update(DeltaTime)
@@ -76,31 +76,30 @@ void SoundSystem::update(DeltaTime)
         if (!sound.initialized) {
             init(entity);
         }
-        if (sound.mOutDated) {
-            if (sound.mPlaying) {
+        if (sound.outDated) {
+            if (sound.playing) {
                 play(sound);
-                //            sound.mPlay = false; ???
             }
-            else if (sound.mPaused)
+            else if (sound.paused)
                 pause(sound);
             else
                 stop(sound);
-            sound.mOutDated = false;
+            sound.outDated = false;
         }
         setPosition(entity, transform.position);
     }
 }
 void SoundSystem::play(Sound &sound)
 {
-    alSourcePlay(sound.mSource);
+    alSourcePlay(sound.source);
 }
 void SoundSystem::pause(Sound &sound)
 {
-    alSourcePause(sound.mSource);
+    alSourcePause(sound.source);
 }
 void SoundSystem::stop(Sound &sound)
 {
-    alSourceStop(sound.mSource);
+    alSourceStop(sound.source);
 }
 void SoundSystem::playAll()
 {
@@ -126,36 +125,36 @@ void SoundSystem::stopAll()
 void SoundSystem::play(GLuint eID)
 {
     Sound &sound{reg->get<Sound>(eID)};
-    sound.mPlaying = true;
-    sound.mPaused = false;
-    sound.mOutDated = true;
+    sound.playing = true;
+    sound.paused = false;
+    sound.outDated = true;
 }
 void SoundSystem::pause(GLuint eID)
 {
     Sound &sound{reg->get<Sound>(eID)};
-    sound.mPlaying = false;
-    sound.mPaused = true;
-    sound.mOutDated = true;
+    sound.playing = false;
+    sound.paused = true;
+    sound.outDated = true;
 }
 void SoundSystem::stop(GLuint eID)
 {
     Sound &sound{reg->get<Sound>(eID)};
-    sound.mPlaying = false;
-    sound.mPaused = false;
-    sound.mOutDated = true;
+    sound.playing = false;
+    sound.paused = false;
+    sound.outDated = true;
 }
 void SoundSystem::setPosition(GLuint eID, vec3 newPos)
 {
     Sound &sound{reg->get<Sound>(eID)};
     ALfloat temp[3] = {newPos.x, newPos.y, newPos.z};
-    alSourcefv(sound.mSource, AL_POSITION, temp);
+    alSourcefv(sound.source, AL_POSITION, temp);
 }
 void SoundSystem::setVelocity(GLuint eID, vec3 newVel)
 {
     Sound &sound{reg->get<Sound>(eID)};
-    sound.mVelocity = newVel;
+    sound.velocity = newVel;
     ALfloat temp[3] = {newVel.x, newVel.y, newVel.z};
-    alSourcefv(sound.mSource, AL_VELOCITY, temp);
+    alSourcefv(sound.source, AL_VELOCITY, temp);
 }
 void SoundSystem::updateListener()
 {

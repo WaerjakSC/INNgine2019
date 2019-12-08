@@ -169,11 +169,11 @@ void Scene::saveScene(const QString &fileName)
                 writer.Key("sound");
                 writer.StartObject();
                 writer.Key("filename");
-                writer.String(sound.mName.c_str());
+                writer.String(sound.name.c_str());
                 writer.Key("loop");
-                writer.Bool(sound.mLooping);
+                writer.Bool(sound.looping);
                 writer.Key("gain");
-                writer.Double(sound.mGain);
+                writer.Double(sound.gain);
                 writer.EndObject();
             }
             if (registry->contains<ParticleEmitter>(entity)) {

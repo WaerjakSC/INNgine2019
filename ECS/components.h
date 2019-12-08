@@ -254,20 +254,26 @@ struct Physics : public Component {
 };
 struct Sound : public Component {
     Sound() {}
-    Sound(std::string name, bool loop = false, float gain = 1.0);
+    /**
+    * @brief Sound constructor
+    * @param name Name of the file to be loaded
+    * @param loop Whether to loop or play only once
+    * @param gain Not sure
+    */
+    Sound(std::string fileName, bool loop = false, float gainIn = 1.0) : looping(loop), name(fileName), gain(gainIn) {}
 
-    bool mLooping{false};
-    bool mPlaying{false}; // Might want to change this, but atm it will just be playing by default immediately
-    bool mPaused{false};
-    bool mOutDated{true};
+    bool looping{false};
+    bool playing{false}; // Might want to change this, but atm it will just be playing by default immediately
+    bool paused{false};
+    bool outDated{true};
     bool initialized{false};
 
-    std::string mName; ///< The name of the sound source.
-    ALuint mSource;    ///< The sound source.
-    ALuint mBuffer;    ///< The data buffer.
-    float mGain;
-    vec3 mPosition;    ///< Vector containing source position.
-    vec3 mVelocity{0}; ///< Vector containing source velocity.
+    std::string name; ///< The name of the sound source.
+    ALuint source;    ///< The sound source.
+    ALuint buffer;    ///< The data buffer.
+    float gain;
+    vec3 position;    ///< Vector containing source position.
+    vec3 velocity{0}; ///< Vector containing source velocity.
 };
 
 /**
