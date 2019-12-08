@@ -4408,6 +4408,7 @@
                 "static": true
             },
             "Buildable": {
+                "canBuild": true
             }
         }
     },
