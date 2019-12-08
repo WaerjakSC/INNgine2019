@@ -261,7 +261,6 @@ struct Sound : public Component {
     * @param gain Not sure
     */
     Sound(std::string fileName, bool loop = false, float gainIn = 1.0) : looping(loop), name(fileName), gain(gainIn) {}
-
     bool looping{false};
     bool playing{false}; // Might want to change this, but atm it will just be playing by default immediately
     bool paused{false};

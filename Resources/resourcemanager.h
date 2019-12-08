@@ -113,12 +113,19 @@ public:
         Calls the wave loader from the FileHandler class, parses the wave data and buffers it.
         \param The file path relative to execution directory.
     **/
-    bool loadWave(Sound &sound);
+    bool loadWave(std::string name);
 
     void initParticleEmitter(ParticleEmitter &emitter);
     void setAABBMesh(Mesh &mesh);
     void newScene(const QString &text);
     std::map<std::string, Ref<Texture>> getTextures() const;
+
+    std::map<std::string, ALuint> getSoundBuffers() const;
+
+    ALCdevice *device() const;
+
+    ALCcontext *context() const;
+    void clearContext();
 
 public slots:
     void save();
@@ -159,7 +166,10 @@ private:
     std::map<std::string, Ref<Shader>> mShaders;
     std::map<std::string, Ref<Texture>> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
-    std::map<std::string, Sound> mSounds;
+    std::map<std::string, ALuint> mSoundBuffers;
+    ALCdevice *mDevice{nullptr};   ///< Pointer to the ALC Device.
+    ALCcontext *mContext{nullptr}; ///< Pointer to the ALC Context.
+    bool createContext();
 
     // Temp mVertices/mIndices container. Cleared before each use.
     meshData mMeshData;

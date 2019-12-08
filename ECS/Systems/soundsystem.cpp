@@ -7,52 +7,32 @@ SoundSystem::SoundSystem() : reg{Registry::instance()}
 {
 }
 
-bool SoundSystem::createContext()
-{
-    qDebug() << "Intializing OpenAL!\n";
-    mDevice = alcOpenDevice(NULL);
-    if (mDevice) {
-        mContext = alcCreateContext(mDevice, NULL);
-        alcMakeContextCurrent(mContext);
-    }
-
-    // Generate buffers
-    alGetError();
-
-    if (!mDevice) {
-        qDebug() << "Device not made!\n";
-    }
-    else
-        qDebug() << "Intialization complete!\n";
-    return true;
-}
 void SoundSystem::cleanUp()
 {
     auto view{reg->view<Sound>()};
     for (auto entity : view) {
         Sound &sound{view.get(entity)};
-        stop(sound);
-        alGetError();
-        alSourcei(sound.source, AL_BUFFER, 0);
-        checkError("alSourcei");
-        alDeleteSources(1, &sound.source);
-        checkError("alDeleteSources");
-        alDeleteBuffers(1, &sound.buffer);
-        checkError("alDeleteBuffers");
+        deleteSound(sound);
     }
-    mContext = alcGetCurrentContext();
-    mDevice = alcGetContextsDevice(mContext);
-    alcMakeContextCurrent(nullptr);
-    alcDestroyContext(mContext);
-    alcCloseDevice(mDevice);
+    ResourceManager::instance()->clearContext();
+}
+void SoundSystem::deleteSound(Sound &sound)
+{
+    stop(sound);
+    alGetError();
+    alSourcei(sound.source, AL_BUFFER, 0);
+    checkError("alSourcei");
+    alDeleteSources(1, &sound.source);
+    checkError("alDeleteSources");
 }
 void SoundSystem::init(GLuint entity)
 {
     auto view{reg->view<Transform, Sound>()};
     auto [trans, sound]{view.get<Transform, Sound>(entity)};
+    auto factory{ResourceManager::instance()};
+
+    alcMakeContextCurrent(factory->context());
     alGetError();
-    alGenBuffers(1, &sound.buffer);
-    checkError("alGenBuffers");
     alGenSources(1, &sound.source);
     checkError("alGenSources");
     alSourcef(sound.source, AL_PITCH, 1.0f);
@@ -62,8 +42,8 @@ void SoundSystem::init(GLuint entity)
     ALfloat temp2[3] = {sound.velocity.x, sound.velocity.y, sound.velocity.z};
     alSourcefv(sound.source, AL_VELOCITY, temp2);
     alSourcei(sound.source, AL_LOOPING, sound.looping);
+    alSourcei(sound.source, AL_BUFFER, factory->getSoundBuffers()[sound.name]); // undefined behaviour if you try to use unloaded audio
 
-    ResourceManager::instance()->loadWave(sound);
     sound.initialized = true;
 }
 

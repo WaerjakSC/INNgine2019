@@ -55,8 +55,28 @@ ResourceManager::ResourceManager() : registry{Registry::instance()}
     registry->registerComponent<Sphere>();
 
     mSceneLoader = std::make_unique<Scene>();
+    createContext();        // create the sound context
+    loadWave("gnomed.wav"); // initialize sounds you want to use here.
 }
+bool ResourceManager::createContext()
+{
+    qDebug() << "Intializing OpenAL!\n";
+    mDevice = alcOpenDevice(NULL);
+    if (mDevice) {
+        mContext = alcCreateContext(mDevice, NULL);
+        alcMakeContextCurrent(mContext);
+    }
 
+    // Generate buffers
+    alGetError();
+
+    if (!mDevice) {
+        qDebug() << "Device not made!\n";
+    }
+    else
+        qDebug() << "Intialization complete!\n";
+    return true;
+}
 std::map<std::string, Ref<Texture>> ResourceManager::getTextures() const
 {
     return mTextures;
@@ -777,19 +797,17 @@ void ResourceManager::loadTriangleMesh(std::string fileName, GLuint eID)
     }
 }
 
-bool ResourceManager::loadWave(Sound &sound)
+bool ResourceManager::loadWave(std::string name)
 {
-
-    auto search = mSounds.find(sound.name);
-    if (search != mSounds.end()) {
-        sound.buffer = search->second.buffer;
-        sound.outDated = true;
+    auto search = mSoundBuffers.find(name);
+    if (search != mSoundBuffers.end()) { // file already loaded
+        qDebug() << "Sound file already loaded!";
         return true;
     }
     ALuint frequency{};
     ALenum format{};
     wave_t *waveData{new wave_t()};
-    if (!WavFileHandler::loadWave(gsl::soundFilePath + sound.name, waveData)) {
+    if (!WavFileHandler::loadWave(gsl::soundFilePath + name, waveData)) {
         qDebug() << "Error loading wave file!\n";
         return false; // error loading wave file data
     }
@@ -837,12 +855,10 @@ bool ResourceManager::loadWave(Sound &sound)
     i2s << waveData->dataSize;
 
     alGetError();
-    alBufferData(sound.buffer, format, waveData->buffer, waveData->dataSize, frequency);
-    SoundSystem *soundSys{registry->system<SoundSystem>().get()};
-    soundSys->checkError("alBufferData");
-    alSourcei(sound.source, AL_BUFFER, sound.buffer);
-    soundSys->checkError("alSourcei (loadWave)");
-    mSounds[sound.name] = sound;
+    ALuint buffer;
+    alGenBuffers(1, &buffer);
+    alBufferData(buffer, format, waveData->buffer, waveData->dataSize, frequency);
+    mSoundBuffers[name] = buffer;
 
     if (waveData->buffer)
         delete waveData->buffer;
@@ -1053,6 +1069,33 @@ void ResourceManager::changeMsg()
     bool &msg = mMainWindow->mShowingMsg;
     msg = !msg;
 }
+
+ALCcontext *ResourceManager::context() const
+{
+    return mContext;
+}
+
+void ResourceManager::clearContext()
+{
+    for (auto soundBuffer : getSoundBuffers()) {
+        alDeleteBuffers(1, &soundBuffer.second);
+    }
+    mContext = alcGetCurrentContext();
+    mDevice = alcGetContextsDevice(mContext);
+    alcMakeContextCurrent(nullptr);
+    alcDestroyContext(mContext);
+    alcCloseDevice(mDevice);
+}
+
+ALCdevice *ResourceManager::device() const
+{
+    return mDevice;
+}
+
+std::map<std::string, ALuint> ResourceManager::getSoundBuffers() const
+{
+    return mSoundBuffers;
+}
 void ResourceManager::newScene(const QString &text)
 {
     setCurrentScene(text);
@@ -1175,10 +1218,10 @@ void ResourceManager::pause()
 void ResourceManager::stop()
 {
     if (mIsPlaying || mIsPaused) {
-        registry->loadSnapshot();
         auto [movement, sound, input]{registry->system<MovementSystem, SoundSystem, InputSystem>()};
-        movement->init();
         sound->stopAll();
+        registry->loadSnapshot();
+        movement->init();
         input->setGameCameraInactive();
         input->reset();
         setActiveCameraController(input->editorCamController());

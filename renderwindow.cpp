@@ -134,7 +134,6 @@ void RenderWindow::init()
     mInputSystem = mRegistry->registerSystem<cjk::InputSystem>(this);
     mInputSystem->setEditorCamController(mEditorCameraController);
     mSoundSystem = mRegistry->registerSystem<cjk::SoundSystem>();
-    mSoundSystem->createContext();
     mCollisionSystem = mRegistry->registerSystem<cjk::CollisionSystem>();
     connect(mCollisionSystem.get(), &cjk::CollisionSystem::updateAABB, mMoveSystem.get(), &cjk::MovementSystem::updateAABBTransform);
     connect(mCollisionSystem.get(), &cjk::CollisionSystem::updateSphere, mMoveSystem.get(), &cjk::MovementSystem::updateSphereTransform);
