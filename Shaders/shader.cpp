@@ -7,7 +7,7 @@
 #include "camera.h"
 #include "cameracontroller.h"
 #include "matrix4x4.h"
-namespace cjk {
+
 Shader::Shader(cjk::Ref<CameraController> camController, const std::string shaderName, const GLchar *geometryPath)
     : mName{shaderName}, mCameraController{camController}
 {
@@ -170,4 +170,4 @@ std::string Shader::getName() const
     return mName;
 }
 
-} // namespace cjk
+

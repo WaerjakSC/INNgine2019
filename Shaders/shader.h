@@ -4,7 +4,7 @@
 #include "core.h"
 #include "matrix4x4.h"
 #include <QOpenGLFunctions_4_1_Core>
-namespace cjk {
+
 class CameraController;
 struct Material;
 class Shader : protected QOpenGLFunctions_4_1_Core {
@@ -35,6 +35,5 @@ protected:
 
     cjk::Ref<CameraController> mCameraController;
 };
-} // namespace cjk
 
 #endif

@@ -1,6 +1,6 @@
 #ifndef DELTATIME_H
 #define DELTATIME_H
-namespace cjk {
+
 class DeltaTime {
 public:
     DeltaTime(float time = 0.0f) : mTime(time)
@@ -13,6 +13,6 @@ public:
 private:
     float mTime;
 };
-} // namespace cjk
+
 
 #endif // DELTATIME_H

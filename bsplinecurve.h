@@ -3,7 +3,7 @@
 #include "core.h"
 #include "vector3d.h"
 #include <QOpenGLFunctions_4_1_Core>
-namespace cjk {
+
 class ColorShader;
 class BSplineCurve : protected QOpenGLFunctions_4_1_Core {
     using vec3 = gsl::Vector3D;
@@ -39,6 +39,6 @@ public:
 private:
     cjk::Ref<ColorShader> debugShader;
 };
-} // namespace cjk
+
 
 #endif // BSPLINECURVE_H

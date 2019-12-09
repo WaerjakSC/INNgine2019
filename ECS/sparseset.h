@@ -1,7 +1,7 @@
 #ifndef SPARSESET_H
 #define SPARSESET_H
 #include "gsl_math.h"
-namespace cjk {
+
 class SparseSet {
 public:
     /**
@@ -136,6 +136,6 @@ private:
     std::vector<int> mIndex;   // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
     std::vector<GLuint> mList; // Value is entityID.
 };
-} // namespace cjk
+
 
 #endif // SPARSESET_H

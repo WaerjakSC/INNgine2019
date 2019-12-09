@@ -12,7 +12,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #endif
 class MainWindow;
-namespace cjk {
+
 class LightSystem;
 class Registry;
 class Scene;
@@ -20,6 +20,8 @@ class Script;
 class CameraController;
 class ResourceManager : public QObject, QOpenGLFunctions_4_1_Core {
     Q_OBJECT
+    using vec3 = gsl::Vector3D;
+
 public:
     static ResourceManager *instance();
     virtual ~ResourceManager();
@@ -31,7 +33,7 @@ public:
      * @param geometryPath
      */
     template <typename ShaderType>
-    void loadShader(Ref<CameraController> camController, const GLchar *geometryPath = nullptr)
+    void loadShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath = nullptr)
     {
         std::string shaderName{typeid(ShaderType).name()};
         if (mShaders.find(shaderName) == mShaders.end()) {
@@ -44,7 +46,7 @@ public:
     }
     // Gets stored shader
     template <typename Type>
-    inline Ref<Type> getShader()
+    inline cjk::Ref<Type> getShader()
     {
         std::string type{typeid(Type).name()};
         return std::static_pointer_cast<Type>(mShaders[type]);
@@ -54,7 +56,7 @@ public:
     bool loadCubemap(std::vector<std::string> faces);
 
     // Gets stored texture
-    Ref<Texture> getTexture(std::string name);
+    cjk::Ref<Texture> getTexture(std::string name);
 
     QString getTextureName(GLuint textureUnit);
 
@@ -62,9 +64,10 @@ public:
 
     void addMeshComponent(std::string name, GLuint eID = -1);
 
-    std::map<std::string, Ref<Shader>> getShaders() const;
+    std::map<std::string, cjk::Ref<Shader>> getShaders() const;
 
     QString getMeshName(const Mesh &mesh);
+    Mesh getMesh(std::string meshName);
 
     void setLoading(bool load) { mLoading = load; }
 
@@ -78,8 +81,8 @@ public:
     GLuint makePlane(const QString &name = "Plane");
     GLuint makeCube(const QString &name = "Cube");
     GLuint makeLightObject(const QString &name = "Light");
-    GLuint make3DObject(std::string name, Ref<Shader> type = std::make_shared<PhongShader>());
-    GLuint makeTriangleSurface(std::string fileName, Ref<Shader> type);
+    GLuint make3DObject(std::string name, cjk::Ref<Shader> type = std::make_shared<PhongShader>());
+    GLuint makeTriangleSurface(std::string fileName, cjk::Ref<Shader> type);
     GLuint makeEnemy(const QString &name = "Gnome");
     GLuint makeLevelPlane(const QString &name = "Level");
 
@@ -103,10 +106,10 @@ public:
 
     void loadMesh(std::string fileName, int eID = -1);
 
-    void setCurrentCameraController(Ref<CameraController> currentCameraController);
+    void setCurrentCameraController(cjk::Ref<CameraController> currentCameraController);
 
-    Ref<CameraController> getCurrentCameraController() const;
-    void setActiveCameraController(Ref<CameraController> controller);
+    cjk::Ref<CameraController> getCurrentCameraController() const;
+    void setActiveCameraController(cjk::Ref<CameraController> controller);
 
     /// Loads one given WAVE file.
     /**
@@ -118,7 +121,7 @@ public:
     void initParticleEmitter(ParticleEmitter &emitter);
     void setAABBMesh(Mesh &mesh);
     void newScene(const QString &text);
-    std::map<std::string, Ref<Texture>> getTextures() const;
+    std::map<std::string, cjk::Ref<Texture>> getTextures() const;
 
     std::map<std::string, ALuint> getSoundBuffers() const;
 
@@ -154,17 +157,17 @@ private:
     static ResourceManager *mInstance;
     Registry *registry;
 
-    Scope<Scene> mSceneLoader;
+    cjk::Scope<Scene> mSceneLoader;
     QString mCurrentProject;
     QString mCurrentScene;
     QString mDefaultScene;
-    Ref<CameraController> mCurrentCameraController;
+    cjk::Ref<CameraController> mCurrentCameraController;
     void changeMsg();
 
     bool mLoading{false};
     // std::map(key, object) for easy resource storage
-    std::map<std::string, Ref<Shader>> mShaders;
-    std::map<std::string, Ref<Texture>> mTextures;
+    std::map<std::string, cjk::Ref<Shader>> mShaders;
+    std::map<std::string, cjk::Ref<Texture>> mTextures;
     std::map<std::string, Mesh> mMeshMap; // Holds each unique mesh for easy access
     std::map<std::string, ALuint> mSoundBuffers;
     ALCdevice *mDevice{nullptr};   ///< Pointer to the ALC Device.
@@ -177,7 +180,7 @@ private:
     MainWindow *mMainWindow;
 
     // Systems
-    Ref<LightSystem> mLightSystem;
+    cjk::Ref<LightSystem> mLightSystem;
     void showMessage(const QString &message);
     bool mIsPlaying{false};
     bool mIsPaused{false}; // Don't make a snapshot if it was just restarted from a pause
@@ -208,6 +211,5 @@ private:
     friend class ComponentList;
     friend class Scene;
 };
-} // namespace cjk
 
 #endif // RESOURCEMANAGER_H

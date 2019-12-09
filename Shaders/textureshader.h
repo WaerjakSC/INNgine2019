@@ -2,7 +2,7 @@
 #define TEXTURESHADER_H
 
 #include "shader.h"
-namespace cjk {
+
 struct Material;
 
 class TextureShader : public Shader {
@@ -16,6 +16,6 @@ private:
     GLint objectColorUniform{-1};
     GLint textureUniform{-1};
 };
-} // namespace cjk
+
 
 #endif // TEXTURESHADER_H

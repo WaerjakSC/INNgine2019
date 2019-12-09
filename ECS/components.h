@@ -21,7 +21,6 @@
 #include <OpenAL/alc.h>
 #endif
 
-namespace cjk {
 struct meshData {
     meshData() = default;
     std::vector<Vertex> mVertices;
@@ -101,13 +100,13 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 struct Material : public Component {
-    Material(Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
+    Material(cjk::Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
 
     GLfloat mSpecularStrength;
     GLint mSpecularExponent;
     vec3 mObjectColor;
     GLuint mTextureUnit; //the actual texture to put into the uniform
-    Ref<Shader> mShader;
+    cjk::Ref<Shader> mShader;
 };
 
 struct Mesh : public Component {
@@ -142,7 +141,7 @@ struct Mesh : public Component {
     }
 };
 struct Particle {
-    vec3 position, velocity;
+    gsl::Vector3D position, velocity;
     float life{-1.f}, size; // Remaining life of the particle. if < 0 : dead and unused.
     GLubyte r, b, g, a;
 };
@@ -389,6 +388,5 @@ struct PlayerComponent : public Component {
     int gold = 500;
     int kills = 0;
 };
-} // namespace cjk
 
 #endif // COMPONENT_H

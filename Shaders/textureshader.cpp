@@ -1,7 +1,7 @@
 #include "textureshader.h"
 #include "components.h"
 #include "innpch.h"
-namespace cjk {
+
 TextureShader::TextureShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
     : Shader{camController, "TextureShader", geometryPath}
 {
@@ -24,4 +24,4 @@ void TextureShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *m
     glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);
     glUniform3f(objectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
 }
-} // namespace cjk
+

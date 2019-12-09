@@ -11,7 +11,7 @@
 #include <memory>
 #include <typeinfo>
 #include <unordered_set>
-namespace cjk {
+
 template <typename... Member>
 struct GroupHandler {
     GroupHandler(const std::tuple<Pool<Member> *...> pools)
@@ -108,7 +108,7 @@ public:
      * @brief Register a system with the ECS. Not strictly required, but will allow you to use the registry to get a reference to the system.
      */
     template <typename Type, class... Args>
-    Ref<Type> registerSystem(Args... args)
+    cjk::Ref<Type> registerSystem(Args... args)
     {
         std::string typeName{typeid(Type).name()};
 
@@ -117,7 +117,7 @@ public:
         }
         else {
             // Create a ComponentArray pointer and add it to the component arrays map
-            Ref<Type> newSystem = std::make_shared<Type>(args...);
+            cjk::Ref<Type> newSystem = std::make_shared<Type>(args...);
             mSystems.insert({typeName, newSystem});
             return newSystem;
         }
@@ -373,8 +373,8 @@ signals:
 
 private:
     static Registry *mInstance;
-    std::map<std::string, Scope<IPool>> mPools{};
-    std::map<std::string, Ref<ISystem>> mSystems{};
+    std::map<std::string, cjk::Scope<IPool>> mPools{};
+    std::map<std::string, cjk::Ref<ISystem>> mSystems{};
     std::vector<uint> mAvailableIDs;
     std::vector<GroupData *> mGroups{};
     void newGeneration(GLuint id, const QString &text);
@@ -383,7 +383,7 @@ private:
     std::tuple<std::vector<GLuint>, std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>
-    Ref<Type> getSystem()
+    cjk::Ref<Type> getSystem()
     {
         std::string typeName{type<Type>()};
         return std::static_pointer_cast<Type>(mSystems[typeName]);
@@ -400,6 +400,5 @@ private:
         return static_cast<Pool<Type> *>(mPools[typeName].get());
     }
 };
-} // namespace cjk
 
 #endif // REGISTRY_H

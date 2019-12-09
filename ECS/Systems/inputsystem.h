@@ -4,7 +4,7 @@
 #include "isystem.h"
 #include "pool.h"
 class RenderWindow;
-namespace cjk {
+
 class Registry;
 class ResourceManager;
 class MovementSystem;
@@ -30,11 +30,11 @@ public:
     Input playerController() const;
     Input &playerController();
 
-    Ref<CameraController> editorCamController() const;
-    void setEditorCamController(const Ref<CameraController> &editorCamController);
+    cjk::Ref<CameraController> editorCamController() const;
+    void setEditorCamController(const cjk::Ref<CameraController> &editorCamController);
 
-    std::vector<Ref<GameCameraController>> gameCameraControllers() const;
-    Ref<CameraController> currentCameraController();
+    std::vector<cjk::Ref<GameCameraController>> gameCameraControllers() const;
+    cjk::Ref<CameraController> currentCameraController();
 
     void onResize(float aspectRatio);
 
@@ -87,8 +87,8 @@ private:
     vec3 origColor{0.57f, 0.57f, 0.57f};
     bool mIsDragging{false};
 
-    Ref<CameraController> mEditorCamController;
-    std::vector<Ref<GameCameraController>> mGameCameraControllers;
+    cjk::Ref<CameraController> mEditorCamController;
+    std::vector<cjk::Ref<GameCameraController>> mGameCameraControllers;
     bool mActiveGameCamera{false};
 
     RenderWindow *mRenderWindow;
@@ -125,9 +125,9 @@ private:
      * @param entity
      */
     void dragEntity(GLuint entity);
+    void updateBuildable(GLuint entityID);
     void spawnTower();
+    void placeTower();
 };
-
-} // namespace cjk
 
 #endif // INPUTSYSTEM_H

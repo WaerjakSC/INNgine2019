@@ -4,7 +4,7 @@
 #include "components.h"
 #include "isystem.h"
 #include <QJSValueList>
-namespace cjk {
+
 struct Script {
     Script()
     {
@@ -31,6 +31,6 @@ private:
     ResourceManager *factory;
     Script script;
 };
-} // namespace cjk
+
 
 #endif // SCRIPTSYSTEM_H

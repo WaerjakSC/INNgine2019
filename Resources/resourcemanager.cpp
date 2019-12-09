@@ -28,7 +28,7 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <skyboxshader.h>
-namespace cjk {
+
 ResourceManager *ResourceManager::mInstance = nullptr;
 
 ResourceManager::ResourceManager() : registry{Registry::instance()}
@@ -78,17 +78,17 @@ bool ResourceManager::createContext()
         qDebug() << "Intialization complete!\n";
     return true;
 }
-std::map<std::string, Ref<Texture>> ResourceManager::getTextures() const
+std::map<std::string, cjk::Ref<Texture>> ResourceManager::getTextures() const
 {
     return mTextures;
 }
 
-Ref<CameraController> ResourceManager::getCurrentCameraController() const
+cjk::Ref<CameraController> ResourceManager::getCurrentCameraController() const
 {
     return mCurrentCameraController;
 }
 
-void ResourceManager::setCurrentCameraController(Ref<CameraController> currentCameraController)
+void ResourceManager::setCurrentCameraController(cjk::Ref<CameraController> currentCameraController)
 {
     mCurrentCameraController = currentCameraController;
 }
@@ -214,7 +214,7 @@ void ResourceManager::onExit()
  * @param type
  * @return The entity ID of the entity.
  */
-GLuint ResourceManager::make3DObject(std::string name, Ref<Shader> type)
+GLuint ResourceManager::make3DObject(std::string name, cjk::Ref<Shader> type)
 {
     if (name.find(".txt") != std::string::npos)
         return makeTriangleSurface(name, type);
@@ -274,7 +274,7 @@ GLuint ResourceManager::makeCube(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
-    registry->add<AABB>(eID, vec3{}, vec3{0.5f, 0.5f, 0.5f});
+    registry->add<AABB>(eID, vec3{}, vec3{1.f, 1.f, 1.f});
     setMesh("cube.obj", eID);
 
     return eID;
@@ -370,7 +370,7 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID)
  * @param fileName
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeTriangleSurface(std::string fileName, Ref<Shader> type)
+GLuint ResourceManager::makeTriangleSurface(std::string fileName, cjk::Ref<Shader> type)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh>(QString::fromStdString(fileName))};
 
@@ -778,6 +778,7 @@ void ResourceManager::setMesh(std::string name, GLuint eID)
     // the mesh at the back is the latest creation
     mMeshMap[name] = registry->get<Mesh>(eID);
 }
+
 /**
  * @brief ResourceManager::LoadMesh - Loads the mesh from file if it isn't already in the Meshes map.
  * @param fileName
@@ -882,7 +883,7 @@ void ResourceManager::initParticleEmitter(ParticleEmitter &emitter)
 bool ResourceManager::loadTexture(std::string fileName)
 {
     if (mTextures.find(fileName) == mTextures.end()) {
-        Ref<Texture> tex{std::make_shared<Texture>(fileName, mTextures.size())};
+        cjk::Ref<Texture> tex{std::make_shared<Texture>(fileName, mTextures.size())};
         if (tex->isValid) {
             mTextures[fileName] = tex;
             qDebug() << "ResourceManager: Added texture" << QString::fromStdString(fileName);
@@ -900,7 +901,7 @@ bool ResourceManager::loadTexture(std::string fileName)
 bool ResourceManager::loadCubemap(std::vector<std::string> faces)
 {
     if (mTextures.find("Skybox") == mTextures.end()) {
-        Ref<Texture> tex{std::make_shared<Texture>(faces, mTextures.size())};
+        cjk::Ref<Texture> tex{std::make_shared<Texture>(faces, mTextures.size())};
         if (tex->isValid) {
             mTextures["Skybox"] = tex;
             qDebug() << "ResourceManager: Added skybox cubemap";
@@ -910,7 +911,7 @@ bool ResourceManager::loadCubemap(std::vector<std::string> faces)
     }
     return false;
 }
-Ref<Texture> ResourceManager::getTexture(std::string fileName)
+cjk::Ref<Texture> ResourceManager::getTexture(std::string fileName)
 {
     return mTextures[fileName];
 }
@@ -932,6 +933,11 @@ QString ResourceManager::getMeshName(const Mesh &mesh)
         }
     }
     return QString();
+}
+
+Mesh ResourceManager::getMesh(std::string meshName)
+{
+    return mMeshMap[meshName];
 }
 /**
  * @brief Read .obj file.
@@ -1046,7 +1052,7 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID)
     }
 }
 
-std::map<std::string, Ref<Shader>> ResourceManager::getShaders() const
+std::map<std::string, cjk::Ref<Shader>> ResourceManager::getShaders() const
 {
     return mShaders;
 }
@@ -1240,7 +1246,7 @@ void ResourceManager::stop()
         emit disableStop(true);
     }
 }
-void ResourceManager::setActiveCameraController(Ref<CameraController> controller)
+void ResourceManager::setActiveCameraController(cjk::Ref<CameraController> controller)
 {
     for (auto shader : mShaders) {
         shader.second->setCameraController(controller);
@@ -1293,5 +1299,3 @@ void ResourceManager::makeUnitOctahedron(GLint recursions)
     subDivide(v5, v4, v3, recursions);
     subDivide(v5, v1, v4, recursions);
 }
-
-} // namespace cjk

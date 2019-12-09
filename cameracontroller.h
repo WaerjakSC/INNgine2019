@@ -2,8 +2,10 @@
 #define CAMERACONTROLLER_H
 #include "camera.h"
 #include "core.h"
-namespace cjk {
+
 class CameraController {
+    using vec3 = gsl::Vector3D;
+
 public:
     CameraController(float aspectRatio);
 
@@ -41,8 +43,8 @@ public:
     const vec3 getCameraRotation() const;
 
 protected:
-    using vec3 = gsl::Vector3D;
     using mat4 = gsl::Matrix4x4;
+
     float mNearPlane{0.5f};
     float mFarPlane{500.f};
     float mFieldOfView{45.f};
@@ -64,6 +66,9 @@ protected:
     bool mOutDated{true};
 };
 class GameCameraController : public CameraController {
+    using vec3 = gsl::Vector3D;
+    using mat4 = gsl::Matrix4x4;
+
 public:
     GameCameraController(float aspectRatio, GLuint controller);
 
@@ -92,6 +97,5 @@ public:
 private:
     GLuint mControllerID;
 };
-} // namespace cjk
 
 #endif // CAMERACONTROLLER_H

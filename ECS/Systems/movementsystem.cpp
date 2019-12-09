@@ -3,7 +3,7 @@
 #include "inputsystem.h"
 #include "pool.h"
 #include "registry.h"
-namespace cjk {
+
 MovementSystem::MovementSystem() : registry{Registry::instance()}
 {
 }
@@ -193,7 +193,7 @@ void MovementSystem::updateTS(Sphere &comp)
     trans.scaleMatrix.scale(comp.radius);
 }
 
-vec3 MovementSystem::getAbsolutePosition(GLuint eID)
+gsl::Vector3D MovementSystem::getAbsolutePosition(GLuint eID)
 {
     if (Registry::instance()->hasParent(eID)) {
         auto view{registry->view<Transform>()};
@@ -204,11 +204,11 @@ vec3 MovementSystem::getAbsolutePosition(GLuint eID)
     return getLocalPosition(eID);
 }
 
-vec3 MovementSystem::getLocalPosition(GLuint eID)
+gsl::Vector3D MovementSystem::getLocalPosition(GLuint eID)
 {
     return registry->view<Transform>().get(eID).localPosition;
 }
-vec3 MovementSystem::getAbsoluteRotation(GLuint eID)
+gsl::Vector3D MovementSystem::getAbsoluteRotation(GLuint eID)
 {
     if (Registry::instance()->hasParent(eID)) {
         auto &trans{registry->view<Transform>().get(eID)};
@@ -217,7 +217,7 @@ vec3 MovementSystem::getAbsoluteRotation(GLuint eID)
     }
     return getRelativeRotation(eID);
 }
-vec3 MovementSystem::getRelativeRotation(GLuint eID)
+gsl::Vector3D MovementSystem::getRelativeRotation(GLuint eID)
 {
     return registry->view<Transform>().get(eID).localRotation;
 }
@@ -415,4 +415,3 @@ void MovementSystem::scaleZ(GLuint eID, float zIn, bool signal)
 {
     scale(eID, vec3{0, 0, zIn}, signal);
 }
-} // namespace cjk

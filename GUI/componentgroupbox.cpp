@@ -5,7 +5,7 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QStyleFactory>
-namespace cjk {
+
 ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox{parent}
 {
     setTitle(name);
@@ -57,4 +57,4 @@ void ComponentGroupBox::createActions()
     addAction(remove);
 }
 
-} // namespace cjk
+

@@ -2,7 +2,7 @@
 #include "cameracontroller.h"
 #include "registry.h"
 #include "resourcemanager.h"
-namespace cjk {
+
 SoundSystem::SoundSystem() : reg{Registry::instance()}
 {
 }
@@ -193,4 +193,4 @@ bool SoundSystem::checkError(std::string name)
     }
     return true;
 }
-} // namespace cjk
+

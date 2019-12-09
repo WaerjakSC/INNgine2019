@@ -2,7 +2,7 @@
 #include "constants.h"
 #include "resourcemanager.h"
 #include <QFileInfo>
-namespace cjk {
+
 ScriptSystem::ScriptSystem() : factory{ResourceManager::instance()}
 {
 }
@@ -58,4 +58,4 @@ QString ScriptSystem::checkError(QJSValue value)
     return error;
 }
 
-} // namespace cjk
+

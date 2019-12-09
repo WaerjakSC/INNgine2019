@@ -30,13 +30,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
-    hierarchy = new cjk::HierarchyModel();
+    hierarchy = new HierarchyModel();
     hView = ui->SceneHierarchy;
     hView->setModel(hierarchy);
     hView->setMainWindow(this);
-    scrollArea = new cjk::VerticalScrollArea();
+    scrollArea = new VerticalScrollArea();
     ui->horizontalTopLayout->addWidget(scrollArea);
-    mComponentList = new cjk::ComponentList(scrollArea);
+    mComponentList = new ComponentList(scrollArea);
 
     //This will contain the setup of the OpenGL surface we will render into
     QSurfaceFormat format;
@@ -70,7 +70,7 @@ void MainWindow::init()
 
     //We have a format for the OpenGL window, so let's make it:
     mRenderWindow = new RenderWindow(format, this);
-    registry = cjk::Registry::instance();
+    registry = Registry::instance();
     createActions();
 
     //Check if renderwindow did initialize, else prints error and quit
@@ -98,26 +98,26 @@ void MainWindow::init()
     //Set size of program in % of available screen
     resize(QGuiApplication::primaryScreen()->size() * 0.7);
 
-    connect(hierarchy, &cjk::HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
-    connect(hierarchy, &cjk::HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
-    connect(hView, &cjk::HierarchyView::clicked, this, &MainWindow::onEntityClicked);
+    connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
+    connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
+    connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
 
-    connect(this, &MainWindow::selectedEntity, registry, &cjk::Registry::setSelectedEntity);
-    connect(registry, &cjk::Registry::entityCreated, this, &MainWindow::onEntityAdded);
-    connect(registry, &cjk::Registry::entityRemoved, hierarchy, &cjk::HierarchyModel::removeEntity);
-    connect(registry, &cjk::Registry::parentChanged, this, &MainWindow::parentChanged);
+    connect(this, &MainWindow::selectedEntity, registry, &Registry::setSelectedEntity);
+    connect(registry, &Registry::entityCreated, this, &MainWindow::onEntityAdded);
+    connect(registry, &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
+    connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
 }
 void MainWindow::playButtons()
 {
     QToolBar *toolbar{ui->mainToolBar};
     QHBoxLayout *buttons{new QHBoxLayout};
-    cjk::ResourceManager *factory{cjk::ResourceManager::instance()};
+    ResourceManager *factory{ResourceManager::instance()};
     buttons->setMargin(0);
     QToolButton *play{new QToolButton};
     play->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     play->setToolTip("Play");
-    connect(play, &QToolButton::clicked, factory, &cjk::ResourceManager::play);
-    connect(factory, &cjk::ResourceManager::disablePlay, play, &QToolButton::setDisabled);
+    connect(play, &QToolButton::clicked, factory, &ResourceManager::play);
+    connect(factory, &ResourceManager::disablePlay, play, &QToolButton::setDisabled);
 
     buttons->addWidget(play);
 
@@ -125,8 +125,8 @@ void MainWindow::playButtons()
     pause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
     pause->setEnabled(false);
     pause->setToolTip("Pause");
-    connect(pause, &QToolButton::clicked, factory, &cjk::ResourceManager::pause);
-    connect(factory, &cjk::ResourceManager::disablePause, pause, &QToolButton::setDisabled);
+    connect(pause, &QToolButton::clicked, factory, &ResourceManager::pause);
+    connect(factory, &ResourceManager::disablePause, pause, &QToolButton::setDisabled);
 
     buttons->addWidget(pause);
 
@@ -134,8 +134,8 @@ void MainWindow::playButtons()
     stop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     stop->setEnabled(false);
     stop->setToolTip("Stop");
-    connect(factory, &cjk::ResourceManager::disableStop, stop, &QToolButton::setDisabled);
-    connect(stop, &QToolButton::clicked, factory, &cjk::ResourceManager::stop);
+    connect(factory, &ResourceManager::disableStop, stop, &QToolButton::setDisabled);
+    connect(stop, &QToolButton::clicked, factory, &ResourceManager::stop);
     buttons->addWidget(stop);
 
     QGroupBox *box{new QGroupBox};
@@ -157,7 +157,7 @@ void MainWindow::playButtons()
 void MainWindow::createActions()
 {
     QMenu *projectActions{ui->menuBar->addMenu(tr("&File"))};
-    cjk::ResourceManager *factory{cjk::ResourceManager::instance()};
+    ResourceManager *factory{ResourceManager::instance()};
     std::vector<QAction *> menuActions;
     QAction *newScene{new QAction(tr("New Scene"))};
     projectActions->addAction(newScene);
@@ -166,30 +166,30 @@ void MainWindow::createActions()
     QAction *saveScene{new QAction(tr("&Save"))};
     menuActions.push_back(saveScene);
     projectActions->addAction(saveScene);
-    connect(saveScene, &QAction::triggered, factory, &cjk::ResourceManager::save);
+    connect(saveScene, &QAction::triggered, factory, &ResourceManager::save);
     QAction *saveAs{new QAction(tr("Save &As"))};
     menuActions.push_back(saveAs);
     projectActions->addAction(saveAs);
-    connect(saveAs, &QAction::triggered, factory, &cjk::ResourceManager::saveAs);
+    connect(saveAs, &QAction::triggered, factory, &ResourceManager::saveAs);
     QAction *loadScene{new QAction(tr("&Load"))};
     menuActions.push_back(loadScene);
     projectActions->addAction(loadScene);
-    connect(loadScene, &QAction::triggered, factory, &cjk::ResourceManager::load);
+    connect(loadScene, &QAction::triggered, factory, &ResourceManager::load);
     QAction *newProject{new QAction(tr("&New Project"))};
     menuActions.push_back(newProject);
     projectActions->addAction(newProject);
-    connect(newProject, &QAction::triggered, factory, &cjk::ResourceManager::newProject);
+    connect(newProject, &QAction::triggered, factory, &ResourceManager::newProject);
     QAction *saveProject{new QAction(tr("Save &Project"))};
     menuActions.push_back(saveProject);
     projectActions->addAction(saveProject);
-    connect(saveProject, &QAction::triggered, factory, &cjk::ResourceManager::saveProject);
+    connect(saveProject, &QAction::triggered, factory, &ResourceManager::saveProject);
     QAction *loadProject{new QAction(tr("&Open Project"))};
     menuActions.push_back(loadProject);
     projectActions->addAction(loadProject);
     connect(loadProject, SIGNAL(triggered()), factory, SLOT(loadProject()));
 
     for (auto action : menuActions) {
-        connect(factory, &cjk::ResourceManager::disableActions, action, &QAction::setDisabled);
+        connect(factory, &ResourceManager::disableActions, action, &QAction::setDisabled);
     }
 
     QAction *exit{new QAction(tr("&Exit"))};
@@ -225,57 +225,57 @@ void MainWindow::createActions()
     QMenu *components{ui->menuBar->addMenu(tr("Add &Components"))}; // Maybe disable specific component if selected entity has that component already
     QAction *transAction{new QAction(tr("Transform"), this)};
     components->addAction(transAction);
-    connect(transAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addTransformComponent);
+    connect(transAction, &QAction::triggered, mComponentList, &ComponentList::addTransformComponent);
 
     QAction *matAction{new QAction(tr("Material"), this)};
     components->addAction(matAction);
-    connect(matAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addMaterialComponent);
+    connect(matAction, &QAction::triggered, mComponentList, &ComponentList::addMaterialComponent);
 
     QAction *meshAction{new QAction(tr("Mesh"), this)};
     components->addAction(meshAction);
-    connect(meshAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addMeshComponent);
+    connect(meshAction, &QAction::triggered, mComponentList, &ComponentList::addMeshComponent);
 
     QMenu *collisionMenu{components->addMenu(tr("&Colliders"))};
 
     QAction *AABBAction{new QAction(tr("AABB"), this)};
     collisionMenu->addAction(AABBAction);
-    connect(AABBAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addAABBCollider);
+    connect(AABBAction, &QAction::triggered, mComponentList, &ComponentList::addAABBCollider);
 
     QAction *SphereAction{new QAction(tr("Sphere"), this)};
     collisionMenu->addAction(SphereAction);
-    connect(SphereAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addSphereCollider);
+    connect(SphereAction, &QAction::triggered, mComponentList, &ComponentList::addSphereCollider);
 
     QAction *lightAction{new QAction(tr("Light"), this)};
     components->addAction(lightAction);
-    connect(lightAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addLightComponent);
+    connect(lightAction, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
 
     QAction *physicsAction{new QAction(tr("Physics"), this)};
     components->addAction(physicsAction);
-    connect(physicsAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addPhysicsComponent);
+    connect(physicsAction, &QAction::triggered, mComponentList, &ComponentList::addPhysicsComponent);
 
     QAction *soundAction{new QAction(tr("Sound"), this)};
     components->addAction(soundAction);
-    connect(soundAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addSoundComponent);
+    connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
 
     QAction *emitterAction{new QAction(tr("Particle Emitter"), this)};
     components->addAction(emitterAction);
-    connect(emitterAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addParticleEmitter);
+    connect(emitterAction, &QAction::triggered, mComponentList, &ComponentList::addParticleEmitter);
 
     QAction *aiAction{new QAction(tr("AI"), this)};
     components->addAction(aiAction);
-    connect(aiAction, &QAction::triggered, mComponentList, &cjk::ComponentList::addAIComponent);
+    connect(aiAction, &QAction::triggered, mComponentList, &ComponentList::addAIComponent);
 
     QAction *bspline{new QAction(tr("BSplinePoint"), this)};
     components->addAction(bspline);
-    connect(bspline, &QAction::triggered, mComponentList, &cjk::ComponentList::addBSplineComponent);
+    connect(bspline, &QAction::triggered, mComponentList, &ComponentList::addBSplineComponent);
 
     QAction *buildable{new QAction(tr("Buildable"), this)};
     components->addAction(buildable);
-    connect(buildable, &QAction::triggered, mComponentList, &cjk::ComponentList::addBuildableComponent);
+    connect(buildable, &QAction::triggered, mComponentList, &ComponentList::addBuildableComponent);
 
     QAction *cam{new QAction(tr("Game Camera"), this)};
     components->addAction(cam);
-    connect(cam, &QAction::triggered, mComponentList, &cjk::ComponentList::addGameCameraComponent);
+    connect(cam, &QAction::triggered, mComponentList, &ComponentList::addGameCameraComponent);
 
     ui->mainToolBar->setMovable(false);
 
@@ -309,7 +309,7 @@ void MainWindow::clearEditor()
 
 void MainWindow::closeEngine()
 {
-    cjk::ResourceManager::instance()->onExit();
+    ResourceManager::instance()->onExit();
     close();
 }
 void MainWindow::makeEntity()
@@ -318,15 +318,15 @@ void MainWindow::makeEntity()
 }
 void MainWindow::makePlane()
 {
-    emit made3DObject(cjk::ResourceManager::instance()->makePlane());
+    emit made3DObject(ResourceManager::instance()->makePlane());
 }
 void MainWindow::makeSphere()
 {
-    emit made3DObject(cjk::ResourceManager::instance()->makeOctBall());
+    emit made3DObject(ResourceManager::instance()->makeOctBall());
 }
 void MainWindow::makeCube()
 {
-    emit made3DObject(cjk::ResourceManager::instance()->makeCube());
+    emit made3DObject(ResourceManager::instance()->makeCube());
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent)
 {
@@ -335,40 +335,40 @@ void MainWindow::onParentChanged(const QModelIndex &newParent)
     if (data >= 0) {
         GLuint parent{static_cast<GLuint>(data)};
         if (newParent.isValid()) {
-            if (registry->contains<cjk::Transform>(parent) && selectedEntity) {
+            if (registry->contains<Transform>(parent) && selectedEntity) {
                 // Find entity in registry and set parentID to that object's ID, then get its transformcomponent and add the childID to its list of children.
                 registry->setParent(selectedEntity, parent, true);
-                registry->system<cjk::MovementSystem>()->updateEntity(selectedEntity);
+                registry->system<MovementSystem>()->updateEntity(selectedEntity);
             }
         }
     }
     else if (selectedEntity)
-        if (registry->contains<cjk::Transform>(selectedEntity)) {
+        if (registry->contains<Transform>(selectedEntity)) {
             registry->setParent(selectedEntity, -1, true);
-            registry->system<cjk::MovementSystem>()->updateEntity(selectedEntity);
+            registry->system<MovementSystem>()->updateEntity(selectedEntity);
         }
 }
 void MainWindow::parentChanged(GLuint eID)
 {
-    disconnect(hierarchy, &cjk::HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
+    disconnect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     QStandardItem *rootItem{hierarchy->invisibleRootItem()};
     QStandardItem *item{hierarchy->itemFromEntityID(eID)};
     if (item) {
         hierarchy->removeRow(item->row());
-        auto &entt{registry->get<cjk::EInfo>(eID)};
+        auto &entt{registry->get<EInfo>(eID)};
         item = new QStandardItem;
         item->setText(entt.name);
         item->setData(eID);
-        int parentID{registry->get<cjk::Transform>(eID).parentID};
+        int parentID{registry->get<Transform>(eID).parentID};
         if (registry->hasParent(eID)) {
             QStandardItem *parent{hierarchy->itemFromEntityID(parentID)};
             parent->insertRow(parent->rowCount(), item);
         }
         else
             rootItem->appendRow(item);
-        registry->system<cjk::MovementSystem>()->updateEntity(eID);
+        registry->system<MovementSystem>()->updateEntity(eID);
     }
-    connect(hierarchy, &cjk::HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
+    connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
 }
 void MainWindow::onEntityClicked(const QModelIndex &index)
 {
@@ -392,7 +392,7 @@ void MainWindow::onNameChanged(const QModelIndex &index)
 {
     QString newName{hierarchy->data(index).toString()};
     GLuint selectedEntity{registry->getSelectedEntity()};
-    auto &info{registry->get<cjk::EInfo>(selectedEntity)};
+    auto &info{registry->get<EInfo>(selectedEntity)};
     if (selectedEntity)
         info.name = hierarchy->data(index).toString();
 }
@@ -400,12 +400,12 @@ void MainWindow::onEntityAdded(GLuint eID)
 {
     QStandardItem *parentItem{hierarchy->invisibleRootItem()};
     QStandardItem *item{new QStandardItem};
-    auto &info{registry->get<cjk::EInfo>(eID)};
+    auto &info{registry->get<EInfo>(eID)};
     item->setText(info.name);
     item->setData(eID);
     parentItem->appendRow(item);
 
-    connect(registry, &cjk::Registry::nameChanged, this, &MainWindow::changeEntityName);
+    connect(registry, &Registry::nameChanged, this, &MainWindow::changeEntityName);
 }
 
 void MainWindow::onEntityRemoved(GLuint entity)
@@ -416,7 +416,7 @@ void MainWindow::onEntityRemoved(GLuint entity)
 void MainWindow::changeEntityName(const GLuint &entt)
 {
     QStandardItem *item{hierarchy->itemFromEntityID(entt)};
-    auto &info{registry->get<cjk::EInfo>(entt)};
+    auto &info{registry->get<EInfo>(entt)};
     item->setText(info.name);
 }
 /**
@@ -428,7 +428,7 @@ void MainWindow::insertEntities()
     hierarchy->clear();
     QStandardItem *parentItem{hierarchy->invisibleRootItem()};
     for (auto entity : registry->getEntities()) {
-        auto &info{registry->get<cjk::EInfo>(entity)};
+        auto &info{registry->get<EInfo>(entity)};
         if (info.isDestroyed)
             continue;
         QStandardItem *item{new QStandardItem};
@@ -437,8 +437,8 @@ void MainWindow::insertEntities()
         else
             item->setText(info.name);
         item->setData(entity);
-        if (registry->contains<cjk::Transform>(entity)) {
-            int parentID{registry->get<cjk::Transform>(entity).parentID};
+        if (registry->contains<Transform>(entity)) {
+            int parentID{registry->get<Transform>(entity).parentID};
             if (parentID != -1) {
                 forEach(parentID, item);
             }

@@ -2,7 +2,7 @@
 #include "registry.h"
 #include <QDebug>
 #include <QMimeData>
-namespace cjk {
+
 HierarchyModel::HierarchyModel()
 {
 }
@@ -51,4 +51,4 @@ QStandardItem *HierarchyModel::itemFromEntityID(GLuint eID)
     return nullptr;
 }
 
-} // namespace cjk
+

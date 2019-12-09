@@ -1,5 +1,5 @@
 #include "verticalscrollarea.h"
-namespace cjk {
+
 VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea{parent}
 {
     setWidgetResizable(true);
@@ -29,4 +29,4 @@ void VerticalScrollArea::setupLayout()
     componentListLayout->setMargin(2);
 }
 
-} // namespace cjk
+

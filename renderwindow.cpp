@@ -35,7 +35,7 @@
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext{nullptr}, mInitialized{false},
-      mFactory{cjk::ResourceManager::instance()}, mRegistry{cjk::Registry::instance()},
+      mFactory{ResourceManager::instance()}, mRegistry{Registry::instance()},
       mMainWindow{mainWindow}
 {
     //This is sent to QWindow:
@@ -103,16 +103,16 @@ void RenderWindow::init()
 
     //********************** Set up camera **********************
     float aspectRatio = static_cast<float>(width()) / height();
-    mEditorCameraController = std::make_shared<cjk::CameraController>(aspectRatio);
+    mEditorCameraController = std::make_shared<CameraController>(aspectRatio);
     mEditorCameraController->setPosition(vec3(0.f, 20.f, 23.0f));
     mFactory->setCurrentCameraController(mEditorCameraController);
 
     //Compile shaders - init them with reference to current camera:
-    mFactory->loadShader<cjk::ColorShader>(mEditorCameraController);
-    mFactory->loadShader<cjk::TextureShader>(mEditorCameraController);
-    mFactory->loadShader<cjk::PhongShader>(mEditorCameraController);
-    mFactory->loadShader<cjk::SkyboxShader>(mEditorCameraController);
-    mFactory->loadShader<cjk::ParticleShader>(mEditorCameraController);
+    mFactory->loadShader<ColorShader>(mEditorCameraController);
+    mFactory->loadShader<TextureShader>(mEditorCameraController);
+    mFactory->loadShader<PhongShader>(mEditorCameraController);
+    mFactory->loadShader<SkyboxShader>(mEditorCameraController);
+    mFactory->loadShader<ParticleShader>(mEditorCameraController);
     //**********************  Texture stuff: **********************
 
     mFactory->loadTexture("white.bmp");
@@ -128,19 +128,19 @@ void RenderWindow::init()
     mFactory->loadMesh("OgreOBJ.obj"); // if a mesh is spawned in during play you'll probably want to load it here first to avoid fps hitches
 
     // Set up the systems.
-    mRenderer = mRegistry->registerSystem<cjk::RenderSystem>();
-    mMoveSystem = mRegistry->registerSystem<cjk::MovementSystem>();
-    mLightSystem = mRegistry->registerSystem<cjk::LightSystem>(mFactory->getShader<cjk::PhongShader>());
-    mInputSystem = mRegistry->registerSystem<cjk::InputSystem>(this);
+    mRenderer = mRegistry->registerSystem<RenderSystem>();
+    mMoveSystem = mRegistry->registerSystem<MovementSystem>();
+    mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
+    mInputSystem = mRegistry->registerSystem<InputSystem>(this);
     mInputSystem->setEditorCamController(mEditorCameraController);
-    mSoundSystem = mRegistry->registerSystem<cjk::SoundSystem>();
-    mCollisionSystem = mRegistry->registerSystem<cjk::CollisionSystem>();
-    connect(mCollisionSystem.get(), &cjk::CollisionSystem::updateAABB, mMoveSystem.get(), &cjk::MovementSystem::updateAABBTransform);
-    connect(mCollisionSystem.get(), &cjk::CollisionSystem::updateSphere, mMoveSystem.get(), &cjk::MovementSystem::updateSphereTransform);
+    mSoundSystem = mRegistry->registerSystem<SoundSystem>();
+    mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
+    connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
+    connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
 
-    mAISystem = mRegistry->registerSystem<cjk::AISystem>();
-    mScriptSystem = mRegistry->registerSystem<cjk::ScriptSystem>();
-    mParticleSystem = mRegistry->registerSystem<cjk::ParticleSystem>(mFactory->getShader<cjk::ParticleShader>());
+    mAISystem = mRegistry->registerSystem<AISystem>();
+    mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
+    mParticleSystem = mRegistry->registerSystem<ParticleSystem>(mFactory->getShader<ParticleShader>());
 
     //********************** Making the objects to be drawn **********************
     xyz = mFactory->makeXYZ();
@@ -155,8 +155,8 @@ void RenderWindow::init()
     mLightSystem->init();
     mParticleSystem->init();
 
-    connect(mInputSystem.get(), &cjk::InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
-    connect(mInputSystem.get(), &cjk::InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
+    connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
+    connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
 }
 
 ///Called each frame - doing the rendering
@@ -164,7 +164,7 @@ void RenderWindow::render()
 {
 
     float time{static_cast<float>(mTime.elapsed()) / 1000.f};
-    cjk::DeltaTime dt{time - mLastFrameTime};
+    DeltaTime dt{time - mLastFrameTime};
     mLastFrameTime = time;
 
     mTimeStart.restart();        //restart FPS clock

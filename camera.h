@@ -6,7 +6,7 @@
 // must undefine for Frustum.
 #undef near
 #undef far
-namespace cjk {
+
 class Camera {
     using vec3 = gsl::Vector3D;
     using vec4 = gsl::Vector4D;
@@ -97,6 +97,6 @@ private:
     friend class GameCameraController;
     void calculateViewMatrix();
 };
-} // namespace cjk
+
 
 #endif // CAMERA_H

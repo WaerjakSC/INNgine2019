@@ -1,7 +1,7 @@
 #include "customdoublespinbox.h"
 #include <QStyleFactory>
 #include <QWheelEvent>
-namespace cjk {
+
 CustomDoubleSpinBox::CustomDoubleSpinBox(const std::optional<float> &minRange, const std::optional<float> &maxRange)
 {
     QStyle *fusion{QStyleFactory::create("fusion")};
@@ -21,5 +21,3 @@ void CustomDoubleSpinBox::wheelEvent(QWheelEvent *event)
         QDoubleSpinBox::wheelEvent(event);
     }
 }
-
-} // namespace cjk

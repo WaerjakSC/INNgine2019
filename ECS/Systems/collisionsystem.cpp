@@ -5,7 +5,7 @@
 #include "inputsystem.h"
 #include "registry.h"
 #include <cmath>
-namespace cjk {
+
 CollisionSystem::CollisionSystem() : registry{Registry::instance()}
 {
 }
@@ -135,7 +135,7 @@ Raycast CollisionSystem::mousePick(const QPoint &mousePos, const QRect &rect, in
     return raycast;
 }
 
-vec3 CollisionSystem::getPointOnRay(const Raycast &r, double distance)
+gsl::Vector3D CollisionSystem::getPointOnRay(const Raycast &r, double distance)
 {
     return r.ray.origin + (r.ray.direction * distance);
 }
@@ -153,7 +153,7 @@ inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &r
     return (lhs.isStatic == rhs.isStatic) == true;
 }
 
-vec3 CollisionSystem::getMin(const AABB &aabb)
+gsl::Vector3D CollisionSystem::getMin(const AABB &aabb)
 {
     vec3 origin{aabb.transform.modelMatrix.getPosition()};
     vec3 p1{origin + aabb.size};
@@ -164,7 +164,7 @@ vec3 CollisionSystem::getMin(const AABB &aabb)
                 fminf(p1.z, p2.z)};
 }
 
-vec3 CollisionSystem::getMax(const AABB &aabb)
+gsl::Vector3D CollisionSystem::getMax(const AABB &aabb)
 {
     vec3 origin{aabb.transform.modelMatrix.getPosition()};
     vec3 p1{origin + aabb.size};
@@ -211,7 +211,7 @@ bool CollisionSystem::AABBAABB(const AABB &AABB1, const AABB &AABB2)
     return aMin <= bMax && aMax >= bMin;
 }
 
-vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point)
+gsl::Vector3D CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point)
 {
     vec3 result{point};
     vec3 min{getMin(aabb)};
@@ -230,7 +230,7 @@ vec3 CollisionSystem::ClosestPoint(const AABB &aabb, const vec3 &point)
     return result;
 }
 
-vec3 CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point)
+gsl::Vector3D CollisionSystem::ClosestPoint(const Sphere &sphere, const vec3 &point)
 {
     vec3 spherePos{sphere.transform.modelMatrix.getPosition()};
     vec3 sphereCenterToPoint{point - spherePos};
@@ -401,4 +401,3 @@ void CollisionSystem::setObjectType(int index)
         sphere.isStatic = isStatic;
     }
 }
-} // namespace cjk

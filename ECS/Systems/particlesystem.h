@@ -4,14 +4,16 @@
 #include "pool.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <random>
-namespace cjk {
+
 struct ParticleEmitter;
 class ParticleShader;
 class Registry;
 class ParticleSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
+    using vec3 = gsl::Vector3D;
+
 public:
-    ParticleSystem(Ref<ParticleShader> shader);
+    ParticleSystem(cjk::Ref<ParticleShader> shader);
     void init();
     void initEmitter(GLuint entityID);
 
@@ -38,7 +40,7 @@ public slots:
 
 private:
     Registry *registry;
-    Ref<ParticleShader> mShader;
+    cjk::Ref<ParticleShader> mShader;
     std::mt19937 rng;
     int findUnusedParticle(ParticleEmitter &emitter);
     void generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform);
@@ -47,6 +49,5 @@ private:
     void renderParticles(ParticleEmitter &emitter);
     void drawElements(ParticleEmitter &emitter);
 };
-} // namespace cjk
 
 #endif // PARTICLESYSTEM_H

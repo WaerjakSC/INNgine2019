@@ -11,7 +11,6 @@
 #include <memory>
 class QOpenGLContext;
 class MainWindow;
-namespace cjk { // forward declaring cjk classes
 class Shader;
 class RenderSystem;
 class MovementSystem;
@@ -25,7 +24,6 @@ class CameraController;
 class ScriptSystem;
 class ResourceManager;
 class Registry;
-} // namespace cjk
 
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.
@@ -64,20 +62,20 @@ private:
     QOpenGLContext *mContext{nullptr};
     bool mInitialized{false};
 
-    cjk::Ref<cjk::RenderSystem> mRenderer;
-    cjk::Ref<cjk::ParticleSystem> mParticleSystem;
-    cjk::Ref<cjk::MovementSystem> mMoveSystem;
-    cjk::Ref<cjk::LightSystem> mLightSystem;
-    cjk::Ref<cjk::SoundSystem> mSoundSystem;
-    cjk::Ref<cjk::InputSystem> mInputSystem;
-    cjk::Ref<cjk::CollisionSystem> mCollisionSystem;
-    cjk::Ref<cjk::ScriptSystem> mScriptSystem;
-    cjk::Ref<cjk::AISystem> mAISystem;
+    cjk::Ref<RenderSystem> mRenderer;
+    cjk::Ref<ParticleSystem> mParticleSystem;
+    cjk::Ref<MovementSystem> mMoveSystem;
+    cjk::Ref<LightSystem> mLightSystem;
+    cjk::Ref<SoundSystem> mSoundSystem;
+    cjk::Ref<InputSystem> mInputSystem;
+    cjk::Ref<CollisionSystem> mCollisionSystem;
+    cjk::Ref<ScriptSystem> mScriptSystem;
+    cjk::Ref<AISystem> mAISystem;
 
-    cjk::ResourceManager *mFactory;
-    cjk::Registry *mRegistry;
+    ResourceManager *mFactory;
+    Registry *mRegistry;
 
-    cjk::Ref<cjk::CameraController> mEditorCameraController{nullptr};
+    cjk::Ref<CameraController> mEditorCameraController{nullptr};
 
     GLuint xyz; // Refers to the colored lines pointing in the X, Y and Z directions.
     bool mWireframe{false};
@@ -100,8 +98,6 @@ private:
     void startOpenGLDebugger();
 
     std::chrono::high_resolution_clock::time_point mLastTime;
-    //    void Cull(const Camera::Frustum &f);
-    cjk::Camera mCamera;
 
     friend class MainWindow;
 

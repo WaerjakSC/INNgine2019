@@ -5,7 +5,7 @@
 #include <QGroupBox>
 class QMainWindow;
 class MainWindow;
-namespace cjk {
+
 class ComponentGroupBox : public QGroupBox {
 public:
     ComponentGroupBox(const QString &name, QWidget *parent = nullptr);
@@ -15,6 +15,6 @@ private slots:
 private:
     void createActions();
 };
-} // namespace cjk
+
 
 #endif // COMPONENTGROUPBOX_H

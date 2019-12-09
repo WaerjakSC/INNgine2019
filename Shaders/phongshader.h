@@ -2,7 +2,7 @@
 #define PHONGSHADER_H
 
 #include "shader.h"
-namespace cjk {
+
 struct LightData;
 struct Light;
 class PhongShader : public Shader {
@@ -30,6 +30,6 @@ private:
     GLuint mLightID;
 };
 
-} // namespace cjk
+
 
 #endif // PHONGSHADER_H

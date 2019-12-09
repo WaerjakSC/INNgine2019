@@ -1,7 +1,7 @@
 #ifndef GROUP_H
 #define GROUP_H
 #include "pool.h"
-namespace cjk {
+
 
 /**
  * @brief Fully owned group.
@@ -77,6 +77,6 @@ private:
     const size_t *length;
     friend class Registry;
 };
-} // namespace cjk
+
 
 #endif // GROUP_H

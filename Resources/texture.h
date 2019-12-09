@@ -2,7 +2,7 @@
 #define TEXTURE_H
 
 #include <QOpenGLFunctions_4_1_Core>
-namespace cjk {
+
 /**
     \brief Simple class for creating textures from an image file.
  */
@@ -37,6 +37,6 @@ private:
     bool textureFromFile(const std::string &directory /*, bool gamma = false*/);
     bool cubeMapFromFile(std::vector<std::string> faces);
 };
-} // namespace cjk
+
 
 #endif // TEXTURE_H

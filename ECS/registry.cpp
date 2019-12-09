@@ -1,7 +1,7 @@
 #include "registry.h"
 #include "soundsystem.h"
 #include <optional>
-namespace cjk {
+
 Registry *Registry::mInstance = nullptr;
 
 Registry::Registry()
@@ -238,4 +238,4 @@ void Registry::loadSnapshot()
     }
 }
 
-} // namespace cjk
+

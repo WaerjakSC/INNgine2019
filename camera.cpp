@@ -1,6 +1,5 @@
 #include "camera.h"
 
-namespace cjk {
 Camera::Camera(float fov, float aspectRatio, float near, float far)
 {
     mViewMatrix.setToIdentity();
@@ -29,7 +28,7 @@ void Camera::setPosition(const vec3 &position)
 {
     mPosition = -position;
 }
-const vec3 Camera::getRotation() const
+const gsl::Vector3D Camera::getRotation() const
 {
     return std::get<2>(gsl::Matrix4x4::decomposed(mViewMatrix));
 }
@@ -51,12 +50,12 @@ void Camera::calculateViewMatrix()
     mViewMatrix.translate(mPosition);
     makeFrustum();
 }
-vec3 Camera::position() const
+gsl::Vector3D Camera::position() const
 {
     return mPosition;
 }
 
-vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width)
+gsl::Vector3D Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width)
 {
     vec3 rayNDC{getNormalizedDeviceCoords(viewportPoint, height, width)};
 
@@ -75,7 +74,7 @@ vec3 Camera::calculateMouseRay(const vec3 &viewportPoint, int height, int width)
 
     return rayWorld;
 }
-vec3 Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
+gsl::Vector3D Camera::getNormalizedDeviceCoords(const vec3 &mouse, int height, int width)
 {
     float x{(2.0f * mouse.x) / width - 1.0f};
     float y{1.0f - (2.0f * mouse.y) / height};
@@ -115,7 +114,7 @@ void Camera::makeFrustum()
     mFrustum = result;
 }
 // Finds the corners where the planes p1, p2 and p3 intersect.
-vec3 Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3)
+gsl::Vector3D Camera::Frustum::Intersection(Plane p1, Plane p2, Plane p3)
 {
     mat3 D{p1.normal.x, p2.normal.x, p3.normal.x,
            p1.normal.y, p2.normal.y, p3.normal.y,
@@ -196,5 +195,3 @@ bool Camera::Frustum::Intersects(const Frustum &f, const AABB &aabb)
     }
     return true;
 }
-
-} // namespace cjk

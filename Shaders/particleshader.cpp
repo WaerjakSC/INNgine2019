@@ -1,7 +1,7 @@
 #include "particleshader.h"
 #include "cameracontroller.h"
 #include "registry.h"
-namespace cjk {
+
 ParticleShader::ParticleShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
     : Shader{camController, "ParticleShader", geometryPath}
 {
@@ -24,4 +24,4 @@ void ParticleShader::transmitParticleUniformData(const ParticleEmitter &emitter)
     glUniform3f(cameraUpUniform, up.x, up.y, up.z);
 }
 
-} // namespace cjk
+

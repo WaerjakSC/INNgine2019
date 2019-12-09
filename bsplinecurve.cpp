@@ -1,6 +1,6 @@
 #include "bsplinecurve.h"
 #include "registry.h"
-namespace cjk {
+
 BSplineCurve::BSplineCurve(int degree) : d{degree}
 {
     debugShader = ResourceManager::instance()->getShader<ColorShader>();
@@ -127,7 +127,7 @@ void BSplineCurve::updatePath(bool init)
  * @param x parameterverdi på skjøtvektor
  * @return et punkt på splinekurven
  */
-vec3 BSplineCurve::evaluateBSpline(int my, float x) const
+gsl::Vector3D BSplineCurve::evaluateBSpline(int my, float x) const
 {
     std::vector<vec3> a;
     a.resize(t.size() + d + 1);
@@ -189,7 +189,7 @@ void BSplineCurve::init()
  * @param x
  * @return
  */
-vec3 BSplineCurve::eval(float x) const
+gsl::Vector3D BSplineCurve::eval(float x) const
 {
     auto my{getMy(x)};
     if (my > -1)
@@ -197,4 +197,3 @@ vec3 BSplineCurve::eval(float x) const
 
     return {0.f, 0.f, 0.f};
 }
-} // namespace cjk

@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QDropEvent>
 #include <QMimeData>
-namespace cjk {
+
 HierarchyView::HierarchyView(QWidget *parent) : QTreeView{parent}
 {
     setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -78,4 +78,4 @@ void HierarchyView::mousePressEvent(QMouseEvent *event)
     }
 }
 
-} // namespace cjk
+

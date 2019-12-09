@@ -5,7 +5,7 @@
 #include "deltaTime.h"
 #include "isystem.h"
 #include <QOpenGLFunctions_4_1_Core>
-namespace cjk {
+
 struct Ray {
     using vec3 = gsl::Vector3D;
     Ray() {}
@@ -194,6 +194,5 @@ private:
      */
     bool bothStatic(const Collision &lhs, const Collision &rhs);
 };
-} // namespace cjk
 
 #endif // COLLISIONSYSTEM_H

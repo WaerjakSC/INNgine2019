@@ -3,12 +3,12 @@
 #include "core.h"
 #include "isystem.h"
 #include "pool.h"
-namespace cjk {
+
 class Registry;
 class PhongShader;
 class LightSystem : public ISystem {
 public:
-    LightSystem(Ref<PhongShader> shader);
+    LightSystem(cjk::Ref<PhongShader> shader);
 
     void update(DeltaTime = 0.016) override;
 
@@ -16,9 +16,9 @@ public:
 
 private:
     Registry *registry;
-    Ref<PhongShader> mPhong;
+    cjk::Ref<PhongShader> mPhong;
 };
 
-} // namespace cjk
+
 
 #endif // LIGHTSYSTEM_H

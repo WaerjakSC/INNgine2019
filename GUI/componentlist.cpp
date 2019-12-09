@@ -22,7 +22,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QStyleFactory>
-namespace cjk {
+
 ComponentList::ComponentList(VerticalScrollArea *inScrollArea)
     : registry{Registry::instance()}, scrollArea{inScrollArea}
 {
@@ -968,4 +968,3 @@ std::tuple<CustomDoubleSpinBox *, CustomDoubleSpinBox *, CustomDoubleSpinBox *> 
     }
     return {xBox, yBox, zBox};
 }
-} // namespace cjk

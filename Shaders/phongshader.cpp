@@ -5,7 +5,7 @@
 #include "components.h"
 #include "innpch.h"
 #include "registry.h"
-namespace cjk {
+
 PhongShader::PhongShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
     : Shader{camController, "PhongShader", geometryPath}
 {
@@ -52,4 +52,4 @@ void PhongShader::setLight(GLuint entt)
 {
     mLightID = entt;
 }
-} // namespace cjk
+

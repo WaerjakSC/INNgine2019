@@ -5,8 +5,8 @@
 #include "particleshader.h"
 #include "registry.h"
 #include <QColor>
-namespace cjk {
-ParticleSystem::ParticleSystem(Ref<ParticleShader> shader)
+
+ParticleSystem::ParticleSystem(cjk::Ref<ParticleShader> shader)
     : registry{Registry::instance()}, mShader{shader}
 {
     rng = std::mt19937(std::random_device()());
@@ -277,4 +277,4 @@ void ParticleSystem::setInitColorBlue(int inBlue)
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialColor.setBlue(inBlue);
 }
-} // namespace cjk
+

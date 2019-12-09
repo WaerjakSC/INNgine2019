@@ -1,8 +1,8 @@
 #include "lightsystem.h"
 #include "phongshader.h"
 #include "registry.h"
-namespace cjk {
-LightSystem::LightSystem(Ref<PhongShader> shader)
+
+LightSystem::LightSystem(cjk::Ref<PhongShader> shader)
     : registry{Registry::instance()}, mPhong{shader}
 {
 }
@@ -19,4 +19,4 @@ void LightSystem::init()
 {
     update();
 }
-} // namespace cjk
+

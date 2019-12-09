@@ -7,7 +7,7 @@
 #include <QObject>
 #include <memory>
 #include <vector>
-namespace cjk {
+
 struct GroupData;
 class IPool {
 public:
@@ -366,6 +366,6 @@ private:
     SparseSet mEntities;
 };
 
-} // namespace cjk
+
 
 #endif // POOL_H

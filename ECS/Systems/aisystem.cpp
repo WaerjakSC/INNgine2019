@@ -3,7 +3,7 @@
 #include "gsl_math.h"
 #include "movementsystem.h"
 #include "registry.h"
-namespace cjk {
+
 AISystem::AISystem()
 {
 }
@@ -267,4 +267,4 @@ void AISystem::setControlPoints(std::vector<vec3> cps)
     mCurve.setControlPoints(cps);
 }
 
-} // namespace cjk
+

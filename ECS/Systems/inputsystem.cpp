@@ -9,7 +9,6 @@
 #include "resourcemanager.h"
 #include "textureshader.h"
 
-namespace cjk {
 InputSystem::InputSystem(RenderWindow *window)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},
       mRenderWindow{window}
@@ -126,23 +125,6 @@ void InputSystem::setPlaneColors(bool dragging)
 void InputSystem::handlePlayerController([[maybe_unused]] DeltaTime dt)
 {
     if (factory->isPlaying()) { // We don't have a movable character anyway, disabling this.
-        //        gsl::Vector3D desiredVelocity{0};
-        //        if (mPlayerController.W)
-        //            desiredVelocity.z -= mCameraSpeed;
-        //        if (mPlayerController.S)
-        //            desiredVelocity.z += mCameraSpeed;
-        //        if (mPlayerController.D)
-        //            desiredVelocity.x += mCameraSpeed;
-        //        if (mPlayerController.A)
-        //            desiredVelocity.x -= mCameraSpeed;
-        //        if (mPlayerController.Q)
-        //            desiredVelocity.y += mCameraSpeed;
-        //        if (mPlayerController.E)
-        //            desiredVelocity.y -= mCameraSpeed;
-        //        mDesiredVelocity = desiredVelocity.normalized() * mMoveSpeed * dt;
-        //        if (mPlayer != 0) {
-        //            registry->system<MovementSystem>()->move(mPlayer, mDesiredVelocity);
-        //        }
     }
 }
 void InputSystem::handleMouseInput()
@@ -169,22 +151,7 @@ void InputSystem::handleMouseInput()
     }
     if (mPlayerController.LMB) {
         if (mIsDragging) {
-            auto view{registry->view<Transform, Buildable, AABB>()};
-            if (view.contains(lastHitEntity)) {
-                auto &build{view.get<Buildable>(lastHitEntity)};
-                if (build.isBuildable) {
-                    mIsDragging = false;
-                    build.isBuildable = false;
-                    auto draggedView{registry->view<Transform, AABB>()};
-                    auto [towerTransform, aabb]{draggedView.get<Transform, AABB>(draggedEntity)};
-                    const auto &transform{view.get<Transform>(lastHitEntity)};
-                    vec3 topCenterOfTarget{transform.localPosition};
-                    topCenterOfTarget.y += aabb.size.y; // place the tower just slightly above the Plane it's sitting on to avoid clipping.
-                    towerTransform.localPosition = topCenterOfTarget;
-                    towerTransform.matrixOutdated = true;
-                    setPlaneColors(mIsDragging);
-                }
-            }
+            placeTower();
         }
     }
     else if (mPlayerController.RMB) {
@@ -192,18 +159,12 @@ void InputSystem::handleMouseInput()
             mIsDragging = false;
             // reset the colors after discarding the tower.
             setPlaneColors(mIsDragging);
-
             // remove the dragged entity from play - discarded by the player.
             registry->removeEntity(draggedEntity);
         }
     }
     if (mIsDragging)
         dragEntity(draggedEntity);
-}
-
-void InputSystem::setBuildableDebug(bool value)
-{
-    buildableDebug = value;
 }
 void InputSystem::confineMouseToScreen(DeltaTime dt)
 {
@@ -238,17 +199,61 @@ void InputSystem::confineMouseToScreen(DeltaTime dt)
 void InputSystem::setBuildableObject(bool state)
 {
     GLuint entityID{registry->getSelectedEntity()};
-    auto view{registry->view<Buildable, Material>()};
-    auto &object{view.get<Buildable>(entityID)};
-    object.isBuildable = state;
-    if (mIsDragging || buildableDebug) {
-        auto &mat = view.get<Material>(entityID);
-        if (object.isBuildable) {
+    auto view{registry->view<Buildable>()};
+    Buildable &build{view.get(entityID)};
+    build.isBuildable = state;
+    updateBuildable(entityID);
+}
+void InputSystem::updateBuildable(GLuint entityID)
+{
+    auto view{registry->view<Transform, Buildable, Material, Mesh, AABB>()};
+    auto [trans, build, mat, mesh, aabb]{view.get<Transform, Buildable, Material, Mesh, AABB>(entityID)};
+    if (build.isBuildable) {
+        if (mIsDragging || buildableDebug) {
             mat.mObjectColor = green * 0.8f;
         }
-        else
-            mat.mObjectColor = red * 0.8f;
+        mesh = factory->getMesh("cube.obj"); // replace with a cube type mesh as wall ingame
+        float scaleY{trans.localScale.x / 2.f};
+        trans.localScale.y = scaleY; // set local scale in y axis to be similar to a raised platform
+        aabb.size.y = scaleY;        // update the AABB to keep up with mesh scale.
+        trans.localPosition.y += scaleY;
+        trans.matrixOutdated = true;
     }
+    else {
+        if (mIsDragging || buildableDebug) {
+            mat.mObjectColor = red * 0.8f;
+        }
+        mesh = factory->getMesh("Plane");
+        trans.localPosition.y = 0.f;
+        float nScale{0.01f};
+        trans.localScale.y = nScale;
+        aabb.size.y = nScale;
+        trans.matrixOutdated = true;
+    }
+}
+void InputSystem::placeTower()
+{
+    auto view{registry->view<Transform, Buildable>()};
+    if (view.contains(lastHitEntity)) {
+        auto &build{view.get<Buildable>(lastHitEntity)};
+        if (build.isBuildable) {
+            mIsDragging = false;
+            build.isBuildable = false;
+            auto draggedView{registry->view<Transform, AABB>()};
+            auto [towerTransform, aabb]{draggedView.get<Transform, AABB>(draggedEntity)};
+            auto &planeTransform{view.get<Transform>(lastHitEntity)};
+            float scaleY{planeTransform.localScale.y};
+            vec3 topCenterOfTarget{planeTransform.localPosition};
+            topCenterOfTarget.y += (aabb.size.y + scaleY); // place the tower just slightly above the Plane it's sitting on to avoid clipping.
+            towerTransform.localPosition = topCenterOfTarget;
+            towerTransform.matrixOutdated = true;
+            setPlaneColors(mIsDragging);
+        }
+    }
+}
+void InputSystem::setBuildableDebug(bool value)
+{
+    buildableDebug = value;
 }
 void InputSystem::dragEntity(GLuint entity)
 {
@@ -272,7 +277,8 @@ void InputSystem::dragEntity(GLuint entity)
                 mat.mObjectColor = red * 0.8f;
         }
         // compensate for size of collider
-        ray.hitPoint.y += registry->get<AABB>(ray.hitEntity).size.y;
+        float colliderHeight{registry->get<AABB>(ray.hitEntity).size.y};
+        ray.hitPoint.y += colliderHeight * 2;
         if (view.contains(ray.hitEntity)) {
             auto &mat = view.get<Material>(ray.hitEntity);
             lastHitEntity = ray.hitEntity;
@@ -295,22 +301,22 @@ void InputSystem::setGameCameraInactive()
     mActiveGameCamera = false;
 }
 
-Ref<CameraController> InputSystem::editorCamController() const
+cjk::Ref<CameraController> InputSystem::editorCamController() const
 {
     return mEditorCamController;
 }
 
-void InputSystem::setEditorCamController(const Ref<CameraController> &editorCamController)
+void InputSystem::setEditorCamController(const cjk::Ref<CameraController> &editorCamController)
 {
     mEditorCamController = editorCamController;
 }
 
-std::vector<Ref<GameCameraController>> InputSystem::gameCameraControllers() const
+std::vector<cjk::Ref<GameCameraController>> InputSystem::gameCameraControllers() const
 {
     return mGameCameraControllers;
 }
 
-Ref<CameraController> InputSystem::currentCameraController()
+cjk::Ref<CameraController> InputSystem::currentCameraController()
 {
     if (factory->isPlaying()) {
         for (auto controller : mGameCameraControllers) {
@@ -605,4 +611,3 @@ void InputSystem::setPitch(double pitch)
     cam.mPitch = pitch;
     cam.mOutDated = true;
 }
-} // namespace cjk

@@ -3,7 +3,7 @@
 #include "gsl_math.h"
 #include <QTreeView>
 class MainWindow;
-namespace cjk {
+
 class HierarchyView : public QTreeView {
     Q_OBJECT
 public:
@@ -30,6 +30,6 @@ private:
     GLuint rightClickEntity;
     void setController();
 };
-} // namespace cjk
+
 
 #endif // HIERARCHYVIEW_H

@@ -1,6 +1,6 @@
 #include "skyboxshader.h"
 #include "cameracontroller.h"
-namespace cjk {
+
 SkyboxShader::SkyboxShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
     : Shader{camController, "SkyboxShader", geometryPath}
 {
@@ -19,4 +19,4 @@ void SkyboxShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *ma
     glUniform1i(skyboxTexUniform, material->mTextureUnit); //TextureUnit = 0 as default);
 }
 
-} // namespace cjk
+

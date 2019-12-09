@@ -12,7 +12,7 @@
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
 #endif
-namespace cjk {
+
 class Registry;
 class SoundSystem : public ISystem {
     using vec3 = gsl::Vector3D;
@@ -45,6 +45,6 @@ private:
     friend class Sound;
     friend class ResourceManager;
 };
-} // namespace cjk
+
 
 #endif // SOUNDSYSTEM_H

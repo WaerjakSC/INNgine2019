@@ -3,7 +3,7 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QVBoxLayout>
-namespace cjk {
+
 class VerticalScrollArea : public QScrollArea {
 public:
     VerticalScrollArea(QWidget *parent = nullptr);
@@ -18,6 +18,6 @@ private:
     void setupLayout();
 };
 
-} // namespace cjk
+
 
 #endif // VERTICALSCROLLAREA_H

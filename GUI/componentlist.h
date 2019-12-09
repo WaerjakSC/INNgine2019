@@ -12,7 +12,7 @@ class QComboBox;
 class QGroupBox;
 class MainWindow;
 class QHBoxLayout;
-namespace cjk {
+
 struct Transform;
 struct Material;
 struct Mesh;
@@ -23,6 +23,8 @@ class HierarchyView;
 class VerticalScrollArea;
 class ComponentList : public QWidget {
     Q_OBJECT
+    using vec3 = gsl::Vector3D;
+
 public:
     ComponentList(VerticalScrollArea *inScrollArea);
     void setupComponentList();
@@ -130,6 +132,5 @@ private:
     QComboBox *makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col);
     friend class MainWindow;
 };
-} // namespace cjk
 
 #endif // COMPONENTLIST_H

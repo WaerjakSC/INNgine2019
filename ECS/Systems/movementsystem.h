@@ -4,7 +4,7 @@
 #include "core.h"
 #include "isystem.h"
 #include "pool.h"
-namespace cjk {
+
 class Registry;
 class MovementSystem : public QObject, public ISystem {
     Q_OBJECT
@@ -175,6 +175,6 @@ private:
 
     void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
 };
-} // namespace cjk
+
 
 #endif // MOVEMENTSYSTEM_H

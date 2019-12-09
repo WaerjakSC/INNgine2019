@@ -1,6 +1,6 @@
 #include "texture.h"
 #include "innpch.h"
-namespace cjk {
+
 Texture::Texture(const std::string &filename, GLuint textureUnit) : QOpenGLFunctions_4_1_Core{}, mTextureUnit{textureUnit}
 {
     isValid = textureFromFile(filename);
@@ -89,4 +89,4 @@ bool Texture::textureFromFile(const std::string &filename /*, bool gamma*/)
     return true;
 }
 
-} // namespace cjk
+

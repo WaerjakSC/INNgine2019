@@ -1,7 +1,7 @@
 ﻿#include "cameracontroller.h"
 #include "movementsystem.h"
 #include "registry.h"
-namespace cjk {
+
 CameraController::CameraController(float aspectRatio)
     : mAspectRatio{aspectRatio},
       mCamera{mFieldOfView, mAspectRatio, mNearPlane, mFarPlane}
@@ -35,20 +35,20 @@ void CameraController::setYaw(float newYaw)
     mYaw = newYaw;
     updateForwardVector();
 }
-vec3 CameraController::up() const
+gsl::Vector3D CameraController::up() const
 {
     return mUp;
 }
 
-vec3 CameraController::forward() const
+gsl::Vector3D CameraController::forward() const
 {
     return mForward;
 }
-vec3 CameraController::right() const
+gsl::Vector3D CameraController::right() const
 {
     return mRight;
 }
-vec3 CameraController::cameraPosition() const
+gsl::Vector3D CameraController::cameraPosition() const
 {
     return mCameraPosition;
 }
@@ -116,7 +116,7 @@ float CameraController::getYaw() const
 {
     return mYaw;
 }
-const vec3 CameraController::getCameraRotation() const
+const gsl::Vector3D CameraController::getCameraRotation() const
 {
     return mCamera.getRotation();
 }
@@ -148,7 +148,7 @@ void CameraController::resize(float aspectRatio)
     mAspectRatio = aspectRatio;
     mCamera.setProjectionMatrix(mFieldOfView, mAspectRatio, mNearPlane, mFarPlane);
 }
-vec3 GameCameraController::cameraPosition() const
+gsl::Vector3D GameCameraController::cameraPosition() const
 {
     const auto &gameCam{Registry::instance()->view<GameCamera>().get(mControllerID)};
     return gameCam.mCameraPosition;
@@ -226,7 +226,8 @@ void GameCameraController::updateMeshPosition()
     moveSys->setLocalPosition(mControllerID, positionWithOffset());
     moveSys->setRotation(mControllerID, rot);
 }
-vec3 GameCameraController::positionWithOffset()
+
+GameCameraController::vec3 GameCameraController::positionWithOffset()
 {
     return cameraPosition() - forward();
 }
@@ -235,5 +236,3 @@ GLuint GameCameraController::controllerID() const
 {
     return mControllerID;
 }
-
-} // namespace cjk

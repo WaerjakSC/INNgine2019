@@ -12,7 +12,7 @@ class QWidget;
 class RenderWindow;
 class QStandardItem;
 class QToolButton;
-namespace cjk {
+
 class HierarchyModel;
 class HierarchyView;
 class VerticalScrollArea;
@@ -20,7 +20,6 @@ class ComponentGroupBox;
 class ComponentList;
 class Registry;
 class ResourceManager;
-} // namespace cjk
 
 namespace Ui {
 class MainWindow;
@@ -69,26 +68,26 @@ private:
     void init();
     Ui::MainWindow *ui;
 
-    cjk::HierarchyModel *hierarchy;
-    cjk::HierarchyView *hView;
-    cjk::VerticalScrollArea *scrollArea;
-    cjk::ComponentList *mComponentList;
+    HierarchyModel *hierarchy;
+    HierarchyView *hView;
+    VerticalScrollArea *scrollArea;
+    ComponentList *mComponentList;
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
 
     quint32 unnamedEntityCount{0};
 
-    cjk::Registry *registry;
+    Registry *registry;
 
     bool mShowingMsg{false};
 
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void playButtons();
-    friend class cjk::ComponentList;
-    friend class cjk::ComponentGroupBox;
-    friend class cjk::HierarchyView;
-    friend class cjk::ResourceManager;
+    friend class ComponentList;
+    friend class ComponentGroupBox;
+    friend class HierarchyView;
+    friend class ResourceManager;
     friend class RenderWindow;
 };
 

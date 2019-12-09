@@ -9,7 +9,7 @@
 #include "skyboxshader.h"
 #include "textureshader.h"
 #include "view.h"
-namespace cjk {
+
 RenderSystem::RenderSystem() : registry{Registry::instance()}
 {
     [[maybe_unused]] auto group{registry->group<Transform, Material, Mesh>()}; // Creating a group early reduces initial cost of first-time creation.
@@ -99,7 +99,7 @@ void RenderSystem::toggleRendered(GLuint entityID)
 void RenderSystem::changeShader(const QString &nShader)
 {
     GLuint eID{registry->getSelectedEntity()};
-    Ref<Shader> shader{nullptr};
+    cjk::Ref<Shader> shader{nullptr};
     ResourceManager *factory{ResourceManager::instance()};
     if (nShader == "PlainShader")
         registry->view<Material>().get(eID).mShader = factory->getShader<ColorShader>();
@@ -110,4 +110,4 @@ void RenderSystem::changeShader(const QString &nShader)
     else if (nShader == "SkyboxShader")
         registry->view<Material>().get(eID).mShader = factory->getShader<SkyboxShader>();
 }
-} // namespace cjk
+

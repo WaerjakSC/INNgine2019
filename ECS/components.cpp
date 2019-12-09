@@ -1,9 +1,9 @@
 #include "components.h"
 #include "registry.h"
 #include "soundsystem.h"
-namespace cjk {
 
-Material::Material(Ref<Shader> shader, GLuint textureUnit, vec3 color, GLfloat specStr, GLint specExp)
+
+Material::Material(cjk::Ref<Shader> shader, GLuint textureUnit, vec3 color, GLfloat specStr, GLint specExp)
     : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
       mTextureUnit(textureUnit), mShader(shader)
 {
@@ -26,4 +26,4 @@ void ParticleEmitter::setNumParticles(size_t num)
     ResourceManager::instance()->initParticleEmitter(*this);
 }
 
-} // namespace cjk
+

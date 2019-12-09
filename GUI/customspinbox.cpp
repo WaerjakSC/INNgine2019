@@ -1,7 +1,7 @@
 #include "customspinbox.h"
 #include <QStyleFactory>
 #include <QWheelEvent>
-namespace cjk {
+
 CustomSpinBox::CustomSpinBox()
 {
     QStyle *fusion{QStyleFactory::create("fusion")};
@@ -10,4 +10,4 @@ CustomSpinBox::CustomSpinBox()
     setFocusPolicy(Qt::StrongFocus);
 }
 
-} // namespace cjk
+

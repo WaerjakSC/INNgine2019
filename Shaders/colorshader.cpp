@@ -1,6 +1,6 @@
 #include "colorshader.h"
 #include "innpch.h"
-namespace cjk {
+
 ColorShader::ColorShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
     : Shader{camController, "PlainShader", geometryPath}
 {
@@ -14,4 +14,4 @@ ColorShader::~ColorShader()
     qDebug() << "Deleting ColorShader";
 }
 
-} // namespace cjk
+

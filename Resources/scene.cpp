@@ -18,7 +18,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rendersystem.h>
 #include <sstream>
-namespace cjk {
+
 void Scene::saveScene(const QString &fileName)
 {
     if (fileName.isEmpty())
@@ -484,4 +484,4 @@ QString Scene::name() const
     return mName;
 }
 
-} // namespace cjk
+
