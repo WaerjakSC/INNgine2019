@@ -237,5 +237,3 @@ void Registry::loadSnapshot()
         transform.matrixOutdated = true;
     }
 }
-
-

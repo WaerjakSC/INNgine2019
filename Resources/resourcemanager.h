@@ -149,6 +149,7 @@ signals:
     void disablePlay(bool disable);
     void disablePause(bool disable);
     void disableStop(bool disable);
+    void addedMesh(GLuint entityID);
 
 private:
     // Private constructor

@@ -4,7 +4,6 @@
 #include <QStandardItemModel>
 class QMimeData;
 
-
 class HierarchyModel : public QStandardItemModel {
     Q_OBJECT
 public:
@@ -15,10 +14,10 @@ public slots:
 
 signals:
     void parentChanged(const QModelIndex &index);
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>{Qt::DisplayRole});
 
 protected:
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
 };
-
 
 #endif // HIERARCHYMODEL_H

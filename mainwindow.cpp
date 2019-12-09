@@ -106,6 +106,7 @@ void MainWindow::init()
     connect(registry, &Registry::entityCreated, this, &MainWindow::onEntityAdded);
     connect(registry, &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
     connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
+    connect(ResourceManager::instance(), &ResourceManager::addedMesh, this, &MainWindow::onMeshAdded);
 }
 void MainWindow::playButtons()
 {
@@ -359,6 +360,17 @@ void MainWindow::parentChanged(GLuint eID)
         item = new QStandardItem;
         item->setText(entt.name);
         item->setData(eID);
+        item->setCheckable(true);
+        auto view{registry->view<Mesh>()};
+        if (view.contains(eID)) {
+            auto &mesh{view.get(eID)};
+            if (mesh.mRendered) {
+                item->setCheckState(Qt::Checked);
+            }
+            else {
+                item->setCheckState(Qt::Unchecked);
+            }
+        }
         int parentID{registry->get<Transform>(eID).parentID};
         if (registry->hasParent(eID)) {
             QStandardItem *parent{hierarchy->itemFromEntityID(parentID)};
@@ -393,8 +405,7 @@ void MainWindow::onNameChanged(const QModelIndex &index)
     QString newName{hierarchy->data(index).toString()};
     GLuint selectedEntity{registry->getSelectedEntity()};
     auto &info{registry->get<EInfo>(selectedEntity)};
-    if (selectedEntity)
-        info.name = hierarchy->data(index).toString();
+    info.name = hierarchy->data(index).toString();
 }
 void MainWindow::onEntityAdded(GLuint eID)
 {
@@ -403,11 +414,27 @@ void MainWindow::onEntityAdded(GLuint eID)
     auto &info{registry->get<EInfo>(eID)};
     item->setText(info.name);
     item->setData(eID);
+    item->setCheckable(true);
     parentItem->appendRow(item);
 
     connect(registry, &Registry::nameChanged, this, &MainWindow::changeEntityName);
 }
-
+void MainWindow::onMeshAdded(GLuint eID)
+{
+    QStandardItem *item{hierarchy->itemFromEntityID(eID)};
+    if (!item)
+        return;
+    auto view{registry->view<Mesh>()};
+    if (view.contains(eID)) {
+        auto &mesh{view.get(eID)};
+        if (mesh.mRendered) {
+            item->setCheckState(Qt::Checked);
+        }
+        else {
+            item->setCheckState(Qt::Unchecked);
+        }
+    }
+}
 void MainWindow::onEntityRemoved(GLuint entity)
 {
     QStandardItem *item{hierarchy->itemFromEntityID(entity)};
@@ -437,6 +464,17 @@ void MainWindow::insertEntities()
         else
             item->setText(info.name);
         item->setData(entity);
+        item->setCheckable(true);
+        auto view{registry->view<Mesh>()};
+        if (view.contains(entity)) {
+            auto &mesh{view.get(entity)};
+            if (mesh.mRendered) {
+                item->setCheckState(Qt::Checked);
+            }
+            else {
+                item->setCheckState(Qt::Unchecked);
+            }
+        }
         if (registry->contains<Transform>(entity)) {
             int parentID{registry->get<Transform>(entity).parentID};
             if (parentID != -1) {

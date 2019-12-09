@@ -287,6 +287,7 @@ GLuint ResourceManager::makeXYZ(const QString &name)
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
     registry->add<Material>(eID, getShader<ColorShader>());
     makeXYZMesh(eID);
+    emit addedMesh(eID);
 
     return eID;
 }
@@ -748,6 +749,7 @@ void ResourceManager::addMeshComponent(std::string name, GLuint eID)
 {
     registry->add<Mesh>(eID);
     setMesh(name, eID);
+    emit addedMesh(eID);
 }
 void ResourceManager::setMesh(std::string name, GLuint eID)
 {
@@ -1202,7 +1204,6 @@ void ResourceManager::play()
             }
         }
         renderer->toggleRendered(0); // disables the XYZ indicators
-        mMainWindow->mRenderWindowContainer->setFocus();
         mIsPlaying = true;
 
         emit disableActions(true);

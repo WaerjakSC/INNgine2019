@@ -45,6 +45,7 @@ public slots:
     void mouseRayHit(int eID);
     void closeEngine();
 
+    void onMeshAdded(GLuint eID);
 private slots:
     void onEntityClicked(const QModelIndex &index);
 
