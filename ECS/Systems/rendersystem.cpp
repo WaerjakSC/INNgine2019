@@ -95,6 +95,18 @@ void RenderSystem::toggleRendered(GLuint entityID)
 {
     bool &isRendered{registry->view<Mesh>().get(entityID).mRendered};
     isRendered = !isRendered;
+    if (isRendered) {
+        emit newRenderedSignal(entityID, Qt::Checked);
+    }
+    else {
+        emit newRenderedSignal(entityID, Qt::Unchecked);
+    }
+}
+
+void RenderSystem::setRendered(GLuint entityID, bool nState)
+{
+    bool &isRendered{registry->view<Mesh>().get(entityID).mRendered};
+    isRendered = nState;
 }
 void RenderSystem::changeShader(const QString &nShader)
 {
@@ -110,4 +122,3 @@ void RenderSystem::changeShader(const QString &nShader)
     else if (nShader == "SkyboxShader")
         registry->view<Material>().get(eID).mShader = factory->getShader<SkyboxShader>();
 }
-

@@ -98,7 +98,7 @@ void MainWindow::init()
     //Set size of program in % of available screen
     resize(QGuiApplication::primaryScreen()->size() * 0.7);
 
-    connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onNameChanged);
+    connect(hierarchy, &HierarchyModel::dataChanged, this, &MainWindow::onDataChanged);
     connect(hierarchy, &HierarchyModel::parentChanged, this, &MainWindow::onParentChanged);
     connect(hView, &HierarchyView::clicked, this, &MainWindow::onEntityClicked);
 
@@ -107,6 +107,7 @@ void MainWindow::init()
     connect(registry, &Registry::entityRemoved, hierarchy, &HierarchyModel::removeEntity);
     connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
     connect(ResourceManager::instance(), &ResourceManager::addedMesh, this, &MainWindow::onMeshAdded);
+    connect(this, &MainWindow::renderStatus, mRenderWindow, &RenderWindow::toggleRendered);
 }
 void MainWindow::playButtons()
 {
@@ -384,8 +385,10 @@ void MainWindow::parentChanged(GLuint eID)
 }
 void MainWindow::onEntityClicked(const QModelIndex &index)
 {
-    GLuint eID{hierarchy->itemFromIndex(index)->data().toUInt()};
+    QStandardItem *item{hierarchy->itemFromIndex(index)};
+    GLuint eID{item->data().toUInt()};
     emit selectedEntity(eID);
+    emit renderStatus(item->checkState());
     mComponentList->setupComponentList();
 }
 void MainWindow::mouseRayHit(int eID)
@@ -400,12 +403,30 @@ void MainWindow::mouseRayHit(int eID)
     registry->setSelectedEntity(eID);
     mComponentList->setupComponentList();
 }
-void MainWindow::onNameChanged(const QModelIndex &index)
+void MainWindow::onDataChanged(const QModelIndex &index, const QModelIndex &otherIndex, const QVector<int> roles)
 {
+    Q_UNUSED(otherIndex);
     QString newName{hierarchy->data(index).toString()};
     GLuint selectedEntity{registry->getSelectedEntity()};
-    auto &info{registry->get<EInfo>(selectedEntity)};
-    info.name = hierarchy->data(index).toString();
+    if (roles[0] == Qt::CheckStateRole) {
+        QStandardItem *item{hierarchy->itemFromIndex(index)};
+        auto view{registry->view<Mesh>()};
+        auto &mesh{view.get(selectedEntity)};
+        switch (item->checkState()) {
+        case Qt::Checked:
+            mesh.mRendered = true;
+            break;
+        case Qt::Unchecked:
+            mesh.mRendered = false;
+            break;
+        default:
+            break;
+        }
+    }
+    else {
+        auto &info{registry->get<EInfo>(selectedEntity)};
+        info.name = hierarchy->data(index).toString();
+    }
 }
 void MainWindow::onEntityAdded(GLuint eID)
 {
@@ -434,6 +455,14 @@ void MainWindow::onMeshAdded(GLuint eID)
             item->setCheckState(Qt::Unchecked);
         }
     }
+}
+
+void MainWindow::updateRenderedCheckBox(GLuint entityID, Qt::CheckState state)
+{
+    QStandardItem *item{hierarchy->itemFromEntityID(entityID)};
+    if (!item)
+        return;
+    item->setCheckState(state);
 }
 void MainWindow::onEntityRemoved(GLuint entity)
 {

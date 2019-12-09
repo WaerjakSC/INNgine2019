@@ -379,7 +379,7 @@ private:
     std::vector<GroupData *> mGroups{};
     void newGeneration(GLuint id, const QString &text);
 
-    GLuint mSelectedEntity;
+    GLuint mSelectedEntity{0};
     std::tuple<std::vector<GLuint>, std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>

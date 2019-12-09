@@ -50,5 +50,3 @@ QStandardItem *HierarchyModel::itemFromEntityID(GLuint eID)
     }
     return nullptr;
 }
-
-

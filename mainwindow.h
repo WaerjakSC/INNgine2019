@@ -40,16 +40,20 @@ signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
     void selectedEntity(GLuint eID);
+    void renderStatus(Qt::CheckState state);
+
 public slots:
     void parentChanged(GLuint eID);
     void mouseRayHit(int eID);
     void closeEngine();
 
     void onMeshAdded(GLuint eID);
+
+    void updateRenderedCheckBox(GLuint entityID, Qt::CheckState state);
 private slots:
     void onEntityClicked(const QModelIndex &index);
 
-    void onNameChanged(const QModelIndex &index);
+    void onDataChanged(const QModelIndex &index, const QModelIndex &otherIndex = QModelIndex(), const QVector<int> roles = QVector<int>());
     void onEntityAdded(GLuint entity);
     void onEntityRemoved(GLuint entity);
 

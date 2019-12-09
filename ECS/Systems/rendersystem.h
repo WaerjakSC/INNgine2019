@@ -31,6 +31,9 @@ public slots:
      * @param entityID
      */
     void toggleRendered(GLuint entityID);
+    void setRendered(GLuint entityID, bool nState);
+signals:
+    void newRenderedSignal(GLuint entityID, Qt::CheckState nState);
 
 private:
     Registry *registry;
@@ -48,6 +51,5 @@ private:
     void drawSkybox();
     void Cull(const Camera::Frustum &f);
 };
-
 
 #endif // RENDERSYSTEM_H

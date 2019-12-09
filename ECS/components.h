@@ -219,6 +219,7 @@ struct Input : public Component {
     bool RIGHT{false};
 
     bool F{false};
+    bool H{false};
     bool C{false};
     bool L{false};
     bool ESCAPE{false};

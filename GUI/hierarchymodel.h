@@ -9,12 +9,11 @@ class HierarchyModel : public QStandardItemModel {
 public:
     HierarchyModel();
     QStandardItem *itemFromEntityID(GLuint eID);
+
 public slots:
     void removeEntity(GLuint eID);
-
 signals:
     void parentChanged(const QModelIndex &index);
-    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>{Qt::DisplayRole});
 
 protected:
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;

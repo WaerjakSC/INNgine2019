@@ -31,5 +31,4 @@ private:
     void setController();
 };
 
-
 #endif // HIERARCHYVIEW_H

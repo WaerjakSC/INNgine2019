@@ -157,6 +157,8 @@ void RenderWindow::init()
 
     connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
     connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
+    connect(mInputSystem.get(), &InputSystem::toggleRendered, mRenderer.get(), &RenderSystem::toggleRendered);
+    connect(mRenderer.get(), &RenderSystem::newRenderedSignal, mMainWindow, &MainWindow::updateRenderedCheckBox);
 }
 
 ///Called each frame - doing the rendering
@@ -251,6 +253,21 @@ void RenderWindow::toggleWireframe()
 void RenderWindow::toggleXYZ()
 {
     mRenderer->toggleRendered(xyz);
+}
+
+void RenderWindow::toggleRendered(Qt::CheckState state)
+{
+    GLuint entityID{mRegistry->getSelectedEntity()};
+    switch (state) {
+    case Qt::Checked:
+        mRenderer->setRendered(entityID, true);
+        break;
+    case Qt::Unchecked:
+        mRenderer->setRendered(entityID, false);
+        break;
+    default:
+        break;
+    }
 }
 void RenderWindow::togglePlaneDebugMode(bool trigger)
 {

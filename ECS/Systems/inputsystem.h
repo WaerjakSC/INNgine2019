@@ -57,6 +57,7 @@ public slots:
 signals:
     void rayHitEntity(GLuint entityID);
     void closeEngine();
+    void toggleRendered(GLuint entityID);
 
 private:
     /**

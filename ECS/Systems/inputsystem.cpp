@@ -55,7 +55,7 @@ void InputSystem::reset()
 }
 void InputSystem::snapToObject()
 {
-    GLuint eID = registry->getSelectedEntity();
+    GLuint eID{registry->getSelectedEntity()};
     if (registry->contains<Transform>(eID)) {
         MovementSystem *moveSystem{registry->system<MovementSystem>().get()};
         mEditorCamController->goTo(moveSystem->getAbsolutePosition(eID));
@@ -78,6 +78,13 @@ void InputSystem::handleKeyInput()
     if (editorInput.CTRL && editorInput.S) {
         if (!factory->isPlaying())
             factory->save();
+    }
+    if (editorInput.H) {
+        GLuint eID{registry->getSelectedEntity()};
+        if (eID != 0) {
+            emit toggleRendered(eID);
+            editorInput.H = false;
+        }
     }
     if (mPlayerController.F1) {
         mIsConfined = false;
@@ -368,6 +375,9 @@ void InputSystem::inputKeyPress(QKeyEvent *event, Input &input)
     case Qt::Key_L:
         input.L = true;
         break;
+    case Qt::Key_H:
+        input.H = true;
+        break;
     case Qt::Key_F:
         input.F = true;
         break;
@@ -419,6 +429,9 @@ void InputSystem::inputKeyRelease(QKeyEvent *event, Input &input)
     switch (event->key()) {
     case Qt::Key_L:
         input.L = false;
+        break;
+    case Qt::Key_H:
+        input.H = false;
         break;
     case Qt::Key_F:
         input.F = false;

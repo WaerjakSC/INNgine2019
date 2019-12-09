@@ -51,6 +51,7 @@ public:
 public slots:
     void toggleWireframe();
     void toggleXYZ();
+    void toggleRendered(Qt::CheckState state);
 
     void togglePlaneDebugMode(bool trigger);
 private slots:

@@ -77,5 +77,3 @@ void HierarchyView::mousePressEvent(QMouseEvent *event)
         rightClickEntity = item->data(257).toUInt();
     }
 }
-
-
