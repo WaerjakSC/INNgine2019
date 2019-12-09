@@ -363,7 +363,6 @@ void Scene::populateScene(const Document &scene)
                     else
                         parentID[id] = comp->value["parent"].GetInt(); // if not, add it to the list of parent/child pairs that must be updated after the loop
                 }
-                registry->system<MovementSystem>()->updateEntity(id); // Note: Not sure about this line, but for now it should ensure that all transforms are correct as soon as they are created
             }
             else if (comp->name == "material") {
                 vec3 color{comp->value["color"][0].GetFloat(), comp->value["color"][1].GetFloat(), comp->value["color"][2].GetFloat()};
@@ -483,5 +482,3 @@ QString Scene::name() const
 {
     return mName;
 }
-
-

@@ -134,18 +134,6 @@ void MovementSystem::updateBillBoardTransformPrivate(const BillBoard &billboard,
     transform.localRotation = std::get<2>(gsl::Matrix4x4::decomposed(transform.rotationMatrix));
     transform.matrixOutdated = true;
 }
-void MovementSystem::updateEntity(GLuint eID)
-{
-    auto &comp{registry->view<Transform>().get(eID)};
-    comp.matrixOutdated = true;
-    updateModelMatrix(eID);
-    for (auto child : comp.children)
-        updateEntity(child);
-    if (registry->contains<AABB>(eID))
-        updateAABBTransform(eID);
-    if (registry->contains<Sphere>(eID))
-        updateSphereTransform(eID);
-}
 
 gsl::Matrix4x4 MovementSystem::getTRMatrix(const Transform &comp)
 {

@@ -810,9 +810,6 @@ void ComponentList::setPositionX(double xIn)
         movement->setAbsolutePositionX(entityID, xIn, false);
     else
         movement->setLocalPositionX(entityID, xIn, false);
-
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setPositionY(double yIn)
 {
@@ -822,8 +819,6 @@ void ComponentList::setPositionY(double yIn)
         movement->setAbsolutePositionY(entityID, yIn, false);
     else
         movement->setLocalPositionY(entityID, yIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setPositionZ(double zIn)
 {
@@ -833,56 +828,42 @@ void ComponentList::setPositionZ(double zIn)
         movement->setAbsolutePositionZ(entityID, zIn, false);
     else
         movement->setLocalPositionZ(entityID, zIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setRotationX(double xIn)
 {
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationX(entityID, xIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setRotationY(double yIn)
 {
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationY(entityID, yIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setRotationZ(double zIn)
 {
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setRotationZ(entityID, zIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setScaleX(double xIn)
 {
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleX(entityID, xIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setScaleY(double yIn)
 {
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleY(entityID, yIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 void ComponentList::setScaleZ(double zIn)
 {
     auto movement{registry->system<MovementSystem>()};
     GLuint entityID{registry->getSelectedEntity()};
     movement->setScaleZ(entityID, zIn, false);
-    if (!ResourceManager::instance()->isPlaying())
-        movement->updateEntity(entityID);
 }
 
 QComboBox *ComponentList::makeObjectTypeBox(QGroupBox *objectTypeBox, const Collision &col)

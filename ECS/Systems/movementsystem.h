@@ -17,12 +17,6 @@ public:
     void update(DeltaTime = 0.016) override;
     void init();
     /**
-     * @brief updateEntity Force update of matrix to an entity,
-     * for instance when the editor is not in play but something still needs to be updated.
-     * @param eID ID of the entity
-     */
-    void updateEntity(GLuint eID);
-    /**
      * @brief getAbsolutePosition Get the absolute position of the entity from the entity's model matrix.
      * @param eID
      * @return vec3 containing the XYZ position of the entity
@@ -175,6 +169,5 @@ private:
 
     void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
 };
-
 
 #endif // MOVEMENTSYSTEM_H
