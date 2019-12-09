@@ -5,7 +5,7 @@ namespace cjk {
 CustomDoubleSpinBox::CustomDoubleSpinBox(const std::optional<float> &minRange, const std::optional<float> &maxRange)
 {
     QStyle *fusion{QStyleFactory::create("fusion")};
-    setDecimals(1);
+    setDecimals(2);
     setRange(minRange.value_or(-5000), maxRange.value_or(5000));
     setMaximumWidth(58);
     setStyle(fusion);
