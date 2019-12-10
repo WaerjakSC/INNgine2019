@@ -50,14 +50,13 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         }
     }
 
-    auto twrview{registry->view<TowerComponent>()};
-    for (auto entity : twrview) {
-        auto &aicomponent{twrview.get(entity)};
-
+    auto towerView{registry->view<TowerComponent, Sphere>()};
+    for (auto entity : towerView) {
+        auto [aicomponent, sphere]{towerView.get<TowerComponent, Sphere>(entity)};
         switch (twrstate) {
         case TWRstates::IDLE:
             // scanning for monsters
-            detectEnemies(aicomponent);
+            detectEnemies(aicomponent, sphere);
             break;
         case TWRstates::ATTACK:
             // kill goblin
@@ -103,9 +102,13 @@ void AISystem::spawnWave(DeltaTime dt)
         curSpawnCD = spawnCD;
     }
 }
-void AISystem::detectEnemies(TowerComponent &ai)
+void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
-
+    if(!sphere.overlappedEntities.empty()){
+        ai.targetID = sphere.overlappedEntities.getList()[0];
+    } else {
+        twrstate = IDLE;
+    }
     // if(!(list.empty())
     // pick random from list
     // save it in targetID

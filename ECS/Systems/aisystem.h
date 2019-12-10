@@ -42,8 +42,8 @@ private:
     BSplineCurve mCurve;
     Registry *registry;
 
-    // FSM twr
-    void detectEnemies(TowerComponent &ai);
+    // FSM tower
+    void detectEnemies(TowerComponent &ai, Sphere &sphere);
     void attack(TowerComponent &ai);
 
     TWRstates twrstate{TWRstates::IDLE};

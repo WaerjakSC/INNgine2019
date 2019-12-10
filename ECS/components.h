@@ -354,7 +354,7 @@ enum class NPCevents { ENDPOINT_ARRIVED,
                        ITEM_TAKEN,
                        DAMAGE_TAKEN };
 
-enum class TWRstates { IDLE,
+enum class TowerStates { IDLE,
                        ATTACK,
                        COOLDOWN };
 
@@ -378,6 +378,8 @@ struct TowerComponent : public Component {
     float attackSpeed;
     float cooldown;
     GLuint targetID;
+    TowerStates state = TowerStates::IDLE;
+    AttackType attackState = AttackType::PHYSICAL;
 };
 // BASE
 struct PlayerComponent : public Component {
