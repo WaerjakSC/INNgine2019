@@ -114,8 +114,13 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 
 void AISystem::attack(TowerComponent &ai)
 {
+    // Splash/Rocket type
     // BSpline from Tower to Enemy entity,
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
+
+    // Standard/Projectile type
+    GLuint bulletID = registry->makeEntity("bullet");
+    registry->add<Bullet>(bulletID);
 }
 
 /**

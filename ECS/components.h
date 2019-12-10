@@ -389,4 +389,12 @@ struct PlayerComponent : public Component {
     int kills = 0;
 };
 
+struct Bullet : public Component {
+    Bullet(){}
+    Bullet(vec3 route, int d, float s) : destination(route), damage(d), speed(s) {}
+    vec3 destination;
+    int damage;
+    float speed;
+};
+
 #endif // COMPONENT_H
