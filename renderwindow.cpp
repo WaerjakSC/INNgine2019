@@ -255,9 +255,8 @@ void RenderWindow::toggleXYZ()
     mRenderer->toggleRendered(xyz);
 }
 
-void RenderWindow::toggleRendered(Qt::CheckState state)
+void RenderWindow::toggleRendered(Qt::CheckState state, GLuint entityID)
 {
-    GLuint entityID{mRegistry->getSelectedEntity()};
     switch (state) {
     case Qt::Checked:
         mRenderer->setRendered(entityID, true);

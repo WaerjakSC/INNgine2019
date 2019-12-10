@@ -40,7 +40,7 @@ signals:
     void made3DObject(GLuint eID);
     void goToLoc(GLuint eID);
     void selectedEntity(GLuint eID);
-    void renderStatus(Qt::CheckState state);
+    void renderStatus(Qt::CheckState state, GLuint entityID);
 
 public slots:
     void parentChanged(GLuint eID);
@@ -80,7 +80,7 @@ private:
     QWidget *mRenderWindowContainer;
     RenderWindow *mRenderWindow;
 
-    quint32 unnamedEntityCount{0};
+    int IDRole{257};
 
     Registry *registry;
 

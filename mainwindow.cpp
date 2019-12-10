@@ -292,14 +292,14 @@ void MainWindow::createActions()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_F)
-        mRenderWindow->keyPressEvent(event);
+    //    if (event->key() == Qt::Key_F)
+    mRenderWindow->keyPressEvent(event);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_F)
-        mRenderWindow->keyReleaseEvent(event);
+    //    if (event->key() == Qt::Key_F)
+    mRenderWindow->keyReleaseEvent(event);
 }
 
 void MainWindow::clearEditor()
@@ -332,7 +332,7 @@ void MainWindow::makeCube()
 }
 void MainWindow::onParentChanged(const QModelIndex &newParent)
 {
-    int data{hierarchy->data(newParent, 257).toInt()};
+    int data{hierarchy->data(newParent, IDRole).toInt()};
     GLuint selectedEntity{registry->getSelectedEntity()};
     if (data >= 0) {
         GLuint parent{static_cast<GLuint>(data)};
@@ -358,7 +358,7 @@ void MainWindow::parentChanged(GLuint eID)
         auto &entt{registry->get<EInfo>(eID)};
         item = new QStandardItem;
         item->setText(entt.name);
-        item->setData(eID);
+        item->setData(eID, IDRole);
         item->setCheckable(true);
         auto view{registry->view<Mesh>()};
         if (view.contains(eID)) {
@@ -383,9 +383,8 @@ void MainWindow::parentChanged(GLuint eID)
 void MainWindow::onEntityClicked(const QModelIndex &index)
 {
     QStandardItem *item{hierarchy->itemFromIndex(index)};
-    GLuint eID{item->data().toUInt()};
+    GLuint eID{item->data(IDRole).toUInt()};
     emit selectedEntity(eID);
-    emit renderStatus(item->checkState());
     mComponentList->setupComponentList();
 }
 void MainWindow::mouseRayHit(int eID)
@@ -403,12 +402,11 @@ void MainWindow::mouseRayHit(int eID)
 void MainWindow::onDataChanged(const QModelIndex &index, const QModelIndex &otherIndex, const QVector<int> roles)
 {
     Q_UNUSED(otherIndex);
-    QString newName{hierarchy->data(index).toString()};
-    GLuint selectedEntity{registry->getSelectedEntity()};
+    GLuint entity{hierarchy->data(index, IDRole).toUInt()};
     if (roles[0] == Qt::CheckStateRole) {
         QStandardItem *item{hierarchy->itemFromIndex(index)};
         auto view{registry->view<Mesh>()};
-        auto &mesh{view.get(selectedEntity)};
+        auto &mesh{view.get(entity)};
         switch (item->checkState()) {
         case Qt::Checked:
             mesh.mRendered = true;
@@ -419,9 +417,10 @@ void MainWindow::onDataChanged(const QModelIndex &index, const QModelIndex &othe
         default:
             break;
         }
+        emit renderStatus(item->checkState(), entity);
     }
     else {
-        auto &info{registry->get<EInfo>(selectedEntity)};
+        auto &info{registry->get<EInfo>(entity)};
         info.name = hierarchy->data(index).toString();
     }
 }
@@ -431,7 +430,7 @@ void MainWindow::onEntityAdded(GLuint eID)
     QStandardItem *item{new QStandardItem};
     auto &info{registry->get<EInfo>(eID)};
     item->setText(info.name);
-    item->setData(eID);
+    item->setData(eID, IDRole);
     item->setCheckable(true);
     parentItem->appendRow(item);
 
@@ -486,10 +485,10 @@ void MainWindow::insertEntities()
             continue;
         QStandardItem *item{new QStandardItem};
         if (info.name == "")
-            item->setText(QString("Entity" + QString::number(unnamedEntityCount)));
+            item->setText(QString("Entity"));
         else
             item->setText(info.name);
-        item->setData(entity);
+        item->setData(entity, IDRole);
         item->setCheckable(true);
         auto view{registry->view<Mesh>()};
         if (view.contains(entity)) {
