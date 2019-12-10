@@ -3,13 +3,13 @@
 #include "registry.h"
 #include "resourcemanager.h"
 
-SoundSystem::SoundSystem() : reg{Registry::instance()}
+SoundSystem::SoundSystem() : registry{Registry::instance()}
 {
 }
 
 void SoundSystem::cleanUp()
 {
-    auto view{reg->view<Sound>()};
+    auto view{registry->view<Sound>()};
     for (auto entity : view) {
         Sound &sound{view.get(entity)};
         deleteSound(sound);
@@ -27,7 +27,7 @@ void SoundSystem::deleteSound(Sound &sound)
 }
 void SoundSystem::init(GLuint entity)
 {
-    auto view{reg->view<Transform, Sound>()};
+    auto view{registry->view<Transform, Sound>()};
     auto [trans, sound]{view.get<Transform, Sound>(entity)};
     auto factory{ResourceManager::instance()};
 
@@ -50,7 +50,7 @@ void SoundSystem::init(GLuint entity)
 void SoundSystem::update(DeltaTime)
 {
     updateListener();
-    auto view{reg->view<Transform, Sound>()};
+    auto view{registry->view<Transform, Sound>()};
     for (auto entity : view) {
         auto &sound{view.get<Sound>(entity)};
         if (!sound.initialized) {
@@ -61,7 +61,7 @@ void SoundSystem::update(DeltaTime)
 }
 void SoundSystem::updatePlayOnly()
 {
-    auto view{reg->view<Transform, Sound>()};
+    auto view{registry->view<Transform, Sound>()};
     for (auto entity : view) {
         const auto &transform{view.get<Transform>(entity)};
         if (transform.matrixOutdated) // keep in mind this check only works if soundsystem's "updatePlayOnly" function runs before movesystem
@@ -70,7 +70,7 @@ void SoundSystem::updatePlayOnly()
 }
 void SoundSystem::refreshSounds()
 {
-    auto view{reg->view<Transform, Sound>()};
+    auto view{registry->view<Transform, Sound>()};
     for (auto entity : view) {
         auto &sound{view.get<Sound>(entity)};
         if (sound.outDated) {
@@ -99,9 +99,9 @@ void SoundSystem::stop(Sound &sound)
 }
 void SoundSystem::playAll()
 {
-    auto view{reg->view<Sound>()};
+    auto view{registry->view<Sound>()};
     for (auto entity : view) {
-        Sound &sound{reg->get<Sound>(entity)};
+        Sound &sound{registry->get<Sound>(entity)};
         sound.playing = true;
         sound.paused = false;
         sound.outDated = true;
@@ -109,9 +109,9 @@ void SoundSystem::playAll()
 }
 void SoundSystem::pauseAll()
 {
-    auto view{reg->view<Sound>()};
+    auto view{registry->view<Sound>()};
     for (auto entity : view) {
-        Sound &sound{reg->get<Sound>(entity)};
+        Sound &sound{registry->get<Sound>(entity)};
         sound.playing = false;
         sound.paused = true;
         sound.outDated = true;
@@ -119,9 +119,9 @@ void SoundSystem::pauseAll()
 }
 void SoundSystem::stopAll()
 {
-    auto view{reg->view<Sound>()};
+    auto view{registry->view<Sound>()};
     for (auto entity : view) {
-        Sound &sound{reg->get<Sound>(entity)};
+        Sound &sound{registry->get<Sound>(entity)};
         sound.playing = false;
         sound.paused = false;
         sound.outDated = true;
@@ -130,13 +130,13 @@ void SoundSystem::stopAll()
 
 void SoundSystem::setPosition(GLuint eID, vec3 newPos)
 {
-    Sound &sound{reg->get<Sound>(eID)};
+    Sound &sound{registry->get<Sound>(eID)};
     ALfloat temp[3] = {newPos.x, newPos.y, newPos.z};
     alSourcefv(sound.source, AL_POSITION, temp);
 }
 void SoundSystem::setVelocity(GLuint eID, vec3 newVel)
 {
-    Sound &sound{reg->get<Sound>(eID)};
+    Sound &sound{registry->get<Sound>(eID)};
     sound.velocity = newVel;
     ALfloat temp[3] = {newVel.x, newVel.y, newVel.z};
     alSourcefv(sound.source, AL_VELOCITY, temp);
@@ -193,4 +193,3 @@ bool SoundSystem::checkError(std::string name)
     }
     return true;
 }
-

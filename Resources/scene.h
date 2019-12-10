@@ -1,8 +1,14 @@
 #ifndef SCENE_H
 #define SCENE_H
-#include "gsl_math.h"
+#include "gltypes.h"
 #include "rapidjson/document.h"
+#include <QString>
+#include <map>
 #include <memory>
+
+namespace gsl {
+class Vector3D;
+}
 
 using namespace rapidjson;
 class ResourceManager;

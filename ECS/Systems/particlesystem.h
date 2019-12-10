@@ -1,13 +1,15 @@
 #ifndef PARTICLESYSTEM_H
 #define PARTICLESYSTEM_H
+#include "core.h"
 #include "isystem.h"
-#include "pool.h"
+#include "vector3d.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <random>
 
-struct ParticleEmitter;
 class ParticleShader;
 class Registry;
+struct ParticleEmitter;
+struct Transform;
 class ParticleSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
     using vec3 = gsl::Vector3D;

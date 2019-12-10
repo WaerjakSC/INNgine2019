@@ -1,15 +1,16 @@
 #ifndef INPUTSYSTEM_H
 #define INPUTSYSTEM_H
+#include "components.h"
 #include "core.h"
 #include "isystem.h"
-#include "pool.h"
 class RenderWindow;
-
 class Registry;
 class ResourceManager;
-class MovementSystem;
 class CameraController;
 class GameCameraController;
+class QKeyEvent;
+class QMouseEvent;
+class QWheelEvent;
 class InputSystem : public QObject, public ISystem {
     Q_OBJECT
     using vec3 = gsl::Vector3D;

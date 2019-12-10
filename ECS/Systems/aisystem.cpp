@@ -1,10 +1,8 @@
 #include "aisystem.h"
-#include "components.h"
-#include "gsl_math.h"
-#include "movementsystem.h"
 #include "registry.h"
+#include "resourcemanager.h"
 
-AISystem::AISystem()
+AISystem::AISystem() : registry(Registry::instance())
 {
 }
 
@@ -35,17 +33,17 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         eventHandler(ai);
         std::optional<NPCevents> event;
         switch (ai.state) {
-        case MOVE:
+        case NPCstates::MOVE:
             event = move(dt, ai, transform);
             if (event) {
                 ai.notification_queue.push(event.value());
             }
             break;
-        case DEATH:
+        case NPCstates::DEATH:
             // Whatever happens when gnomes die
             death(entity);
             break;
-        case GOAL_REACHED:
+        case NPCstates::GOAL_REACHED:
             // implement this for folder
             goalReached(entity);
             break;
@@ -57,15 +55,15 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         auto &aicomponent{twrview.get(entity)};
 
         switch (twrstate) {
-        case IDLE:
+        case TWRstates::IDLE:
             // scanning for monsters
             detectEnemies(aicomponent);
             break;
-        case ATTACK:
+        case TWRstates::ATTACK:
             // kill goblin
             attack(aicomponent);
             break;
-        case COOLDOWN:
+        case TWRstates::COOLDOWN:
             // cooldown
             break;
         }
@@ -126,12 +124,12 @@ void AISystem::eventHandler(AIComponent &ai)
     while (!ai.notification_queue.empty()) {
         auto event = ai.notification_queue.front();
         switch (event) {
-        case ENDPOINT_ARRIVED:
-            ai.state = GOAL_REACHED;
+        case NPCevents::ENDPOINT_ARRIVED:
+            ai.state = NPCstates::GOAL_REACHED;
             break;
-        case DAMAGE_TAKEN:
+        case NPCevents::DAMAGE_TAKEN:
             if (ai.health <= 0) {
-                ai.state = DEATH;
+                ai.state = NPCstates::DEATH;
             }
             break;
         default:
@@ -184,7 +182,7 @@ std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform
 
     if (endPoint) {
         // remove 1 hp from player
-        return ENDPOINT_ARRIVED;
+        return NPCevents::ENDPOINT_ARRIVED;
     }
 
     return {};
@@ -266,5 +264,3 @@ void AISystem::setControlPoints(std::vector<vec3> cps)
 {
     mCurve.setControlPoints(cps);
 }
-
-

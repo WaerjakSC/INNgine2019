@@ -1,14 +1,13 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
+#include "components.h"
 #include "group.h"
 #include "isystem.h"
 #include "pool.h"
 #include "view.h"
 
-#include "resourcemanager.h"
 #include <functional>
-#include <memory>
 #include <typeinfo>
 #include <unordered_set>
 

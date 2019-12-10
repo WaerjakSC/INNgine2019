@@ -1,9 +1,7 @@
 #ifndef COMPONENTLIST_H
 #define COMPONENTLIST_H
-#include "collisionsystem.h"
 #include "gltypes.h"
 #include "registry.h"
-#include "resourcemanager.h"
 #include <QColor>
 #include <QWidget>
 class QLabel;

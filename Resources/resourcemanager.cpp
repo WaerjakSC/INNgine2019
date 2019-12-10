@@ -1061,7 +1061,7 @@ std::map<std::string, cjk::Ref<Shader>> ResourceManager::getShaders() const
 void ResourceManager::showMessage(const QString &message)
 {
     mMainWindow->statusBar()->showMessage(message, 1000);
-    mMainWindow->mShowingMsg = true;
+    mMainWindow->setShowingMsg(true);
     QTimer::singleShot(1000, this, &ResourceManager::changeMsg);
 }
 
@@ -1076,8 +1076,7 @@ bool ResourceManager::isPlaying() const
 }
 void ResourceManager::changeMsg()
 {
-    bool &msg = mMainWindow->mShowingMsg;
-    msg = !msg;
+    mMainWindow->setShowingMsg(!mMainWindow->showingMsg());
 }
 
 ALCcontext *ResourceManager::context() const

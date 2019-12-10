@@ -1,5 +1,4 @@
 #include "hierarchymodel.h"
-#include "registry.h"
 #include <QDebug>
 #include <QMimeData>
 

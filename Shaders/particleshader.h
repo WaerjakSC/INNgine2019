@@ -4,7 +4,9 @@
 #include "shader.h"
 
 struct ParticleEmitter;
-
+namespace gsl {
+class Vector3D;
+}
 class ParticleShader : public Shader {
     using vec3 = gsl::Vector3D;
 

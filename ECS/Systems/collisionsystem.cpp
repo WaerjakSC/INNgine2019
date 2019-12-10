@@ -309,7 +309,6 @@ void CollisionSystem::setOriginX(double xIn)
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.x = xIn;
     aabb.transform.matrixOutdated = true;
-    emit updateAABB(entityID);
 }
 void CollisionSystem::setOriginY(double yIn)
 {
@@ -317,7 +316,6 @@ void CollisionSystem::setOriginY(double yIn)
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.y = yIn;
     aabb.transform.matrixOutdated = true;
-    emit updateAABB(entityID);
 }
 void CollisionSystem::setOriginZ(double zIn)
 {
@@ -325,7 +323,6 @@ void CollisionSystem::setOriginZ(double zIn)
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.origin.z = zIn;
     aabb.transform.matrixOutdated = true;
-    emit updateAABB(entityID);
 }
 void CollisionSystem::setAABBSizeX(double xIn)
 {
@@ -333,7 +330,6 @@ void CollisionSystem::setAABBSizeX(double xIn)
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.x = xIn;
     aabb.transform.matrixOutdated = true;
-    emit updateAABB(entityID);
 }
 void CollisionSystem::setAABBSizeY(double yIn)
 {
@@ -341,7 +337,6 @@ void CollisionSystem::setAABBSizeY(double yIn)
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.y = yIn;
     aabb.transform.matrixOutdated = true;
-    emit updateAABB(entityID);
 }
 void CollisionSystem::setAABBSizeZ(double zIn)
 {
@@ -349,7 +344,6 @@ void CollisionSystem::setAABBSizeZ(double zIn)
     auto &aabb{registry->get<AABB>(entityID)};
     aabb.size.z = zIn;
     aabb.transform.matrixOutdated = true;
-    emit updateAABB(entityID);
 }
 void CollisionSystem::setSpherePositionX(double xIn)
 {
@@ -357,7 +351,6 @@ void CollisionSystem::setSpherePositionX(double xIn)
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.x = xIn;
     sphere.transform.matrixOutdated = true;
-    emit updateSphere(entityID);
 }
 void CollisionSystem::setSpherePositionY(double yIn)
 {
@@ -365,7 +358,6 @@ void CollisionSystem::setSpherePositionY(double yIn)
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.y = yIn;
     sphere.transform.matrixOutdated = true;
-    emit updateSphere(entityID);
 }
 void CollisionSystem::setSpherePositionZ(double zIn)
 {
@@ -373,7 +365,6 @@ void CollisionSystem::setSpherePositionZ(double zIn)
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.position.z = zIn;
     sphere.transform.matrixOutdated = true;
-    emit updateSphere(entityID);
 }
 void CollisionSystem::setSphereRadius(double radius)
 {
@@ -381,7 +372,6 @@ void CollisionSystem::setSphereRadius(double radius)
     auto &sphere{registry->get<Sphere>(entityID)};
     sphere.radius = radius;
     sphere.transform.matrixOutdated = true;
-    emit updateSphere(entityID);
 }
 void CollisionSystem::setObjectType(int index)
 {

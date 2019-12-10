@@ -6,19 +6,21 @@
 #include "constants.h"
 #include "customdoublespinbox.h"
 #include "customspinbox.h"
-#include "hierarchymodel.h"
-#include "hierarchyview.h"
 #include "inputsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
 #include "particlesystem.h"
 #include "rendersystem.h"
+#include "resourcemanager.h"
 #include "verticalscrollarea.h"
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QStyleFactory>
@@ -121,16 +123,12 @@ void ComponentList::addAABBCollider()
         auto &trans{registry->get<Transform>(selectedEntity)};
         auto &aabb{registry->get<AABB>(selectedEntity)};
         aabb.size = vec3{trans.localScale.x / 2, trans.localScale.y / 2, trans.localScale.z / 2};
-        registry->system<MovementSystem>()->updateAABBTransform(selectedEntity);
     }
 }
 
 void ComponentList::addSphereCollider()
 {
     addCollider<Sphere>();
-    GLuint selectedEntity{registry->getSelectedEntity()};
-
-    registry->system<MovementSystem>()->updateSphereTransform(selectedEntity);
 }
 
 void ComponentList::setupGameCameraSettings(const GameCamera &cam)

@@ -1,14 +1,10 @@
 #ifndef POOL_H
 #define POOL_H
 
-#include "components.h"
 #include "core.h"
 #include "sparseset.h"
-#include <QObject>
-#include <memory>
 #include <vector>
 
-struct GroupData;
 class IPool {
 public:
     class iterator;
@@ -19,7 +15,6 @@ public:
     virtual void swap(const GLuint lhs, const GLuint rhs) = 0;
     virtual int find(const GLuint eID) const = 0;
     virtual bool has(const GLuint eID) const = 0;
-    //    virtual bool has(const Entity &entity) const = 0;
     virtual const GLuint *entities() const = 0;
     virtual const int &index(GLuint entityID) const = 0;
     virtual size_t size() const = 0;
@@ -365,7 +360,5 @@ private:
     std::vector<Type> mComponents;
     SparseSet mEntities;
 };
-
-
 
 #endif // POOL_H

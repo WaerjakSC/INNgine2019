@@ -4,11 +4,10 @@
 #include "bsplinecurve.h"
 #include "components.h"
 #include "isystem.h"
-#include "registry.h"
+class Registry;
 
 class AISystem : public QObject, public ISystem {
     Q_OBJECT
-    using vec2 = gsl::Vector2D;
     using vec3 = gsl::Vector3D;
 
 public:
@@ -17,12 +16,10 @@ public:
     virtual void update(DeltaTime dt = 0.016) override;
     void updatePlayOnly(DeltaTime dt = 0.016);
     void updateEditorOnly(DeltaTime dt = 0.016);
-    void setControlPoints(std::vector<vec3> cps);
-    std::optional<NPCevents> move(DeltaTime dt, AIComponent &ai, Transform &transform);
+
     void init();
 
     void draw();
-    void masterOfCurves();
 
     void resetTimers();
 public slots:
@@ -33,20 +30,23 @@ public slots:
 
 private:
     // FSM npc
-    void move();
+    std::optional<NPCevents> move(DeltaTime dt, AIComponent &ai, Transform &transform);
+    void setControlPoints(std::vector<vec3> cps);
+    void masterOfCurves();
+
     void death(const GLuint entityID);
     void goalReached(const GLuint entityID);
     //    void learn();
     void eventHandler(AIComponent &ai);
 
     BSplineCurve mCurve;
-    Registry *registry{Registry::instance()};
+    Registry *registry;
 
     // FSM twr
     void detectEnemies(TowerComponent &ai);
     void attack(TowerComponent &ai);
 
-    TWRstates twrstate{IDLE};
+    TWRstates twrstate{TWRstates::IDLE};
 
     void notify(int notification);
 

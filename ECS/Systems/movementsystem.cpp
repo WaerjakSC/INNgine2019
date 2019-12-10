@@ -1,7 +1,5 @@
 #include "movementsystem.h"
 #include "cameracontroller.h"
-#include "inputsystem.h"
-#include "pool.h"
 #include "registry.h"
 
 MovementSystem::MovementSystem() : registry{Registry::instance()}
@@ -81,24 +79,7 @@ void MovementSystem::updateColliders(GLuint eID)
     else if (registry->contains<Sphere>(eID))
         registry->get<Sphere>(eID).transform.matrixOutdated = true;
 }
-void MovementSystem::updateAABBTransform(GLuint entity)
-{
-    auto view{registry->view<Transform, AABB>()};
-    auto [trans, col]{view.get<Transform, AABB>(entity)};
-    if (col.transform.matrixOutdated) {
-        updateTS(col);
-        updateColliderTransformPrivate(col, trans);
-    }
-}
-void MovementSystem::updateSphereTransform(GLuint entity)
-{
-    auto view{registry->view<Transform, Sphere>()};
-    auto [trans, col]{view.get<Transform, Sphere>(entity)};
-    if (col.transform.matrixOutdated) {
-        updateTS(col);
-        updateColliderTransformPrivate(col, trans);
-    }
-}
+
 void MovementSystem::updateColliderTransformPrivate(Collision &col, const Transform &trans)
 {
     col.transform.modelMatrix = getTRMatrix(trans) * col.transform.translationMatrix * col.transform.scaleMatrix;

@@ -1,15 +1,6 @@
 ﻿#include "renderwindow.h"
 #include "innpch.h"
 #include "mainwindow.h"
-#include <QKeyEvent>
-#include <QOpenGLContext>
-#include <QOpenGLDebugLogger>
-#include <QOpenGLFunctions>
-#include <QStatusBar>
-#include <QTimer>
-#include <chrono>
-#include <iostream>
-#include <thread> //for sleep_for
 
 #include "aisystem.h"
 #include "collisionsystem.h"
@@ -32,6 +23,16 @@
 #include "registry.h"
 #include "resourcemanager.h"
 #include "scene.h"
+
+#include <QKeyEvent>
+#include <QOpenGLContext>
+#include <QOpenGLDebugLogger>
+#include <QOpenGLFunctions>
+#include <QStatusBar>
+#include <QTimer>
+#include <chrono>
+#include <iostream>
+#include <thread> //for sleep_for
 
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext{nullptr}, mInitialized{false},
@@ -135,8 +136,6 @@ void RenderWindow::init()
     mInputSystem->setEditorCamController(mEditorCameraController);
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
-    connect(mCollisionSystem.get(), &CollisionSystem::updateAABB, mMoveSystem.get(), &MovementSystem::updateAABBTransform);
-    connect(mCollisionSystem.get(), &CollisionSystem::updateSphere, mMoveSystem.get(), &MovementSystem::updateSphereTransform);
 
     mAISystem = mRegistry->registerSystem<AISystem>();
     mScriptSystem = mRegistry->registerSystem<ScriptSystem>();
@@ -287,7 +286,7 @@ void RenderWindow::calculateFramerate()
         ++frameCount;
         if (frameCount > 30) //once pr 30 frames = update the message twice pr second (on a 60Hz monitor)
         {
-            if (!mMainWindow->mShowingMsg) {
+            if (!mMainWindow->showingMsg()) {
                 //showing some statistics in status bar
                 mMainWindow->statusBar()->showMessage(" Time pr FrameDraw: " +
                                                       QString::number(nsecElapsed / 1000000., 'g', 4) + " ms  |  " +

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "componentlist.h"
 #include "hierarchymodel.h"
 #include "innpch.h"
 #include "inputsystem.h"
@@ -6,15 +7,16 @@
 #include "registry.h"
 #include "rendersystem.h"
 #include "renderwindow.h"
+#include "resourcemanager.h"
 #include "ui_mainwindow.h"
 #include "verticalscrollarea.h"
 #include <QFileDialog>
+#include <QGroupBox>
 #include <QInputDialog>
 #include <QScreen>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 #include <QToolButton>
-#include <componentlist.h>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow}
 {
@@ -108,6 +110,16 @@ void MainWindow::init()
     connect(registry, &Registry::parentChanged, this, &MainWindow::parentChanged);
     connect(ResourceManager::instance(), &ResourceManager::addedMesh, this, &MainWindow::onMeshAdded);
     connect(this, &MainWindow::renderStatus, mRenderWindow, &RenderWindow::toggleRendered);
+}
+
+void MainWindow::setShowingMsg(bool showingMsg)
+{
+    mShowingMsg = showingMsg;
+}
+
+bool MainWindow::showingMsg() const
+{
+    return mShowingMsg;
 }
 void MainWindow::playButtons()
 {

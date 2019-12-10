@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "cameracontroller.h"
+#include "colorshader.h"
 #include "constants.h"
 #include "core.h"
 #include "inputsystem.h"
@@ -7,7 +8,6 @@
 #include "phongshader.h"
 #include "registry.h"
 #include "resourcemanager.h"
-#include "shader.h"
 #include "skyboxshader.h"
 #include "textureshader.h"
 #include <fstream>

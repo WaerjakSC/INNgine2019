@@ -2,7 +2,6 @@
 #define LIGHTSYSTEM_H
 #include "core.h"
 #include "isystem.h"
-#include "pool.h"
 
 class Registry;
 class PhongShader;
@@ -18,7 +17,5 @@ private:
     Registry *registry;
     cjk::Ref<PhongShader> mPhong;
 };
-
-
 
 #endif // LIGHTSYSTEM_H

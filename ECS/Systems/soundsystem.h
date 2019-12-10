@@ -1,9 +1,8 @@
 #ifndef SOUNDSYSTEM_H
 #define SOUNDSYSTEM_H
-#include "components.h"
 #include "gltypes.h"
 #include "isystem.h"
-#include "vector3d.h"
+
 #ifdef _WIN32
 #include <al.h>
 #include <alc.h>
@@ -12,7 +11,10 @@
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
 #endif
-
+namespace gsl {
+class Vector3D;
+}
+struct Sound;
 class Registry;
 class SoundSystem : public ISystem {
     using vec3 = gsl::Vector3D;
@@ -34,7 +36,7 @@ public:
     void deleteSound(Sound &sound);
 
 private:
-    Registry *reg;
+    Registry *registry;
 
     void play(Sound &sound);
     void pause(Sound &sound);
@@ -42,9 +44,7 @@ private:
     void updateListener();
     void refreshSounds();
     bool checkError(std::string name);
-    friend class Sound;
     friend class ResourceManager;
 };
-
 
 #endif // SOUNDSYSTEM_H

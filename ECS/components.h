@@ -1,15 +1,12 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
-#include "colorshader.h"
 #include "core.h"
-#include "matrix3x3.h"
+#include "gltypes.h"
 #include "matrix4x4.h"
-#include "shader.h"
 #include "sparseset.h"
 #include "vertex.h"
 #include <QColor>
 #include <QJSEngine>
-#include <QKeyEvent>
 #include <queue>
 
 #ifdef _WIN32
@@ -99,6 +96,7 @@ struct Transform : Component {
 /**
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
+class Shader;
 struct Material : public Component {
     Material(cjk::Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
 
@@ -336,23 +334,6 @@ struct BSplinePoint : Component {
     vec3 location{0};
 };
 
-// TD enemies følger en path fra A til B
-// de kan bevege seg, ta skade, dø
-enum NPCstates { MOVE,
-                 DEATH,
-                 GOAL_REACHED };
-
-enum NPCevents { ENDPOINT_ARRIVED,
-                 ITEM_TAKEN,
-                 DAMAGE_TAKEN };
-
-enum TWRstates { IDLE,
-                 ATTACK,
-                 COOLDOWN };
-
-enum AttackType { SPLASH,
-                  PHYSICAL,
-                  MAGIC };
 /**
  * @brief The Buildable struct is merely a tag to let the engine know whether to let the player place an object onto it or not.
  * Defaults to false in construction, should be set to true for objects that can be built on.
@@ -363,14 +344,30 @@ struct Buildable : public Component {
     }
     bool isBuildable;
 };
+// TD enemies følger en path fra A til B
+// de kan bevege seg, ta skade, dø
+enum class NPCstates { MOVE,
+                       DEATH,
+                       GOAL_REACHED };
 
+enum class NPCevents { ENDPOINT_ARRIVED,
+                       ITEM_TAKEN,
+                       DAMAGE_TAKEN };
+
+enum class TWRstates { IDLE,
+                       ATTACK,
+                       COOLDOWN };
+
+enum class AttackType { SPLASH,
+                        PHYSICAL,
+                        MAGIC };
 // GNOMES
 struct AIComponent : public Component {
     AIComponent(int hp = 100, float speed = 0.1f) : health(hp), moveSpeed(speed) {}
     int health;
     float moveSpeed;
     float pathT{0};
-    NPCstates state{MOVE};
+    NPCstates state{NPCstates::MOVE};
     std::queue<NPCevents> notification_queue;
 };
 // Towers

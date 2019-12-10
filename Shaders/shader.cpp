@@ -1,11 +1,7 @@
 #include "shader.h"
 #include "camera.h"
-#include "innpch.h"
-
-//#include "GL/glew.h" - using QOpenGLFunctions instead
-
-#include "camera.h"
 #include "cameracontroller.h"
+#include "innpch.h"
 #include "matrix4x4.h"
 
 Shader::Shader(cjk::Ref<CameraController> camController, const std::string shaderName, const GLchar *geometryPath)
@@ -169,5 +165,3 @@ std::string Shader::getName() const
 {
     return mName;
 }
-
-

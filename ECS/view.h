@@ -1,7 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 #include "pool.h"
-
+#include <algorithm>
 /**
  * @brief Multi-Component View.
  * Searches for the smallest pool of components and uses this pool
@@ -225,6 +225,5 @@ private:
     Pool<Component> *pool;
     friend class Registry;
 };
-
 
 #endif // VIEW_H

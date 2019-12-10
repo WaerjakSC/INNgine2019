@@ -6,6 +6,7 @@
 #include "inputsystem.h"
 #include "phongshader.h"
 #include "registry.h"
+#include "resourcemanager.h"
 #include "skyboxshader.h"
 #include "textureshader.h"
 #include "view.h"

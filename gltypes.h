@@ -11,10 +11,11 @@ using GLdouble = double;
 using GLint = int;
 using GLuint = unsigned int;
 using GLenum = unsigned int;
+using GLubyte = unsigned char;
 #else
 
 //minGW on windows
-#ifdef _WIN32   //_WIN32 is defined if _WIN64 is defined, so must test _WIN64 first
+#ifdef _WIN32 //_WIN32 is defined if _WIN64 is defined, so must test _WIN64 first
 #include <GL/gl.h>
 #endif
 

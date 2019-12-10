@@ -1,6 +1,5 @@
 #include "particleshader.h"
 #include "cameracontroller.h"
-#include "registry.h"
 
 ParticleShader::ParticleShader(cjk::Ref<CameraController> camController, const GLchar *geometryPath)
     : Shader{camController, "ParticleShader", geometryPath}
@@ -23,5 +22,3 @@ void ParticleShader::transmitParticleUniformData(const ParticleEmitter &emitter)
     const vec3 &up = mCameraController->up();
     glUniform3f(cameraUpUniform, up.x, up.y, up.z);
 }
-
-

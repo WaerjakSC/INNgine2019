@@ -1,9 +1,6 @@
 #include "componentgroupbox.h"
-#include "componentlist.h"
-#include "mainwindow.h"
 #include "registry.h"
 #include <QAction>
-#include <QMainWindow>
 #include <QStyleFactory>
 
 ComponentGroupBox::ComponentGroupBox(const QString &name, QWidget *parent) : QGroupBox{parent}
@@ -56,5 +53,3 @@ void ComponentGroupBox::createActions()
     connect(remove, &QAction::triggered, this, &ComponentGroupBox::removeComponent);
     addAction(remove);
 }
-
-

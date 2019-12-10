@@ -1,12 +1,10 @@
 #include "hierarchyview.h"
 #include "hierarchymodel.h"
-#include "inputsystem.h"
 #include "mainwindow.h"
 #include "registry.h"
 #include <QAction>
 #include <QDebug>
 #include <QDropEvent>
-#include <QMimeData>
 
 HierarchyView::HierarchyView(QWidget *parent) : QTreeView{parent}
 {

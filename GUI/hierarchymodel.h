@@ -1,6 +1,6 @@
 #ifndef HIERARCHYMODEL_H
 #define HIERARCHYMODEL_H
-#include "gsl_math.h"
+#include "gltypes.h"
 #include <QStandardItemModel>
 class QMimeData;
 

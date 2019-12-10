@@ -65,9 +65,6 @@ public slots:
     void setSpherePositionZ(double zIn);
     void setSphereRadius(double radius);
     void setObjectType(int index);
-signals:
-    void updateAABB(GLuint eID);
-    void updateSphere(GLuint eID);
 
 private:
     float fixedDelta{0.02f};

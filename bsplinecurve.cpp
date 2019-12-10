@@ -1,6 +1,7 @@
 #include "bsplinecurve.h"
+#include "colorshader.h"
 #include "registry.h"
-
+#include "resourcemanager.h"
 BSplineCurve::BSplineCurve(int degree) : d{degree}
 {
     debugShader = ResourceManager::instance()->getShader<ColorShader>();

@@ -4,10 +4,8 @@
 #include "components.h"
 #include "core.h"
 #include "gltypes.h"
-#include "vector3d.h"
 #include <QMainWindow>
-#include <QStringListModel>
-
+#include <QModelIndex>
 class QWidget;
 class RenderWindow;
 class QStandardItem;
@@ -35,6 +33,10 @@ public:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void clearEditor();
+
+    bool showingMsg() const;
+
+    void setShowingMsg(bool showingMsg);
 
 signals:
     void made3DObject(GLuint eID);
@@ -89,11 +91,6 @@ private:
     void forEach(GLuint parentID, QStandardItem *child, QModelIndex parent = QModelIndex());
     void createActions();
     void playButtons();
-    friend class ComponentList;
-    friend class ComponentGroupBox;
-    friend class HierarchyView;
-    friend class ResourceManager;
-    friend class RenderWindow;
 };
 
 #endif // MAINWINDOW_H

@@ -2,10 +2,12 @@
 #define SHADER_H
 
 #include "core.h"
-#include "matrix4x4.h"
 #include <QOpenGLFunctions_4_1_Core>
 
 class CameraController;
+namespace gsl {
+class Matrix4x4;
+}
 struct Material;
 class Shader : protected QOpenGLFunctions_4_1_Core {
 public:

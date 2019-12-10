@@ -3,11 +3,13 @@
 #include "cameracontroller.h"
 #include "collisionsystem.h"
 #include "movementsystem.h"
-#include "phongshader.h"
 #include "registry.h"
 #include "renderwindow.h"
 #include "resourcemanager.h"
-#include "textureshader.h"
+
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 InputSystem::InputSystem(RenderWindow *window)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},

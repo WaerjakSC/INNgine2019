@@ -1,7 +1,6 @@
 #include "components.h"
-#include "registry.h"
-#include "soundsystem.h"
-
+#include "colorshader.h"
+#include "resourcemanager.h"
 
 Material::Material(cjk::Ref<Shader> shader, GLuint textureUnit, vec3 color, GLfloat specStr, GLint specExp)
     : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
@@ -25,5 +24,3 @@ void ParticleEmitter::setNumParticles(size_t num)
     particles = std::vector<Particle>(numParticles);
     ResourceManager::instance()->initParticleEmitter(*this);
 }
-
-

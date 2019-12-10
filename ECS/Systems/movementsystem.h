@@ -3,8 +3,13 @@
 
 #include "core.h"
 #include "isystem.h"
-#include "pool.h"
-
+#include "matrix4x4.h"
+struct Transform;
+struct AABB;
+struct Sphere;
+struct Collision;
+struct BillBoard;
+struct Material;
 class Registry;
 class MovementSystem : public QObject, public ISystem {
     Q_OBJECT
@@ -115,18 +120,6 @@ public:
      * @param signal
      */
     void rotate(GLuint eID, const vec3 &rotDelta, bool signal = true);
-
-public slots:
-    /**
-     * @brief updateAABBTransform Gets a list of all AABB colliders and updates them to follow the entity according to their offset
-     * @param entity Belonging entity
-     */
-    void updateAABBTransform(GLuint entity);
-    /**
-     * @brief updateSphereTransform Gets a list of all Sphere colliders and updates them to follow the entity according to their offset
-     * @param entity Belonging entity
-     */
-    void updateSphereTransform(GLuint entity);
 
 signals:
     void positionChanged(GLuint eID, vec3 newPos, bool isGlobal);

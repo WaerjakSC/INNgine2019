@@ -1,17 +1,14 @@
 #ifndef RENDERWINDOW_H
 #define RENDERWINDOW_H
 
-#include "camera.h"
 #include "core.h"
-#include "texture.h"
 #include <QElapsedTimer>
+#include <QOpenGLFunctions_4_1_Core>
 #include <QTimer>
 #include <QWindow>
 #include <chrono>
-#include <memory>
 class QOpenGLContext;
 class MainWindow;
-class Shader;
 class RenderSystem;
 class MovementSystem;
 class LightSystem;
@@ -24,6 +21,9 @@ class CameraController;
 class ScriptSystem;
 class ResourceManager;
 class Registry;
+namespace gsl {
+class Vector3D;
+}
 
 /// This inherits from QWindow to get access to the Qt functionality and
 /// OpenGL surface.

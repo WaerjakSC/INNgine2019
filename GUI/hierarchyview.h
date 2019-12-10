@@ -1,9 +1,9 @@
 #ifndef HIERARCHYVIEW_H
 #define HIERARCHYVIEW_H
-#include "gsl_math.h"
+#include "gltypes.h"
 #include <QTreeView>
-class MainWindow;
 
+class MainWindow;
 class HierarchyView : public QTreeView {
     Q_OBJECT
 public:

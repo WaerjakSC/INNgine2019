@@ -1,4 +1,6 @@
 #include "verticalscrollarea.h"
+#include <QGroupBox>
+#include <QVBoxLayout>
 
 VerticalScrollArea::VerticalScrollArea(QWidget *parent) : QScrollArea{parent}
 {
@@ -28,5 +30,3 @@ void VerticalScrollArea::setupLayout()
     componentListLayout->setAlignment(Qt::AlignTop);
     componentListLayout->setMargin(2);
 }
-
-

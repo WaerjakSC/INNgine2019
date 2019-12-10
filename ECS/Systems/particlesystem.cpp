@@ -1,9 +1,8 @@
 #include "particlesystem.h"
-#include "cameracontroller.h"
-#include "inputsystem.h"
-#include "movementsystem.h"
 #include "particleshader.h"
 #include "registry.h"
+#include "resourcemanager.h"
+
 #include <QColor>
 
 ParticleSystem::ParticleSystem(cjk::Ref<ParticleShader> shader)
@@ -277,4 +276,3 @@ void ParticleSystem::setInitColorBlue(int inBlue)
     auto &emitter{registry->get<ParticleEmitter>(entityID)};
     emitter.initialColor.setBlue(inBlue);
 }
-

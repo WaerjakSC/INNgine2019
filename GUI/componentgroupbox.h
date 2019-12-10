@@ -1,10 +1,7 @@
 #ifndef COMPONENTGROUPBOX_H
 #define COMPONENTGROUPBOX_H
 
-#include "components.h"
 #include <QGroupBox>
-class QMainWindow;
-class MainWindow;
 
 class ComponentGroupBox : public QGroupBox {
 public:
@@ -15,6 +12,5 @@ private slots:
 private:
     void createActions();
 };
-
 
 #endif // COMPONENTGROUPBOX_H
