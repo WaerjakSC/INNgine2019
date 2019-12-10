@@ -92,9 +92,14 @@ void Scene::saveScene(const QString &fileName)
 
                 writer.Key("color");
                 writer.StartArray();
-                writer.Double(mat.mObjectColor.x);
-                writer.Double(mat.mObjectColor.y);
-                writer.Double(mat.mObjectColor.z);
+                vec3 color{mat.mObjectColor};
+                if (registry->system<InputSystem>()->buildableDebugMode() &&
+                    ((color.x >= 1.59f && color.x <= 1.601f) || (color.y >= 1.59f && color.x <= 1.601f))) {
+                    color = vec3{0.57f, 0.57f, 0.57f};
+                }
+                writer.Double(color.x);
+                writer.Double(color.y);
+                writer.Double(color.z);
                 writer.EndArray();
 
                 writer.Key("specstr");

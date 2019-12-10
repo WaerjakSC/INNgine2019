@@ -43,6 +43,8 @@ public:
     void reset();
     void setBuildableDebug(bool value);
 
+    bool buildableDebugMode() const;
+
 public slots:
     void setCameraPositionX(double xIn);
     void setCameraPositionY(double yIn);
@@ -80,7 +82,7 @@ private:
     QPoint lastPos;
     bool mEnteredWindow{false};
     bool mIsConfined{false};
-    bool buildableDebug{false};
+    bool mBuildableDebug{false};
 
     GLuint draggedEntity{0};
     GLuint lastHitEntity{0};

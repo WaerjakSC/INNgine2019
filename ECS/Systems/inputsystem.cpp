@@ -107,10 +107,10 @@ void InputSystem::spawnTower()
     setPlaneColors(mIsDragging);
     // Might want to also "pause" the game here, or rather stop all AI and Movement while still allowing the player to move the camera and place the tower.
 }
-void InputSystem::setPlaneColors(bool dragging)
+void InputSystem::setPlaneColors(bool dragMode)
 {
     auto view{registry->view<Buildable, Material>()};
-    if (dragging) {
+    if (dragMode) {
         for (auto entity : view) {
             auto [build, mat]{view.get<Buildable, Material>(entity)};
             // set color according to buildable state -- Red means unbuildable, green means buildable.
@@ -173,6 +173,11 @@ void InputSystem::handleMouseInput()
     if (mIsDragging)
         dragEntity(draggedEntity);
 }
+
+bool InputSystem::buildableDebugMode() const
+{
+    return mBuildableDebug;
+}
 void InputSystem::confineMouseToScreen(DeltaTime dt)
 {
     int width{mRenderWindow->width()};
@@ -216,7 +221,7 @@ void InputSystem::updateBuildable(GLuint entityID)
     auto view{registry->view<Transform, Buildable, Material, Mesh, AABB>()};
     auto [trans, build, mat, mesh, aabb]{view.get<Transform, Buildable, Material, Mesh, AABB>(entityID)};
     if (build.isBuildable) {
-        if (mIsDragging || buildableDebug) {
+        if (mIsDragging || mBuildableDebug) {
             mat.mObjectColor = green * 0.8f;
         }
         mesh = factory->getMesh("cube.obj"); // replace with a cube type mesh as wall ingame
@@ -227,7 +232,7 @@ void InputSystem::updateBuildable(GLuint entityID)
         trans.matrixOutdated = true;
     }
     else {
-        if (mIsDragging || buildableDebug) {
+        if (mIsDragging || mBuildableDebug) {
             mat.mObjectColor = red * 0.8f;
         }
         mesh = factory->getMesh("Plane");
@@ -260,7 +265,7 @@ void InputSystem::placeTower()
 }
 void InputSystem::setBuildableDebug(bool value)
 {
-    buildableDebug = value;
+    mBuildableDebug = value;
 }
 void InputSystem::dragEntity(GLuint entity)
 {
