@@ -25,44 +25,25 @@ void CollisionSystem::updatePlayOnly(DeltaTime deltaTime)
 void CollisionSystem::runAABBSimulations()
 {
     // possible groups - AABB + AIComponent, do two passes, one for Buildable + AABB, another for AABB + Bullet or whatever
-    auto view{registry->view<EInfo, AABB>()};
+    auto view{registry->view<AIComponent, AABB>()};
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
-        // Check for AABB-AABB intersections
-        for (auto otherEntity : view) {
+        auto towerRangeView{registry->view<TowerComponent, Sphere>()};
+        for (auto otherEntity : towerRangeView) {
             if (entity != otherEntity) {
-                auto &otherAABB{view.get<AABB>(otherEntity)};
-                if (!bothStatic(aabb, otherAABB))
-                    if (AABBAABB(aabb, otherAABB)) {
-                        //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1{view.get<EInfo>(entity).name};
-                        QString entity2{view.get<EInfo>(otherEntity).name};
-                        //                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
-                        collisions++;
-                        // notify FSM if needed
-                    }
-            }
-        }
-        auto sphereView{registry->view<EInfo, Sphere>()};
-        for (auto otherEntity : sphereView) {
-            if (entity != otherEntity) {
-                auto &sphere{sphereView.get<Sphere>(otherEntity)};
+                auto &sphere{towerRangeView.get<Sphere>(otherEntity)};
                 if (!bothStatic(aabb, sphere))
                     if (SphereAABB(sphere, aabb)) {
-                        //                aabbAIcomponent.hp -= sphereAIcomponent.damage;
-                        QString entity1{view.get<EInfo>(entity).name};
-                        QString entity2{sphereView.get<EInfo>(otherEntity).name};
+                        //                aabbAIcomponent.hp -= sphereAIcomponent.damage;                     
                         // NOTIFY FSM
-                        // send event notify on first enter (hei se på meg noe er i radius jippi)
+                        // send event notify ON ENTER (hei se på meg noe er i radius jippi)
+                        // sjekker for overlaps mot tårnets radius(sphere)
                         if (aabb.overlapEvent && sphere.overlapEvent) {
-                            if (aabb.overlappedEntities.contains(otherEntity)) {
+                            if (!aabb.overlappedEntities.contains(otherEntity)) {
                                 aabb.overlappedEntities.insert(otherEntity);
                             }
                         }
-                        qDebug() << "Collision between " + entity1 + " and " + entity2 + " " + QString::number(collisions);
-                        if (entity1 == "Enemy" && entity2 == "Player") {
-                            qDebug() << "oops you got hit by the red ogre!";
-                        }
+
                         collisions++;
                         // notify FSM if needed
                     }
