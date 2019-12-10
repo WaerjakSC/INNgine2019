@@ -105,6 +105,7 @@ void AISystem::spawnWave(DeltaTime dt)
 }
 void AISystem::detectEnemies(TowerComponent &ai)
 {
+
     // if(!(list.empty())
     // pick random from list
     // save it in targetID

@@ -26,27 +26,36 @@ void CollisionSystem::runAABBSimulations()
 {
     // possible groups - AABB + AIComponent, do two passes, one for Buildable + AABB, another for AABB + Bullet or whatever
     auto view{registry->view<AIComponent, AABB>()};
+    auto towerRangeView{registry->view<TowerComponent, Sphere>()};
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
-        auto towerRangeView{registry->view<TowerComponent, Sphere>()};
-        for (auto otherEntity : towerRangeView) {
-            if (entity != otherEntity) {
-                auto &sphere{towerRangeView.get<Sphere>(otherEntity)};
+        for (auto tower : towerRangeView) {
+            if (entity != tower) {
+                auto &sphere{towerRangeView.get<Sphere>(tower)};
                 if (!bothStatic(aabb, sphere))
-                    if (SphereAABB(sphere, aabb)) {
-                        //                aabbAIcomponent.hp -= sphereAIcomponent.damage;                     
+                    if (SphereAABB(sphere, aabb)) {                
                         // NOTIFY FSM
                         // send event notify ON ENTER (hei se på meg noe er i radius jippi)
                         // sjekker for overlaps mot tårnets radius(sphere)
                         if (aabb.overlapEvent && sphere.overlapEvent) {
-                            if (!aabb.overlappedEntities.contains(otherEntity)) {
-                                aabb.overlappedEntities.insert(otherEntity);
+                            if (!sphere.overlappedEntities.contains(entity)) {
+                                sphere.overlappedEntities.insert(entity);
                             }
                         }
-
                         collisions++;
                         // notify FSM if needed
                     }
+            }
+        }
+    }
+    for(auto tower : towerRangeView){
+        auto &sphere{towerRangeView.get<Sphere>(tower)};
+        std::vector<GLuint> entities = sphere.overlappedEntities.getList();
+        for(int i = 0; i < entities.size(); ++i){
+            GLuint entity = entities[i];
+            auto &aabb{view.get<AABB>(entity)};
+            if(!SphereAABB(sphere, aabb)){
+               sphere.overlappedEntities.remove(entity);
             }
         }
     }
