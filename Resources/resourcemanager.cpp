@@ -386,9 +386,10 @@ GLuint ResourceManager::makeEnemy(const QString &name)
 {
     GLuint eID{registry->makeEntity<Mesh, AIComponent>(name)};
     registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
-    registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false);
-    registry->add<Sound>(eID, "gnomed.wav", true);
-    registry->get<Sound>(eID).playing = true;
+    auto &aabb{registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false)};
+    aabb.overlapEvent = true;
+    auto &sound{registry->add<Sound>(eID, "gnomed.wav", true)};
+    sound.playing = true;
     setMesh("OgreOBJ.obj", eID);
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["SkinColorMostro_COLOR.png"]->textureUnit()); // probably change textureunit later
     return eID;
@@ -397,7 +398,8 @@ GLuint ResourceManager::makeEnemy(const QString &name)
 GLuint ResourceManager::makeTower(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh, TowerComponent, AABB>(name)};
-    registry->add<Sphere>(eID, vec3{}, 13.f, false);
+    auto &rangeCollider{registry->add<Sphere>(eID, vec3{}, 13.f, false)};
+    rangeCollider.overlapEvent = true;
     registry->add<Material>(eID, getShader<ColorShader>(), 0); // change this when we have a tower mesh!
     registry->add<ParticleEmitter>(eID, false, true, 30, 30, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 0.1f, 1.5f, 1.5f);
     setMesh("cube.obj", eID);

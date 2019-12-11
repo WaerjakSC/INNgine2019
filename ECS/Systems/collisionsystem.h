@@ -185,12 +185,12 @@ private:
     // todo
     //    vec3 ClosestPoint(const OBB &obb, const vec3 &point);
     /**
-     * @brief bothStatic simple bool check to see if both Collision objects have isStatic set to true
+     * @brief bothStatic check if one or both of the colliders are set to dynamic object type.
      * @param lhs
      * @param rhs
-     * @return if both are static objects, return true
+     * @return
      */
-    bool bothStatic(const Collision &lhs, const Collision &rhs);
+    bool shouldCheckCollision(const Collision &lhs, const Collision &rhs);
 };
 
 #endif // COLLISIONSYSTEM_H

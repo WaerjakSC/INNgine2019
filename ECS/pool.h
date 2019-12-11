@@ -165,11 +165,12 @@ public:
      * @param entityID
      */
     template <class... Args>
-    void add(GLuint entityID, Args... args)
+    Type &add(GLuint entityID, Args... args)
     {
         assert(!has(entityID)); // Make sure the entityID is unique.
         mEntities.insert(entityID);
         mComponents.push_back(Type{args...});
+        return mComponents.back();
     }
     /**
      * @brief cloneComponent creates a new component with the exact same parameters as the old component.

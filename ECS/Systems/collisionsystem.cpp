@@ -30,41 +30,40 @@ void CollisionSystem::runAABBSimulations()
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
         for (auto tower : towerRangeView) {
-                auto &sphere{towerRangeView.get<Sphere>(tower)};
-                if (!bothStatic(aabb, sphere))
-                    if (SphereAABB(sphere, aabb)) {                
-                        // NOTIFY FSM
-                        // send event notify ON ENTER (hei se på meg noe er i radius jippi)
-                        // sjekker for overlaps mot tårnets radius(sphere)
-                        if (aabb.overlapEvent && sphere.overlapEvent) {
-                            if (!sphere.overlappedEntities.contains(entity)) {
-                                sphere.overlappedEntities.insert(entity);
-                                qDebug() << "ON ENTER: Entity in range";
-                            }
+            auto [sphere, towerComp]{towerRangeView.get<Sphere, TowerComponent>(tower)};
+            if (shouldCheckCollision(aabb, sphere) && towerComp.state != TowerStates::PLACEMENT)
+                if (SphereAABB(sphere, aabb)) {
+                    // NOTIFY FSM
+                    // send event notify ON ENTER (hei se på meg noe er i radius jippi)
+                    // sjekker for overlaps mot tårnets radius(sphere)
+                    if (aabb.overlapEvent && sphere.overlapEvent) {
+                        if (!sphere.overlappedEntities.contains(entity)) {
+                            sphere.overlappedEntities.insert(entity);
+                             qDebug() << "ON ENTER: Entity in range";
                         }
-                        collisions++;
-                        // notify FSM if needed
-
-            }
+                    }
+                    collisions++;
+                    // notify FSM if needed
+                }
         }
 
         auto bulletview{registry->view<Bullet, Sphere>()};
-        for( auto bulletID : bulletview){
+        for (auto bulletID : bulletview) {
             auto [bul, sphere]{bulletview.get<Bullet, Sphere>(bulletID)};
-            if(SphereAABB(sphere,aabb)){
+            if (SphereAABB(sphere, aabb)) {
                 auto &ai{view.get<AIComponent>(entity)};
                 ai.health -= bul.damage;
-                qDebug() << "Enemy health: " + ai.health;
+                qDebug() << "Enemy health: " + QString::number(ai.health);
                 registry->removeEntity(bulletID);
             }
         }
     }
 
     // ON EXIT
-    for(auto tower : towerRangeView){
+    for (auto tower : towerRangeView) {
         auto &sphere{towerRangeView.get<Sphere>(tower)};
         std::vector<GLuint> entities = sphere.overlappedEntities.getList();
-        for(int i = 0; i < entities.size(); ++i){
+        for (int i = 0; i < entities.size(); ++i) {
             GLuint entity = entities[i];
             auto &aabb{view.get<AABB>(entity)};
             if(!SphereAABB(sphere, aabb)){
@@ -82,7 +81,7 @@ void CollisionSystem::runSphereSimulations()
         for (auto otherEntity : view) {
             if (entity != otherEntity) {
                 auto &otherSphere{view.get<Sphere>(otherEntity)};
-                if (!bothStatic(sphere, otherSphere))
+                if (!shouldCheckCollision(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
                         QString entity1{view.get<EInfo>(entity).name};
                         QString entity2{view.get<EInfo>(otherEntity).name};
@@ -152,9 +151,9 @@ Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect)
     vec3 origin{curController->cameraPosition()};
     return Ray{origin, direction};
 }
-inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs)
+inline bool CollisionSystem::shouldCheckCollision(const Collision &lhs, const Collision &rhs)
 {
-    return (lhs.isStatic == rhs.isStatic) == true;
+    return lhs.isStatic != rhs.isStatic || (!lhs.isStatic && !rhs.isStatic);
 }
 
 gsl::Vector3D CollisionSystem::getMin(const AABB &aabb)
