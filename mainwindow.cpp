@@ -263,10 +263,6 @@ void MainWindow::createActions()
     components->addAction(lightAction);
     connect(lightAction, &QAction::triggered, mComponentList, &ComponentList::addLightComponent);
 
-    QAction *physicsAction{new QAction(tr("Physics"), this)};
-    components->addAction(physicsAction);
-    connect(physicsAction, &QAction::triggered, mComponentList, &ComponentList::addPhysicsComponent);
-
     QAction *soundAction{new QAction(tr("Sound"), this)};
     components->addAction(soundAction);
     connect(soundAction, &QAction::triggered, mComponentList, &ComponentList::addSoundComponent);
@@ -375,7 +371,7 @@ void MainWindow::parentChanged(GLuint eID)
         auto view{registry->view<Mesh>()};
         if (view.contains(eID)) {
             auto &mesh{view.get(eID)};
-            if (mesh.mRendered) {
+            if (mesh.rendered) {
                 item->setCheckState(Qt::Checked);
             }
             else {
@@ -421,10 +417,10 @@ void MainWindow::onDataChanged(const QModelIndex &index, const QModelIndex &othe
         auto &mesh{view.get(entity)};
         switch (item->checkState()) {
         case Qt::Checked:
-            mesh.mRendered = true;
+            mesh.rendered = true;
             break;
         case Qt::Unchecked:
-            mesh.mRendered = false;
+            mesh.rendered = false;
             break;
         default:
             break;
@@ -456,7 +452,7 @@ void MainWindow::onMeshAdded(GLuint eID)
     auto view{registry->view<Mesh>()};
     if (view.contains(eID)) {
         auto &mesh{view.get(eID)};
-        if (mesh.mRendered) {
+        if (mesh.rendered) {
             item->setCheckState(Qt::Checked);
         }
         else {
@@ -505,7 +501,7 @@ void MainWindow::insertEntities()
         auto view{registry->view<Mesh>()};
         if (view.contains(entity)) {
             auto &mesh{view.get(entity)};
-            if (mesh.mRendered) {
+            if (mesh.rendered) {
                 item->setCheckState(Qt::Checked);
             }
             else {

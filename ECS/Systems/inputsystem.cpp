@@ -117,17 +117,17 @@ void InputSystem::setPlaneColors(bool dragMode)
             auto [build, mat]{view.get<Buildable, Material>(entity)};
             // set color according to buildable state -- Red means unbuildable, green means buildable.
             if (build.isBuildable) {
-                mat.mObjectColor = green * 0.8f; // GREEN'ish
+                mat.objectColor = green * 0.8f; // GREEN'ish
             }
             else {
-                mat.mObjectColor = red * 0.8f; // RED'ish
+                mat.objectColor = red * 0.8f; // RED'ish
             }
         }
     }
     else { // set colors back to the original and set shader back to Phong for lighting
         for (auto entity : view) {
             auto &mat{view.get<Material>(entity)};
-            mat.mObjectColor = origColor;
+            mat.objectColor = origColor;
         }
     }
 }
@@ -229,7 +229,7 @@ void InputSystem::updateBuildable(GLuint entityID)
     auto [trans, build, mat, mesh, aabb]{view.get<Transform, Buildable, Material, Mesh, AABB>(entityID)};
     if (build.isBuildable) {
         if (mIsDragging || mBuildableDebug) {
-            mat.mObjectColor = green * 0.8f;
+            mat.objectColor = green * 0.8f;
         }
         mesh = factory->getMesh("cube.obj"); // replace with a cube type mesh as wall ingame
         float scaleY{trans.localScale.x / 2.f};
@@ -240,7 +240,7 @@ void InputSystem::updateBuildable(GLuint entityID)
     }
     else {
         if (mIsDragging || mBuildableDebug) {
-            mat.mObjectColor = red * 0.8f;
+            mat.objectColor = red * 0.8f;
         }
         mesh = factory->getMesh("Plane");
         trans.localPosition.y = 0.f;
@@ -290,10 +290,10 @@ void InputSystem::dragEntity(GLuint entity)
         if (view.contains(lastHitEntity) && static_cast<int>(lastHitEntity) != ray.hitEntity) { // reset the color after hitting another object
             auto &mat = view.get<Material>(lastHitEntity);
             if (view.get<Buildable>(lastHitEntity).isBuildable) {
-                mat.mObjectColor = green * 0.8f;
+                mat.objectColor = green * 0.8f;
             }
             else
-                mat.mObjectColor = red * 0.8f;
+                mat.objectColor = red * 0.8f;
         }
         // compensate for size of collider
         float colliderHeight{registry->get<AABB>(ray.hitEntity).size.y};
@@ -302,10 +302,10 @@ void InputSystem::dragEntity(GLuint entity)
             auto &mat = view.get<Material>(ray.hitEntity);
             lastHitEntity = ray.hitEntity;
             if (view.get<Buildable>(ray.hitEntity).isBuildable) {
-                mat.mObjectColor = green;
+                mat.objectColor = green;
             }
             else
-                mat.mObjectColor = red; // slightly increase the color intensity of the object as it's being moused over.
+                mat.objectColor = red; // slightly increase the color intensity of the object as it's being moused over.
         }
     }
     ray.hitPoint.y += tf.localScale.y;

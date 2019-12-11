@@ -382,8 +382,8 @@ struct PlayerComponent : public Component {
 
 struct Bullet : public Component {
     Bullet() {}
-    Bullet(vec3 route, int d, float s) : destination(route), damage(d), speed(s) {}
-    vec3 destination;
+    Bullet(vec3 route, int d, float s) : direction(route), damage(d), speed(s) {}
+    vec3 direction;
     int damage;
     float speed;
 };

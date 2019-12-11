@@ -22,9 +22,9 @@ void MovementSystem::update(DeltaTime dt)
     }
 
     auto bulletview{registry->view<Transform, Bullet>()};
-    for (auto entity : bulletview){
-        auto [trans, bullet] {bulletview.get<Transform, Bullet>(entity)};
-        vec3 deltaVector = bullet.destination.normalized() * dt * bullet.speed;
+    for (auto entity : bulletview) {
+        auto [trans, bullet]{bulletview.get<Transform, Bullet>(entity)};
+        vec3 deltaVector = bullet.direction * dt * bullet.speed;
         move(entity, deltaVector);
     }
 

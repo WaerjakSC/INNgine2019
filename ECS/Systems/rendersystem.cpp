@@ -23,14 +23,14 @@ void RenderSystem::drawEntities()
     auto group{registry->group<Transform, Material, Mesh>()};
     for (auto entity : group) {
         auto [transform, material, mesh]{group.get<Transform, Material, Mesh>(entity)}; // Structured bindings (c++17), creates and assigns from tuple
-        if (mesh.mRendered) {
-            glUseProgram(material.mShader->getProgram());
-            material.mShader->transmitUniformData(transform.modelMatrix, &material);
-            glBindVertexArray(mesh.mVAO);
-            if (mesh.mIndiceCount > 0)
-                glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
+        if (mesh.rendered) {
+            glUseProgram(material.shader->getProgram());
+            material.shader->transmitUniformData(transform.modelMatrix, &material);
+            glBindVertexArray(mesh.VAO);
+            if (mesh.indiceCount > 0)
+                glDrawElements(mesh.drawType, mesh.indiceCount, GL_UNSIGNED_INT, nullptr);
             else
-                glDrawArrays(mesh.mDrawType, 0, mesh.mVerticeCount);
+                glDrawArrays(mesh.drawType, 0, mesh.verticeCount);
         }
     }
     drawSkybox();
@@ -50,11 +50,11 @@ void RenderSystem::drawSkybox()
     auto skyBoxview{registry->view<Material, Mesh>()};
     auto [material, mesh]{skyBoxview.get<Material, Mesh>(mSkyBoxID)};
     glDepthFunc(GL_LEQUAL);
-    glUseProgram(material.mShader->getProgram());
+    glUseProgram(material.shader->getProgram());
     gsl::Matrix4x4 temp;
-    material.mShader->transmitUniformData(temp, &material);
-    glBindVertexArray(mesh.mVAO);
-    glDrawElements(mesh.mDrawType, mesh.mIndiceCount, GL_UNSIGNED_INT, nullptr);
+    material.shader->transmitUniformData(temp, &material);
+    glBindVertexArray(mesh.VAO);
+    glDrawElements(mesh.drawType, mesh.indiceCount, GL_UNSIGNED_INT, nullptr);
     glDepthFunc(GL_LESS);
 }
 void RenderSystem::drawColliders()
@@ -66,8 +66,8 @@ void RenderSystem::drawColliders()
         glUseProgram(shader->getProgram());
         // For AABB you could possibly alter the modelMatrix by a desired position or scale(half-size) before sending it to the shader.
         shader->transmitUniformData(aabb.transform.modelMatrix, nullptr); // no need to send a material since the box collider is just lines
-        glBindVertexArray(aabb.colliderMesh.mVAO);
-        glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
+        glBindVertexArray(aabb.colliderMesh.VAO);
+        glDrawArrays(aabb.colliderMesh.drawType, 0, aabb.colliderMesh.verticeCount);
     }
 }
 
@@ -87,15 +87,15 @@ void RenderSystem::Cull(const Camera::Frustum &f)
     for (auto entity : view) {
         auto &collider{view.get<AABB>(entity)};
         if (cam.getFrustum().Intersects(f, collider)) {
-            view.get<Mesh>(entity).mRendered = true;
+            view.get<Mesh>(entity).rendered = true;
         }
         else
-            view.get<Mesh>(entity).mRendered = false;
+            view.get<Mesh>(entity).rendered = false;
     }
 }
 void RenderSystem::toggleRendered(GLuint entityID)
 {
-    bool &isRendered{registry->view<Mesh>().get(entityID).mRendered};
+    bool &isRendered{registry->view<Mesh>().get(entityID).rendered};
     isRendered = !isRendered;
     if (isRendered) {
         emit newRenderedSignal(entityID, Qt::Checked);
@@ -107,7 +107,7 @@ void RenderSystem::toggleRendered(GLuint entityID)
 
 void RenderSystem::setRendered(GLuint entityID, bool nState)
 {
-    bool &isRendered{registry->view<Mesh>().get(entityID).mRendered};
+    bool &isRendered{registry->view<Mesh>().get(entityID).rendered};
     isRendered = nState;
 }
 void RenderSystem::changeShader(const QString &nShader)
@@ -116,11 +116,11 @@ void RenderSystem::changeShader(const QString &nShader)
     cjk::Ref<Shader> shader{nullptr};
     ResourceManager *factory{ResourceManager::instance()};
     if (nShader == "PlainShader")
-        registry->view<Material>().get(eID).mShader = factory->getShader<ColorShader>();
+        registry->view<Material>().get(eID).shader = factory->getShader<ColorShader>();
     else if (nShader == "TextureShader")
-        registry->view<Material>().get(eID).mShader = factory->getShader<TextureShader>();
+        registry->view<Material>().get(eID).shader = factory->getShader<TextureShader>();
     else if (nShader == "PhongShader")
-        registry->view<Material>().get(eID).mShader = factory->getShader<PhongShader>();
+        registry->view<Material>().get(eID).shader = factory->getShader<PhongShader>();
     else if (nShader == "SkyboxShader")
-        registry->view<Material>().get(eID).mShader = factory->getShader<SkyboxShader>();
+        registry->view<Material>().get(eID).shader = factory->getShader<SkyboxShader>();
 }

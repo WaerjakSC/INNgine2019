@@ -122,15 +122,17 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
 
     // Standard/Projectile type
-    if(registry->contains<Transform>(ai.targetID)){
+    if (registry->contains<Transform>(ai.targetID)) {
         auto &trans{registry->get<Transform>(ai.targetID)};
         GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
-        registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
+        vec3 velocity{(trans.localPosition - t.localPosition).normalized()}; // get the vector (line) from tower to enemy, normalize to get the general direction.
+        registry->add<Bullet>(bulletID, velocity, ai.damage, ai.projectileSpeed);
         registry->add<Sphere>(bulletID, vec3{0}, .25f, false);
         registry->get<Transform>(bulletID).localPosition = t.position;
-        registry->get<Transform>(bulletID).localScale = vec3{0.25,0.25,0.25};
+        registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
-    } else {
+    }
+    else {
         ai.state = TowerStates::IDLE;
     }
 }

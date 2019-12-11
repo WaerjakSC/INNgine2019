@@ -38,7 +38,6 @@ ResourceManager::ResourceManager() : registry{Registry::instance()}
     registry->registerComponent<Material>();
     registry->registerComponent<Mesh>();
     registry->registerComponent<ParticleEmitter>();
-    registry->registerComponent<Physics>();
     registry->registerComponent<Sound>();
     registry->registerComponent<Input>();
     registry->registerComponent<Light>();
@@ -1010,8 +1009,8 @@ bool ResourceManager::readFile(std::string fileName, int eID)
                 // Currently doesn't support multiple textures
                 if (registry->contains<Material>(eID) && textureLoaded) {
                     auto &mat{registry->get<Material>(eID)};
-                    mat.mTextureUnit = mTextures[texname]->textureUnit();
-                    mat.mShader = getShader<TextureShader>();
+                    mat.textureUnit = mTextures[texname]->textureUnit();
+                    mat.shader = getShader<TextureShader>();
                 }
             }
         }
@@ -1051,9 +1050,9 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID)
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
         auto &mesh{registry->get<Mesh>(eID)};
-        mesh.mVerticeCount = mMeshData.vertices.size();
-        mesh.mName = fileName;
-        mesh.mDrawType = GL_TRIANGLES;
+        mesh.verticeCount = mMeshData.vertices.size();
+        mesh.name = fileName;
+        mesh.drawType = GL_TRIANGLES;
         initVertexBuffers(&mesh);
         return true;
     }

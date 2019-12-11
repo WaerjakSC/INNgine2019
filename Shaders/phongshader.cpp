@@ -36,10 +36,10 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
     if (view.contains(mLightID)) {
         auto [lightTrans, light]{view.get<Transform, Light>(mLightID)};
 
-        glUniform1f(mAmbientLightStrengthUniform, light.mAmbientStrength);
-        glUniform3f(mAmbientColorUniform, light.mAmbientColor.x, light.mAmbientColor.y, light.mAmbientColor.z);
-        glUniform1f(mLightPowerUniform, light.mLightStrength);
-        glUniform3f(mLightColorUniform, light.mLightColor.x, light.mLightColor.y, light.mLightColor.z);
+        glUniform1f(mAmbientLightStrengthUniform, light.ambientStrength);
+        glUniform3f(mAmbientColorUniform, light.ambientColor.x, light.ambientColor.y, light.ambientColor.z);
+        glUniform1f(mLightPowerUniform, light.lightStrength);
+        glUniform3f(mLightColorUniform, light.lightColor.x, light.lightColor.y, light.lightColor.z);
         glUniform3f(mLightPositionUniform, lightTrans.position.x, lightTrans.position.y, lightTrans.position.z);
     }
     glUniform1i(textureUniform, material->textureUnit); //TextureUnit = 0 as default);
@@ -52,4 +52,3 @@ void PhongShader::setLight(GLuint entt)
 {
     mLightID = entt;
 }
-

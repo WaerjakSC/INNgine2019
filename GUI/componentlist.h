@@ -32,7 +32,6 @@ public slots:
     void addMaterialComponent();
     void addMeshComponent();
     void addSoundComponent();
-    void addPhysicsComponent();
     void addLightComponent();
     void addBSplineComponent();
     void addGameCameraComponent();

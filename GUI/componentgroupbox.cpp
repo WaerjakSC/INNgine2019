@@ -27,8 +27,6 @@ void ComponentGroupBox::removeComponent()
         registry->remove<Light>(entityID);
     if (title() == "Input")
         registry->remove<Input>(entityID);
-    if (title() == "Physics")
-        registry->remove<Physics>(entityID);
     if (title() == "Sound")
         registry->remove<Sound>(entityID);
     if (title() == "AI")

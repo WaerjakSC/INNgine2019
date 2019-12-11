@@ -89,10 +89,7 @@ void ComponentList::addLightComponent()
 {
     addComponent<Light>();
 }
-void ComponentList::addPhysicsComponent()
-{
-    addComponent<Physics>();
-}
+
 void ComponentList::addSoundComponent()
 {
     addComponent<Sound>();
