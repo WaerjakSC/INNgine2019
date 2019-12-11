@@ -46,8 +46,6 @@ private:
     void detectEnemies(TowerComponent &ai, Sphere &sphere);
     void attack(TowerComponent &ai);
 
-    TWRstates twrstate{TWRstates::IDLE};
-
     void notify(int notification);
 
     float elapsed_time;

@@ -375,6 +375,7 @@ struct TowerComponent : public Component {
     int damage;
     int range;
     float attackSpeed;
+    float projectileSpeed;
     float cooldown;
     GLuint targetID;
     TowerStates state = TowerStates::IDLE;
@@ -386,6 +387,14 @@ struct PlayerComponent : public Component {
     int health = 100;
     int gold = 500;
     int kills = 0;
+};
+
+struct Bullet : public Component {
+    Bullet(){}
+    Bullet(vec3 route, int d, float s) : destination(route), damage(d), speed(s) {}
+    vec3 destination;
+    int damage;
+    float speed;
 };
 
 #endif // COMPONENT_H

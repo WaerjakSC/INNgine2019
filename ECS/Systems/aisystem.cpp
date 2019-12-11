@@ -53,16 +53,16 @@ void AISystem::updatePlayOnly(DeltaTime dt)
     auto towerView{registry->view<TowerComponent, Sphere>()};
     for (auto entity : towerView) {
         auto [aicomponent, sphere]{towerView.get<TowerComponent, Sphere>(entity)};
-        switch (twrstate) {
-        case TWRstates::IDLE:
+        switch (aicomponent.state) {
+        case TowerStates::IDLE:
             // scanning for monsters
             detectEnemies(aicomponent, sphere);
             break;
-        case TWRstates::ATTACK:
+        case TowerStates::ATTACK:
             // kill goblin
             attack(aicomponent);
             break;
-        case TWRstates::COOLDOWN:
+        case TowerStates::COOLDOWN:
             // cooldown
             break;
         }
@@ -106,18 +106,22 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if(!sphere.overlappedEntities.empty()){
         ai.targetID = sphere.overlappedEntities.getList()[0];
+        ai.state = TowerStates::ATTACK;
     } else {
-        twrstate = IDLE;
+        ai.state = TowerStates::IDLE;
     }
-    // if(!(list.empty())
-    // pick random from list
-    // save it in targetID
-    // twrstate = ATTACK;
 }
 
 void AISystem::attack(TowerComponent &ai)
 {
-    // We already have the targetID here
+    // Splash/Rocket type
+    // BSpline from Tower to Enemy entity,
+    // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
+
+    // Standard/Projectile type
+    auto &trans {registry->get<Transform>(ai.targetID)};
+    GLuint bulletID = registry->makeEntity("bullet");
+    registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
 }
 
 /**
