@@ -15,6 +15,10 @@ void AISystem::update(DeltaTime)
 {
 }
 
+/**
+ * @brief AISystem::updatePlayOnly
+ * @param dt
+ */
 void AISystem::updatePlayOnly(DeltaTime dt)
 {
     // Run the eventHandler incase of events
@@ -71,10 +75,17 @@ void AISystem::updatePlayOnly(DeltaTime dt)
     }
 }
 
+/**
+ * @brief AISystem::updateEditorOnly
+ */
 void AISystem::updateEditorOnly(DeltaTime)
 {
     draw();
 }
+
+/**
+ * @brief AISystem::resetTimers
+ */
 void AISystem::resetTimers()
 {
     curWaveCD = 1.f;
@@ -82,17 +93,9 @@ void AISystem::resetTimers()
     curSpawnDuration = 0.f;
 }
 /**
- * @brief AIsystem::learn, flips the direction and updates path
+ * @brief AISystem::spawnWave
+ * @param dt
  */
-//void AISystem::learn() {
-//    dir = -dir;
-//    if (updatePath) {
-//        mCurve.updatePath();
-//        //            mCurve.updateTrophies();
-//        updatePath = false;
-//    }
-//    state = MOVE;
-//}
 void AISystem::spawnWave(DeltaTime dt)
 {
     curSpawnDuration += dt;
@@ -104,6 +107,11 @@ void AISystem::spawnWave(DeltaTime dt)
         curSpawnCD = spawnCD;
     }
 }
+/**
+ * @brief AISystem::detectEnemies
+ * @param ai
+ * @param sphere
+ */
 void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if (!sphere.overlappedEntities.empty()) {
@@ -115,6 +123,11 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
     }
 }
 
+/**
+ * @brief AISystem::attack
+ * @param ai
+ * @param t
+ */
 void AISystem::attack(TowerComponent &ai, Transform &t)
 {
     // Splash/Rocket type
@@ -168,20 +181,6 @@ void AISystem::draw()
     mCurve.draw();
 }
 
-// follow b-spline from start of path to end of path
-// if end of path is reached,
-// remove 1 LP (lifepoint) from player's base
-
-/* position = deBoor(t)
-     * draw NPC
-     * if(endpoint arrived)
-     *  notify(endpoint_arrived)
-     *  state(GOAL_REACHED);
-     * if(AIcomponent.hp >= 0)
-     *  state(DEATH)
-     *
-     *
-     */
 
 /**
  * @brief AIsystem::move, moves the NPC along the path
@@ -249,11 +248,21 @@ void AISystem::masterOfCurves()
     mCurve.updateTrophies();
     mCurve.updatePath();
 }
+
+/**
+ * @brief AISystem::setHealth
+ * @param health
+ */
 void AISystem::setHealth(int health)
 {
     auto ai{registry->get<AIComponent>(registry->getSelectedEntity())};
     ai.health = health;
 }
+
+/**
+ * @brief AISystem::setBSPlinePointX
+ * @param xIn
+ */
 void AISystem::setBSPlinePointX(double xIn)
 {
     GLuint entityID{registry->getSelectedEntity()};
@@ -262,6 +271,10 @@ void AISystem::setBSPlinePointX(double xIn)
     masterOfCurves();
 }
 
+/**
+ * @brief AISystem::setBSPlinePointY
+ * @param yIn
+ */
 void AISystem::setBSPlinePointY(double yIn)
 {
     GLuint entityID{registry->getSelectedEntity()};
@@ -270,6 +283,10 @@ void AISystem::setBSPlinePointY(double yIn)
     masterOfCurves();
 }
 
+/**
+ * @brief AISystem::setBSPlinePointZ
+ * @param zIn
+ */
 void AISystem::setBSPlinePointZ(double zIn)
 {
     GLuint entityID{registry->getSelectedEntity()};
