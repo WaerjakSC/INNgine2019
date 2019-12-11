@@ -341,7 +341,7 @@ void MovementSystem::rotate(GLuint eID, const vec3 &rotDelta, bool signal)
     vec3 rotation{registry->view<Transform>().get(eID).localRotation + rotDelta};
     setRotation(eID, rotation, signal);
 }
-void MovementSystem::setScale(int eID, vec3 scale, bool signal)
+void MovementSystem::setScale(GLuint eID, vec3 scale, bool signal)
 {
     auto &trans{registry->view<Transform>().get(eID)};
     trans.localScale = scale;

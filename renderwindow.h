@@ -11,7 +11,6 @@ class QOpenGLContext;
 class MainWindow;
 class RenderSystem;
 class MovementSystem;
-class LightSystem;
 class SoundSystem;
 class InputSystem;
 class CollisionSystem;
@@ -66,7 +65,6 @@ private:
     cjk::Ref<RenderSystem> mRenderer;
     cjk::Ref<ParticleSystem> mParticleSystem;
     cjk::Ref<MovementSystem> mMoveSystem;
-    cjk::Ref<LightSystem> mLightSystem;
     cjk::Ref<SoundSystem> mSoundSystem;
     cjk::Ref<InputSystem> mInputSystem;
     cjk::Ref<CollisionSystem> mCollisionSystem;

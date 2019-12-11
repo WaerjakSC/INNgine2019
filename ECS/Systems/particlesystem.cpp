@@ -1,8 +1,8 @@
 #include "particlesystem.h"
+#include "gsl_math.h"
 #include "particleshader.h"
 #include "registry.h"
 #include "resourcemanager.h"
-
 #include <QColor>
 
 ParticleSystem::ParticleSystem(cjk::Ref<ParticleShader> shader)

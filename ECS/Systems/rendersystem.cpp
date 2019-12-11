@@ -88,10 +88,6 @@ void RenderSystem::Cull(const Camera::Frustum &f)
             view.get<Mesh>(entity).mRendered = false;
     }
 }
-void RenderSystem::setSkyBoxID(const GLuint &skyBoxID)
-{
-    mSkyBoxID = skyBoxID;
-}
 void RenderSystem::toggleRendered(GLuint entityID)
 {
     bool &isRendered{registry->view<Mesh>().get(entityID).mRendered};

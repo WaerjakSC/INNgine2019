@@ -72,7 +72,6 @@ HEADERS += \
     ECS/Systems/particlesystem.h \
     ECS/Systems/scriptsystem.h \
     ECS/Systems/soundsystem.h \
-    ECS/Systems/lightsystem.h \
     ECS/Systems/rendersystem.h \
     ECS/Systems/movementsystem.h \
     ECS/Systems/collisionsystem.h \
@@ -136,7 +135,6 @@ SOURCES += main.cpp \
     ECS/Systems/particlesystem.cpp \
     ECS/Systems/scriptsystem.cpp \
     ECS/Systems/soundsystem.cpp \
-    ECS/Systems/lightsystem.cpp \
     ECS/Systems/rendersystem.cpp \
     ECS/Systems/movementsystem.cpp \
     ECS/Systems/collisionsystem.cpp \

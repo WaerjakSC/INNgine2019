@@ -5,7 +5,9 @@
 #include "deltaTime.h"
 #include "isystem.h"
 #include <QOpenGLFunctions_4_1_Core>
-
+/**
+ * @brief The Ray struct is a simple representation of a ray from point A to point B.
+ */
 struct Ray {
     using vec3 = gsl::Vector3D;
     Ray() {}
@@ -21,6 +23,9 @@ struct Ray {
     vec3 invDir;
     int sign[3];
 };
+/**
+ * @brief The Raycast struct holds relevant information for a ray from an origin point to a final point rayRange distance away.
+ */
 struct Raycast {
     Raycast(float range) : rayRange(range), closestTarget(range)
     {
@@ -34,6 +39,9 @@ struct Raycast {
     gsl::Vector3D hitPoint;
 };
 class Registry;
+/**
+ * @brief The CollisionSystem class performs collision detection/response for AABB and Sphere colliders.
+ */
 class CollisionSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
     using vec3 = gsl::Vector3D;
@@ -128,13 +136,6 @@ private:
     * @return true if distance is less than radius^2 (intersection)
     */
     bool SphereSphere(const Sphere &sphere1, const Sphere &sphere2);
-    /**
-    * @brief SphereOBB returns true if an intersection between a Sphere and an OBB occurs
-    * @param sphere
-    * @param obb
-    * @return true if distance less than radius squared ( We have an intersection )
-    */
-    //    bool SphereOBB(const Sphere &sphere, const OBB &obb);
     /**
      * @brief calcRayToSphere finds the intersection point between a ray and a sphere collider
      * Not to be confused with raySphere which runs this function for each entity

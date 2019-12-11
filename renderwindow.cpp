@@ -5,7 +5,6 @@
 #include "aisystem.h"
 #include "collisionsystem.h"
 #include "inputsystem.h"
-#include "lightsystem.h"
 #include "movementsystem.h"
 #include "particlesystem.h"
 #include "rendersystem.h"
@@ -131,9 +130,7 @@ void RenderWindow::init()
     // Set up the systems.
     mRenderer = mRegistry->registerSystem<RenderSystem>();
     mMoveSystem = mRegistry->registerSystem<MovementSystem>();
-    mLightSystem = mRegistry->registerSystem<LightSystem>(mFactory->getShader<PhongShader>());
-    mInputSystem = mRegistry->registerSystem<InputSystem>(this);
-    mInputSystem->setEditorCamController(mEditorCameraController);
+    mInputSystem = mRegistry->registerSystem<InputSystem>(this, mEditorCameraController);
     mSoundSystem = mRegistry->registerSystem<SoundSystem>();
     mCollisionSystem = mRegistry->registerSystem<CollisionSystem>();
 
@@ -151,7 +148,6 @@ void RenderWindow::init()
     mScriptSystem->init();
     mInputSystem->init(aspectRatio);
     mAISystem->init();
-    mLightSystem->init();
     mParticleSystem->init();
 
     connect(mInputSystem.get(), &InputSystem::rayHitEntity, mMainWindow, &MainWindow::mouseRayHit);
@@ -177,7 +173,6 @@ void RenderWindow::render()
         mRenderer->update(dt);
         mSoundSystem->update(dt);
         mInputSystem->update(dt);
-        mLightSystem->update(dt);
         mAISystem->update(dt);
         mParticleSystem->update(dt);
         if (mFactory->isPaused() || !mFactory->isPlaying()) {
