@@ -17,11 +17,17 @@
 #include <OpenAL/alc.h>
 #endif
 
+/** Struct for the mesh data.
+
+*/
 struct meshData {
     meshData() = default;
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
     std::string name;
+    /** Erases the mesh data.
+
+    */
     void Clear()
     {
         vertices.clear();
@@ -39,6 +45,9 @@ public:
     Component() = default;
     virtual ~Component() {}
 };
+/** Entity info component struct.
+
+*/
 struct EInfo : Component {
     EInfo() = default;
     EInfo(QString nameIn) : name(nameIn) {}
@@ -46,15 +55,18 @@ struct EInfo : Component {
     GLuint generation{0};
     bool isDestroyed{false};
 };
+
+/** Component struct.
+
+*/
 struct BillBoard : Component {
     BillBoard(bool constantYUp = true, bool normalVersion = false) : constantYUp(constantYUp), normalVersion(normalVersion) {}
-
-    //    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
-    //    gsl::Vector3D normal{0.f, 0.f, -1.f};
-
     bool constantYUp{true};
     bool normalVersion{false}; //flip between two ways to calculate forward direction
 };
+/** Component struct.
+   Defines functionality for the transform component.
+*/
 struct Transform : Component {
 
     Transform()
@@ -85,7 +97,6 @@ struct Transform : Component {
     vec3 localRotation{0};
     vec3 rotation{0};
     vec3 localScale{1};
-    //    vec3 scale{1};
     gsl::Matrix4x4 modelMatrix, translationMatrix, rotationMatrix, scaleMatrix;
 
     std::vector<GLuint> children;
@@ -96,6 +107,9 @@ struct Transform : Component {
  * @brief The MaterialComponent class holds the shader, texture unit and objectcolor
  */
 class Shader;
+/** Component struct.
+   Defines functionality for the material component.
+*/
 struct Material : public Component {
     Material(cjk::Ref<Shader> shaderIn = nullptr, GLuint texUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
 
@@ -106,6 +120,9 @@ struct Material : public Component {
     cjk::Ref<Shader> shader;
 };
 
+/** Component struct.
+   Defines functionality the mesh component.
+*/
 struct Mesh : public Component {
     Mesh()
     {
@@ -134,11 +151,17 @@ struct Mesh : public Component {
         return name == other.name; // name of the obj/txt file should be enough to verify if they're the same.
     }
 };
+/** Struct for a particle.
+   Defines functionality for a particle.
+*/
 struct Particle {
     gsl::Vector3D position, velocity;
     float life{-1.f}, size; // Remaining life of the particle. if < 0 : dead and unused.
     GLubyte r, b, g, a;
 };
+/** Component struct.
+   Defines functionality for the particle emitter component.
+*/
 struct ParticleEmitter : public Component {
     ParticleEmitter(bool active = false, bool decay = false, size_t nrParticles = 100, int pps = 50,
                     const vec3 &initDir = vec3{0}, const QColor &initColor = QColor{255, 0, 0, 127},
@@ -178,6 +201,9 @@ struct ParticleEmitter : public Component {
     int activeParticles{0};
     int lastUsedParticle{0};
 };
+/** Component struct.
+   Defines functionality for the light component.
+*/
 struct Light : public Component {
     Light(GLfloat ambStr = 0.3f, vec3 ambColor = vec3{0.3f, 0.3f, 0.3f},
           GLfloat lightStr = 0.7f, vec3 lColor = vec3{0.3f, 0.3f, 0.3f},
@@ -194,6 +220,10 @@ struct Light : public Component {
     vec3 lightColor;
     vec3 objectColor;
 };
+/** Component struct.
+   Defines functionality for the input component.
+   Supports input from keyboard and mouse.
+*/
 struct Input : public Component {
     Input()
     {
@@ -229,6 +259,10 @@ struct Input : public Component {
     bool F1{false};
 };
 
+/** Component struct.
+   Defines functionality for the sound component.
+
+*/
 struct Sound : public Component {
     Sound() {}
     /**
@@ -259,7 +293,6 @@ struct Sound : public Component {
 struct Collision : public Component {
 public:
     Collision() {}
-    //    Collision(vec3 size) : colType(type) {}
 
     bool trigger{false};
     Mesh colliderMesh;
@@ -286,24 +319,32 @@ struct AABB : public Collision {
 };
 
 /**
-  * @brief Sphere struct
+  * @brief Sphere collider struct
   */
 struct Sphere : public Collision {
     vec3 position;
     float radius;
-
-    // default constructor
+    /** Constructor for the sphere collider
+      @param Static
+    */
     inline Sphere(bool stat = true) : radius(1.0f)
     {
         isStatic = stat;
     };
-    // constructor with radius and position params
+    /** Constructor for the sphere collider
+      @param Position
+      @param Radius
+      @param Static
+    */
     inline Sphere(const vec3 &pos, const float &r, bool stat = true) : position(pos), radius(r)
     {
         isStatic = stat;
     }
 };
 
+/** Component struct.
+   Defines functionality for the game camera component.
+*/
 struct GameCamera : public Component {
     inline GameCamera(vec3 pos = vec3{0}, float pitch = 0, float yaw = 0, bool active = false) : mCameraPosition(pos), mPitch(pitch), mYaw(yaw), mIsActive(active)
     {
@@ -315,7 +356,7 @@ struct GameCamera : public Component {
 };
 
 /**
- * @brief The BSplineCurve struct
+ * @brief BSpline control point struct.
  */
 struct BSplinePoint : Component {
     BSplinePoint(vec3 loc = vec3{0}) : location(loc)
@@ -334,24 +375,34 @@ struct Buildable : public Component {
     }
     bool isBuildable;
 };
-// TD enemies følger en path fra A til B
-// de kan bevege seg, ta skade, dø
+
+/** Enum class for the NPCstate.
+   Used with a finite state machine in the AIsystem.
+*/
 enum class NPCstates { MOVE,
                        DEATH,
                        GOAL_REACHED };
-
+/** Enum class for the NPCevents.
+   Used to store new events by the AIsystem.
+*/
 enum class NPCevents { ENDPOINT_ARRIVED,
                        ITEM_TAKEN,
                        DAMAGE_TAKEN };
-
+/** Enum class for the tower states.
+    Used with a finite state machine in the AIsystem.
+*/
 enum class TowerStates { IDLE,
                          ATTACK,
                          PLACEMENT };
-
+/** Enum class for the attack types.
+    Used by the tower component in the AIsystem.
+*/
 enum class AttackType { SPLASH,
                         PHYSICAL,
                         MAGIC };
-// GNOMES
+/** Component struct.
+    Defines functionality for the AIcomponent.
+*/
 struct AIComponent : public Component {
     AIComponent(int hp = 100, float speed = 0.03f) : health(hp), moveSpeed(speed) {}
     int health;
@@ -360,7 +411,9 @@ struct AIComponent : public Component {
     NPCstates state{NPCstates::MOVE};
     std::queue<NPCevents> notification_queue;
 };
-// Towers
+/** Component struct.
+    Defines functionality for the tower component, with attributes for the buildable towers.
+*/
 struct TowerComponent : public Component {
     TowerComponent(int dmg = 40, float cd = 0.5f, float r = 13.f) : damage(dmg), range(r), cooldown(cd) {}
     int damage;
@@ -372,7 +425,10 @@ struct TowerComponent : public Component {
     TowerStates state{TowerStates::PLACEMENT};
     AttackType attackState = AttackType::PHYSICAL;
 };
-// BASE
+
+/** Component struct.
+    Defines functionality for the player component.
+*/
 struct PlayerComponent : public Component {
     PlayerComponent() {}
     int health = 100;
@@ -380,6 +436,9 @@ struct PlayerComponent : public Component {
     int kills = 0;
 };
 
+/** Component struct.
+    Defines functionality for the bullet component.
+*/
 struct Bullet : public Component {
     Bullet() {}
     Bullet(vec3 route, int d, float s) : direction(route), damage(d), speed(s) {}
