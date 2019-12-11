@@ -31,7 +31,7 @@ void CollisionSystem::runAABBSimulations()
         auto &aabb{view.get<AABB>(entity)};
         for (auto tower : towerRangeView) {
             auto [sphere, towerComp]{towerRangeView.get<Sphere, TowerComponent>(tower)};
-            if (!bothStatic(aabb, sphere) && towerComp.state != TowerStates::PLACEMENT)
+            if (!shouldCheckCollision(aabb, sphere) && towerComp.state != TowerStates::PLACEMENT)
                 if (SphereAABB(sphere, aabb)) {
                     // NOTIFY FSM
                     // send event notify ON ENTER (hei se på meg noe er i radius jippi)
@@ -78,7 +78,7 @@ void CollisionSystem::runSphereSimulations()
         for (auto otherEntity : view) {
             if (entity != otherEntity) {
                 auto &otherSphere{view.get<Sphere>(otherEntity)};
-                if (!bothStatic(sphere, otherSphere))
+                if (!shouldCheckCollision(sphere, otherSphere))
                     if (SphereSphere(sphere, otherSphere)) {
                         QString entity1{view.get<EInfo>(entity).name};
                         QString entity2{view.get<EInfo>(otherEntity).name};
@@ -148,9 +148,9 @@ Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect)
     vec3 origin{curController->cameraPosition()};
     return Ray{origin, direction};
 }
-inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs)
+inline bool CollisionSystem::shouldCheckCollision(const Collision &lhs, const Collision &rhs)
 {
-    return lhs.isStatic == rhs.isStatic && lhs.isStatic == true;
+    return lhs.isStatic != rhs.isStatic || (!lhs.isStatic && !rhs.isStatic);
 }
 
 gsl::Vector3D CollisionSystem::getMin(const AABB &aabb)
