@@ -53,18 +53,19 @@ void AISystem::updatePlayOnly(DeltaTime dt)
 
     auto towerView{registry->view<TowerComponent, Sphere, Transform>()};
     for (auto entity : towerView) {
-        auto [aicomponent, sphere, transform]{towerView.get<TowerComponent, Sphere, Transform>(entity)};
-        switch (aicomponent.state) {
+        auto [ai, sphere, transform]{towerView.get<TowerComponent, Sphere, Transform>(entity)};
+        switch (ai.state) {
         case TowerStates::IDLE:
             // scanning for monsters
-            detectEnemies(aicomponent, sphere);
+            detectEnemies(ai, sphere);
             break;
         case TowerStates::ATTACK:
-            // kill goblin
-            attack(aicomponent, transform);
-            break;
-        case TowerStates::COOLDOWN:
-            // cooldown
+            if (ai.curCooldown >= 0.f)
+                ai.curCooldown -= dt;
+            if (ai.curCooldown <= 0.f) {
+                attack(ai, transform);
+                ai.curCooldown = ai.cooldown;
+            }
             break;
         }
     }
@@ -121,12 +122,16 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
 
     // Standard/Projectile type
-    auto &trans{registry->get<Transform>(ai.targetID)};
-    GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
-    registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
-    registry->add<Sphere>(bulletID, vec3{0}, .3f, false);
-    registry->get<Transform>(bulletID).localPosition = t.position;
-    registry->get<Transform>(bulletID).matrixOutdated = true;
+    if(registry->contains<Transform>(ai.targetID)){
+        auto &trans{registry->get<Transform>(ai.targetID)};
+        GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
+        registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
+        registry->add<Sphere>(bulletID, vec3{0}, .3f, false);
+        registry->get<Transform>(bulletID).localPosition = t.position;
+        registry->get<Transform>(bulletID).matrixOutdated = true;
+    } else {
+        ai.state = TowerStates::IDLE;
+    }
 }
 
 /**

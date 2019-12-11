@@ -371,12 +371,12 @@ struct AIComponent : public Component {
 };
 // Towers
 struct TowerComponent : public Component {
-    TowerComponent(int dmg = 10) : damage(dmg) {}
+    TowerComponent(int dmg = 10, float cd = 2.5f, float r = 4.f) : damage(dmg), cooldown(cd), range(r) {}
     int damage;
-    int range;
-    float attackSpeed;
-    float projectileSpeed;
+    float range;
+    float projectileSpeed = 5.f;
     float cooldown;
+    float curCooldown = 1.5f;
     GLuint targetID;
     TowerStates state = TowerStates::IDLE;
     AttackType attackState = AttackType::PHYSICAL;
