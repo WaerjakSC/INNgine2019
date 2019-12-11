@@ -176,6 +176,11 @@ void InputSystem::handleMouseInput()
         dragEntity(draggedEntity);
 }
 
+bool InputSystem::buildableDebugMode() const
+{
+    return mBuildableDebug;
+}
+
 cjk::Ref<CameraController> InputSystem::editorCamController() const
 {
     return mEditorCamController;
@@ -326,7 +331,10 @@ cjk::Ref<CameraController> InputSystem::currentCameraController()
     }
     return mEditorCamController;
 }
-
+void InputSystem::setGameCameraInactive()
+{
+    mActiveGameCamera = false;
+}
 void InputSystem::setCameraSpeed(float value)
 {
     mCameraSpeed += value;

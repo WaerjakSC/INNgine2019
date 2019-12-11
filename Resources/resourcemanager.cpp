@@ -4,7 +4,6 @@
 #include "colorshader.h"
 #include "innpch.h"
 #include "inputsystem.h"
-#include "lightsystem.h"
 #include "mainwindow.h"
 #include "movementsystem.h"
 #include "registry.h"

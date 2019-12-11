@@ -19,6 +19,8 @@ public:
     void update(DeltaTime = 0.016) override;
     void updateEditorOnly();
 
+    void setSkyBoxID(const GLuint &skyBoxID);
+
 public slots:
     /**
      * @brief changeShader Replace the entity's current shader with a new shader given by the editor GUI.

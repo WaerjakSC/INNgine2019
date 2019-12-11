@@ -63,6 +63,9 @@ public:
 
     cjk::Ref<CameraController> editorCamController() const;
 
+    void setGameCameraInactive();
+    bool buildableDebugMode() const;
+
 public slots:
     void setCameraPositionX(double xIn);
     void setCameraPositionY(double yIn);

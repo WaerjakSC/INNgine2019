@@ -70,6 +70,11 @@ void RenderSystem::drawColliders()
         glDrawArrays(aabb.colliderMesh.mDrawType, 0, aabb.colliderMesh.mVerticeCount);
     }
 }
+
+void RenderSystem::setSkyBoxID(const GLuint &skyBoxID)
+{
+    mSkyBoxID = skyBoxID;
+}
 /**
  * @brief RenderWindow::Cull, Cull furries right now
  * @param f, the frustum
