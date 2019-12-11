@@ -6,7 +6,6 @@
 #include "sparseset.h"
 #include "vertex.h"
 #include <QColor>
-#include <QJSEngine>
 #include <queue>
 
 #ifdef _WIN32
@@ -355,8 +354,8 @@ enum class NPCevents { ENDPOINT_ARRIVED,
                        DAMAGE_TAKEN };
 
 enum class TowerStates { IDLE,
-                       ATTACK,
-                       COOLDOWN };
+                         ATTACK,
+                         COOLDOWN };
 
 enum class AttackType { SPLASH,
                         PHYSICAL,

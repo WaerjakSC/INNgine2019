@@ -11,6 +11,9 @@ struct Collision;
 struct BillBoard;
 struct Material;
 class Registry;
+/**
+ * @brief The MovementSystem class iterates on all entities containing Transform components, and contains functions to get and set Transform variables.
+ */
 class MovementSystem : public QObject, public ISystem {
     Q_OBJECT
     friend class RenderWindow;
@@ -79,6 +82,12 @@ public:
     void moveY(GLuint eID, float yIn, bool signal = true);
     void moveZ(GLuint eID, float zIn, bool signal = true);
     // ******** Rotation Setters ******** //
+    /**
+     * @brief setRotation Set rotation of the entity
+     * @param eID entity ID
+     * @param rotation new rotation vector
+     * @param signal
+     */
     void setRotation(GLuint eID, vec3 rotation, bool signal = true);
 
     void setRotationX(int eID, float xIn, bool signal = true);
@@ -90,7 +99,13 @@ public:
     void rotateZ(GLuint eID, float zIn, bool signal = true);
 
     // ******** Scale Setters ******** //
-    void setScale(int eID, vec3 scale, bool signal = true);
+    /**
+     * @brief setScale Set a new scale value for an entity
+     * @param eID entity ID
+     * @param scale new scale vector
+     * @param signal
+     */
+    void setScale(GLuint eID, vec3 scale, bool signal = true);
 
     void setScaleX(int eID, float xIn, bool signal = true);
     void setScaleY(int eID, float yIn, bool signal = true);
@@ -130,10 +145,18 @@ private:
     Registry *registry;
     /**
      * @brief updateModelMatrix Update the entity's model matrix if it's outdated, otherwise does nothing
-     * @param eID
+     * @param eID entityID
      */
     void updateModelMatrix(GLuint eID);
+    /**
+     * @copybrief MovementSystem::updateModelMatrix(GLuint)
+     * @param comp Transform component of the entity.
+     */
     void updateModelMatrix(Transform &comp);
+    /**
+     * @brief updateColliders Sets an entity's colliders to outdated
+     * @param eID entityID
+     */
     void updateColliders(GLuint eID);
 
     /**
@@ -145,6 +168,10 @@ private:
      */
     gsl::Matrix4x4 getTRMatrix(const Transform &comp);
 
+    /**
+     * @brief updateTRS update a Transform component's Scale, Rotation and Translation matrices, in that order.
+     * @param comp
+     */
     void updateTRS(Transform &comp);
     /**
      * @brief updateTS Update the transform component belonging to the AABB component given
@@ -157,9 +184,23 @@ private:
      */
     void updateTS(Sphere &comp);
 
+    /**
+     * @brief updateBillBoardTransform Specialized function for billboards, public
+     * @param entity
+     */
     void updateBillBoardTransform(GLuint entity);
+    /**
+     * @brief updateColliderTransformPrivate actually updates the colliders of each entity
+     * @param col
+     * @param trans
+     */
     void updateColliderTransformPrivate(Collision &col, const Transform &trans);
-
+    /**
+     * @brief updateBillBoardTransformPrivate private version of the updateBillBoardTransform function, does the actual updating.
+     * @param billboard
+     * @param transform
+     * @param mat
+     */
     void updateBillBoardTransformPrivate(const BillBoard &billboard, Transform &transform, const Material &mat);
 };
 

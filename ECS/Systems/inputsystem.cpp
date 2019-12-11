@@ -11,16 +11,16 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 
-InputSystem::InputSystem(RenderWindow *window)
+InputSystem::InputSystem(RenderWindow *window, cjk::Ref<CameraController> editorController)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},
-      mRenderWindow{window}
+      mRenderWindow{window}, mEditorCamController(editorController)
 {
 }
 
 void InputSystem::update(DeltaTime dt)
 {
     if (!mActiveGameCamera)
-        editorCamController()->update();
+        mEditorCamController->update();
     handlePlayerController(dt);
     handleKeyInput();
     handleMouseInput();
@@ -49,7 +49,7 @@ void InputSystem::reset()
 {
     mEnteredWindow = false;
     mIsConfined = false;
-    playerController().F1 = false;
+    mPlayerController.F1 = false;
     mIsDragging = false;
     for (auto controller : mGameCameraControllers) {
         controller->setupController();
@@ -176,9 +176,9 @@ void InputSystem::handleMouseInput()
         dragEntity(draggedEntity);
 }
 
-bool InputSystem::buildableDebugMode() const
+cjk::Ref<CameraController> InputSystem::editorCamController() const
 {
-    return mBuildableDebug;
+    return mEditorCamController;
 }
 void InputSystem::confineMouseToScreen(DeltaTime dt)
 {
@@ -310,21 +310,6 @@ void InputSystem::dragEntity(GLuint entity)
     tf.matrixOutdated = true;
 }
 
-void InputSystem::setGameCameraInactive()
-{
-    mActiveGameCamera = false;
-}
-
-cjk::Ref<CameraController> InputSystem::editorCamController() const
-{
-    return mEditorCamController;
-}
-
-void InputSystem::setEditorCamController(const cjk::Ref<CameraController> &editorCamController)
-{
-    mEditorCamController = editorCamController;
-}
-
 std::vector<cjk::Ref<GameCameraController>> InputSystem::gameCameraControllers() const
 {
     return mGameCameraControllers;
@@ -340,15 +325,6 @@ cjk::Ref<CameraController> InputSystem::currentCameraController()
         }
     }
     return mEditorCamController;
-}
-
-Input &InputSystem::playerController()
-{
-    return mPlayerController;
-}
-Input InputSystem::playerController() const
-{
-    return mPlayerController;
 }
 
 void InputSystem::setCameraSpeed(float value)
@@ -619,9 +595,9 @@ void InputSystem::setActiveCamera(bool checked)
     else {
         selectedCam.mIsActive = false;
         selectedCam.mOutDated = true;
-        setGameCameraInactive();
+        mActiveGameCamera = false;
         // Unchecking a checked box defaults the editor to the main editor camera controller
-        factory->setActiveCameraController(editorCamController());
+        factory->setActiveCameraController(mEditorCamController);
     }
 }
 void InputSystem::setPitch(double pitch)

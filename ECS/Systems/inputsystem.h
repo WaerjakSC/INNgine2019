@@ -11,40 +11,57 @@ class GameCameraController;
 class QKeyEvent;
 class QMouseEvent;
 class QWheelEvent;
+/**
+ * @brief The InputSystem class is in charge of input events and the various camera controllers.
+ */
 class InputSystem : public QObject, public ISystem {
     Q_OBJECT
     using vec3 = gsl::Vector3D;
 
 public:
-    InputSystem(RenderWindow *window);
+    InputSystem(RenderWindow *window, cjk::Ref<CameraController> editorController);
     void update(DeltaTime dt = 0.016) override;
     void updatePlayOnly(DeltaTime deltaTime = 0.016);
+    /**
+     * @brief init creates a GameCameraController for each entity containing a GameCamera component.
+     * @param aspectRatio
+     */
     void init(float aspectRatio = 1.92f);
-    void keyPressEvent(QKeyEvent *event);
 
+    void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    Input playerController() const;
-    Input &playerController();
-
-    cjk::Ref<CameraController> editorCamController() const;
-    void setEditorCamController(const cjk::Ref<CameraController> &editorCamController);
-
+    /**
+     * @brief gameCameraControllers getter for the vector of game camera controllers
+     * @return
+     */
     std::vector<cjk::Ref<GameCameraController>> gameCameraControllers() const;
+    /**
+     * @brief currentCameraController finds and returns the active game camera controller if in play mode, otherwise returns the editor camera controller
+     * @return
+     */
     cjk::Ref<CameraController> currentCameraController();
 
+    /**
+     * @brief onResize called when the RenderWindow is resized. Updates the aspectRatio of all camera controllers.
+     * @param aspectRatio
+     */
     void onResize(float aspectRatio);
-
-    void setGameCameraInactive();
-
+    /**
+     * @brief reset Resets editor and play variables, for instance when switching from Editor to Play or vice versa.
+     */
     void reset();
+    /**
+     * @brief setBuildableDebug If true, turns on colored tiles for debugging the buildable mode
+     * @param value
+     */
     void setBuildableDebug(bool value);
 
-    bool buildableDebugMode() const;
+    cjk::Ref<CameraController> editorCamController() const;
 
 public slots:
     void setCameraPositionX(double xIn);
@@ -91,11 +108,10 @@ private:
     vec3 origColor{0.57f, 0.57f, 0.57f};
     bool mIsDragging{false};
 
+    RenderWindow *mRenderWindow;
     cjk::Ref<CameraController> mEditorCamController;
     std::vector<cjk::Ref<GameCameraController>> mGameCameraControllers;
     bool mActiveGameCamera{false};
-
-    RenderWindow *mRenderWindow;
 
     Input mPlayerController;
     vec3 mDesiredVelocity;
