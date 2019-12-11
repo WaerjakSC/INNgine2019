@@ -7,18 +7,10 @@ AISystem::AISystem() : registry(Registry::instance())
 {
 }
 
-/**
- * @brief AIsystem::update, runs the highly sophisticated AI cortex
- * @param dt
- */
 void AISystem::update(DeltaTime)
 {
 }
 
-/**
- * @brief AISystem::updatePlayOnly
- * @param dt
- */
 void AISystem::updatePlayOnly(DeltaTime dt)
 {
     // Run the eventHandler incase of events
@@ -62,8 +54,10 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         case TowerStates::IDLE:
             // scanning for monsters
             detectEnemies(ai, sphere);
+            qDebug() << "AI STATE: " + QString::number(static_cast<int>(ai.state)) + "\n";
             break;
         case TowerStates::ATTACK:
+            qDebug() << "AI STATE: " + QString::number(static_cast<int>(ai.state)) + "\n";
             if (ai.curCooldown >= 0.f)
                 ai.curCooldown -= dt;
             if (ai.curCooldown <= 0.f) {
@@ -78,27 +72,19 @@ void AISystem::updatePlayOnly(DeltaTime dt)
     }
 }
 
-/**
- * @brief AISystem::updateEditorOnly
- */
+
 void AISystem::updateEditorOnly(DeltaTime)
 {
     draw();
 }
 
-/**
- * @brief AISystem::resetTimers
- */
 void AISystem::resetTimers()
 {
     curWaveCD = 1.f;
     curSpawnCD = 0.f;
     curSpawnDuration = 0.f;
 }
-/**
- * @brief AISystem::spawnWave
- * @param dt
- */
+
 void AISystem::spawnWave(DeltaTime dt)
 {
     curSpawnDuration += dt;
@@ -110,14 +96,11 @@ void AISystem::spawnWave(DeltaTime dt)
         curSpawnCD = spawnCD;
     }
 }
-/**
- * @brief AISystem::detectEnemies
- * @param ai
- * @param sphere
- */
+
 void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if (!sphere.overlappedEntities.empty()) {
+        qDebug() << "AIsystem - detectEnemies: Enemy Detected\n";
         ai.targetID = sphere.overlappedEntities.getList()[0];
         qDebug() << "New target: " + QString::number(ai.targetID);
         ai.state = TowerStates::ATTACK;
@@ -127,11 +110,6 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
     }
 }
 
-/**
- * @brief AISystem::attack
- * @param ai
- * @param t
- */
 void AISystem::attack(TowerComponent &ai, Transform &t)
 {
     // Splash/Rocket type
@@ -148,15 +126,14 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
         registry->get<Transform>(bulletID).localPosition = t.position;
         registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
+        qDebug() << "AIsystem - attack: Projectile spawned\n";
+
     }
     else {
         ai.state = TowerStates::IDLE;
     }
 }
 
-/**
- * @brief AIsystem::eventHandler, event handling
- */
 void AISystem::eventHandler(AIComponent &ai)
 {
     while (!ai.notification_queue.empty()) {
@@ -177,19 +154,11 @@ void AISystem::eventHandler(AIComponent &ai)
     }
 }
 
-/**
- * @brief AIsystem::draw
- */
 void AISystem::draw()
 {
     mCurve.draw();
 }
 
-/**
- * @brief AIsystem::move, moves the NPC along the path
- * @param deltaT
- * @return
- */
 std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform &transform)
 {
     float &t = ai.pathT; // shortcut
@@ -211,19 +180,12 @@ std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform
     return {};
 }
 
-/**
- * @brief AIsystem::init, initializes NPC and curve
- * @param eID
- */
 void AISystem::init()
 {
     mCurve.init();
     masterOfCurves();
 }
 
-/**
- * @brief AIsystem::death, todo
- */
 void AISystem::death(const GLuint entityID)
 {
     // hp <= 0
@@ -234,9 +196,6 @@ void AISystem::death(const GLuint entityID)
     qDebug() << "Murdered another innocent gnome!";
 }
 
-/**
- * @brief AIsystem::goalReached, todo
- */
 void AISystem::goalReached(const GLuint entityID)
 {
     // endpoint reached
@@ -244,29 +203,19 @@ void AISystem::goalReached(const GLuint entityID)
     // delete entity
     registry->removeEntity(entityID);
 }
-/**
- * @brief AIsystem::masterOfCurves, helper function that updates trophies and path
- */
+
 void AISystem::masterOfCurves()
 {
     mCurve.updateTrophies();
     mCurve.updatePath();
 }
 
-/**
- * @brief AISystem::setHealth
- * @param health
- */
 void AISystem::setHealth(int health)
 {
     auto ai{registry->get<AIComponent>(registry->getSelectedEntity())};
     ai.health = health;
 }
 
-/**
- * @brief AISystem::setBSPlinePointX
- * @param xIn
- */
 void AISystem::setBSPlinePointX(double xIn)
 {
     GLuint entityID{registry->getSelectedEntity()};
@@ -275,10 +224,6 @@ void AISystem::setBSPlinePointX(double xIn)
     masterOfCurves();
 }
 
-/**
- * @brief AISystem::setBSPlinePointY
- * @param yIn
- */
 void AISystem::setBSPlinePointY(double yIn)
 {
     GLuint entityID{registry->getSelectedEntity()};
@@ -287,10 +232,6 @@ void AISystem::setBSPlinePointY(double yIn)
     masterOfCurves();
 }
 
-/**
- * @brief AISystem::setBSPlinePointZ
- * @param zIn
- */
 void AISystem::setBSPlinePointZ(double zIn)
 {
     GLuint entityID{registry->getSelectedEntity()};
@@ -298,10 +239,7 @@ void AISystem::setBSPlinePointZ(double zIn)
     bspline.location.z = zIn;
     masterOfCurves();
 }
-/**
- * @brief AIsystem::setControlPoints
- * @param cps
- */
+
 void AISystem::setControlPoints(std::vector<vec3> cps)
 {
     mCurve.setControlPoints(cps);

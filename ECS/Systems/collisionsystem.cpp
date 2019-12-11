@@ -39,6 +39,7 @@ void CollisionSystem::runAABBSimulations()
                     if (aabb.overlapEvent && sphere.overlapEvent) {
                         if (!sphere.overlappedEntities.contains(entity)) {
                             sphere.overlappedEntities.insert(entity);
+                             qDebug() << "ON ENTER: Entity in range";
                         }
                     }
                     collisions++;
@@ -53,6 +54,7 @@ void CollisionSystem::runAABBSimulations()
                 auto &ai{view.get<AIComponent>(entity)};
                 ai.health -= bul.damage;
                 ai.notification_queue.push(NPCevents::DAMAGE_TAKEN);
+                qDebug() << "Enemy health: " + QString::number(ai.health);
                 registry->removeEntity(bulletID);
             }
         }
@@ -68,6 +70,8 @@ void CollisionSystem::runAABBSimulations()
                 auto &aabb{view.get<AABB>(entity)};
                 if (!SphereAABB(sphere, aabb)) {
                     sphere.overlappedEntities.remove(entity);
+                    qDebug() << "ON EXIT: Entity removed";
+
                 }
             }
         }
