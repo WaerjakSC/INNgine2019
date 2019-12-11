@@ -2,8 +2,7 @@
 #define HUD_H
 
 
-class hud
-{
+class hud {
 public:
     hud();
 };
