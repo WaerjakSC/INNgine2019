@@ -30,7 +30,6 @@ void CollisionSystem::runAABBSimulations()
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
         for (auto tower : towerRangeView) {
-            if (entity != tower) {
                 auto &sphere{towerRangeView.get<Sphere>(tower)};
                 if (!bothStatic(aabb, sphere))
                     if (SphereAABB(sphere, aabb)) {                
@@ -44,7 +43,17 @@ void CollisionSystem::runAABBSimulations()
                         }
                         collisions++;
                         // notify FSM if needed
-                    }
+
+            }
+        }
+
+        auto bulletview{registry->view<Bullet, Sphere>()};
+        for( auto bulletID : bulletview){
+            auto [bul, sphere]{bulletview.get<Bullet, Sphere>(bulletID)};
+            if(SphereAABB(sphere,aabb)){
+                auto &ai{view.get<AIComponent>(entity)};
+                ai.health -= bul.damage;
+                registry->removeEntity(bulletID);
             }
         }
     }

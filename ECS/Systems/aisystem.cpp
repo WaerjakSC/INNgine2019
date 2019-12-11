@@ -112,7 +112,7 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
     }
 }
 
-void AISystem::attack(TowerComponent &ai)
+void AISystem::attack(TowerComponent &ai, Transform &t)
 {
     // Splash/Rocket type
     // BSpline from Tower to Enemy entity,
@@ -120,8 +120,11 @@ void AISystem::attack(TowerComponent &ai)
 
     // Standard/Projectile type
     auto &trans {registry->get<Transform>(ai.targetID)};
-    GLuint bulletID = registry->makeEntity("bullet");
+    GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
     registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
+    registry->add<Sphere>(bulletID, vec3{0}, .3f, false);
+    registry->get<Transform>(bulletID).localPosition = t.position;
+    registry->get<Transform>(bulletID).matrixOutdated = true;
 }
 
 /**
