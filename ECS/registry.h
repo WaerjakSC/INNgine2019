@@ -12,17 +12,27 @@
 #include <unordered_set>
 
 template <typename... Member>
+/**
+ * The GroupHandler struct contains the pools iterated on by a Group.
+ */
 struct GroupHandler {
     GroupHandler(const std::tuple<Pool<Member> *...> pools)
         : ownedPools(pools) {}
     const std::tuple<Pool<Member> *...> ownedPools;
     size_t owned{};
 };
+/**
+ * The GroupData struct is used to check if a group already exists.
+ */
 struct GroupData {
     template <typename Func>
     GroupData(size_t ext, const Func &ownedType)
         : extent(ext), ownsType(ownedType) {}
     size_t extent;
+    /**
+     * Function object for checking if a pool is already owned by a Group.
+     * Checks typeid().name() against already owned pools' typenames.
+     */
     bool (*ownsType)(const std::string &);
     std::unordered_set<std::string> pools;
     size_t owned{};
@@ -30,7 +40,7 @@ struct GroupData {
 class Registry : public QObject {
     Q_OBJECT
     /**
-     * @brief Simple getter for a type's typeid name
+     * Simple getter for a type's typeid name.
      */
     template <typename Type>
     static std::string type()
@@ -44,7 +54,7 @@ public:
     virtual ~Registry() {}
 
     /**
-     * @brief Creates a view guaranteed to contain the entities containing all the components given in the template argument.
+     * Creates a view guaranteed to contain the entities containing all the components given in the template argument.
      * Essentially free to create, lifetime should be very low to ensure a view is up to date.
      * Simply create to get the entities you want, and discard immediately after use.
      * @tparam List of the component types you want the view to contain.
@@ -54,7 +64,16 @@ public:
     {
         return View{getPool<Comp>()...};
     }
+
     template <typename... Owned>
+    /**
+     * Creates a group guaranteed to contain the entities that own all the components given in the template argument.
+     * Essentially free to create, can and should be discarded every frame.
+     * First time initialization can be somewhat expensive if done while entities exist. Create before entities are created to have the group sort them as they are created.
+     * Slight performance cost to component creation in the Pools owned by a Group, however this is more than offset by the gain in performance from being able to guarantee
+     * that all the components iterated by the Group will be tightly packed in memory.
+     * @return
+     */
     Group<Owned...> group()
     {
         const auto cpools{std::make_tuple(getPool<Owned>()...)};
@@ -88,7 +107,7 @@ public:
         return {&data->owned, std::get<Pool<Owned> *>(cpools)...};
     }
     /**
-     * @brief Register component type. A component must be registered before it can be used by the ECS.
+     * Register component type. A component must be registered before it can be used by the ECS.
      */
     template <typename Type>
     void registerComponent()
@@ -104,7 +123,7 @@ public:
         }
     }
     /**
-     * @brief Register a system with the ECS. Not strictly required, but will allow you to use the registry to get a reference to the system.
+     * Register a system with the ECS. Not strictly required, but will allow you to use the registry to get a reference to the system.
      */
     template <typename Type, class... Args>
     cjk::Ref<Type> registerSystem(Args... args)
@@ -122,7 +141,7 @@ public:
         }
     }
     /**
-    * @brief Make a generic entity.
+    * Make a generic entity.
     * Add default state components by writing makeEntity<ComponentType1, ComponentType2, etc...>(name, signal)
     * @param name Name of the entity. Leave blank if no name desired.
     * @return Returns the entity ID for use in adding components or other tasks.
@@ -143,7 +162,7 @@ public:
         return eID;
     }
     /**
-     * @brief Adds an entity and its new component to a pool of that type.
+     * Adds an entity and its new component to a pool of that type.
      * Entity is equivalent to Component in this case, since a pool won't contain the entity if the entity doesn't have the component.
      * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
      * @param entityID
@@ -159,8 +178,13 @@ public:
         onConstruct<Type>(entityID);
         return component;
     }
-    void onConstruct(const std::string &type, const GLuint entityID);
     template <typename Type>
+    /**
+     * Called when an entity is assigned a component owned by a Group.
+     * The Group holds an integer pointing to the last member owned by the Group to enable it to sort its owned pools efficiently.
+     * This function increments that integer.
+     * @param entityID
+     */
     void onConstruct(const GLuint entityID)
     {
         for (auto &group : mGroups) {
@@ -184,8 +208,10 @@ public:
             }
         }
     }
+    void onConstruct(const std::string &type, const GLuint entityID);
+
     /**
-     * @brief Remove a component of type Type from the entity with entityID.
+     * Remove a component of type Type from the entity with entityID.
      */
     template <typename Type>
     void remove(GLuint entityID)
@@ -197,6 +223,12 @@ public:
     }
     void onDestroy(const std::string &type, const GLuint entityID);
     template <typename Type>
+    /**
+     * Called when an entity is destroyed.
+     * If it's owned by a Group, this will decrement the integer pointing to the last member owned by the Group,
+     * and swap the entity being destroyed with the entity past the index of that integer.
+     * @param entityID
+     */
     void onDestroy(const GLuint entityID)
     {
         for (auto &group : mGroups) {
@@ -217,7 +249,7 @@ public:
         }
     }
     /**
-     * @brief Get a reference to the Type component owned by entityID
+     * Get a reference to the Type component owned by entityID
      */
     template <typename Type>
     Type &get(GLuint entityID)
@@ -226,6 +258,11 @@ public:
         return getPool<Type>()->get(entityID);
     }
     template <typename... Type>
+    /**
+    * Get a reference to one or more systems.
+    * @example auto inputSys{registry->system<InputSystem>()};
+    * @example auto [inputSys, moveSys]{registry->system<InputSystem, MovementSystem>()};
+    */
     decltype(auto) system()
     {
         if constexpr (sizeof...(Type) == 1) {
@@ -235,7 +272,8 @@ public:
             return std::tuple<decltype(getSystem<Type>())...>{getSystem<Type>()...};
     }
     /**
-     * @brief get a reference to the last component created of that Type, if you don't have or don't need the entityID
+     * Get a reference to the last component in the Pool of that Type.
+     * Not guaranteed to be the last created component, due to how Groups may sort their pools.
      */
     template <typename Type>
     Type &getLastComponent()
@@ -244,7 +282,7 @@ public:
         return getPool<Type>()->back();
     }
     /**
-     * @brief entityDestroyed is called when an entity is removed from the game.
+     * Called when an entity is removed from the game.
      * Iterates through all the Pools, and if they contain a component owned by entityID, delete and re-arrange the Pool.
      * @param entityID
      */
@@ -266,7 +304,7 @@ public:
         }
     }
     /**
-     * @brief Checks if an entity owns the given component types.
+     * Checks if an entity owns the given component types.
      */
     template <typename... Type>
     bool contains(GLuint eID)
@@ -276,25 +314,31 @@ public:
     }
 
     /**
-     * @brief duplicateEntity Creates an entity with the exact same name and components as the duped entity.
+     * Creates an entity with the exact same name and components as the duped entity.
      * @param dupedEntity
      * @return
      */
     GLuint duplicateEntity(GLuint dupedEntity);
+    /**
+     * Returns a list of all the entities in existence.
+     * All entities are guaranteed to have the EInfo component.
+     * @return
+     */
     const std::vector<GLuint> getEntities() { return getPool<EInfo>()->entityList(); }
     /**
-    * @brief Get a pointer to the entity with the specified ID.
+    * Get a pointer to the entity with the specified ID.
     * @param eID
     * @return
     */
     EInfo &getEntity(GLuint eID);
     /**
-    * @brief Destroy an entity - Clears all components from an entity ID and readies that ID for use with the next created entity
+    * Destroy an entity.
+    * Clears all components from an entity ID and readies that ID for use with the next created entity
     * @param eID - entityID
     */
     void removeEntity(GLuint eID);
     /**
-     * @brief numEntities size of the mEntities map
+     * Total number of entities in existence.
      * @return
      */
     GLuint numEntities()
@@ -302,67 +346,82 @@ public:
         return getPool<EInfo>()->entityList().size();
     }
     /**
-     * @brief nextAvailable get the next available ID. In a scenario with no destroyed IDs, this will simply return the size of the mEntities map.
+     * Get the next available ID.
+     * In a scenario with no destroyed IDs, this will simply return the number of entities + 1.
      * Destroyed entities give up their ID for use with a new entity. This avoids unnecessary bloating.
      * @return
      */
     GLuint nextAvailable();
     /**
-     * @brief clearScene Simply calls removeEntity() on every entity in the scene.
+     * Simply calls removeEntity() on every entity in the scene.
      */
     void clearScene();
     /**
-    * @brief Updates the child parent hierarchy in case it's out of date
+    * Updates the child parent hierarchy in case it's out of date.
     */
     void updateChildParent();
     /**
-     * @brief makeSnapshot takes a snapshot of the current entities etc.
+     * Takes a snapshot of the current entities etc.
      */
     void makeSnapshot();
     /**
-     * @brief loadSnapshot loads the snapshot taken by makeSnapshot()
+     * Loads the snapshot taken by makeSnapshot().
      */
     void loadSnapshot();
     /**
-     * @brief removeChild remove a child from an entity
+     * Remove a child from an entity.
      * @param eID
      * @param childID
      */
     void removeChild(const GLuint eID, const GLuint childID);
     /**
-     * @brief addChild Make an entity the child of another entity.
+     * Make an entity the child of another entity.
      * @param eID
      * @param childID
      */
     void addChild(const GLuint eID, const GLuint childID);
     /**
-     * @brief Check if Transform component (or rather its entity) has a parent object
+     * Check if Transform component (or rather its entity) has a parent object.
      * @param eID
      * @return
      */
     bool hasParent(GLuint eID);
     /**
-     * @brief Remove the entity's old parent (if it had one) and set it to the given parentID. If parentID == -1, simply removes the parent.
+     * Remove the entity's old parent (if it had one) and set it to the given parentID. If parentID == -1, simply removes the parent.
      * @param eID
      * @param parentID
      */
     void setParent(GLuint eID, int parentID, bool fromEditor = false);
     /**
-     * @brief getParent get the parent of the given entity. Undefined behaviour of the entity has no parent.
+     * Get the parent of the given entity.
+     * Undefined behaviour of the entity has no parent.
      * @param eID
      * @return
      */
     Transform &getParent(GLuint eID);
     /**
-     * @brief getChildren get a list of an entity's children.
+     * Get a list of an entity's children.
      * @param eID
      * @return
      */
     std::vector<GLuint> getChildren(GLuint eID);
 
+    /**
+     * Get the entity selected in the GUI.
+     * @return
+     */
     GLuint getSelectedEntity() const;
+    /**
+     * Check if an entity is destroyed and its ID waiting to be reassigned.
+     * @param entityID
+     * @return
+     */
     bool isDestroyed(GLuint entityID);
 public slots:
+    /**
+     * Sets the selected entity, usually called by MainWindow or HierarchyView.
+     * @param selectedEntity
+     */
     void setSelectedEntity(const GLuint selectedEntity);
 
 signals:
@@ -374,27 +433,50 @@ signals:
 
 private:
     static Registry *mInstance;
+    /// Contains the Pools for every registered component type.
     std::map<std::string, cjk::Scope<IPool>> mPools{};
+    /// Contains every registered system.
     std::map<std::string, cjk::Ref<ISystem>> mSystems{};
+    /// List of all the entityIDs waiting to be reassigned.
     std::vector<uint> mAvailableIDs;
-    std::vector<GroupData *> mGroups{};
+    /**
+     * Give an EInfo component to a new entity
+     * @param id
+     * @param text
+     */
     void newGeneration(GLuint id, const QString &text);
-
+    /// List of every existing Group.
+    std::vector<GroupData *> mGroups{};
+    /// Current entity selected in the GUI.
     GLuint mSelectedEntity{0};
+    /// Snapshot containing relevant data for use when hitting Play/Stop in the editor.
     std::tuple<std::vector<GLuint>, std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 
     template <typename Type>
+    /**
+     * Casts the system to the correct type according to its typename.
+     * @return
+     */
     cjk::Ref<Type> getSystem()
     {
         std::string typeName{type<Type>()};
         return std::static_pointer_cast<Type>(mSystems[typeName]);
     }
+    /**
+     * Return the Pool with the given typename.
+     * @param type
+     * @return
+     */
     IPool *getPool(const std::string &type)
     {
         return mPools[type].get();
     }
     // Convenience function to get the statically casted pointer to the Pool of type Type.
     template <typename Type>
+    /**
+     * Casts a Pool to the correct type according to its typename.
+     * @return
+     */
     Pool<Type> *getPool()
     {
         std::string typeName{type<Type>()};

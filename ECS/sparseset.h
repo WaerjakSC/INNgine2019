@@ -2,10 +2,13 @@
 #define SPARSESET_H
 #include "gltypes.h"
 #include <vector>
+/**
+ * The SparseSet class is a custom implementation of the concept commonly called Sparse (or Dense) Set.
+ */
 class SparseSet {
 public:
     /**
-     * @brief pads the mIndex vector to make room for an entityID larger than the current size of the index.
+     * Pads the mIndex vector to make room for an entityID larger than the current size of the index.
      * @param entityID - ID of the entity to be added.
      */
     void pad(GLuint entityID)
@@ -15,7 +18,7 @@ public:
         }
     }
     /**
-     * @brief find an entity's position in the sparse set's list
+     * Find an entity's position in the sparse set's list
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
@@ -25,6 +28,11 @@ public:
             return mIndex[eID];
         return -1;
     }
+    /**
+     * Check if an entity is contained within the sparse set.
+     * @param eID
+     * @return
+     */
     bool contains(const GLuint eID) const
     {
         if (find(eID) != -1)
@@ -32,13 +40,13 @@ public:
         return false;
     }
     /**
-     * @brief Actual number of entities with owned components in the pool.
+     * Actual number of entities with owned components in the pool.
      * @return
      */
     size_t size() const { return mList.size(); }
     bool empty() const { return mList.empty(); }
     /**
-     * @brief Size of the sparse array.
+     * Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
@@ -51,7 +59,7 @@ public:
             mList.clear();
     }
     /**
-     * @brief Reset the arrays to empty.
+     * Reset the arrays to empty.
      */
     void clear()
     {
@@ -59,7 +67,7 @@ public:
         mList.clear();
     }
     /**
-     * @brief Returns a copy of the entity at the index specified.
+     * Returns a copy of the entity at the index specified.
      * @param index
      * @return
      */
@@ -68,7 +76,7 @@ public:
         return mList[find(entityID)];
     }
     /**
-     * @brief Returns a read-write reference to the entityID at the index specified.
+     * Returns a read-write reference to the entityID at the index specified.
      * @param index
      * @return
      */
@@ -77,7 +85,7 @@ public:
         return mList[index(entityID)];
     }
     /**
-     * @brief getIndex returns the index location to mList for the given entityID
+     * Returns the index location to mList for the given entityID.
      * @param entityID
      * @return
      */
@@ -86,20 +94,25 @@ public:
         return mIndex[entityID];
     }
     /**
-     * @brief back returns a read-write reference to the last element in mList.
+     * Returns a read-write reference to the last element in mList.
      * @return
      */
     GLuint &back()
     {
         return mList.back();
     }
+    /**
+     * Swaps two entities in the dense set.
+     * @param eID
+     * @param other
+     */
     void swap(GLuint eID, GLuint other)
     {
         std::swap(mList[mIndex[eID]], mList[mIndex[other]]); // Swap the two entities in the pool
         std::swap(mIndex[eID], mIndex[other]);               // Set the index to point to the location after swap
     }
     /**
-     * @brief insert Inserts an entity into the sparse set.
+     * Inserts an entity into the sparse set.
      * Pads the index if entityID value is larger than size of mIndex.
      * @param entityID
      */
@@ -114,27 +127,44 @@ public:
             mIndex.push_back(size()); // entity list size is location of new entityID
         mList.push_back(entityID);
     }
-
+    /**
+     * Returns a copy of the mIndex vector.
+     * @return
+     */
     std::vector<int> getIndices() const
     {
         return mIndex;
     }
+    /**
+     * Returns a copy of the mList vector.
+     * @return
+     */
     std::vector<GLuint> getList() const
     {
         return mList;
     }
+    /**
+     * Pointer to the first item in the mList vector.
+     * @return
+     */
     const GLuint *entities() const
     {
         return mList.data();
     }
-    const std::vector<GLuint> *list() const
+    /**
+     * Pointer to the mList vector itself. Used by Pool's iterator.
+     * @return
+     */
+    const std::vector<GLuint> *listPtr() const
     {
         return &mList;
     }
 
 private:
-    std::vector<int> mIndex;   // Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
-    std::vector<GLuint> mList; // Value is entityID.
+    /// Sparse array -- index is the entityID. Value contained is the index location of each entityID in mEntityList
+    std::vector<int> mIndex;
+    /// Contains the ID of each entity.
+    std::vector<GLuint> mList;
 };
 
 #endif // SPARSESET_H

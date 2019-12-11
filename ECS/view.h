@@ -3,7 +3,7 @@
 #include "pool.h"
 #include <algorithm>
 /**
- * @brief Multi-Component View.
+ * Multi-Component View.
  * Searches for the smallest pool of components and uses this pool
  * to check if an entity contains the other types as well.
  * Less performant than groups because it doesn't modify/sort the underlying pool,
@@ -16,7 +16,7 @@ class View {
     using underlying_iterator_type = typename IPool::iterator;
     using unchecked_type = std::array<const IPool *, (sizeof...(Component) - 1)>;
     /**
-     * @brief The iterator class is a custom iterator for use with views to allow the use of for-loops
+     * The iterator class is a custom iterator for use with views to allow the use of for-loops
      */
     class iterator {
         friend class View<Component...>;
@@ -30,7 +30,6 @@ class View {
                 ++(*this);
             }
         }
-
         bool valid() const
         {
             return std::all_of(unchecked.cbegin(), unchecked.cend(), [this](const IPool *view) {
@@ -85,34 +84,67 @@ class View {
 
 public:
     template <typename Comp>
+    /**
+     * Number of entities observed by this View.
+     * @return
+     */
     size_t size() const
     {
         return std::get<Pool<Comp> *>(pools)->size();
     }
+    /**
+     * Iterator pointing to the first entity observed by the View.
+     * @return
+     */
     iterator begin() const
     {
         const auto view{candidate()};
         return iterator{unchecked(view), view->begin(), view->end()};
     }
+    /**
+     * Iterator pointing past the last entity observed by the View.
+     * @return
+     */
     iterator end() const
     {
         const auto view{candidate()};
         return iterator{unchecked(view), view->end(), view->end()};
     }
     template <typename Comp>
+    /**
+     * Returns a reference to the vector containing the given component type.
+     * @tparam Type of Component.
+     * @return
+     */
     std::vector<Comp> &data()
     {
         return std::get<Pool<Comp>>(pools).data();
     }
     template <typename Comp>
+    /**
+     * Returns a reference to the vector containing the entities owning the given component type.
+     * @tparam Type of Component.
+     * @return
+     */
     std::vector<int> &entities() const
     {
         return std::get<Pool<Comp>>(pools)->entities();
     }
+    /**
+     * Finds the entity list location of an entity given its ID.
+     * Can return -1, in which case it is not contained in this View.
+     * @param entt
+     * @return
+     */
     int find(const int &entt) const
     {
         return candidate()->find(entt);
     }
+    /**
+     * Helper function to check if an entity is contained within this View.
+     * @param entt Entity ID.
+     * @return
+     */
     bool contains(const int &entt) const
     {
         if (entt < 0)
@@ -120,10 +152,13 @@ public:
         return find(entt) != -1;
     }
     /**
-     * @brief Retrieves the desired components from an entity
+     * Retrieves the desired components from an entity
      * If multiple component types entered, the returned value will be a tuple of each component.
      * Retrieving these components is easiest done using structured bindings.
-     * @example auto [trans, mat, mesh] = view.get<Transform, Material, Mesh>(entity);
+     * @example auto [trans, mat, mesh]{view.get<Transform, Material, Mesh>(entity)};
+     * A single component type is retrieved as such:
+     * @example auto &trans{view.get<Transform>(entity)};
+     * @return Either a reference to one component or a tuple containing a reference to each component type.
      */
     template <typename... Comp>
     decltype(auto) get(const int &entt) const
@@ -141,10 +176,11 @@ private:
         : pools{ref...}
     {
     }
+    /// Pools observed by this View.
     const std::tuple<Pool<Component> *...> pools;
 
     /**
-     * @brief Returns the smallest pool of components for use with begin() and end() functions
+     * Returns the smallest pool of components for use with begin() and end() functions
      * @return
      */
     const IPool *candidate() const
@@ -163,7 +199,7 @@ private:
     friend class Registry;
 };
 /**
- *@brief Single component view type.
+ * Single Component View.
  * No need to check for entity existence or anything else,
  * which makes this a useful and fast utility for accessing
  * all the components of a type.
@@ -174,30 +210,60 @@ class View<Component> {
     using iterator_type = typename IPool::iterator;
 
 public:
+    /**
+     * Number of entities observed by this View.
+     * @return
+     */
     size_t size() const
     {
         return pool->size();
     }
+    /**
+     * Iterator pointing to the first entity observed by the View.
+     * @return
+     */
     iterator_type begin() const
     {
         return pool->begin();
     }
+    /**
+     * Iterator pointing past the last entity observed by the View.
+     * @return
+     */
     iterator_type end() const
     {
         return pool->end();
     }
+    /**
+     * Returns a reference to the vector containing the component type contained in this View.
+     * @return
+     */
     std::vector<Component> &data() const
     {
         return pool->data();
     }
+    /**
+     * Pointer to the first item in the entity list.
+     * @return
+     */
     const GLuint *entities() const
     {
         return pool->entities();
     }
+    /**
+     * Finds an entity's location in the Sparse Set.
+     * @param entt
+     * @return
+     */
     int find(const int &entt) const
     {
         return pool->find(entt);
     }
+    /**
+     * Checks if an entity is contained in this View.
+     * @param entt
+     * @return
+     */
     bool contains(const int &entt) const
     {
         return find(entt) != -1;
@@ -211,7 +277,7 @@ public:
         return pool->empty();
     }
     /**
-    * @brief same as the multi-component view, but here you don't need to enter a component type since it's implicitly discovered
+    * Same as the multi-component view, but here you don't need to enter a component type since it's implicitly discovered
     */
     decltype(auto) get(const int &entt) const
     {
@@ -222,6 +288,7 @@ public:
 private:
     View(Pool<Component> *ref)
         : pool{ref} {}
+    /// Pool observed by this View.
     Pool<Component> *pool;
     friend class Registry;
 };

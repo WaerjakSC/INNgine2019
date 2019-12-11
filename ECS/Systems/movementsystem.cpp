@@ -198,13 +198,7 @@ gsl::Vector3D MovementSystem::getRelativeRotation(GLuint eID)
 {
     return registry->view<Transform>().get(eID).localRotation;
 }
-/**
- * @brief MovementSystem::setAbsolutePosition
- * @note don't use this function at the moment! doesn't work
- * @param eID
- * @param position
- * @param signal
- */
+
 void MovementSystem::setAbsolutePosition(GLuint eID, vec3 position, bool signal)
 {
     Transform &trans{registry->view<Transform>().get(eID)};
@@ -219,11 +213,7 @@ void MovementSystem::setAbsolutePosition(GLuint eID, vec3 position, bool signal)
     if (signal)
         emit positionChanged(eID, position, true);
 }
-/**
- * @brief Sets relative position -- equal to global pos if no parent
- * @param eID
- * @param position
- */
+
 void MovementSystem::setLocalPosition(GLuint eID, vec3 position, bool signal)
 {
     auto view{registry->view<Transform>()};
@@ -232,11 +222,7 @@ void MovementSystem::setLocalPosition(GLuint eID, vec3 position, bool signal)
     if (signal)
         emit positionChanged(eID, position, false);
 }
-/**
- * @brief Sets relative position -- equal to global pos if no parent
- * @param eID
- * @param position
- */
+
 void MovementSystem::setLocalPosition(int eID, float xIn, float yIn, float zIn, bool signal)
 {
     setLocalPosition(eID, vec3{xIn, yIn, zIn}, signal);

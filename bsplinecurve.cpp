@@ -7,10 +7,6 @@ BSplineCurve::BSplineCurve(int degree) : d{degree}
     debugShader = ResourceManager::instance()->getShader<ColorShader>();
 }
 
-/**
- * @brief BSplineCurve::setControlPoints
- * @param cp
- */
 void BSplineCurve::setControlPoints(const std::vector<vec3> &cp)
 {
     std::size_t oldSize{b.size()};
@@ -21,10 +17,6 @@ void BSplineCurve::setControlPoints(const std::vector<vec3> &cp)
         t = findKnots();
 }
 
-/**
- * @brief BSplineCurve::findKnots
- * @return
- */
 std::vector<float> BSplineCurve::findKnots() const
 {
 
@@ -51,11 +43,6 @@ std::vector<float> BSplineCurve::findKnots() const
     return t;
 }
 
-/**
- * @brief BSplineCurve::getMy
- * @param x
- * @return
- */
 int BSplineCurve::getMy(float x) const
 {
     for (unsigned int i{0}; !t.empty() && i < t.size() - 1; ++i)
@@ -65,24 +52,6 @@ int BSplineCurve::getMy(float x) const
     return -1;
 }
 
-/**
- * @brief updateTrophies call this when a trophy is taken
- */
-void BSplineCurve::updateTrophies()
-{
-    std::vector<vec3> controlPoints;
-    auto view{Registry::instance()->view<BSplinePoint>()}; // Get every entity with these two components
-    for (auto entity : view) {
-        auto &bspline{view.get(entity)};
-        controlPoints.push_back(bspline.location);
-    }
-
-    setControlPoints(controlPoints);
-}
-
-/**
- * @brief BSplineCurve::updatePath, updates the bspline, called from AIsystem.
- */
 void BSplineCurve::updatePath(bool init)
 {
     std::vector<Vertex> vertices;
@@ -122,12 +91,6 @@ void BSplineCurve::updatePath(bool init)
     glBindVertexArray(0);
 }
 
-/**
- * @brief BSplineCurve::evaluateBSpline, deBoor's algorithm for bsplines
- * @param my et tall slik at bspline.t[my] <= x < bspline.t[my+1]
- * @param x parameterverdi på skjøtvektor
- * @return et punkt på splinekurven
- */
 gsl::Vector3D BSplineCurve::evaluateBSpline(int my, float x) const
 {
     std::vector<vec3> a;
@@ -148,9 +111,6 @@ gsl::Vector3D BSplineCurve::evaluateBSpline(int my, float x) const
     return a[0];
 }
 
-/**
- * @brief BSplineCurve::draw
- */
 void BSplineCurve::draw()
 {
     if (debugLine) {
@@ -162,15 +122,10 @@ void BSplineCurve::draw()
     }
 }
 
-/**
- * @brief BSplineCurve::init
- */
 void BSplineCurve::init()
 {
     initializeOpenGLFunctions();
-    updateTrophies();
 
-    // Spline curve
     glGenVertexArrays(1, &mVAO);
     glBindVertexArray(mVAO);
 
@@ -185,11 +140,6 @@ void BSplineCurve::init()
     updatePath(true);
 }
 
-/**
- * @brief BSplineCurve::eval
- * @param x
- * @return
- */
 gsl::Vector3D BSplineCurve::eval(float x) const
 {
     auto my{getMy(x)};
