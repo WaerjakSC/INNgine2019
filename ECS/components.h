@@ -371,7 +371,7 @@ struct AIComponent : public Component {
 };
 // Towers
 struct TowerComponent : public Component {
-    TowerComponent(int dmg = 10, float cd = 2.5f, float r = 4.f) : damage(dmg), cooldown(cd), range(r) {}
+    TowerComponent(int dmg = 10, float cd = 2.5f, float r = 13.f) : damage(dmg), cooldown(cd), range(r) {}
     int damage;
     float range;
     float projectileSpeed = 5.f;

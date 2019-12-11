@@ -126,8 +126,9 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
         auto &trans{registry->get<Transform>(ai.targetID)};
         GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
         registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
-        registry->add<Sphere>(bulletID, vec3{0}, .3f, false);
+        registry->add<Sphere>(bulletID, vec3{0}, .25f, false);
         registry->get<Transform>(bulletID).localPosition = t.position;
+        registry->get<Transform>(bulletID).localScale = vec3{0.25,0.25,0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
     } else {
         ai.state = TowerStates::IDLE;
