@@ -346,7 +346,8 @@ enum class NPCevents { ENDPOINT_ARRIVED,
 
 enum class TowerStates { IDLE,
                          ATTACK,
-                         COOLDOWN };
+                         COOLDOWN,
+                         PLACING };
 
 enum class AttackType { SPLASH,
                         PHYSICAL,

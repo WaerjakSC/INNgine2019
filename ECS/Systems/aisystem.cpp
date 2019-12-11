@@ -62,8 +62,10 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         case TowerStates::IDLE:
             // scanning for monsters
             detectEnemies(ai, sphere);
+            qDebug() << "AI STATE: " + QString::number(static_cast<int>(ai.state)) + "\n";
             break;
         case TowerStates::ATTACK:
+            qDebug() << "AI STATE: " + QString::number(static_cast<int>(ai.state)) + "\n";
             if (ai.curCooldown >= 0.f)
                 ai.curCooldown -= dt;
             if (ai.curCooldown <= 0.f) {
@@ -115,6 +117,7 @@ void AISystem::spawnWave(DeltaTime dt)
 void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if (!sphere.overlappedEntities.empty()) {
+        qDebug() << "AIsystem - detectEnemies: Enemy Detected\n";
         ai.targetID = sphere.overlappedEntities.getList()[0];
         ai.state = TowerStates::ATTACK;
     }
@@ -144,6 +147,8 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
         registry->get<Transform>(bulletID).localPosition = t.position;
         registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
+        qDebug() << "AIsystem - attack: Projectile spawned\n";
+
     }
     else {
         ai.state = TowerStates::IDLE;
