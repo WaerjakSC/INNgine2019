@@ -30,27 +30,26 @@ void CollisionSystem::runAABBSimulations()
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
         for (auto tower : towerRangeView) {
-                auto &sphere{towerRangeView.get<Sphere>(tower)};
-                if (!bothStatic(aabb, sphere))
-                    if (SphereAABB(sphere, aabb)) {                
-                        // NOTIFY FSM
-                        // send event notify ON ENTER (hei se på meg noe er i radius jippi)
-                        // sjekker for overlaps mot tårnets radius(sphere)
-                        if (aabb.overlapEvent && sphere.overlapEvent) {
-                            if (!sphere.overlappedEntities.contains(entity)) {
-                                sphere.overlappedEntities.insert(entity);
-                            }
+            auto [sphere, towerComp]{towerRangeView.get<Sphere, TowerComponent>(tower)};
+            if (!bothStatic(aabb, sphere) && towerComp.state != TowerStates::PLACEMENT)
+                if (SphereAABB(sphere, aabb)) {
+                    // NOTIFY FSM
+                    // send event notify ON ENTER (hei se på meg noe er i radius jippi)
+                    // sjekker for overlaps mot tårnets radius(sphere)
+                    if (aabb.overlapEvent && sphere.overlapEvent) {
+                        if (!sphere.overlappedEntities.contains(entity)) {
+                            sphere.overlappedEntities.insert(entity);
                         }
-                        collisions++;
-                        // notify FSM if needed
-
-            }
+                    }
+                    collisions++;
+                    // notify FSM if needed
+                }
         }
 
         auto bulletview{registry->view<Bullet, Sphere>()};
-        for( auto bulletID : bulletview){
+        for (auto bulletID : bulletview) {
             auto [bul, sphere]{bulletview.get<Bullet, Sphere>(bulletID)};
-            if(SphereAABB(sphere,aabb)){
+            if (SphereAABB(sphere, aabb)) {
                 auto &ai{view.get<AIComponent>(entity)};
                 ai.health -= bul.damage;
                 registry->removeEntity(bulletID);
@@ -59,14 +58,14 @@ void CollisionSystem::runAABBSimulations()
     }
 
     // ON EXIT
-    for(auto tower : towerRangeView){
+    for (auto tower : towerRangeView) {
         auto &sphere{towerRangeView.get<Sphere>(tower)};
         std::vector<GLuint> entities = sphere.overlappedEntities.getList();
-        for(int i = 0; i < entities.size(); ++i){
+        for (int i = 0; i < entities.size(); ++i) {
             GLuint entity = entities[i];
             auto &aabb{view.get<AABB>(entity)};
-            if(!SphereAABB(sphere, aabb)){
-               sphere.overlappedEntities.remove(entity);
+            if (!SphereAABB(sphere, aabb)) {
+                sphere.overlappedEntities.remove(entity);
             }
         }
     }
@@ -151,7 +150,7 @@ Ray CollisionSystem::getRayFromMouse(const QPoint &mousePos, const QRect &rect)
 }
 inline bool CollisionSystem::bothStatic(const Collision &lhs, const Collision &rhs)
 {
-    return (lhs.isStatic == rhs.isStatic) == true;
+    return lhs.isStatic == rhs.isStatic && lhs.isStatic == true;
 }
 
 gsl::Vector3D CollisionSystem::getMin(const AABB &aabb)

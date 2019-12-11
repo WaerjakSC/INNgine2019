@@ -346,7 +346,7 @@ enum class NPCevents { ENDPOINT_ARRIVED,
 
 enum class TowerStates { IDLE,
                          ATTACK,
-                         COOLDOWN };
+                         PLACEMENT };
 
 enum class AttackType { SPLASH,
                         PHYSICAL,
@@ -362,14 +362,14 @@ struct AIComponent : public Component {
 };
 // Towers
 struct TowerComponent : public Component {
-    TowerComponent(int dmg = 10, float cd = 2.5f, float r = 13.f) : damage(dmg), cooldown(cd), range(r) {}
+    TowerComponent(int dmg = 10, float cd = 2.5f, float r = 13.f) : damage(dmg), range(r), cooldown(cd) {}
     int damage;
     float range;
     float projectileSpeed = 5.f;
     float cooldown;
     float curCooldown = 1.5f;
     GLuint targetID;
-    TowerStates state = TowerStates::IDLE;
+    TowerStates state{TowerStates::PLACEMENT};
     AttackType attackState = AttackType::PHYSICAL;
 };
 // BASE

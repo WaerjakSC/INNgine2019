@@ -258,8 +258,9 @@ void InputSystem::placeTower()
         if (build.isBuildable) {
             mIsDragging = false;
             build.isBuildable = false;
-            auto draggedView{registry->view<Transform, AABB>()};
-            auto [towerTransform, aabb]{draggedView.get<Transform, AABB>(draggedEntity)};
+            auto draggedView{registry->view<Transform, AABB, TowerComponent>()};
+            auto [towerTransform, aabb, tower]{draggedView.get<Transform, AABB, TowerComponent>(draggedEntity)};
+            tower.state = TowerStates::IDLE;
             auto &planeTransform{view.get<Transform>(lastHitEntity)};
             float scaleY{planeTransform.localScale.y};
             vec3 topCenterOfTarget{planeTransform.localPosition};
@@ -282,6 +283,7 @@ void InputSystem::dragEntity(GLuint entity)
     auto collisionSystem{registry->system<CollisionSystem>()};
     // we pass the dragged entity to mousePick in order to ignore that entity in raycasting
     Raycast ray{collisionSystem->mousePick(cursorPos, mRenderWindow->geometry(), entity, 100.f)};
+
     Transform &tf{registry->get<Transform>(entity)};
 
     // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc

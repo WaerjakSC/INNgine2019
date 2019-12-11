@@ -148,14 +148,16 @@ public:
      * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
      * @param entityID
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
+     * @return the new component in case we want to change something not in the constructor.
      */
     template <typename Type, typename... Args>
-    void add(const GLuint entityID, Args... args)
+    Type &add(const GLuint entityID, Args... args)
     {
         // Add a component to the array for an entity
-        getPool<Type>()->add(entityID, args...);
+        Type &component{getPool<Type>()->add(entityID, args...)};
 
         onConstruct<Type>(entityID);
+        return component;
     }
     void onConstruct(const std::string &type, const GLuint entityID);
     template <typename Type>
