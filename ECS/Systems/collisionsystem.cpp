@@ -31,7 +31,7 @@ void CollisionSystem::runAABBSimulations()
         auto &aabb{view.get<AABB>(entity)};
         for (auto tower : towerRangeView) {
             auto [sphere, towerComp]{towerRangeView.get<Sphere, TowerComponent>(tower)};
-            if (!shouldCheckCollision(aabb, sphere) && towerComp.state != TowerStates::PLACEMENT)
+            if (shouldCheckCollision(aabb, sphere) && towerComp.state != TowerStates::PLACEMENT)
                 if (SphereAABB(sphere, aabb)) {
                     // NOTIFY FSM
                     // send event notify ON ENTER (hei se på meg noe er i radius jippi)
