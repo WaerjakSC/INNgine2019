@@ -431,7 +431,7 @@ struct TowerComponent : public Component {
 */
 struct PlayerComponent : public Component {
     PlayerComponent() {}
-    int health = 100;
+    int health = 5;
     int gold = 500;
     int kills = 0;
 };
