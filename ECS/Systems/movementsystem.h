@@ -25,33 +25,32 @@ public:
     void update(DeltaTime dt = 0.016) override;
     void init();
     /**
-     * @brief getAbsolutePosition Get the absolute position of the entity from the entity's model matrix.
+     * @brief Get the absolute position of the entity from the entity's model matrix.
      * @param eID
      * @return vec3 containing the XYZ position of the entity
      */
     vec3 getAbsolutePosition(GLuint eID);
     /**
-    * @brief getLocalPosition Get relative position of object (null-vector if no parent)
+    * @brief Get relative position of object (null-vector if no parent).
     * @param eID
     * @return localPosition vector from an entity's transform component
     */
     vec3 getLocalPosition(GLuint eID);
     /**
-     * @brief getAbsoluteRotation get the absolute rotation of an object from the decomposed model matrix
+     * @brief Get the absolute rotation of an object from the decomposed model matrix.
      * @param eID
      * @return vec3 containing euler rotation values
      */
     vec3 getAbsoluteRotation(GLuint eID);
     /**
-     * @brief getRelativeRotation simple function to grab the localRotation vector from an entity's transform component
+     * @brief Simple function to grab the localRotation vector from an entity's transform component.
      * @param eID
      * @return localRotation vector from an entity's transform component
      */
     vec3 getRelativeRotation(GLuint eID);
     // ******** Position Setters ******** //
     /**
-     * @brief setAbsolutePosition position an entity according to its global position
-     *  rather than its position relative to a parent
+     * @brief Position an entity according to its global position rather than its position relative to a parent.
      * @param eID
      * @param position New position
      * @param signal decides whether to push the change in position on to the editor GUI
@@ -59,7 +58,7 @@ public:
      */
     void setAbsolutePosition(GLuint eID, vec3 position, bool signal = true);
     /**
-     * @brief setLocalPosition set the local position of the object, to be updated in the next update tick
+     * @brief Set the local position of the object, to be updated in the next update tick.
      * @param eID
      * @param position New position
      * @param signal decides whether to push the change in position on to the editor GUI
@@ -83,7 +82,7 @@ public:
     void moveZ(GLuint eID, float zIn, bool signal = true);
     // ******** Rotation Setters ******** //
     /**
-     * @brief setRotation Set rotation of the entity
+     * @brief Set rotation of the entity.
      * @param eID entity ID
      * @param rotation new rotation vector
      * @param signal
@@ -100,7 +99,7 @@ public:
 
     // ******** Scale Setters ******** //
     /**
-     * @brief setScale Set a new scale value for an entity
+     * @brief Set a new scale value for an entity.
      * @param eID entity ID
      * @param scale new scale vector
      * @param signal
@@ -115,21 +114,21 @@ public:
     void scaleY(GLuint eID, float yIn, bool signal = true);
     void scaleZ(GLuint eID, float zIn, bool signal = true);
     /**
-     * @brief move Moves the entity by the delta given
+     * @brief Moves the entity by the delta given.
      * @param eID
      * @param moveDelta
      * @param signal
      */
     void move(GLuint eID, const vec3 &moveDelta, bool signal = true);
     /**
-     * @brief scale Scales the entity by the delta given
+     * @brief Scales the entity by the delta given.
      * @param eID
      * @param scaleDelta
      * @param signal
      */
     void scale(GLuint eID, const vec3 &scaleDelta, bool signal = true);
     /**
-     * @brief rotate Rotates the entity by the delta given
+     * @brief Rotates the entity by the delta given.
      * @param eID
      * @param rotDelta
      * @param signal
@@ -144,7 +143,7 @@ signals:
 private:
     Registry *registry;
     /**
-     * @brief updateModelMatrix Update the entity's model matrix if it's outdated, otherwise does nothing
+     * @brief Update the entity's model matrix if it's outdated, otherwise does nothing.
      * @param eID entityID
      */
     void updateModelMatrix(GLuint eID);
@@ -154,14 +153,13 @@ private:
      */
     void updateModelMatrix(Transform &comp);
     /**
-     * @brief updateColliders Sets an entity's colliders to outdated
+     * @brief Sets an entity's colliders to outdated.
      * @param eID entityID
      */
     void updateColliders(GLuint eID);
 
     /**
-     * @brief getTRMatrix Get the Translation and Rotation matrices of a component,
-     * multiplied by its parent TR matrices if it has a parent.
+     * @brief Get the Translation and Rotation matrices of a component, multiplied by its parent TR matrices if it has a parent.
      * We don't want to inherit the scale of the parent, since that can lead to wrong scaling for the child object.
      * @param comp
      * @return
@@ -169,34 +167,34 @@ private:
     gsl::Matrix4x4 getTRMatrix(const Transform &comp);
 
     /**
-     * @brief updateTRS update a Transform component's Scale, Rotation and Translation matrices, in that order.
+     * @brief Update a Transform component's Scale, Rotation and Translation matrices, in that order.
      * @param comp
      */
     void updateTRS(Transform &comp);
     /**
-     * @brief updateTS Update the transform component belonging to the AABB component given
+     * @brief Update the transform component belonging to the AABB component given.
      * @param comp
      */
     void updateTS(AABB &comp);
     /**
-     * @brief updateTS Update the transform component belonging to the Sphere component given
+     * @brief Update the transform component belonging to the Sphere component given.
      * @param comp
      */
     void updateTS(Sphere &comp);
 
     /**
-     * @brief updateBillBoardTransform Specialized function for billboards, public
+     * @brief Specialized function for billboards, public.
      * @param entity
      */
     void updateBillBoardTransform(GLuint entity);
     /**
-     * @brief updateColliderTransformPrivate actually updates the colliders of each entity
+     * @brief Actually updates the colliders of each entity.
      * @param col
      * @param trans
      */
     void updateColliderTransformPrivate(Collision &col, const Transform &trans);
     /**
-     * @brief updateBillBoardTransformPrivate private version of the updateBillBoardTransform function, does the actual updating.
+     * @brief Private version of the updateBillBoardTransform function, does the actual updating.
      * @param billboard
      * @param transform
      * @param mat

@@ -23,18 +23,18 @@ public:
 
 public slots:
     /**
-     * @brief changeShader Replace the entity's current shader with a new shader given by the editor GUI.
+     * @brief Replace the entity's current shader with a new shader given by the editor GUI.
      * @param entityID
      * @param nShader String corresponding to the name of the new shader.
      */
     void changeShader(const QString &nShader);
     /**
-     * @brief toggleRendered Toggle an entity's Mesh.IsRendered state.
+     * @brief Toggle an entity's Mesh.IsRendered state.
      * @param entityID
      */
     void toggleRendered(GLuint entityID);
     /**
-     * @brief setRendered Set the rendered state of the entity
+     * @brief Set the rendered state of the entity.
      * @param entityID
      * @param nState
      */
@@ -45,17 +45,17 @@ signals:
 private:
     Registry *registry;
     /**
-    * @brief drawEntities Render entities that want to be rendered (Mesh.isRendered).
+    * @brief Render entities that want to be rendered (Mesh.isRendered).
     */
     void drawEntities();
     /**
-     * @brief drawColliders Colliders have their own meshes, these are drawn with a plain shader and lines.
+     * @brief Colliders have their own meshes, these are drawn with a plain shader and lines.
      */
     void drawColliders();
 
     GLuint mSkyBoxID;
     /**
-     * @brief drawSkybox draw the skybox with its own shader and OpenGL settinsg.
+     * @brief Draw the skybox with its own shader and OpenGL settings.
      */
     void drawSkybox();
     void Cull(const Camera::Frustum &f);

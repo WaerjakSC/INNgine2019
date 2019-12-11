@@ -11,7 +11,7 @@ class Registry;
 struct ParticleEmitter;
 struct Transform;
 /**
- * @brief The ParticleSystem class is in control of... You guessed it, particles!
+ * @brief The ParticleSystem class is in control of particles.
  */
 class ParticleSystem : public QObject, public ISystem, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
@@ -20,11 +20,11 @@ class ParticleSystem : public QObject, public ISystem, public QOpenGLFunctions_4
 public:
     ParticleSystem(cjk::Ref<ParticleShader> shader);
     /**
-     * @brief init Initializes any emitters that exist at renderwindow start.
+     * @brief Initializes any emitters that exist at renderwindow start.
      */
     void init();
     /**
-     * @brief initEmitter initializes emitter to make it ready for use.
+     * @brief Initializes emitter to make it ready for use.
      * @param entityID
      */
     void initEmitter(GLuint entityID);
@@ -55,27 +55,27 @@ private:
     cjk::Ref<ParticleShader> mShader;
     std::mt19937 rng;
     /**
-     * @brief findUnusedParticle finds dead particles and sets them ready for a new generation.
+     * @brief Finds dead particles and sets them ready for a new generation.
      * @param emitter
      * @return
      */
     int findUnusedParticle(ParticleEmitter &emitter);
     /**
-     * @brief generateParticles generate new particles based on the settings of the ParticleEmitter.
+     * @brief Generate new particles based on the settings of the ParticleEmitter.
      * @param deltaTime
      * @param emitter
      * @param transform Used to find the spawn location of the particles
      */
     void generateParticles(DeltaTime deltaTime, ParticleEmitter &emitter, const Transform &transform);
     /**
-     * @brief simulateParticles Reduce the life of active particles by deltaTime, killing any that fall below 0 life
+     * @brief Reduce the life of active particles by deltaTime, killing any that fall below 0 life.
      * Also sets the new position and color of active particles.
      * @param deltaTime
      * @param emitter
      */
     void simulateParticles(DeltaTime deltaTime, ParticleEmitter &emitter);
     /**
-     * @brief renderParticles Renders all active particles originating from emitter.
+     * @brief Renders all active particles originating from emitter.
      * @param emitter
      */
     void renderParticles(ParticleEmitter &emitter);
