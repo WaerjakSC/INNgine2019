@@ -206,7 +206,6 @@ void AISystem::goalReached(const GLuint entityID)
 
 void AISystem::masterOfCurves()
 {
-    mCurve.updateTrophies();
     mCurve.updatePath();
 }
 

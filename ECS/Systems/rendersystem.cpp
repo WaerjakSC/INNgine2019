@@ -75,10 +75,7 @@ void RenderSystem::setSkyBoxID(const GLuint &skyBoxID)
 {
     mSkyBoxID = skyBoxID;
 }
-/**
- * @brief RenderWindow::Cull, Cull furries right now
- * @param f, the frustum
- */
+
 void RenderSystem::Cull(const Camera::Frustum &f)
 {
     auto view{registry->view<Mesh, AABB>()};
