@@ -376,6 +376,7 @@ struct TowerComponent : public Component {
     int damage;
     int range;
     float attackSpeed;
+    float projectileSpeed;
     float cooldown;
     GLuint targetID;
     TowerStates state = TowerStates::IDLE;

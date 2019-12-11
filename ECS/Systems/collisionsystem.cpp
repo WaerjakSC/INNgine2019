@@ -48,6 +48,8 @@ void CollisionSystem::runAABBSimulations()
             }
         }
     }
+
+    // ON EXIT
     for(auto tower : towerRangeView){
         auto &sphere{towerRangeView.get<Sphere>(tower)};
         std::vector<GLuint> entities = sphere.overlappedEntities.getList();

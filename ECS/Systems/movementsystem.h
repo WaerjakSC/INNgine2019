@@ -19,7 +19,7 @@ class MovementSystem : public QObject, public ISystem {
 public:
     MovementSystem();
 
-    void update(DeltaTime = 0.016) override;
+    void update(DeltaTime dt = 0.016) override;
     void init();
     /**
      * @brief getAbsolutePosition Get the absolute position of the entity from the entity's model matrix.

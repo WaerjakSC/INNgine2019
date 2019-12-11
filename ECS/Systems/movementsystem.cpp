@@ -9,7 +9,7 @@ void MovementSystem::init()
 {
     update();
 }
-void MovementSystem::update(DeltaTime)
+void MovementSystem::update(DeltaTime dt)
 {
     auto view{registry->view<Transform>()};
     for (auto entity : view) {
@@ -20,6 +20,14 @@ void MovementSystem::update(DeltaTime)
         }
         updateModelMatrix(comp);
     }
+
+    auto bulletview{registry->view<Transform, Bullet>()};
+    for (auto entity : bulletview){
+        auto &bullet {bulletview.get<Bullet>(entity)};
+        vec3 deltaVector = bullet.destination.normalized() * dt * bullet.speed;
+        move(entity, deltaVector);
+    }
+
     auto aabbview{registry->view<Transform, AABB>()};
     for (auto entity : aabbview) {
         auto [trans, col]{aabbview.get<Transform, AABB>(entity)};

@@ -119,8 +119,9 @@ void AISystem::attack(TowerComponent &ai)
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
 
     // Standard/Projectile type
+    auto &trans {registry->get<Transform>(ai.targetID)};
     GLuint bulletID = registry->makeEntity("bullet");
-    registry->add<Bullet>(bulletID);
+    registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
 }
 
 /**
