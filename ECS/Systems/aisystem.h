@@ -44,7 +44,7 @@ private:
 
     // FSM tower
     void detectEnemies(TowerComponent &ai, Sphere &sphere);
-    void attack(TowerComponent &ai);
+    void attack(TowerComponent &ai, Transform &trans);
 
     void notify(int notification);
 
