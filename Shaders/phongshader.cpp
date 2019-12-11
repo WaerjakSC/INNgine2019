@@ -42,10 +42,10 @@ void PhongShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *mat
         glUniform3f(mLightColorUniform, light.mLightColor.x, light.mLightColor.y, light.mLightColor.z);
         glUniform3f(mLightPositionUniform, lightTrans.position.x, lightTrans.position.y, lightTrans.position.z);
     }
-    glUniform1i(textureUniform, material->mTextureUnit); //TextureUnit = 0 as default);
-    glUniform1i(mSpecularExponentUniform, material->mSpecularExponent);
-    glUniform1f(mSpecularStrengthUniform, material->mSpecularStrength);
-    glUniform3f(mObjectColorUniform, material->mObjectColor.x, material->mObjectColor.y, material->mObjectColor.z);
+    glUniform1i(textureUniform, material->textureUnit); //TextureUnit = 0 as default);
+    glUniform1i(mSpecularExponentUniform, material->specularExponent);
+    glUniform1f(mSpecularStrengthUniform, material->specularStrength);
+    glUniform3f(mObjectColorUniform, material->objectColor.x, material->objectColor.y, material->objectColor.z);
     glUniform3f(mCameraPositionUniform, mCameraController->getCamera().position().x, mCameraController->getCamera().position().y, mCameraController->getCamera().position().z);
 }
 void PhongShader::setLight(GLuint entt)

@@ -16,7 +16,7 @@ void SkyboxShader::transmitUniformData(gsl::Matrix4x4 &modelMatrix, Material *ma
     glUniformMatrix4fv(vMatrixUniform, 1, GL_TRUE, view.constData());
     glUniformMatrix4fv(pMatrixUniform, 1, GL_TRUE, mCameraController->getCamera().mProjectionMatrix.constData());
 
-    glUniform1i(skyboxTexUniform, material->mTextureUnit); //TextureUnit = 0 as default);
+    glUniform1i(skyboxTexUniform, material->textureUnit); //TextureUnit = 0 as default);
 }
 
 

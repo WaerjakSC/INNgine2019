@@ -589,13 +589,13 @@ void ComponentList::setupMaterialSettings(const Material &mat)
     for (auto type : factory->getShaders()) {
         QString curText{QString::fromStdString(type.second->getName())};
         shaderType->addItem(curText);
-        if (curText == QString::fromStdString(mat.mShader->getName()))
+        if (curText == QString::fromStdString(mat.shader->getName()))
             shaderType->setCurrentIndex(shaderType->findText(curText));
     }
     RenderSystem *renderSys{registry->system<RenderSystem>().get()};
     connect(shaderType, SIGNAL(currentIndexChanged(const QString &)), renderSys, SLOT(changeShader(const QString &)));
 
-    QString curTexture{factory->getTextureName(mat.mTextureUnit)};
+    QString curTexture{factory->getTextureName(mat.textureUnit)};
     QLabel *textureThumb{new QLabel(box)};
     QPixmap thumbNail;
     thumbNail.load(QString::fromStdString(gsl::assetFilePath) + "Textures/" + curTexture); // Load the texture image into the pixmap
@@ -614,7 +614,7 @@ void ComponentList::setupMaterialSettings(const Material &mat)
 
     colorLabel = new QLabel;
     QPixmap curColor{18, 18};
-    vec3 oColor{mat.mObjectColor};
+    vec3 oColor{mat.objectColor};
     oColor.normalize();
     rgb.setRgbF(oColor.x, oColor.y, oColor.z); // setRgbF takes floats in the 0-1 range, which is what we want
     curColor.fill(rgb);
@@ -716,7 +716,7 @@ void ComponentList::setNewTextureFile()
         fileName = file.fileName();
         ResourceManager *factory{ResourceManager::instance()};
         factory->loadTexture(fileName.toStdString());
-        registry->get<Material>(registry->getSelectedEntity()).mTextureUnit = factory->getTexture(fileName.toStdString())->textureUnit();
+        registry->get<Material>(registry->getSelectedEntity()).textureUnit = factory->getTexture(fileName.toStdString())->textureUnit();
         texFileLabel->setText(fileName);
     }
 }
@@ -744,7 +744,7 @@ void ComponentList::setColor()
         newRgb.fill(color);
         colorLabel->setPixmap(newRgb);
     }
-    registry->get<Material>(registry->getSelectedEntity()).mObjectColor = vec3{static_cast<GLfloat>(color.redF()), static_cast<GLfloat>(color.greenF()), static_cast<GLfloat>(color.blueF())};
+    registry->get<Material>(registry->getSelectedEntity()).objectColor = vec3{static_cast<GLfloat>(color.redF()), static_cast<GLfloat>(color.greenF()), static_cast<GLfloat>(color.blueF())};
 }
 
 void ComponentList::updatePosSpinBoxes(int state)

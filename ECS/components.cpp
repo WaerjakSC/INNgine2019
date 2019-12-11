@@ -2,12 +2,12 @@
 #include "colorshader.h"
 #include "resourcemanager.h"
 
-Material::Material(cjk::Ref<Shader> shader, GLuint textureUnit, vec3 color, GLfloat specStr, GLint specExp)
-    : mSpecularStrength(specStr), mSpecularExponent(specExp), mObjectColor(color),
-      mTextureUnit(textureUnit), mShader(shader)
+Material::Material(cjk::Ref<Shader> shaderIn, GLuint texUnit, vec3 color, GLfloat specStr, GLint specExp)
+    : specularStrength(specStr), specularExponent(specExp), objectColor(color),
+      textureUnit(texUnit), shader(shaderIn)
 {
-    if (!mShader)
-        mShader = ResourceManager::instance()->getShader<ColorShader>();
+    if (!shaderIn)
+        shader = ResourceManager::instance()->getShader<ColorShader>();
 }
 
 AABB::AABB(bool stat) : size(vec3(1.0f, 1.0f, 1.0f))

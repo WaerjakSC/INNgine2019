@@ -19,14 +19,14 @@
 
 struct meshData {
     meshData() = default;
-    std::vector<Vertex> mVertices;
-    std::vector<GLuint> mIndices;
-    std::string mName;
+    std::vector<Vertex> vertices;
+    std::vector<GLuint> indices;
+    std::string name;
     void Clear()
     {
-        mVertices.clear();
-        mIndices.clear();
-        mName.clear();
+        vertices.clear();
+        indices.clear();
+        name.clear();
     }
 };
 /**
@@ -41,19 +41,19 @@ public:
 };
 struct EInfo : Component {
     EInfo() = default;
-    EInfo(QString name) : name(name) {}
+    EInfo(QString nameIn) : name(nameIn) {}
     QString name;
     GLuint generation{0};
     bool isDestroyed{false};
 };
 struct BillBoard : Component {
-    BillBoard(bool constantYUp = true, bool normalVersion = false) : mConstantYUp(constantYUp), mNormalVersion(normalVersion) {}
+    BillBoard(bool constantYUp = true, bool normalVersion = false) : constantYUp(constantYUp), normalVersion(normalVersion) {}
 
     //    gsl::Vector3D getNormal(gsl::Matrix4x4 mMatrix);
     //    gsl::Vector3D normal{0.f, 0.f, -1.f};
 
-    bool mConstantYUp{true};
-    bool mNormalVersion{false}; //flip between two ways to calculate forward direction
+    bool constantYUp{true};
+    bool normalVersion{false}; //flip between two ways to calculate forward direction
 };
 struct Transform : Component {
 
@@ -97,44 +97,41 @@ struct Transform : Component {
  */
 class Shader;
 struct Material : public Component {
-    Material(cjk::Ref<Shader> shader = nullptr, GLuint textureUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
+    Material(cjk::Ref<Shader> shaderIn = nullptr, GLuint texUnit = 0, vec3 color = vec3{1}, GLfloat specStr = 0.3f, GLint specExp = 4);
 
-    GLfloat mSpecularStrength;
-    GLint mSpecularExponent;
-    vec3 mObjectColor;
-    GLuint mTextureUnit; //the actual texture to put into the uniform
-    cjk::Ref<Shader> mShader;
+    GLfloat specularStrength;
+    GLint specularExponent;
+    vec3 objectColor;
+    GLuint textureUnit; //the actual texture to put into the uniform
+    cjk::Ref<Shader> shader;
 };
 
 struct Mesh : public Component {
     Mesh()
     {
     }
-    Mesh(GLenum drawType, std::string name, GLuint verticeCount = 0, GLuint indiceCount = 0)
-        : mVerticeCount(verticeCount), mIndiceCount(indiceCount), mDrawType(drawType), mName(name)
+    Mesh(GLenum drawTypeIn, std::string meshName, GLuint numVertices = 0, GLuint numIndices = 0)
+        : verticeCount(numVertices), indiceCount(numIndices), drawType(drawTypeIn), name(meshName)
     {
     }
-    Mesh(GLenum drawType, meshData data) : Mesh(drawType, data.mName, data.mVertices.size(), data.mIndices.size())
+    Mesh(GLenum drawTypeIn, meshData data) : Mesh(drawTypeIn, data.name, data.vertices.size(), data.indices.size())
     {
     }
-    //    Mesh(const Mesh &other) {
-    //        *this = other;
-    //    }
 
-    GLuint mVAO{0};
-    GLuint mVBO{0};
-    GLuint mEAB{0}; //holds the indices (Element Array Buffer - EAB)
+    GLuint VAO{0};
+    GLuint VBO{0};
+    GLuint EAB{0}; //holds the indices (Element Array Buffer - EAB)
 
-    GLuint mVerticeCount{0};
-    GLuint mIndiceCount{0};
-    GLenum mDrawType{0};
-    bool mRendered{true};
+    GLuint verticeCount{0};
+    GLuint indiceCount{0};
+    GLenum drawType{0};
+    bool rendered{true};
 
-    std::string mName;
+    std::string name;
 
     bool operator==(const Mesh &other)
     {
-        return mName == other.mName; // name of the obj/txt file should be enough to verify if they're the same.
+        return name == other.name; // name of the obj/txt file should be enough to verify if they're the same.
     }
 };
 struct Particle {
@@ -183,19 +180,19 @@ struct ParticleEmitter : public Component {
 };
 struct Light : public Component {
     Light(GLfloat ambStr = 0.3f, vec3 ambColor = vec3{0.3f, 0.3f, 0.3f},
-          GLfloat lightStr = 0.7f, vec3 lightColor = vec3{0.3f, 0.3f, 0.3f},
-          vec3 color = vec3{1.f, 1.f, 1.f})
-        : mAmbientStrength(ambStr), mAmbientColor(ambColor), mLightStrength(lightStr),
-          mLightColor(lightColor), mObjectColor(color)
+          GLfloat lightStr = 0.7f, vec3 lColor = vec3{0.3f, 0.3f, 0.3f},
+          vec3 objColor = vec3{1.f, 1.f, 1.f})
+        : ambientStrength(ambStr), ambientColor(ambColor), lightStrength(lightStr),
+          lightColor(lColor), objectColor(objColor)
     {
     }
 
-    GLfloat mAmbientStrength;
-    vec3 mAmbientColor;
+    GLfloat ambientStrength;
+    vec3 ambientColor;
 
-    GLfloat mLightStrength;
-    vec3 mLightColor;
-    vec3 mObjectColor;
+    GLfloat lightStrength;
+    vec3 lightColor;
+    vec3 objectColor;
 };
 struct Input : public Component {
     Input()
@@ -232,12 +229,6 @@ struct Input : public Component {
     bool F1{false};
 };
 
-struct Physics : public Component {
-    Physics(float speed = 1.0f) : mSpeed(speed) {}
-
-    float mSpeed;
-    vec3 mVelocity;
-};
 struct Sound : public Component {
     Sound() {}
     /**
@@ -390,7 +381,7 @@ struct PlayerComponent : public Component {
 };
 
 struct Bullet : public Component {
-    Bullet(){}
+    Bullet() {}
     Bullet(vec3 route, int d, float s) : destination(route), damage(d), speed(s) {}
     vec3 destination;
     int damage;

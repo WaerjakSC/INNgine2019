@@ -92,7 +92,7 @@ void Scene::saveScene(const QString &fileName)
 
                 writer.Key("color");
                 writer.StartArray();
-                vec3 color{mat.mObjectColor};
+                vec3 color{mat.objectColor};
                 if (registry->system<InputSystem>()->buildableDebugMode() &&
                     ((color.x >= 1.59f && color.x <= 1.601f) || (color.y >= 1.59f && color.x <= 1.601f))) {
                     color = vec3{0.57f, 0.57f, 0.57f};
@@ -103,15 +103,15 @@ void Scene::saveScene(const QString &fileName)
                 writer.EndArray();
 
                 writer.Key("specstr");
-                writer.Double(mat.mSpecularStrength);
+                writer.Double(mat.specularStrength);
                 writer.Key("specexp");
-                writer.Int(mat.mSpecularExponent);
+                writer.Int(mat.specularExponent);
 
                 writer.Key("textureunit");
-                writer.Int(mat.mTextureUnit);
+                writer.Int(mat.textureUnit);
 
                 writer.Key("shader");
-                writer.String(mat.mShader->getName().c_str());
+                writer.String(mat.shader->getName().c_str());
 
                 writer.EndObject();
             }
@@ -122,7 +122,7 @@ void Scene::saveScene(const QString &fileName)
                 //                if (mesh.mName == "")
                 //                    qDebug() << "No mesh name!";
                 writer.Key("name");
-                writer.String(mesh.mName.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
+                writer.String(mesh.name.c_str()); // Use the mesh name (either a prefab or a file in Assets/Meshes) to find out what to do from here.
                 writer.EndObject();
             }
             if (registry->contains<Light>(entity)) {
@@ -131,30 +131,30 @@ void Scene::saveScene(const QString &fileName)
                 const Light &light{registry->get<Light>(entity)};
 
                 writer.Key("ambstr");
-                writer.Double(light.mAmbientStrength);
+                writer.Double(light.ambientStrength);
 
                 writer.Key("ambcolor");
                 writer.StartArray();
-                writer.Double(light.mAmbientColor.x);
-                writer.Double(light.mAmbientColor.y);
-                writer.Double(light.mAmbientColor.z);
+                writer.Double(light.ambientColor.x);
+                writer.Double(light.ambientColor.y);
+                writer.Double(light.ambientColor.z);
                 writer.EndArray();
 
                 writer.Key("lightstr");
-                writer.Double(light.mLightStrength);
+                writer.Double(light.lightStrength);
 
                 writer.Key("lightcolor");
                 writer.StartArray();
-                writer.Double(light.mLightColor.x);
-                writer.Double(light.mLightColor.y);
-                writer.Double(light.mLightColor.z);
+                writer.Double(light.lightColor.x);
+                writer.Double(light.lightColor.y);
+                writer.Double(light.lightColor.z);
                 writer.EndArray();
 
                 writer.Key("color");
                 writer.StartArray();
-                writer.Double(light.mObjectColor.x);
-                writer.Double(light.mObjectColor.y);
-                writer.Double(light.mObjectColor.z);
+                writer.Double(light.objectColor.x);
+                writer.Double(light.objectColor.y);
+                writer.Double(light.objectColor.z);
                 writer.EndArray();
 
                 writer.EndObject();
@@ -164,9 +164,9 @@ void Scene::saveScene(const QString &fileName)
                 writer.Key("billboard");
                 writer.StartObject();
                 writer.Key("y-up");
-                writer.Bool(board.mConstantYUp);
+                writer.Bool(board.constantYUp);
                 writer.Key("normalversion");
-                writer.Bool(board.mNormalVersion);
+                writer.Bool(board.normalVersion);
                 writer.EndObject();
             }
             if (registry->contains<Sound>(entity)) {

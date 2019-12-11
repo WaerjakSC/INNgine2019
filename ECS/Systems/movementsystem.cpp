@@ -103,17 +103,17 @@ void MovementSystem::updateBillBoardTransformPrivate(const BillBoard &billboard,
 {
     // find direction between this and camera
     vec3 direction{};
-    if (billboard.mNormalVersion) {
-        vec3 camPosition{mat.mShader->getCameraController()->cameraPosition()};
+    if (billboard.normalVersion) {
+        vec3 camPosition{mat.shader->getCameraController()->cameraPosition()};
         //cancel height info so billboard is allways upright:
-        if (billboard.mConstantYUp)
+        if (billboard.constantYUp)
             camPosition.setY(transform.modelMatrix.getPosition().y);
         direction = camPosition - vec3(transform.modelMatrix.getPosition());
     }
     else {
-        vec3 camDirection{mat.mShader->getCameraController()->forward()};
+        vec3 camDirection{mat.shader->getCameraController()->forward()};
         //cancel height info so billboard is allways upright:
-        if (billboard.mConstantYUp)
+        if (billboard.constantYUp)
             camDirection.setY(transform.modelMatrix.getPosition().y);
         direction = camDirection * -1;
     }

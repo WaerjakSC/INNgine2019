@@ -246,13 +246,13 @@ void ResourceManager::makePlaneMesh(GLuint eID)
 {
     initializeOpenGLFunctions();
     mMeshData.Clear();
-    mMeshData.mName = "Plane";
-    mMeshData.mVertices.push_back(Vertex{1.0, 0, -1.0, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{-1.0, 0, -1.0, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{-1.0, 0, 1.0, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{-1.0, 0, 1.0, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{1.0, 0, 1.0, 0, 1, 0});
-    mMeshData.mVertices.push_back(Vertex{1.0, 0, -1.0, 0, 1, 0});
+    mMeshData.name = "Plane";
+    mMeshData.vertices.push_back(Vertex{1.0, 0, -1.0, 0, 1, 0});
+    mMeshData.vertices.push_back(Vertex{-1.0, 0, -1.0, 0, 1, 0});
+    mMeshData.vertices.push_back(Vertex{-1.0, 0, 1.0, 0, 1, 0});
+    mMeshData.vertices.push_back(Vertex{-1.0, 0, 1.0, 0, 1, 0});
+    mMeshData.vertices.push_back(Vertex{1.0, 0, 1.0, 0, 1, 0});
+    mMeshData.vertices.push_back(Vertex{1.0, 0, -1.0, 0, 1, 0});
 
     // Once VAO and VBO have been generated, mMeshData can be discarded.
     if (!registry->contains<Mesh>(eID))
@@ -294,13 +294,13 @@ void ResourceManager::makeXYZMesh(GLuint eID)
 {
     initializeOpenGLFunctions();
     mMeshData.Clear();
-    mMeshData.mName = "XYZ";
-    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
-    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
-    mMeshData.mVertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
+    mMeshData.name = "XYZ";
+    mMeshData.vertices.push_back(Vertex{0.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mMeshData.vertices.push_back(Vertex{100.f, 0.f, 0.f, 1.f, 0.f, 0.f});
+    mMeshData.vertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 1.f, 0.f});
+    mMeshData.vertices.push_back(Vertex{0.f, 100.f, 0.f, 0.f, 1.f, 0.f});
+    mMeshData.vertices.push_back(Vertex{0.f, 0.f, 0.f, 0.f, 0.f, 1.f});
+    mMeshData.vertices.push_back(Vertex{0.f, 0.f, 100.f, 0.f, 0.f, 1.f});
 
     // Once VAO and VBO have been generated, mMesh data can be discarded.
     if (!registry->contains<Mesh>(eID))
@@ -333,24 +333,24 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID)
 {
     initializeOpenGLFunctions();
     mMeshData.Clear();
-    mMeshData.mName = "Skybox";
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {Vertex{vec3(-1.0f, 1.0f, -1.0f)},  // 0
-                                Vertex{vec3(-1.0f, -1.0f, -1.0f)}, // 1
-                                Vertex{vec3(1.0f, -1.0f, -1.0f)},  // 2
-                                Vertex{vec3(1.0f, 1.0f, -1.0f)},   // 3
-                                Vertex{vec3(-1.0f, -1.0f, 1.0f)},  // 4
-                                Vertex{vec3(-1.0f, 1.0f, 1.0f)},   // 5
-                                Vertex{vec3(1.0f, -1.0f, 1.0f)},   // 6
-                                Vertex{vec3(1.0f, 1.0f, 1.0f)}});  // 7
+    mMeshData.name = "Skybox";
+    mMeshData.vertices.insert(mMeshData.vertices.end(),
+                              {Vertex{vec3(-1.0f, 1.0f, -1.0f)},  // 0
+                               Vertex{vec3(-1.0f, -1.0f, -1.0f)}, // 1
+                               Vertex{vec3(1.0f, -1.0f, -1.0f)},  // 2
+                               Vertex{vec3(1.0f, 1.0f, -1.0f)},   // 3
+                               Vertex{vec3(-1.0f, -1.0f, 1.0f)},  // 4
+                               Vertex{vec3(-1.0f, 1.0f, 1.0f)},   // 5
+                               Vertex{vec3(1.0f, -1.0f, 1.0f)},   // 6
+                               Vertex{vec3(1.0f, 1.0f, 1.0f)}});  // 7
 
-    mMeshData.mIndices.insert(mMeshData.mIndices.end(),
-                              {0, 1, 2, 2, 3, 0,
-                               4, 1, 0, 0, 5, 4,
-                               2, 6, 7, 7, 3, 2,
-                               4, 5, 7, 7, 6, 4,
-                               0, 3, 7, 7, 5, 0,
-                               1, 4, 2, 2, 4, 6});
+    mMeshData.indices.insert(mMeshData.indices.end(),
+                             {0, 1, 2, 2, 3, 0,
+                              4, 1, 0, 0, 5, 4,
+                              2, 6, 7, 7, 3, 2,
+                              4, 5, 7, 7, 6, 4,
+                              0, 3, 7, 7, 5, 0,
+                              1, 4, 2, 2, 4, 6});
 
     if (!registry->contains<Mesh>(eID))
         registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
@@ -443,14 +443,14 @@ void ResourceManager::makeBillBoardMesh(int eID)
     initializeOpenGLFunctions();
 
     mMeshData.Clear();
-    mMeshData.mName = "BillBoard";
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(), {
-                                                              // Positions            // Normals          //UVs
-                                                              Vertex{vec3(-2.f, -2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
-                                                              Vertex{vec3(2.f, -2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
-                                                              Vertex{vec3(-2.f, 2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
-                                                              Vertex{vec3(2.f, 2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
-                                                          });
+    mMeshData.name = "BillBoard";
+    mMeshData.vertices.insert(mMeshData.vertices.end(), {
+                                                            // Positions            // Normals          //UVs
+                                                            Vertex{vec3(-2.f, -2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 0.f)}, // Bottom Left
+                                                            Vertex{vec3(2.f, -2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 0.f)},  // Bottom Right
+                                                            Vertex{vec3(-2.f, 2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(0.f, 1.f)},  // Top Left
+                                                            Vertex{vec3(2.f, 2.f, 0.f), vec3(0.0f, 0.0f, 1.0f), gsl::Vector2D(1.f, 1.f)}    // Top Right
+                                                        });
     if (!registry->contains<Mesh>(eID))
         registry->add<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
     else
@@ -492,47 +492,47 @@ void ResourceManager::makeTowerMesh(GLuint eID)
 {
     initializeOpenGLFunctions();
     mMeshData.Clear();
-    mMeshData.mName = "Tower";
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {
-                                   //Vertex data for front
-                                   Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.333f}}, //v0
-                                   Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.333f}},  //v1
-                                   Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.666f}},  //v2
-                                   Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.666f}}, //v3
+    mMeshData.name = "Tower";
+    mMeshData.vertices.insert(mMeshData.vertices.end(),
+                              {
+                                  //Vertex data for front
+                                  Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.333f}}, //v0
+                                  Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.333f}},  //v1
+                                  Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.666f}},  //v2
+                                  Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.666f}}, //v3
 
-                                   //Vertex data for right
-                                   Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.333f}},   //v4
-                                   Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.333f}},  //v5
-                                   Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v6
-                                   Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.666f}}, //v7
+                                  //Vertex data for right
+                                  Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.333f}},   //v4
+                                  Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.333f}},  //v5
+                                  Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v6
+                                  Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.666f}}, //v7
 
-                                   //Vertex data for back
-                                   Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.333f}},  //v8
-                                   Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.333f}}, //v9
-                                   Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.666f}}, //v10
-                                   Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.666f}},  //v11
+                                  //Vertex data for back
+                                  Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.333f}},  //v8
+                                  Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.333f}}, //v9
+                                  Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.666f}}, //v10
+                                  Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.666f}},  //v11
 
-                                   //Vertex data for left
-                                   Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.333f}},     //v12
-                                   Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.333f}}, //v13
-                                   Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.666f}},    //v14
-                                   Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.666f}},  //v15
+                                  //Vertex data for left
+                                  Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.333f}},     //v12
+                                  Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.333f}}, //v13
+                                  Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.666f}},    //v14
+                                  Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.666f}},  //v15
 
-                                   //Vertex data for top
-                                   Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.666f}}, //v16
-                                   Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v17
-                                   Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.999f}},  //v18
-                                   Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.999f}}    //v19
-                               });
+                                  //Vertex data for top
+                                  Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.666f}}, //v16
+                                  Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v17
+                                  Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.999f}},  //v18
+                                  Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.999f}}    //v19
+                              });
 
-    mMeshData.mIndices.insert(mMeshData.mIndices.end(), {
-                                                            0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
-                                                            4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
-                                                            8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
-                                                            12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
-                                                            16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
-                                                        });
+    mMeshData.indices.insert(mMeshData.indices.end(), {
+                                                          0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
+                                                          4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
+                                                          8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
+                                                          12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
+                                                          16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
+                                                      });
 
     //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
     if (!registry->contains<Mesh>(eID))
@@ -571,7 +571,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n)
 {
     initializeOpenGLFunctions();
     mMeshData.Clear();
-    mMeshData.mName = "Ball";
+    mMeshData.name = "Ball";
     GLint mRecursions{n};
 
     makeUnitOctahedron(mRecursions); // This fills mMeshData
@@ -610,22 +610,22 @@ void ResourceManager::makeLightMesh(int eID)
     initializeOpenGLFunctions();
 
     mMeshData.Clear();
-    mMeshData.mName = "Pyramid";
+    mMeshData.name = "Pyramid";
 
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {
-                                   //Vertex data - normals not correct
-                                   Vertex{vec3{-0.5f, -0.5f, 0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.f, 0.f}},  //Left low
-                                   Vertex{vec3{0.5f, -0.5f, 0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{1.f, 0.f}},   //Right low
-                                   Vertex{vec3{0.0f, 0.5f, 0.0f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
-                                   Vertex{vec3{0.0f, -0.5f, -0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.5f}} //Back low
-                               });
+    mMeshData.vertices.insert(mMeshData.vertices.end(),
+                              {
+                                  //Vertex data - normals not correct
+                                  Vertex{vec3{-0.5f, -0.5f, 0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.f, 0.f}},  //Left low
+                                  Vertex{vec3{0.5f, -0.5f, 0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{1.f, 0.f}},   //Right low
+                                  Vertex{vec3{0.0f, 0.5f, 0.0f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
+                                  Vertex{vec3{0.0f, -0.5f, -0.5f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.5f}} //Back low
+                              });
 
-    mMeshData.mIndices.insert(mMeshData.mIndices.end(),
-                              {0, 1, 2,
-                               1, 3, 2,
-                               3, 0, 2,
-                               0, 3, 1});
+    mMeshData.indices.insert(mMeshData.indices.end(),
+                             {0, 1, 2,
+                              1, 3, 2,
+                              3, 0, 2,
+                              0, 3, 1});
     if (!registry->contains<Mesh>(eID))
         registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
     else
@@ -641,40 +641,40 @@ void ResourceManager::setAABBMesh(Mesh &mesh)
 {
     mMeshData.Clear();
 
-    mMeshData.mVertices.insert(mMeshData.mVertices.end(),
-                               {
-                                   // Right face
-                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.f, 0.f}},   //Left low
-                                   Vertex{vec3{1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{1.f, 0.f}},  //Right low
-                                   Vertex{vec3{1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
-                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   // 0,
-                                   // Front face
-                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
-                                   Vertex{vec3{1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   Vertex{vec3{-1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
-                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   // Left face
-                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
-                                   Vertex{vec3{-1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   Vertex{vec3{-1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
-                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   // Back face
-                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
-                                   Vertex{vec3{-1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Back low
-                                   Vertex{vec3{1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
-                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Back low
-                                   // Top face
-                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
-                                   Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
-                                   Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
-                                   Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}  //Back low
-                               });
-    mesh.mName = "BoxCollider";
-    mesh.mVerticeCount = mMeshData.mVertices.size();
-    mesh.mIndiceCount = mMeshData.mIndices.size();
-    mesh.mDrawType = GL_LINE_STRIP;
+    mMeshData.vertices.insert(mMeshData.vertices.end(),
+                              {
+                                  // Right face
+                                  Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.f, 0.f}},   //Left low
+                                  Vertex{vec3{1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{1.f, 0.f}},  //Right low
+                                  Vertex{vec3{1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                  Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  // 0,
+                                  // Front face
+                                  Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                  Vertex{vec3{1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  Vertex{vec3{-1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                  Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  // Left face
+                                  Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                  Vertex{vec3{-1.0f, -1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  Vertex{vec3{-1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                  Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  // Back face
+                                  Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
+                                  Vertex{vec3{-1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Back low
+                                  Vertex{vec3{1.0f, -1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Top
+                                  Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Back low
+                                  // Top face
+                                  Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}, //Top
+                                  Vertex{vec3{1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  Vertex{vec3{1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},   //Top
+                                  Vertex{vec3{-1.0f, 1.0f, 1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}},  //Back low
+                                  Vertex{vec3{-1.0f, 1.0f, -1.0f}, vec3{0.f, 1.f, 0.f}, gsl::Vector2D{0.5f, 0.5f}}  //Back low
+                              });
+    mesh.name = "BoxCollider";
+    mesh.verticeCount = mMeshData.vertices.size();
+    mesh.indiceCount = mMeshData.indices.size();
+    mesh.drawType = GL_LINE_STRIP;
 
     initVertexBuffers(&mesh);
     initIndexBuffers(&mesh);
@@ -686,14 +686,14 @@ void ResourceManager::setAABBMesh(Mesh &mesh)
 void ResourceManager::initVertexBuffers(Mesh *mesh)
 {
     //Vertex Array Object - VAO
-    glGenVertexArrays(1, &mesh->mVAO);
-    glBindVertexArray(mesh->mVAO);
+    glGenVertexArrays(1, &mesh->VAO);
+    glBindVertexArray(mesh->VAO);
 
     //Vertex Buffer Object to hold vertices - VBO
-    glGenBuffers(1, &mesh->mVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->mVBO);
+    glGenBuffers(1, &mesh->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
 
-    glBufferData(GL_ARRAY_BUFFER, mMeshData.mVertices.size() * sizeof(Vertex), mMeshData.mVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mMeshData.vertices.size() * sizeof(Vertex), mMeshData.vertices.data(), GL_STATIC_DRAW);
 
     // 1rst attribute buffer : vertices
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
@@ -713,9 +713,9 @@ void ResourceManager::initVertexBuffers(Mesh *mesh)
  */
 void ResourceManager::initIndexBuffers(Mesh *mesh)
 {
-    glGenBuffers(1, &mesh->mEAB);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mEAB);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.mIndices.size() * sizeof(GLuint), mMeshData.mIndices.data(), GL_STATIC_DRAW);
+    glGenBuffers(1, &mesh->EAB);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EAB);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMeshData.indices.size() * sizeof(GLuint), mMeshData.indices.data(), GL_STATIC_DRAW);
 }
 
 void ResourceManager::initParticleBuffers(ParticleEmitter &emitter)
@@ -971,7 +971,7 @@ bool ResourceManager::readFile(std::string fileName, int eID)
     if (!ret)
         return false;
     mMeshData.Clear();
-    mMeshData.mName = fileName;
+    mMeshData.name = fileName;
     // Append `default` material
     materials.push_back(tinyobj::material_t{});
     std::unordered_map<Vertex, GLuint> uniqueVertices;
@@ -989,10 +989,10 @@ bool ResourceManager::readFile(std::string fileName, int eID)
                 vertex.set_st(attrib.texcoords[2 * index.texcoord_index],
                               attrib.texcoords[2 * index.texcoord_index + 1]);
             if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] = static_cast<GLuint>(mMeshData.mVertices.size());
-                mMeshData.mVertices.push_back(vertex);
+                uniqueVertices[vertex] = static_cast<GLuint>(mMeshData.vertices.size());
+                mMeshData.vertices.push_back(vertex);
             }
-            mMeshData.mIndices.push_back(uniqueVertices[vertex]);
+            mMeshData.indices.push_back(uniqueVertices[vertex]);
         }
     }
     for (size_t m = 0; m < materials.size(); m++) {
@@ -1042,16 +1042,16 @@ bool ResourceManager::readTriangleFile(std::string fileName, GLuint eID)
         Vertex vertex;
         inn >> n;
 
-        mMeshData.mVertices.reserve(n);
+        mMeshData.vertices.reserve(n);
         for (int i = 0; i < n; i++) {
             inn >> vertex;
-            mMeshData.mVertices.push_back(vertex);
+            mMeshData.vertices.push_back(vertex);
         }
         inn.close();
         qDebug() << "TriangleSurface file read: " << QString::fromStdString(fileName);
 
         auto &mesh{registry->get<Mesh>(eID)};
-        mesh.mVerticeCount = mMeshData.mVertices.size();
+        mesh.mVerticeCount = mMeshData.vertices.size();
         mesh.mName = fileName;
         mesh.mDrawType = GL_TRIANGLES;
         initVertexBuffers(&mesh);
@@ -1264,9 +1264,9 @@ void ResourceManager::setActiveCameraController(cjk::Ref<CameraController> contr
 //=========================== Octahedron Functions =========================== //
 void ResourceManager::makeTriangle(const vec3 &v1, const vec3 &v2, const vec3 &v3)
 {
-    mMeshData.mVertices.push_back(Vertex{v1, v1, gsl::Vector2D{0.f, 0.f}});
-    mMeshData.mVertices.push_back(Vertex{v2, v2, gsl::Vector2D{1.f, 0.f}});
-    mMeshData.mVertices.push_back(Vertex{v3, v3, gsl::Vector2D{0.5f, 1.f}});
+    mMeshData.vertices.push_back(Vertex{v1, v1, gsl::Vector2D{0.f, 0.f}});
+    mMeshData.vertices.push_back(Vertex{v2, v2, gsl::Vector2D{1.f, 0.f}});
+    mMeshData.vertices.push_back(Vertex{v3, v3, gsl::Vector2D{0.5f, 1.f}});
 }
 
 void ResourceManager::subDivide(const vec3 &a, const vec3 &b, const vec3 &c, GLint n)
