@@ -80,33 +80,33 @@ private:
     int collisions{0};
     Registry *registry;
     /**
-     * @brief runAABBSimulations runs the collision simulations for AABB types
+     * @brief Runs the collision simulations for AABB types.
      */
     void runAABBSimulations();
     /**
-     * @brief runSphereSimulations runs the collision simulations for sphere based collider types
+     * @brief Runs the collision simulations for sphere based collider types.
      */
     void runSphereSimulations();
     /**
-    * @brief Helper function getMin finds minimum point in an AABB
+    * @brief Helper function getMin finds minimum point in an AABB.
     * @param aabb
     * @return a vector minimum point found in the AABB
     */
     vec3 getMin(const AABB &aabb);
     /**
-    * @brief Helper function getMax finds maximum point in an AABB
+    * @brief Helper function getMax finds maximum point in an AABB.
     * @param aabb
     * @return a vector maximum point found in the AABB
     */
     vec3 getMax(const AABB &aabb);
     /**
-     * @brief rayAABB checks every entity owning an AABB collider to find the closest one hit by the ray.
+     * @brief Checks every entity owning an AABB collider to find the closest one hit by the ray.
      * @param ray
      * @param ignoredEntity
      */
     void rayAABB(Raycast &ray, int ignoredEntity = -1);
     /**
-     * @brief raySphere checks every entity owning a Sphere collider to find the closest one hit by the ray.
+     * @brief Checks every entity owning a Sphere collider to find the closest one hit by the ray.
      * @param ray
      * @param ignoredEntity
      */
@@ -115,7 +115,7 @@ private:
     void rayPlane(Raycast &ray, int ignoredEntity = -1);
 
     /**
-    * @brief AABBAABB returns true if an intersection between given AABB's occur
+    * @brief Returns true if an intersection between given AABB's occur.
     * @param AABB1
     * @param AABB2
     * @return true if all axis overlap (we have an intersection)
@@ -123,22 +123,22 @@ private:
     bool AABBAABB(const AABB &aabb1, const AABB &aabb2);
 
     /**
-    * @brief SphereAABB collision between a Sphere and AABB
+    * @brief Collision between a Sphere and AABB.
     * @param sphere
     * @param aabb
     * @return true if distance is less than radius (we have an intersection)
     */
     bool SphereAABB(const Sphere &sphere, const AABB &aabb1);
     /**
-    * @brief SphereSphere
+    * @brief Collision between two spheres.
     * @param sphere1
     * @param sphere2
     * @return true if distance is less than radius^2 (intersection)
     */
     bool SphereSphere(const Sphere &sphere1, const Sphere &sphere2);
     /**
-     * @brief calcRayToSphere finds the intersection point between a ray and a sphere collider
-     * Not to be confused with raySphere which runs this function for each entity
+     * @brief Finds the intersection point between a ray and a sphere collider.
+     * Not to be confused with raySphere which runs this function for each entity.
      * @param ray
      * @param sphere
      * @param intersectionDistance retrieves the distance between the ray origin and the sphere
@@ -146,8 +146,8 @@ private:
      */
     bool calcRayToSphere(Raycast &r, const Sphere &sphere);
     /**
-     * @brief calcRayToAABB finds the intersection point between ray and AABB collider
-     * Not to be confused with rayAABB which runs this function for each entity
+     * @brief Finds the intersection point between ray and AABB collider.
+     * Not to be confused with rayAABB which runs this function for each entity.
      * @param r
      * @param aabb
      * @param intersectionDistance retrieves the distance between ray origin and AABB
@@ -155,28 +155,28 @@ private:
      */
     bool calcRayToAABB(Raycast &r, const AABB &aabb);
     /**
-     * @brief getRayFromMouse calculates a ray based on the mouse's position in the viewport
+     * @brief Calculates a ray based on the mouse's position in the viewport.
      * @param mousePos
      * @param rect
      * @return
      */
     Ray getRayFromMouse(const QPoint &mousePos, const QRect &rect);
     /**
-     * @brief getPointOnRay calculates a point on a ray given a specific distance from the ray's origin
+     * @brief Calculates a point on a ray given a specific distance from the ray's origin.
      * @param r
      * @param distance
      * @return
      */
     vec3 getPointOnRay(const Raycast &r, double distance);
     /**
-    * @brief ClosestPoint finds the point in an AABB closest to a given point
+    * @brief Finds the point in an AABB closest to a given point.
     * @param Collider aabb
     * @param vec3 point
     * @return the vec3 closest point
     */
     vec3 ClosestPoint(const AABB &aabb, const vec3 &point);
     /**
-    * @brief ClosestPoint finds the point in a Sphere closest to a given point
+    * @brief Finds the point in a Sphere closest to a given point.
     * @param sphere collider type
     * @param point
     * @return resized vector, offset by sphere.position
@@ -185,7 +185,7 @@ private:
     // todo
     //    vec3 ClosestPoint(const OBB &obb, const vec3 &point);
     /**
-     * @brief bothStatic check if one or both of the colliders are set to dynamic object type.
+     * @brief Check if one or both of the colliders are set to dynamic object type.
      * @param lhs
      * @param rhs
      * @return

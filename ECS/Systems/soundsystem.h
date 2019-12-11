@@ -17,7 +17,7 @@ class Vector3D;
 struct Sound;
 class Registry;
 /**
- * @brief The SoundSystem class controls Sound components
+ * @brief The SoundSystem class controls Sound components.
  */
 class SoundSystem : public ISystem {
     using vec3 = gsl::Vector3D;
@@ -25,7 +25,7 @@ class SoundSystem : public ISystem {
 public:
     SoundSystem();
     /**
-     * @brief cleanUp for OpenAL called on destruction of RenderWindow
+     * @brief Used for OpenAL called on destruction of RenderWindow.
      */
     void cleanUp();
     void init(GLuint entity);
@@ -33,7 +33,7 @@ public:
     void updatePlayOnly();
 
     /**
-     * @brief setPosition updates the position the sound play at for directional sound
+     * @brief Updates the position the sound play at for directional sound.
      * @param eID
      * @param newPos
      */
@@ -45,7 +45,7 @@ public:
     void stopAll();
 
     /**
-     * @brief deleteSound OpenAL cleanup for a removed sound component
+     * @brief OpenAL cleanup for a removed sound component.
      * @param sound
      */
     void deleteSound(Sound &sound);
