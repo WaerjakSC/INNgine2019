@@ -104,7 +104,7 @@ void InputSystem::handleKeyInput()
 // !!! Temporary proof of concept function, replace with makeTower or something and whatever other logic is wanted.
 void InputSystem::spawnTower()
 {
-    draggedEntity = factory->makeCube("FauxTower");
+    draggedEntity = factory->makeTower("Tower");
     mIsDragging = true;
     setPlaneColors(mIsDragging);
     // Might want to also "pause" the game here, or rather stop all AI and Movement while still allowing the player to move the camera and place the tower.

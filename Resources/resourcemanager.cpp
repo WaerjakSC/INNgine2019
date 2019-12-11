@@ -395,6 +395,16 @@ GLuint ResourceManager::makeEnemy(const QString &name)
     return eID;
 }
 
+GLuint ResourceManager::makeTower(const QString &name)
+{
+    GLuint eID{registry->makeEntity<Transform, Mesh, TowerComponent, AABB>(name)};
+    registry->add<Sphere>(eID, vec3{}, 13.f, false);
+    registry->add<Material>(eID, getShader<ColorShader>(), 0); // change this when we have a tower mesh!
+    registry->add<ParticleEmitter>(eID, false, true, 30, 30, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 0.1f, 1.5f, 1.5f);
+    setMesh("cube.obj", eID);
+    return eID;
+}
+
 /**
  * @brief Levelplane prefab
  * @param name

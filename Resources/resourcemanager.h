@@ -84,6 +84,7 @@ public:
     GLuint make3DObject(std::string name, cjk::Ref<Shader> type = std::make_shared<PhongShader>());
     GLuint makeTriangleSurface(std::string fileName, cjk::Ref<Shader> type);
     GLuint makeEnemy(const QString &name = "Gnome");
+    GLuint makeTower(const QString &name = "Tower");
     GLuint makeLevelPlane(const QString &name = "Level");
 
     Scene *getSceneLoader() const;
