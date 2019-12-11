@@ -3,10 +3,10 @@
 #include "vector2d.h"
 
 
-class hud {
+class HUD {
 public:
-    hud();
-    hud(int texture, gsl::Vector2D position, gsl::Vector2D scale);
+    HUD();
+    HUD(int texture, gsl::Vector2D position, gsl::Vector2D scale);
 
 
     int getTexture() const;

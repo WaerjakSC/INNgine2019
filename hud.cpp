@@ -1,20 +1,20 @@
-#include "hud.h"
+#include "HUD.h"
 #include "texture.h"
 
-hud::hud() {
+HUD::HUD() {
 
 }
-hud::hud(int texture, gsl::Vector2D position, gsl::Vector2D scale) {
+HUD::HUD(int texture, gsl::Vector2D position, gsl::Vector2D scale) {
     this->texture = texture;
     this->position = position;
     this->scale = scale;
 }
-int hud::getTexture() const {
+int HUD::getTexture() const {
     return texture;
 }
-gsl::Vector2D hud::getPosition() const {
+gsl::Vector2D HUD::getPosition() const {
     return position;
 }
-gsl::Vector2D hud::getScale() const {
+gsl::Vector2D HUD::getScale() const {
     return scale;
 }
