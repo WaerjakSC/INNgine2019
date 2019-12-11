@@ -23,7 +23,7 @@ public:
     void update(DeltaTime dt = 0.016) override;
     void updatePlayOnly(DeltaTime deltaTime = 0.016);
     /**
-     * @brief init creates a GameCameraController for each entity containing a GameCamera component.
+     * @brief Init creates a GameCameraController for each entity containing a GameCamera component.
      * @param aspectRatio
      */
     void init(float aspectRatio = 1.92f);
@@ -36,27 +36,27 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
 
     /**
-     * @brief gameCameraControllers getter for the vector of game camera controllers
+     * @brief Getter for the vector of game camera controllers.
      * @return
      */
     std::vector<cjk::Ref<GameCameraController>> gameCameraControllers() const;
     /**
-     * @brief currentCameraController finds and returns the active game camera controller if in play mode, otherwise returns the editor camera controller
+     * @brief Finds and returns the active game camera controller if in play mode, otherwise returns the editor camera controller.
      * @return
      */
     cjk::Ref<CameraController> currentCameraController();
 
     /**
-     * @brief onResize called when the RenderWindow is resized. Updates the aspectRatio of all camera controllers.
+     * @brief Called when the RenderWindow is resized. Updates the aspectRatio of all camera controllers.
      * @param aspectRatio
      */
     void onResize(float aspectRatio);
     /**
-     * @brief reset Resets editor and play variables, for instance when switching from Editor to Play or vice versa.
+     * @brief Resets editor and play variables, for instance when switching from Editor to Play or vice versa.
      */
     void reset();
     /**
-     * @brief setBuildableDebug If true, turns on colored tiles for debugging the buildable mode
+     * @brief If true, turns on colored tiles for debugging the buildable mode.
      * @param value
      */
     void setBuildableDebug(bool value);
@@ -84,11 +84,11 @@ signals:
 
 private:
     /**
-     * @brief handleKeyInput takes care of certain hard-coded key inputs
+     * @brief Takes care of certain hard-coded key inputs in the engine.
      */
     void handleKeyInput();
     /**
-     * @brief handleMouseInput mainly handles editor camera movement
+     * @brief Handles in-editor camera movement.
      */
     void handleMouseInput();
 
@@ -120,19 +120,19 @@ private:
     vec3 mDesiredVelocity;
     Input editorInput;
     /**
-     * @brief handlePlayerController mainly deals with WASD and other player control type events
+     * @brief Mainly deals with WASD and other player control type events.
      * @param dt
      */
     void handlePlayerController(DeltaTime dt);
     void setCameraSpeed(float value);
     /**
-     * @brief inputKeyPress takes an Input variable based on whether the editor is in play mode or not
+     * @brief Takes an Input variable based on whether the editor is in play mode or not.
      * @param event
      * @param input
      */
     void inputKeyPress(QKeyEvent *event, Input &input);
     /**
-     * @brief inputKeyRelease takes an Input variable based on whether the editor is in play mode or not
+     * @brief Takes an Input variable based on whether the editor is in play mode or not.
      * @param event
      * @param input
      */
@@ -143,8 +143,8 @@ private:
     void snapToObject();
     void confineMouseToScreen(DeltaTime dt);
     /**
-     * @brief dragEntity - move entity by mouse raycast when activated
-     * If the mouse raycast hits an AABB or sphere collider it will place the entity on top of that collider, as close to the mouse as possible
+     * @brief Move entity by mouse raycast when activated.
+     * If the mouse raycast hits an AABB or sphere collider it will place the entity on top of that collider, as close to the mouse as possible.
      * @param entity
      */
     void dragEntity(GLuint entity);

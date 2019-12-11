@@ -14,17 +14,17 @@ public:
     AISystem();
 
     /**
-     * @brief update
+     * @brief AIsystem update function.
      * @param dt
      */
     virtual void update(DeltaTime dt = 0.016) override;
     /**
-     * @brief updatePlayOnly
+     * @brief Play only update function.
      * @param dt
      */
     void updatePlayOnly(DeltaTime dt = 0.016);
     /**
-     * @brief updateEditorOnly
+     * @brief Editor only update function.
      * @param dt
      */
     void updateEditorOnly(DeltaTime dt = 0.016);
@@ -42,7 +42,7 @@ public slots:
 
 private:
     /**
-     * @brief move, moves the NPCs along the bspline from spawn to endpoint
+     * @brief Moves the NPCs along the bspline from spawn to endpoint.
      * @param dt
      * @param ai
      * @param transform
@@ -50,26 +50,26 @@ private:
      */
     std::optional<NPCevents> move(DeltaTime dt, AIComponent &ai, Transform &transform);
     /**
-     * @brief setControlPoints
+     * @brief Sets the control points for a bspline.
      * @param cps
      */
     void setControlPoints(std::vector<vec3> cps);
     /**
-     * @brief masterOfCurves
+     * @brief Updates trophies and path.
      */
     void masterOfCurves();
     /**
-     * @brief death, NPC death
+     * @brief Handles NPC death.
      * @param entityID
      */
     void death(const GLuint entityID);
     /**
-     * @brief goalReached, handles when the NPCs reaches end of path
+     * @brief Handles when the NPCs reaches end of path.
      * @param entityID
      */
     void goalReached(const GLuint entityID);
     /**
-     * @brief eventHandler
+     * @brief Handles the events used for NPC FSM.
      * @param ai
      */
     void eventHandler(AIComponent &ai);
@@ -78,13 +78,13 @@ private:
     Registry *registry;
 
     /**
-     * @brief detectEnemies, NPC detection for the towers
+     * @brief NPC detection for the towers.
      * @param ai
      * @param sphere
      */
     void detectEnemies(TowerComponent &ai, Sphere &sphere);
     /**
-     * @brief attack, tower attack functionality, launches a projectile towards NPC position
+     * @brief Tower attack functionality, launches a projectile towards NPC position.
      * @param ai
      * @param trans
      */
@@ -92,7 +92,7 @@ private:
 
     void notify(int notification);
     /**
-     * @brief spawnWave, spawns NPCs
+     * @brief Spawns NPCs.
      * @param dt
      */
     void spawnWave(DeltaTime dt);
