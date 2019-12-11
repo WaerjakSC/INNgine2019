@@ -1,4 +1,5 @@
 #include "aisystem.h"
+#include "gsl_math.h"
 #include "registry.h"
 #include "resourcemanager.h"
 
@@ -50,9 +51,9 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         }
     }
 
-    auto towerView{registry->view<TowerComponent, Sphere>()};
+    auto towerView{registry->view<TowerComponent, Sphere, Transform>()};
     for (auto entity : towerView) {
-        auto [aicomponent, sphere]{towerView.get<TowerComponent, Sphere>(entity)};
+        auto [aicomponent, sphere, transform]{towerView.get<TowerComponent, Sphere, Transform>(entity)};
         switch (aicomponent.state) {
         case TowerStates::IDLE:
             // scanning for monsters
@@ -60,7 +61,7 @@ void AISystem::updatePlayOnly(DeltaTime dt)
             break;
         case TowerStates::ATTACK:
             // kill goblin
-            attack(aicomponent);
+            attack(aicomponent, transform);
             break;
         case TowerStates::COOLDOWN:
             // cooldown
@@ -104,10 +105,11 @@ void AISystem::spawnWave(DeltaTime dt)
 }
 void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
-    if(!sphere.overlappedEntities.empty()){
+    if (!sphere.overlappedEntities.empty()) {
         ai.targetID = sphere.overlappedEntities.getList()[0];
         ai.state = TowerStates::ATTACK;
-    } else {
+    }
+    else {
         ai.state = TowerStates::IDLE;
     }
 }
@@ -119,7 +121,7 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
 
     // Standard/Projectile type
-    auto &trans {registry->get<Transform>(ai.targetID)};
+    auto &trans{registry->get<Transform>(ai.targetID)};
     GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
     registry->add<Bullet>(bulletID, trans.position, ai.damage, ai.projectileSpeed);
     registry->add<Sphere>(bulletID, vec3{0}, .3f, false);

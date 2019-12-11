@@ -49,7 +49,7 @@ ResourceManager::ResourceManager() : registry{Registry::instance()}
     registry->registerComponent<TowerComponent>();
     registry->registerComponent<BillBoard>();
     registry->registerComponent<Buildable>();
-
+    registry->registerComponent<Bullet>();
     // Collision Types
     registry->registerComponent<AABB>();
     registry->registerComponent<Sphere>();
