@@ -353,7 +353,7 @@ enum class AttackType { SPLASH,
                         MAGIC };
 // GNOMES
 struct AIComponent : public Component {
-    AIComponent(int hp = 100, float speed = 0.1f) : health(hp), moveSpeed(speed) {}
+    AIComponent(int hp = 100, float speed = 0.03f) : health(hp), moveSpeed(speed) {}
     int health;
     float moveSpeed;
     float pathT{0};
@@ -362,10 +362,10 @@ struct AIComponent : public Component {
 };
 // Towers
 struct TowerComponent : public Component {
-    TowerComponent(int dmg = 10, float cd = 2.5f, float r = 13.f) : damage(dmg), range(r), cooldown(cd) {}
+    TowerComponent(int dmg = 40, float cd = 0.5f, float r = 13.f) : damage(dmg), range(r), cooldown(cd) {}
     int damage;
     float range;
-    float projectileSpeed = 5.f;
+    float projectileSpeed = 25.f;
     float cooldown;
     float curCooldown = 1.5f;
     GLuint targetID;

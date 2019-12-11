@@ -25,7 +25,7 @@ void CollisionSystem::updatePlayOnly(DeltaTime deltaTime)
 void CollisionSystem::runAABBSimulations()
 {
     // possible groups - AABB + AIComponent, do two passes, one for Buildable + AABB, another for AABB + Bullet or whatever
-    auto view{registry->view<AIComponent, AABB>()};
+    auto view{registry->view<AIComponent, AABB, Transform>()};
     auto towerRangeView{registry->view<TowerComponent, Sphere>()};
     for (auto entity : view) {
         auto &aabb{view.get<AABB>(entity)};
@@ -52,6 +52,7 @@ void CollisionSystem::runAABBSimulations()
             if (SphereAABB(sphere, aabb)) {
                 auto &ai{view.get<AIComponent>(entity)};
                 ai.health -= bul.damage;
+                ai.notification_queue.push(NPCevents::DAMAGE_TAKEN);
                 registry->removeEntity(bulletID);
             }
         }
@@ -61,11 +62,13 @@ void CollisionSystem::runAABBSimulations()
     for (auto tower : towerRangeView) {
         auto &sphere{towerRangeView.get<Sphere>(tower)};
         std::vector<GLuint> entities = sphere.overlappedEntities.getList();
-        for (int i = 0; i < entities.size(); ++i) {
+        for (size_t i{0}; i < entities.size(); ++i) {
             GLuint entity = entities[i];
-            auto &aabb{view.get<AABB>(entity)};
-            if (!SphereAABB(sphere, aabb)) {
-                sphere.overlappedEntities.remove(entity);
+            if (view.contains(entity)) {
+                auto &aabb{view.get<AABB>(entity)};
+                if (!SphereAABB(sphere, aabb)) {
+                    sphere.overlappedEntities.remove(entity);
+                }
             }
         }
     }

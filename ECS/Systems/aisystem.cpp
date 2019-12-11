@@ -142,7 +142,6 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
     if (registry->contains<Transform>(ai.targetID)) {
         auto &trans{registry->get<Transform>(ai.targetID)};
         GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
-        qDebug() << "Shooting bullet!";
         vec3 velocity{(trans.localPosition - t.localPosition).normalized()}; // get the vector (line) from tower to enemy, normalize to get the general direction.
         registry->add<Bullet>(bulletID, velocity, ai.damage, ai.projectileSpeed);
         registry->add<Sphere>(bulletID, vec3{0}, .25f, false);
@@ -232,6 +231,7 @@ void AISystem::death(const GLuint entityID)
     // gold++
     // delete entity
     registry->removeEntity(entityID);
+    qDebug() << "Murdered another innocent gnome!";
 }
 
 /**

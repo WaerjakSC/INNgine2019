@@ -558,7 +558,7 @@ GLuint ResourceManager::makeOctBall(const QString &name, int n)
 {
     GLuint eID{registry->makeEntity<Transform>(name)};
 
-    registry->add<Material>(eID, getShader<ColorShader>());
+    registry->add<Material>(eID, getShader<TextureShader>(), 0, vec3{1, 1, 1});
     auto search{mMeshMap.find("Ball")};
     if (search != mMeshMap.end()) {
         registry->add<Mesh>(eID, search->second);
