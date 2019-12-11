@@ -4,7 +4,9 @@
 #include "core.h"
 #include "sparseset.h"
 #include <vector>
-
+/**
+ * The IPool class is the base Interface class for the Pool<Type> class.
+ */
 class IPool {
 public:
     class iterator;
@@ -21,7 +23,9 @@ public:
     virtual bool empty() const = 0;
     virtual iterator begin() const = 0;
     virtual iterator end() const = 0;
-
+    /**
+     * Custom iterator class to let us use range-based for loops and such.
+     */
     class iterator {
         friend class IPool;
 
@@ -137,6 +141,10 @@ public:
 };
 
 template <typename Type>
+/**
+ * The Pool class is a wrapper containing a Sparse Set of entities (GLuint) and their components.
+ * The Sparse Set serves as an index for each entity's component for quick look-up with minimal cache misses.
+ */
 class Pool : public IPool {
 public:
     Pool() = default;
@@ -158,7 +166,7 @@ public:
     }
 
     /**
-     * @brief Adds an entity and its new component to this pool.
+     * Adds an entity and its new component to this pool.
      * Entity is equivalent to Component in this case, since pool won't contain the entity if the entity doesn't have the component.
      * @example the Transform component type can take 3 extra variables, add<Transform>(entityID, position, rotation, scale) will initialize its variables to custom values.
      * @tparam Args... args Variadic parameter pack - Use as many function parameters as needed to construct the component.
@@ -173,7 +181,7 @@ public:
         return mComponents.back();
     }
     /**
-     * @brief cloneComponent creates a new component with the exact same parameters as the old component.
+     * Creates a new component with the exact same parameters as the old component.
      * @param cloneFrom Entity being cloned
      * @param cloneTo Entity receiving the new component
      */
@@ -185,7 +193,7 @@ public:
         mComponents.push_back(get(cloneFrom));
     }
     /**
-     * @brief Removes an entity by swapping the entityID/component with the last element of the dense arrays and popping out the last element.
+     * Removes an entity by swapping the entityID/component with the last element of the dense arrays and popping out the last element.
      * mEntities.mIndices[removedEntityID] now holds an invalid value for the dense arrays.
      * mEntities.mIndices[swappedEntity] now holds the swapped location of the entityID/component.
      * @param removedEntityID
@@ -199,16 +207,22 @@ public:
             mEntities.remove(removedEntityID);
         }
     }
-    void swap(GLuint eID, GLuint other)
+    /**
+     * Swaps one Entity's position in the Pool with another.
+     * Most commonly used when removing an entity - swaps the entity being removed with the last entity in the list and pops it out.
+     * @param entityID
+     * @param otherEntityID
+     */
+    void swap(GLuint entityID, GLuint otherEntityID)
     {
-        assert(has(eID));
-        assert(has(other));
-        std::swap(mComponents[mEntities.find(eID)], mComponents[mEntities.find(other)]); // Swap the components to keep the dense set up to date
-        mEntities.swap(eID, other);
+        assert(has(entityID));
+        assert(has(otherEntityID));
+        std::swap(mComponents[mEntities.find(entityID)], mComponents[mEntities.find(otherEntityID)]); // Swap the components to keep the dense set up to date
+        mEntities.swap(entityID, otherEntityID);
     }
 
     /**
-     * @brief sort the pool according to a different index
+     * Sort the pool according to a different index.
      * @param otherIndex
      */
     void sort(std::vector<int> otherIndex)
@@ -222,43 +236,54 @@ public:
         }
     }
     /**
-     * @brief Direct access to the component list
-     * @return std::vector containing the component type. Use operator[] to access a component if you know the component exists (isn't out of range) --
-     * it's faster than .at() BUT doesn't give an out_of_range exception like .at() does, so it can be harder to debug
+     * Direct access to the component list.
+     * Use operator[] to access a component if you know the component exists (isn't out of range) --
+     * it's faster than .at() BUT doesn't give an out_of_range exception like .at() does, so it can be harder to debug.
+     * @return std::vector containing the component type.
      */
     std::vector<Type> &data() { return mComponents; }
     /**
-     * @brief Calls mComponents.data()
-     * raw() + size() will return the last member of the vector
+     * @brief Calls mComponents.data().
+     * raw() + size() will return the last member of the vector.
      * @return
      */
     Type *raw() { return mComponents.data(); }
     /**
-     * @brief Returns a list of every entity that exists in the component array.
+     * Returns a list of every entity that exists in the component array.
      * The index is initially meaningless except as an accessor, the component pool can be sorted
      * to keep entities relevant to a certain system first in the array.
      * @return The entity list contains a list of every entityID.
      */
     const std::vector<GLuint> entityList() { return mEntities.getList(); }
 
+    /**
+     * Pointer to the first entity in the sparse set list. Guaranteed to be tightly packed.
+     * @return
+     */
     const GLuint *entities() const override { return mEntities.entities(); }
 
     /**
-     * @brief Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
+     * Returns the sparse array containing an int "pointer" to the mEntityList and mComponentList arrays.
      * The index location is equal to the entityID.
      * @example The location of Entity 5 in the packed arrays can be found at mEntities.mIndices[5].
      * Both IDs and arrays begin at 0.
      * @return
      */
     const std::vector<int> &indices() { return mEntities.getIndices(); }
+    /**
+     * Find the location of the entityID in the Sparse Set's entity list.
+     * Can return -1, in which case the entity is not contained within.
+     * @param entityID
+     * @return
+     */
     const int &index(GLuint entityID) const
     {
         return mEntities.index(entityID);
     }
     /**
-     * @brief get the component belonging to entity with given ID.
+     * Get the component belonging to entity with given ID.
      * Some minor additional overhead due to going through mEntities.mIndices first -
-     * if you know you want to use all the entities in the Pool you may want data() instead
+     * if you know you want to use all the entities in the Pool you may want data() instead.
      * @param eID
      * @return
      */
@@ -268,7 +293,7 @@ public:
         return mComponents[mEntities.index(eID)];
     }
     /**
-     * @brief back get the last component in the pool, aka the latest creation
+     * Back get the last component in the pool, aka the latest creation.
      * @return
      */
     Type &back()
@@ -278,14 +303,14 @@ public:
     iterator begin() const
     {
         const int32_t pos{static_cast<int32_t>(mEntities.size())};
-        return iterator{mEntities.list(), pos};
+        return iterator{mEntities.listPtr(), pos};
     }
     iterator end() const
     {
-        return iterator{mEntities.list(), {}};
+        return iterator{mEntities.listPtr(), {}};
     }
     /**
-     * @brief find an entity's position in the sparse set
+     * Find an entity's position in the sparse set.
      * @param eID
      * @return returns -1 (an invalid value) if entity doesn't own a component in the pool
      */
@@ -294,7 +319,7 @@ public:
         return mEntities.find(eID);
     }
     /**
-     * @brief For checking if the pool contains a given entity.
+     * For checking if the pool contains a given entity.
      * @param eID
      * @return
      */
@@ -302,29 +327,25 @@ public:
     {
         return find(eID) != -1;
     }
-    /**
-     * @brief has - alternate function taking Entity reference instead of entityID
-     * @param entity actual entity object
-     * @return
-     */
-    //     bool has(const Entity &entity) const override {
-    //        return find(entity.id()) != -1;
-    //    }
 
     /**
-     * @brief Actual number of entities with owned components in the pool.
+     * Actual number of entities with owned components in the pool.
      * @return
      */
     size_t size() const override { return mEntities.size(); }
+    /**
+     * Check if the Pool is empty.
+     * @return
+     */
     bool empty() const override { return mEntities.empty(); }
     /**
-     * @brief Size of the sparse array.
+     * Size of the sparse array.
      * Usually equal to the ID of the latest entity created that owns a component in this pool.
      * @return
      */
     size_t extent() { return mEntities.extent(); }
     /**
-     * @brief Reset the arrays to empty.
+     * Reset the arrays to empty.
      */
     void clear()
     {
@@ -356,10 +377,9 @@ public:
     void onConstruct(GLuint entityID);
 
 private:
-    // Dense Arrays --  n points to Entity in list[n] and component data in mComponentList[n]
-    // Both should be the same length.
-    std::vector<Type> mComponents;
+    /// Sparse Set --  n points to Entity in list[n] and component data in mComponentList[n].
     SparseSet mEntities;
+    std::vector<Type> mComponents;
 };
 
 #endif // POOL_H
