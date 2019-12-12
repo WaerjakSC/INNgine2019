@@ -203,7 +203,7 @@ bool CollisionSystem::SphereAABB(const Sphere &sphere, const AABB &aabb)
     //    vec3 closestPoint = ClosestPoint(aabb, sphere.radius);
     // Now sends the center position of the sphere
     vec3 closestPoint{ClosestPoint(aabb, spherePos)};
-    // not 100% sure about this one
+
     float dist{(spherePos - closestPoint).length()};
     float radiusSq{sphere.radius * sphere.radius};
 

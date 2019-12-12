@@ -70,6 +70,7 @@ void AISystem::updatePlayOnly(DeltaTime dt)
     }
     bulletLifeTime(dt);
 }
+
 void AISystem::bulletLifeTime(DeltaTime dt)
 {
     auto view{registry->view<Bullet>()};
@@ -114,14 +115,12 @@ void AISystem::spawnWave(DeltaTime dt)
 void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if (!sphere.overlappedEntities.empty()) {
-        //        qDebug() << "AIsystem - detectEnemies: Enemy Detected\n";
         for (auto entity : sphere.overlappedEntities.getList()) {
             if (entity != ai.lastTarget) {
                 ai.lastTarget = ai.targetID;
                 ai.targetID = entity;
             }
         }
-        //        qDebug() << "New target: " + QString::number(ai.targetID);
         ai.state = TowerStates::ATTACK;
     }
     else {
@@ -145,7 +144,6 @@ void AISystem::attack(TowerComponent &tower, Transform &t)
         registry->get<Transform>(bulletID).localPosition = t.position;
         registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
-        //        qDebug() << "AIsystem - attack: Projectile spawned\n";
     }
     else {
         tower.state = TowerStates::IDLE;
@@ -204,7 +202,6 @@ std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform
     transform.matrixOutdated = true;
 
     if (endPoint) {
-        // remove 1 hp from player
         return NPCevents::ENDPOINT_ARRIVED;
     }
 
