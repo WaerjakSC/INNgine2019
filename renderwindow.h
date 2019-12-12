@@ -4,6 +4,7 @@
 #include "core.h"
 #include <QElapsedTimer>
 #include <QOpenGLFunctions_4_1_Core>
+#include <QOpenGLPaintDevice>
 #include <QTimer>
 #include <QWindow>
 #include <chrono>
@@ -91,7 +92,7 @@ private:
     MainWindow *mMainWindow{nullptr}; //points back to MainWindow to be able to put info in StatusBar
 
     class QOpenGLDebugLogger *mOpenGLDebugLogger{nullptr};
-
+    QOpenGLPaintDevice *mDevice{nullptr};
     void calculateFramerate();
 
     void startOpenGLDebugger();

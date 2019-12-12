@@ -72,7 +72,6 @@ void AISystem::updatePlayOnly(DeltaTime dt)
     }
 }
 
-
 void AISystem::updateEditorOnly(DeltaTime)
 {
     draw();
@@ -129,7 +128,6 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
         registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
         qDebug() << "AIsystem - attack: Projectile spawned\n";
-
     }
     else {
         ai.state = TowerStates::IDLE;
@@ -220,6 +218,7 @@ void AISystem::goalReached(const GLuint entityID)
 
 void AISystem::masterOfCurves()
 {
+    mCurve.updateControlPoints();
     mCurve.updatePath();
 }
 

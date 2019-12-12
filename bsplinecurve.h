@@ -67,9 +67,10 @@ public:
      */
     void updatePath(bool init = false);
 
+    void updateControlPoints();
+
 private:
     cjk::Ref<ColorShader> debugShader;
 };
-
 
 #endif // BSPLINECURVE_H

@@ -411,21 +411,23 @@ void MainWindow::onDataChanged(const QModelIndex &index, const QModelIndex &othe
 {
     Q_UNUSED(otherIndex);
     GLuint entity{hierarchy->data(index, IDRole).toUInt()};
-    if (roles[0] == Qt::CheckStateRole) {
-        QStandardItem *item{hierarchy->itemFromIndex(index)};
-        auto view{registry->view<Mesh>()};
-        auto &mesh{view.get(entity)};
-        switch (item->checkState()) {
-        case Qt::Checked:
-            mesh.rendered = true;
-            break;
-        case Qt::Unchecked:
-            mesh.rendered = false;
-            break;
-        default:
-            break;
+    if (!roles.empty()) {
+        if (roles[0] == Qt::CheckStateRole) {
+            QStandardItem *item{hierarchy->itemFromIndex(index)};
+            auto view{registry->view<Mesh>()};
+            auto &mesh{view.get(entity)};
+            switch (item->checkState()) {
+            case Qt::Checked:
+                mesh.rendered = true;
+                break;
+            case Qt::Unchecked:
+                mesh.rendered = false;
+                break;
+            default:
+                break;
+            }
+            emit renderStatus(item->checkState(), entity);
         }
-        emit renderStatus(item->checkState(), entity);
     }
     else {
         auto &info{registry->get<EInfo>(entity)};
