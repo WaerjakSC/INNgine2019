@@ -481,10 +481,7 @@ void MainWindow::changeEntityName(const GLuint &entt)
     auto &info{registry->get<EInfo>(entt)};
     item->setText(info.name);
 }
-/**
- * @brief Initial insertion of entities, such as those made in an init function or read from a level file.
- * @param entities
- */
+
 void MainWindow::insertEntities()
 {
     hierarchy->clear();

@@ -113,7 +113,7 @@ void InputSystem::setPlaneColors(bool dragMode)
 {
     auto &player = registry->getPlayer();
     auto draggedView{registry->view<Transform, AABB, TowerComponent>()};
-    auto [towerTransform, aabb, tower]{draggedView.get<Transform, AABB, TowerComponent>(draggedEntity)};
+    auto &tower{draggedView.get<TowerComponent>(draggedEntity)};
     auto view{registry->view<Buildable, Material>()};
 
     if (dragMode) {
@@ -131,7 +131,7 @@ void InputSystem::setPlaneColors(bool dragMode)
         }
         else {
             for (auto entity : view) {
-                auto [build, mat]{view.get<Buildable, Material>(entity)};
+                auto &mat{view.get<Material>(entity)};
                 mat.objectColor = red * 0.8f;
             }
         }
@@ -201,6 +201,7 @@ void InputSystem::confineMouseToScreen(DeltaTime dt)
 {
     int width{mRenderWindow->width()};
     int height{mRenderWindow->height()};
+
     QPoint pos{mRenderWindow->mapFromGlobal(QCursor::pos())};
     if (pos.x() >= 0 && pos.y() >= 0 && pos.x() <= width && pos.y() <= height) {
         mEnteredWindow = true;

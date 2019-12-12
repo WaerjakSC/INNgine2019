@@ -29,11 +29,21 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    /**
+    * Initial insertion of entities, such as those made in an init function or read from a level file.
+    */
     void insertEntities();
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    /**
+     * Refreshes the list of entities in the scene.
+     */
     void clearEditor();
 
+    /**
+     * Whether or not the window is showing a custom message.
+     * @return
+     */
     bool showingMsg() const;
 
     void setShowingMsg(bool showingMsg);
@@ -46,6 +56,10 @@ signals:
 
 public slots:
     void parentChanged(GLuint eID);
+    /**
+     * Set the selected entity based on what was clicked on in the scene.
+     * @param eID
+     */
     void mouseRayHit(int eID);
     void closeEngine();
 

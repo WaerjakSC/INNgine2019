@@ -176,7 +176,7 @@ void AISystem::draw()
     mCurve.draw();
 }
 
-void AISystem::deathTimer(AIComponent &ai, DeltaTime dt)
+void AISystem::deathTimer(DeltaTime dt)
 {
     for (auto entity : deadAI) {
         registry->get<AIComponent>(entity);
