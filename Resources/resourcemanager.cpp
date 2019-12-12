@@ -422,6 +422,24 @@ GLuint ResourceManager::makeLevelPlane(const QString &name)
 }
 
 /**
+ * @brief TextureQuad prefab
+ * @param name
+ * @return Returns the entity id
+ */
+GLuint ResourceManager::makeTextureQuad(const QString &name) {
+    GLuint eID{registry->makeEntity<Mesh, PlayerComponent>(name)};
+    registry->add<Material>(eID, getShader<TextureShader>(), mTextures["Lives"]->textureUnit());
+    auto search = mMeshMap.find("TextureQuad");
+    if (search != mMeshMap.end()) {
+        registry->add<Mesh>(eID, search->second);
+    }
+    else
+        makeTextureQuadMesh(eID);
+
+    return eID;
+}
+
+/**
  * @brief Billboard prefab
  * @return
  */
@@ -462,7 +480,26 @@ void ResourceManager::makeBillBoardMesh(int eID)
 
     glBindVertexArray(0);
 }
+void ResourceManager::makeTextureQuadMesh(int eID)
+{
+    initializeOpenGLFunctions();
+    mMeshData.Clear();
+    mMeshData.name = "TextureQuad";
+    mMeshData.vertices.insert(mMeshData.vertices.end(),
+                              {Vertex{vec3(1.0f, -1.0f, 0.0f)},
+                               Vertex{vec3(-1.0f, -1.0f, 0.0f)},
+                               Vertex{vec3(1.0f, 1.0f, 0.0f)},
+                               Vertex{vec3(1.0f, -1.0f, 0.0f)}});
+    if (!registry->contains<Mesh>(eID))
+        registry->add<Mesh>(eID, GL_TRIANGLE_STRIP, mMeshData);
+    else
+        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLE_STRIP, mMeshData);
+    auto &textureQuadMesh{registry->get<Mesh>(eID)};
 
+    initVertexBuffers(&textureQuadMesh);
+
+    glBindVertexArray(0);
+}
 /**
  * @brief Creates the level grid.
  * @return
