@@ -4,6 +4,7 @@
 
 #include "aisystem.h"
 #include "collisionsystem.h"
+#include "hud.h"
 #include "inputsystem.h"
 #include "movementsystem.h"
 #include "particlesystem.h"
@@ -161,6 +162,9 @@ void RenderWindow::init()
     connect(mInputSystem.get(), &InputSystem::closeEngine, mMainWindow, &MainWindow::closeEngine);
     connect(mInputSystem.get(), &InputSystem::toggleRendered, mRenderer.get(), &RenderSystem::toggleRendered);
     connect(mRenderer.get(), &RenderSystem::newRenderedSignal, mMainWindow, &MainWindow::updateRenderedCheckBox);
+
+    HUD hud;
+    hud.updatehealth();
 }
 
 ///Called each frame - doing the rendering
