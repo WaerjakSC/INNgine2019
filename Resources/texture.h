@@ -9,7 +9,7 @@
 class Texture : protected QOpenGLFunctions_4_1_Core {
 private:
     GLuint mId{0};
-    GLuint mTextureUnit{0};
+
 
 public:
     /**
@@ -36,7 +36,7 @@ public:
      * @return
      */
     GLuint textureUnit() const;
-
+    GLuint mTextureUnit{0};
 private:
     /**
      * Loads a texture from file.

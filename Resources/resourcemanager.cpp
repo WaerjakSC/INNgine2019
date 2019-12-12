@@ -2,6 +2,7 @@
 #include "aisystem.h"
 #include "cameracontroller.h"
 #include "colorshader.h"
+#include "hud.h"
 #include "innpch.h"
 #include "inputsystem.h"
 #include "mainwindow.h"
@@ -27,6 +28,7 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <skyboxshader.h>
+
 
 ResourceManager *ResourceManager::mInstance = nullptr;
 

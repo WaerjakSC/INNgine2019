@@ -1,18 +1,19 @@
 #ifndef HUD_H
 #define HUD_H
 #include "vector2d.h"
-
+#include "ECS/registry.h"
+#include "ECS/view.h"
+#include "ECS/components.h"
 
 class HUD {
 public:
     HUD();
     HUD(int texture, gsl::Vector2D position, gsl::Vector2D scale);
 
-
-    int getTexture() const;
     gsl::Vector2D getPosition() const;
     gsl::Vector2D getScale() const;
-    std::string currentTexture(int currenthealth);
+    std::string currentTexture();
+    void updatehealth();
 
 private:
     int texture;

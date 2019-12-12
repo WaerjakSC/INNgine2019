@@ -2,6 +2,7 @@
 #include "gsl_math.h"
 #include "registry.h"
 #include "resourcemanager.h"
+#include "hud.h"
 
 AISystem::AISystem() : registry(Registry::instance())
 {
@@ -225,8 +226,10 @@ void AISystem::death(const GLuint entityID)
 
 void AISystem::goalReached(const GLuint entityID)
 {
+    HUD hud;
     registry->getPlayer().health--;
-    registry->removeEntity(entityID);
+    registry->removeEntity(entityID);   
+    hud.updatehealth();
 }
 
 void AISystem::masterOfCurves()
