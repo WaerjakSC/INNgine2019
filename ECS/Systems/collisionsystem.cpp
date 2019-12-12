@@ -75,6 +75,7 @@ void CollisionSystem::runAABBSimulations()
             }
             else {
                 sphere.overlappedEntities.remove(entity);
+                qDebug() << "Entity died of natural causes: Entity removed";
             }
         }
     }

@@ -23,7 +23,6 @@ void AISystem::updatePlayOnly(DeltaTime dt)
             curSpawnDuration = 0.f;
         }
     }
-    // Currently only set up for one entity
     auto view{registry->view<Transform, AIComponent>()};
     for (auto entity : view) {
         auto [transform, ai] = view.get<Transform, AIComponent>(entity);
@@ -112,7 +111,12 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if (!sphere.overlappedEntities.empty()) {
         //        qDebug() << "AIsystem - detectEnemies: Enemy Detected\n";
-        ai.targetID = sphere.overlappedEntities.getList()[0];
+        for (auto entity : sphere.overlappedEntities.getList()) {
+            if (entity != ai.lastTarget) {
+                ai.lastTarget = ai.targetID;
+                ai.targetID = entity;
+            }
+        }
         //        qDebug() << "New target: " + QString::number(ai.targetID);
         ai.state = TowerStates::ATTACK;
     }
@@ -128,7 +132,7 @@ void AISystem::attack(TowerComponent &tower, Transform &t)
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
 
     // Standard/Projectile type
-    if (registry->contains<Transform>(tower.targetID)) {
+    if (registry->contains<Transform>(tower.targetID) && tower.targetID != tower.lastTarget) {
         auto &trans{registry->get<Transform>(tower.targetID)};
         GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
         vec3 velocity{(trans.localPosition - t.localPosition).normalized()}; // get the vector (line) from tower to enemy, normalize to get the general direction.
@@ -137,7 +141,7 @@ void AISystem::attack(TowerComponent &tower, Transform &t)
         registry->get<Transform>(bulletID).localPosition = t.position;
         registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
         registry->get<Transform>(bulletID).matrixOutdated = true;
-        qDebug() << "AIsystem - attack: Projectile spawned\n";
+        //        qDebug() << "AIsystem - attack: Projectile spawned\n";
     }
     else {
         tower.state = TowerStates::IDLE;

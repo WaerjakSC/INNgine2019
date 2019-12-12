@@ -266,8 +266,8 @@ void InputSystem::placeTower()
 {
     auto view{registry->view<Transform, Buildable>()};
     auto &player = registry->getPlayer();
-    auto draggedView{registry->view<Transform, AABB, TowerComponent>()};
-    auto [towerTransform, aabb, tower]{draggedView.get<Transform, AABB, TowerComponent>(draggedEntity)};
+    auto draggedView{registry->view<Transform, AABB, TowerComponent, Sphere>()};
+    auto [towerTransform, aabb, tower, sphere]{draggedView.get<Transform, AABB, TowerComponent, Sphere>(draggedEntity)};
 
     if (view.contains(lastHitEntity) && player.gold >= tower.towerCost) {
         auto &build{view.get<Buildable>(lastHitEntity)};
@@ -275,6 +275,7 @@ void InputSystem::placeTower()
             mIsDragging = false;
             build.isBuildable = false;
             tower.state = TowerStates::IDLE;
+            sphere.overlapEvent = true;
             player.gold -= tower.towerCost;
             auto &planeTransform{view.get<Transform>(lastHitEntity)};
             float scaleY{planeTransform.localScale.y};
@@ -300,7 +301,6 @@ void InputSystem::dragEntity(GLuint entity)
     Raycast ray{collisionSystem->mousePick(cursorPos, mRenderWindow->geometry(), entity, 100.f)};
     auto towerView{registry->view<Transform, TowerComponent>()};
     auto [tf, tower]{towerView.get<Transform, TowerComponent>(entity)};
-
     // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
     if (registry->contains<AABB>(ray.hitEntity)) { // We only want to deal with AABB colliders
         auto view{registry->view<Buildable, Material>()};

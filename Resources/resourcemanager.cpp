@@ -399,8 +399,7 @@ GLuint ResourceManager::makeEnemy(const QString &name)
 GLuint ResourceManager::makeTower(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh, TowerComponent, AABB>(name)};
-    auto &rangeCollider{registry->add<Sphere>(eID, vec3{}, 3.f, false)};
-    rangeCollider.overlapEvent = true;
+    registry->add<Sphere>(eID, vec3{}, 4.f, false);
     registry->add<Material>(eID, getShader<ColorShader>(), 0); // change this when we have a tower mesh!
     registry->add<ParticleEmitter>(eID, false, true, 30, 30, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 0.1f, 1.5f, 1.5f);
     setMesh("cube.obj", eID);
