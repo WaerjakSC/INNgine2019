@@ -16,7 +16,20 @@ void BSplineCurve::setControlPoints(const std::vector<vec3> &cp)
     if (cp.size() != oldSize)
         t = findKnots();
 }
+/**
+ * @brief updateTrophies call this when a trophy is taken
+ */
+void BSplineCurve::updateControlPoints()
+{
+    std::vector<vec3> controlPoints;
+    auto view{Registry::instance()->view<BSplinePoint>()}; // Get every entity with these two components
+    for (auto entity : view) {
+        auto &bspline{view.get(entity)};
+        controlPoints.push_back(bspline.location);
+    }
 
+    setControlPoints(controlPoints);
+}
 std::vector<float> BSplineCurve::findKnots() const
 {
 

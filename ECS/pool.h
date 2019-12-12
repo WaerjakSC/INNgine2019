@@ -187,7 +187,6 @@ public:
      */
     void cloneComponent(GLuint cloneFrom, GLuint cloneTo) override
     {
-        assert(!has(cloneTo));
         assert(has(cloneFrom));
         mEntities.insert(cloneTo);
         mComponents.push_back(get(cloneFrom));

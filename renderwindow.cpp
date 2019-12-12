@@ -27,6 +27,7 @@
 #include <QOpenGLContext>
 #include <QOpenGLDebugLogger>
 #include <QOpenGLFunctions>
+#include <QPainter>
 #include <QStatusBar>
 #include <QTimer>
 #include <chrono>
@@ -176,6 +177,7 @@ void RenderWindow::render()
 
     //to clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     if (!mFactory->isLoading()) { // Not sure if this is necessary, but we wouldn't want to try rendering something before the scene is done loading everything
         mRenderer->update(dt);
         mSoundSystem->update(dt);
@@ -218,6 +220,7 @@ void RenderWindow::exposeEvent(QExposeEvent *)
     if (!mInitialized) {
         init();
         mTime.start();
+        mDevice = new QOpenGLPaintDevice;
     }
 
     //If the window actually is exposed to the screen we start the main loop
