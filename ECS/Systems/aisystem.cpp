@@ -82,6 +82,8 @@ void AISystem::resetTimers()
     curWaveCD = 1.f;
     curSpawnCD = 0.f;
     curSpawnDuration = 0.f;
+    curTimerCD = 2.0f;
+    curTimer = 0.f;
 }
 
 void AISystem::spawnWave(DeltaTime dt)
@@ -157,6 +159,19 @@ void AISystem::draw()
     mCurve.draw();
 }
 
+void AISystem::deathTimer(AIComponent &ai, DeltaTime dt)
+{
+    for(auto entity : deadAI){
+        registry->get<AIComponent>(entity);
+        if (curTimerCD >= 0.f)
+            curTimerCD -= dt;
+        if (curTimerCD <= 0.f) {
+            registry->removeEntity(entity);
+            curTimerCD = curTimer;
+        }
+    }
+}
+
 std::optional<NPCevents> AISystem::move(DeltaTime dt, AIComponent &ai, Transform &transform)
 {
     float &t = ai.pathT; // shortcut
@@ -186,19 +201,18 @@ void AISystem::init()
 
 void AISystem::death(const GLuint entityID)
 {
-    // hp <= 0
-    // particles
-    // gold++
-    // delete entity
-    registry->removeEntity(entityID);
+    registry->getPlayer().gold += 20;
+    auto view{registry->view<ParticleEmitter, Mesh, AIComponent>()};
+    auto [emitter, mesh, ai] = view.get<ParticleEmitter, Mesh, AIComponent>(entityID);
+    emitter.isActive = true;
+    mesh.rendered = false;
+    deadAI.push_back(entityID);
     qDebug() << "Murdered another innocent gnome!";
 }
 
 void AISystem::goalReached(const GLuint entityID)
 {
-    // endpoint reached
-    // remove 1LP from player
-    // delete entity
+    registry->getPlayer().health--;
     registry->removeEntity(entityID);
 }
 

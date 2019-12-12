@@ -86,6 +86,7 @@ public:
     GLuint makeEnemy(const QString &name = "Gnome");
     GLuint makeTower(const QString &name = "Tower");
     GLuint makeLevelPlane(const QString &name = "Level");
+    GLuint makeTextureQuad(const QString &name = "TextureQuad");
 
     Scene *getSceneLoader() const;
 
@@ -208,6 +209,7 @@ private:
     void makePlaneMesh(GLuint eID);
     void makeBallMesh(GLuint eID, int n = 3);
     void makeBillBoardMesh(int eID);
+    void makeTextureQuadMesh(int eID);
     // void makeLevel(GLuint eID);
     void makeTowerMesh(GLuint eID);
     friend class ComponentList;

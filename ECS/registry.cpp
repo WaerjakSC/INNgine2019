@@ -204,6 +204,11 @@ void Registry::newGeneration(GLuint entityID, const QString &text)
     info.isDestroyed = false;
 }
 
+PlayerComponent &Registry::getPlayer()
+{
+    return player;
+}
+
 bool Registry::isDestroyed(GLuint entityID)
 {
     EInfo &info{get<EInfo>(entityID)};
