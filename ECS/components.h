@@ -421,6 +421,7 @@ struct TowerComponent : public Component {
     float projectileSpeed = 100.f;
     float cooldown;
     float curCooldown = 0.5f;
+    GLuint lastTarget{0};
     GLuint targetID;
     TowerStates state{TowerStates::PLACEMENT};
     AttackType attackState = AttackType::PHYSICAL;
@@ -430,9 +431,11 @@ struct TowerComponent : public Component {
     Defines functionality for the player component.
 */
 struct PlayerComponent : public Component {
-    PlayerComponent() {}
+    PlayerComponent() : health(initialHealth), gold(initialGold) {}
+    int initialHealth{5};
     int health = 5;
-    int gold = 200;
+    int initialGold{200};
+    int gold;
     int kills = 0;
 };
 

@@ -86,13 +86,16 @@ void AISystem::updateEditorOnly(DeltaTime)
     draw();
 }
 
-void AISystem::resetTimers()
+void AISystem::reset()
 {
     curWaveCD = 1.f;
     curSpawnCD = 0.f;
     curSpawnDuration = 0.f;
     curTimerCD = 2.0f;
     curTimer = 0.f;
+    auto &player{registry->getPlayer()};
+    player.gold = player.initialGold;
+    player.health = player.initialHealth;
 }
 
 void AISystem::spawnWave(DeltaTime dt)
