@@ -79,7 +79,7 @@
                 ],
                 "rotation": [
                     -0.0,
-                    35.748817443847659,
+                    36.09828186035156,
                     0.0
                 ],
                 "scale": [
@@ -97,7 +97,7 @@
                 ],
                 "specstr": 0.30000001192092898,
                 "specexp": 4,
-                "textureunit": 1,
+                "textureunit": 2,
                 "shader": "TextureShader"
             },
             "mesh": {
