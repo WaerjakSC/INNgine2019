@@ -5,9 +5,9 @@
         "components": {
             "transform": {
                 "position": [
-                    0.0,
-                    46.0,
-                    35.0
+                    -3.5,
+                    66.0,
+                    48.0
                 ],
                 "rotation": [
                     135.0,
@@ -37,11 +37,11 @@
             },
             "GameCamera": {
                 "position": [
-                    0.0,
-                    45.0,
-                    35.0
+                    -3.5,
+                    65.0,
+                    48.0
                 ],
-                "pitch": -55.0,
+                "pitch": -57.0,
                 "yaw": 0.0,
                 "active": true
             }
@@ -79,7 +79,7 @@
                 ],
                 "rotation": [
                     -0.0,
-                    -55.779144287109378,
+                    -20.857725143432618,
                     -0.0
                 ],
                 "scale": [
@@ -14396,7 +14396,7 @@
     },
     "Entity": {
         "name": "CurvePt8",
-        "id": 270,
+        "id": 269,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14422,7 +14422,7 @@
     },
     "Entity": {
         "name": "CurvePt9",
-        "id": 272,
+        "id": 271,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14448,7 +14448,7 @@
     },
     "Entity": {
         "name": "CurvePt10",
-        "id": 274,
+        "id": 273,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14474,7 +14474,7 @@
     },
     "Entity": {
         "name": "CurvePt11",
-        "id": 276,
+        "id": 275,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14500,7 +14500,7 @@
     },
     "Entity": {
         "name": "CurvePt12",
-        "id": 278,
+        "id": 277,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14526,7 +14526,7 @@
     },
     "Entity": {
         "name": "CurvePt13",
-        "id": 280,
+        "id": 279,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14552,7 +14552,7 @@
     },
     "Entity": {
         "name": "CurvePt14",
-        "id": 282,
+        "id": 281,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14578,7 +14578,7 @@
     },
     "Entity": {
         "name": "CurvePt15",
-        "id": 284,
+        "id": 283,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14604,7 +14604,7 @@
     },
     "Entity": {
         "name": "CurvePt16",
-        "id": 286,
+        "id": 285,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14630,7 +14630,7 @@
     },
     "Entity": {
         "name": "CurvePt17",
-        "id": 288,
+        "id": 287,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14656,7 +14656,7 @@
     },
     "Entity": {
         "name": "CurvePt18",
-        "id": 290,
+        "id": 289,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14682,7 +14682,7 @@
     },
     "Entity": {
         "name": "CurvePt19",
-        "id": 292,
+        "id": 291,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14708,7 +14708,7 @@
     },
     "Entity": {
         "name": "CurvePt20",
-        "id": 294,
+        "id": 293,
         "components": {
             "BSplinePoint": {
                 "location": [
@@ -14734,7 +14734,7 @@
     },
     "Entity": {
         "name": "CurvePt21",
-        "id": 296,
+        "id": 295,
         "components": {
             "BSplinePoint": {
                 "location": [

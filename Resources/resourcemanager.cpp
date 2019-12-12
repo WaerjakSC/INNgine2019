@@ -386,6 +386,7 @@ GLuint ResourceManager::makeEnemy(const QString &name)
 {
     GLuint eID{registry->makeEntity<Mesh, AIComponent>(name)};
     registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
+    registry->add<ParticleEmitter>(eID, false, true, 500, 500, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 1.f, 1.5f, 1.5f);
     auto &aabb{registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false)};
     aabb.overlapEvent = true;
     auto &sound{registry->add<Sound>(eID, "gnomed.wav", true)};
@@ -398,7 +399,7 @@ GLuint ResourceManager::makeEnemy(const QString &name)
 GLuint ResourceManager::makeTower(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh, TowerComponent, AABB>(name)};
-    auto &rangeCollider{registry->add<Sphere>(eID, vec3{}, 13.f, false)};
+    auto &rangeCollider{registry->add<Sphere>(eID, vec3{}, 3.f, false)};
     rangeCollider.overlapEvent = true;
     registry->add<Material>(eID, getShader<ColorShader>(), 0); // change this when we have a tower mesh!
     registry->add<ParticleEmitter>(eID, false, true, 30, 30, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 0.1f, 1.5f, 1.5f);
@@ -426,7 +427,8 @@ GLuint ResourceManager::makeLevelPlane(const QString &name)
  * @param name
  * @return Returns the entity id
  */
-GLuint ResourceManager::makeTextureQuad(const QString &name) {
+GLuint ResourceManager::makeTextureQuad(const QString &name)
+{
     GLuint eID{registry->makeEntity<Mesh, PlayerComponent>(name)};
     registry->add<Material>(eID, getShader<TextureShader>(), mTextures["Lives"]->textureUnit());
     auto search = mMeshMap.find("TextureQuad");

@@ -191,8 +191,8 @@ void Registry::updateChildParent()
     {
         if (contains<Transform>(entity)) {
             Transform &comp{get<Transform>(entity)};
-            if (comp.parentID != -1) {            // If this entity has a parent then,
-                setParent(entity, comp.parentID); // add this entity's ID to the parent's list of children.
+            if (comp.parentID != -1 && static_cast<int>(entity) != comp.parentID) { // If this entity has a parent then,
+                setParent(entity, comp.parentID);                                   // add this entity's ID to the parent's list of children.
             }
         }
     }

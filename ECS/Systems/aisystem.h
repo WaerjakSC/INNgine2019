@@ -109,6 +109,11 @@ private:
     void spawnWave(DeltaTime dt);
     float elapsed_time;
     float waveCD{7.f}, curWaveCD{1.f}, spawnCD{0.5f}, curSpawnCD{0.f}, spawnDuration{5.f}, curSpawnDuration{0.f}, curTimerCD{2.f}, curTimer{0.f};
+    /**
+     * Remove bullets after a certain amount of time, to avoid stacking up a ton of missed bullets.
+     * @param dt
+     */
+    void bulletLifeTime(DeltaTime dt);
 };
 
 #endif // AISYSTEM_H

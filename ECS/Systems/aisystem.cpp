@@ -54,10 +54,8 @@ void AISystem::updatePlayOnly(DeltaTime dt)
         case TowerStates::IDLE:
             // scanning for monsters
             detectEnemies(ai, sphere);
-            qDebug() << "AI STATE: " + QString::number(static_cast<int>(ai.state)) + "\n";
             break;
         case TowerStates::ATTACK:
-            qDebug() << "AI STATE: " + QString::number(static_cast<int>(ai.state)) + "\n";
             if (ai.curCooldown >= 0.f)
                 ai.curCooldown -= dt;
             if (ai.curCooldown <= 0.f) {
@@ -70,8 +68,20 @@ void AISystem::updatePlayOnly(DeltaTime dt)
             break;
         }
     }
+    bulletLifeTime(dt);
 }
-
+void AISystem::bulletLifeTime(DeltaTime dt)
+{
+    auto view{registry->view<Bullet>()};
+    for (auto entity : view) {
+        auto &bullet{view.get(entity)};
+        if (bullet.lifeTime >= 0.f)
+            bullet.lifeTime -= dt;
+        if (bullet.lifeTime <= 0.f) {
+            registry->removeEntity(entity);
+        }
+    }
+}
 void AISystem::updateEditorOnly(DeltaTime)
 {
     draw();
@@ -101,9 +111,9 @@ void AISystem::spawnWave(DeltaTime dt)
 void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
 {
     if (!sphere.overlappedEntities.empty()) {
-        qDebug() << "AIsystem - detectEnemies: Enemy Detected\n";
+        //        qDebug() << "AIsystem - detectEnemies: Enemy Detected\n";
         ai.targetID = sphere.overlappedEntities.getList()[0];
-        qDebug() << "New target: " + QString::number(ai.targetID);
+        //        qDebug() << "New target: " + QString::number(ai.targetID);
         ai.state = TowerStates::ATTACK;
     }
     else {
@@ -111,18 +121,18 @@ void AISystem::detectEnemies(TowerComponent &ai, Sphere &sphere)
     }
 }
 
-void AISystem::attack(TowerComponent &ai, Transform &t)
+void AISystem::attack(TowerComponent &tower, Transform &t)
 {
     // Splash/Rocket type
     // BSpline from Tower to Enemy entity,
     // 2 Controlpoints -> First control point is offset by some value on y axis, 2nd is set at target location
 
     // Standard/Projectile type
-    if (registry->contains<Transform>(ai.targetID)) {
-        auto &trans{registry->get<Transform>(ai.targetID)};
+    if (registry->contains<Transform>(tower.targetID)) {
+        auto &trans{registry->get<Transform>(tower.targetID)};
         GLuint bulletID = ResourceManager::instance()->makeOctBall("projectile", 1);
         vec3 velocity{(trans.localPosition - t.localPosition).normalized()}; // get the vector (line) from tower to enemy, normalize to get the general direction.
-        registry->add<Bullet>(bulletID, velocity, ai.damage, ai.projectileSpeed);
+        registry->add<Bullet>(bulletID, velocity, tower.damage, tower.projectileSpeed);
         registry->add<Sphere>(bulletID, vec3{0}, .25f, false);
         registry->get<Transform>(bulletID).localPosition = t.position;
         registry->get<Transform>(bulletID).localScale = vec3{0.25, 0.25, 0.25};
@@ -130,7 +140,7 @@ void AISystem::attack(TowerComponent &ai, Transform &t)
         qDebug() << "AIsystem - attack: Projectile spawned\n";
     }
     else {
-        ai.state = TowerStates::IDLE;
+        tower.state = TowerStates::IDLE;
     }
 }
 
@@ -161,7 +171,7 @@ void AISystem::draw()
 
 void AISystem::deathTimer(AIComponent &ai, DeltaTime dt)
 {
-    for(auto entity : deadAI){
+    for (auto entity : deadAI) {
         registry->get<AIComponent>(entity);
         if (curTimerCD >= 0.f)
             curTimerCD -= dt;
@@ -202,11 +212,7 @@ void AISystem::init()
 void AISystem::death(const GLuint entityID)
 {
     registry->getPlayer().gold += 20;
-    auto view{registry->view<ParticleEmitter, Mesh, AIComponent>()};
-    auto [emitter, mesh, ai] = view.get<ParticleEmitter, Mesh, AIComponent>(entityID);
-    emitter.isActive = true;
-    mesh.rendered = false;
-    deadAI.push_back(entityID);
+    registry->removeEntity(entityID);
     qDebug() << "Murdered another innocent gnome!";
 }
 

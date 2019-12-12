@@ -39,7 +39,7 @@ void CollisionSystem::runAABBSimulations()
                     if (aabb.overlapEvent && sphere.overlapEvent) {
                         if (!sphere.overlappedEntities.contains(entity)) {
                             sphere.overlappedEntities.insert(entity);
-                             qDebug() << "ON ENTER: Entity in range";
+                            qDebug() << "ON ENTER: Entity in range";
                         }
                     }
                     collisions++;
@@ -64,15 +64,17 @@ void CollisionSystem::runAABBSimulations()
     for (auto tower : towerRangeView) {
         auto &sphere{towerRangeView.get<Sphere>(tower)};
         std::vector<GLuint> entities = sphere.overlappedEntities.getList();
-        for (size_t i{0}; i < entities.size(); ++i) {
+        for (size_t i{0}; i < entities.size(); i++) {
             GLuint entity = entities[i];
             if (view.contains(entity)) {
                 auto &aabb{view.get<AABB>(entity)};
                 if (!SphereAABB(sphere, aabb)) {
                     sphere.overlappedEntities.remove(entity);
                     qDebug() << "ON EXIT: Entity removed";
-
                 }
+            }
+            else {
+                sphere.overlappedEntities.remove(entity);
             }
         }
     }

@@ -415,13 +415,12 @@ struct AIComponent : public Component {
     Defines functionality for the tower component, with attributes for the buildable towers.
 */
 struct TowerComponent : public Component {
-    TowerComponent(int dmg = 40, float cd = 0.5f, float r = 13.f) : damage(dmg), range(r), cooldown(cd) {}
+    TowerComponent(int dmg = 40, float cd = 0.5f) : damage(dmg), cooldown(cd) {}
     int damage;
-    int towerCost;
-    float range;
-    float projectileSpeed = 25.f;
+    int towerCost{50};
+    float projectileSpeed = 100.f;
     float cooldown;
-    float curCooldown = 1.5f;
+    float curCooldown = 0.5f;
     GLuint targetID;
     TowerStates state{TowerStates::PLACEMENT};
     AttackType attackState = AttackType::PHYSICAL;
@@ -445,6 +444,7 @@ struct Bullet : public Component {
     Bullet(vec3 route, int d, float s) : direction(route), damage(d), speed(s) {}
     vec3 direction;
     int damage;
+    float lifeTime{3};
     float speed;
 };
 

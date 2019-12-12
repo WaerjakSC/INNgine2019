@@ -13,7 +13,7 @@
 
 InputSystem::InputSystem(RenderWindow *window, cjk::Ref<CameraController> editorController)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},
-    mRenderWindow{window}, mEditorCamController(editorController)
+      mRenderWindow{window}, mEditorCamController(editorController)
 {
 }
 
@@ -117,7 +117,7 @@ void InputSystem::setPlaneColors(bool dragMode)
     auto view{registry->view<Buildable, Material>()};
 
     if (dragMode) {
-        if(player.gold >= tower.towerCost){
+        if (player.gold >= tower.towerCost) {
             for (auto entity : view) {
                 auto [build, mat]{view.get<Buildable, Material>(entity)};
                 // set color according to buildable state -- Red means unbuildable, green means buildable.
@@ -128,7 +128,8 @@ void InputSystem::setPlaneColors(bool dragMode)
                     mat.objectColor = red * 0.8f; // RED'ish
                 }
             }
-        } else {
+        }
+        else {
             for (auto entity : view) {
                 auto [build, mat]{view.get<Buildable, Material>(entity)};
                 mat.objectColor = red * 0.8f;
@@ -297,15 +298,15 @@ void InputSystem::dragEntity(GLuint entity)
     auto collisionSystem{registry->system<CollisionSystem>()};
     // we pass the dragged entity to mousePick in order to ignore that entity in raycasting
     Raycast ray{collisionSystem->mousePick(cursorPos, mRenderWindow->geometry(), entity, 100.f)};
-
-    Transform &tf{registry->get<Transform>(entity)};
+    auto towerView{registry->view<Transform, TowerComponent>()};
+    auto [tf, tower]{towerView.get<Transform, TowerComponent>(entity)};
 
     // some functionality might need to be added here for things like placing the entity in the center of a plane collider regardless of where on the collider the mouse is etc
     if (registry->contains<AABB>(ray.hitEntity)) { // We only want to deal with AABB colliders
         auto view{registry->view<Buildable, Material>()};
         if (view.contains(lastHitEntity) && static_cast<int>(lastHitEntity) != ray.hitEntity) { // reset the color after hitting another object
             auto &mat = view.get<Material>(lastHitEntity);
-            if (view.get<Buildable>(lastHitEntity).isBuildable) {
+            if (view.get<Buildable>(lastHitEntity).isBuildable && registry->getPlayer().gold >= tower.towerCost) {
                 mat.objectColor = green * 0.8f;
             }
             else
@@ -317,7 +318,7 @@ void InputSystem::dragEntity(GLuint entity)
         if (view.contains(ray.hitEntity)) {
             auto &mat = view.get<Material>(ray.hitEntity);
             lastHitEntity = ray.hitEntity;
-            if (view.get<Buildable>(ray.hitEntity).isBuildable) {
+            if (view.get<Buildable>(ray.hitEntity).isBuildable && registry->getPlayer().gold >= tower.towerCost) {
                 mat.objectColor = green;
             }
             else

@@ -203,7 +203,7 @@ public:
             GLuint swappedEntity{mEntities.back()};
             swap(swappedEntity, removedEntityID); // Swap the removed with the last, then pop out the last.
             mComponents.pop_back();
-            mEntities.remove(removedEntityID);
+            mEntities.remove(removedEntityID, false);
         }
     }
     /**

@@ -51,8 +51,16 @@ public:
      * @return
      */
     size_t extent() { return mIndex.size(); }
-    void remove(int removedEntityID)
+    /**
+     * Remove an entity from the Sparse Set.
+     * @param removedEntityID
+     * @param noPool If used as a pure sparse set, this should be true. Will cause the Sparse Set to swap before removal.
+     */
+    void remove(int removedEntityID, bool noPool = true)
     {
+        if (noPool) {
+            swap(back(), removedEntityID); // Swap the removed with the last, then pop out the last.
+        }
         mList.pop_back();
         mIndex[removedEntityID] = -1; // Set entity location to an invalid value.
         if (mList.empty())
