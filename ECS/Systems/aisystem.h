@@ -33,8 +33,14 @@ public:
 
     void draw();
 
+    /** A timer helper function
+     *
+     * @param ai
+     * @param dt
+     */
     void deathTimer(AIComponent &ai, DeltaTime dt = 0.016);
 
+    /// A vector containing the entity id's of the dead npcs
     std::vector<GLuint> deadAI;
 
     void resetTimers();
@@ -64,6 +70,7 @@ private:
     void masterOfCurves();
     /**
      * @brief Handles NPC death.
+     *        Adds the npc to a deadAI vector, updates player gold and emits particles.
      * @param entityID
      */
     void death(const GLuint entityID);

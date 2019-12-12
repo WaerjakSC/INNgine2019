@@ -13,7 +13,7 @@
 
 InputSystem::InputSystem(RenderWindow *window, cjk::Ref<CameraController> editorController)
     : registry{Registry::instance()}, factory{ResourceManager::instance()},
-      mRenderWindow{window}, mEditorCamController(editorController)
+    mRenderWindow{window}, mEditorCamController(editorController)
 {
 }
 
@@ -111,16 +111,27 @@ void InputSystem::spawnTower()
 }
 void InputSystem::setPlaneColors(bool dragMode)
 {
+    auto &player = registry->getPlayer();
+    auto draggedView{registry->view<Transform, AABB, TowerComponent>()};
+    auto [towerTransform, aabb, tower]{draggedView.get<Transform, AABB, TowerComponent>(draggedEntity)};
     auto view{registry->view<Buildable, Material>()};
+
     if (dragMode) {
-        for (auto entity : view) {
-            auto [build, mat]{view.get<Buildable, Material>(entity)};
-            // set color according to buildable state -- Red means unbuildable, green means buildable.
-            if (build.isBuildable) {
-                mat.objectColor = green * 0.8f; // GREEN'ish
+        if(player.gold >= tower.towerCost){
+            for (auto entity : view) {
+                auto [build, mat]{view.get<Buildable, Material>(entity)};
+                // set color according to buildable state -- Red means unbuildable, green means buildable.
+                if (build.isBuildable) {
+                    mat.objectColor = green * 0.8f; // GREEN'ish
+                }
+                else {
+                    mat.objectColor = red * 0.8f; // RED'ish
+                }
             }
-            else {
-                mat.objectColor = red * 0.8f; // RED'ish
+        } else {
+            for (auto entity : view) {
+                auto [build, mat]{view.get<Buildable, Material>(entity)};
+                mat.objectColor = red * 0.8f;
             }
         }
     }
@@ -253,14 +264,17 @@ void InputSystem::updateBuildable(GLuint entityID)
 void InputSystem::placeTower()
 {
     auto view{registry->view<Transform, Buildable>()};
-    if (view.contains(lastHitEntity)) {
+    auto &player = registry->getPlayer();
+    auto draggedView{registry->view<Transform, AABB, TowerComponent>()};
+    auto [towerTransform, aabb, tower]{draggedView.get<Transform, AABB, TowerComponent>(draggedEntity)};
+
+    if (view.contains(lastHitEntity) && player.gold >= tower.towerCost) {
         auto &build{view.get<Buildable>(lastHitEntity)};
         if (build.isBuildable) {
             mIsDragging = false;
             build.isBuildable = false;
-            auto draggedView{registry->view<Transform, AABB, TowerComponent>()};
-            auto [towerTransform, aabb, tower]{draggedView.get<Transform, AABB, TowerComponent>(draggedEntity)};
             tower.state = TowerStates::IDLE;
+            player.gold -= tower.towerCost;
             auto &planeTransform{view.get<Transform>(lastHitEntity)};
             float scaleY{planeTransform.localScale.y};
             vec3 topCenterOfTarget{planeTransform.localPosition};
