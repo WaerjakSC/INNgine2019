@@ -1243,7 +1243,7 @@ void ResourceManager::play()
             Registry::instance()->makeSnapshot();
         auto [sound, input, renderer, ai]{registry->system<SoundSystem, InputSystem, RenderSystem, AISystem>()};
         sound->playAll();
-        ai->resetTimers();
+        ai->reset();
         for (auto controller : input->gameCameraControllers()) {
             if (controller->isActive()) {
                 setActiveCameraController(controller);

@@ -43,7 +43,7 @@ public:
     /// A vector containing the entity id's of the dead npcs
     std::vector<GLuint> deadAI;
 
-    void resetTimers();
+    void reset();
 public slots:
     void setBSPlinePointX(double xIn);
     void setBSPlinePointY(double yIn);
