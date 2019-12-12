@@ -220,7 +220,6 @@ void RenderWindow::exposeEvent(QExposeEvent *)
     if (!mInitialized) {
         init();
         mTime.start();
-        mDevice = new QOpenGLPaintDevice;
     }
 
     //If the window actually is exposed to the screen we start the main loop

@@ -116,7 +116,6 @@ bool ResourceManager::isLoading() const
     return mLoading;
 }
 
-// Do resource manager stuff -- Aka actually delete the pointers after application end
 ResourceManager::~ResourceManager()
 {
 }
@@ -206,12 +205,7 @@ void ResourceManager::onExit()
     if (!of.good() || !of)
         throw std::runtime_error("Can't write the JSON string to the file!");
 }
-/**
- * @brief Make a standard 3D object from a .obj or .txt file with the given name and type
- * @param name
- * @param type
- * @return The entity ID of the entity.
- */
+
 GLuint ResourceManager::make3DObject(std::string name, cjk::Ref<Shader> type)
 {
     if (name.find(".txt") != std::string::npos)
@@ -223,10 +217,7 @@ GLuint ResourceManager::make3DObject(std::string name, cjk::Ref<Shader> type)
         return eID;
     }
 }
-/**
- * @brief Plane prefab -- should fix coloring at some point
- * @return
- */
+
 GLuint ResourceManager::makePlane(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform>(name)};
@@ -264,10 +255,7 @@ void ResourceManager::makePlaneMesh(GLuint eID)
     initVertexBuffers(&mesh);
     glBindVertexArray(0);
 }
-/**
- * @brief Cube prefab
- * @return
- */
+
 GLuint ResourceManager::makeCube(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
@@ -277,9 +265,7 @@ GLuint ResourceManager::makeCube(const QString &name)
 
     return eID;
 }
-/**
- * @brief Creates basic XYZ lines
- */
+
 GLuint ResourceManager::makeXYZ(const QString &name)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh>(name)};
@@ -364,11 +350,6 @@ void ResourceManager::makeSkyBoxMesh(GLuint eID)
     glBindVertexArray(0);
 }
 
-/**
- * @brief Reads a .txt file for vertices.
- * @param fileName
- * @return Returns the entity id
- */
 GLuint ResourceManager::makeTriangleSurface(std::string fileName, cjk::Ref<Shader> type)
 {
     GLuint eID{registry->makeEntity<Transform, Mesh>(QString::fromStdString(fileName))};
@@ -386,7 +367,6 @@ GLuint ResourceManager::makeEnemy(const QString &name)
 {
     GLuint eID{registry->makeEntity<Mesh, AIComponent>(name)};
     registry->add<Transform>(eID, vec3{}, vec3{}, vec3{0.3f, 0.3f, 0.3f});
-    registry->add<ParticleEmitter>(eID, false, true, 500, 500, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 1.f, 1.5f, 1.5f);
     auto &aabb{registry->add<AABB>(eID, vec3{0.f, 0.8f, -0.1f}, vec3{0.5f, 0.8f, 0.3f}, false)};
     aabb.overlapEvent = true;
     auto &sound{registry->add<Sound>(eID, "gnomed.wav", true)};
@@ -401,16 +381,10 @@ GLuint ResourceManager::makeTower(const QString &name)
     GLuint eID{registry->makeEntity<Transform, Mesh, TowerComponent, AABB>(name)};
     registry->add<Sphere>(eID, vec3{}, 4.f, false);
     registry->add<Material>(eID, getShader<ColorShader>(), 0); // change this when we have a tower mesh!
-    registry->add<ParticleEmitter>(eID, false, true, 30, 30, vec3{}, QColor{255, 0, 0, 127}, 0.5f, 0.1f, 1.5f, 1.5f);
     setMesh("cube.obj", eID);
     return eID;
 }
 
-/**
- * @brief Levelplane prefab
- * @param name
- * @return Returns the entity id
- */
 GLuint ResourceManager::makeLevelPlane(const QString &name)
 {
     GLuint eID{registry->makeEntity<Mesh, Buildable>(name)};
@@ -421,11 +395,6 @@ GLuint ResourceManager::makeLevelPlane(const QString &name)
     return eID;
 }
 
-/**
- * @brief TextureQuad prefab
- * @param name
- * @return Returns the entity id
- */
 GLuint ResourceManager::makeTextureQuad(const QString &name)
 {
     GLuint eID{registry->makeEntity<Mesh, PlayerComponent>(name)};
@@ -440,10 +409,6 @@ GLuint ResourceManager::makeTextureQuad(const QString &name)
     return eID;
 }
 
-/**
- * @brief Billboard prefab
- * @return
- */
 GLuint ResourceManager::makeBillBoard(const QString &name)
 {
     GLuint eID{registry->makeEntity<BillBoard>(name)};
@@ -527,71 +492,6 @@ void ResourceManager::makeLevel()
     }
 }
 
-void ResourceManager::makeTowerMesh(GLuint eID)
-{
-    initializeOpenGLFunctions();
-    mMeshData.Clear();
-    mMeshData.name = "Tower";
-    mMeshData.vertices.insert(mMeshData.vertices.end(),
-                              {
-                                  //Vertex data for front
-                                  Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.333f}}, //v0
-                                  Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.333f}},  //v1
-                                  Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.25f, 0.666f}},  //v2
-                                  Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 0.f, 1.0f}, gsl::Vector2D{0.5f, 0.666f}}, //v3
-
-                                  //Vertex data for right
-                                  Vertex{vec3{0.8f, 0.f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.333f}},   //v4
-                                  Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.333f}},  //v5
-                                  Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v6
-                                  Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{1.0f, 0.f, 0.f}, gsl::Vector2D{0.75f, 0.666f}}, //v7
-
-                                  //Vertex data for back
-                                  Vertex{vec3{0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.333f}},  //v8
-                                  Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.333f}}, //v9
-                                  Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.75f, 0.666f}}, //v10
-                                  Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 0.f, -1.0f}, gsl::Vector2D{0.8f, 0.666f}},  //v11
-
-                                  //Vertex data for left
-                                  Vertex{vec3{-0.8f, 0.f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.333f}},     //v12
-                                  Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.333f}}, //v13
-                                  Vertex{vec3{-0.8f, 0.f, -0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.f, 0.666f}},    //v14
-                                  Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{-1.0f, 0.f, 0.f}, gsl::Vector2D{0.25f, 0.666f}},  //v15
-
-                                  //Vertex data for top
-                                  Vertex{vec3{-0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.666f}}, //v16
-                                  Vertex{vec3{0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.666f}},    //v17
-                                  Vertex{vec3{0.8f, 0.8f, -0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.25f, 0.999f}},  //v18
-                                  Vertex{vec3{-0.8f, 0.8f, 0.8f}, vec3{0.f, 1.0f, 0.f}, gsl::Vector2D{0.5f, 0.999f}}    //v19
-                              });
-
-    mMeshData.indices.insert(mMeshData.indices.end(), {
-                                                          0, 2, 1, 1, 2, 3,       //Face 0 - triangle strip (v0,  v1,  v2,  v3)
-                                                          4, 6, 5, 5, 6, 7,       //Face 1 - triangle strip (v4,  v5,  v6,  v7)
-                                                          8, 10, 9, 9, 10, 11,    //Face 2 - triangle strip (v8,  v9, v10,  v11)
-                                                          12, 14, 13, 13, 14, 15, //Face 3 - triangle strip (v12, v13, v14, v15)
-                                                          16, 18, 17, 17, 18, 19, //Face 4 - triangle strip (v16, v17, v18, v19)
-                                                      });
-
-    //    skyMat.setTextureUnit(Textures["skybox.bmp"]->id() - 1); // Not sure why the ID is one ahead of the actual texture I want??
-    if (!registry->contains<Mesh>(eID))
-        registry->add<Mesh>(eID, GL_TRIANGLES, mMeshData);
-    else
-        registry->get<Mesh>(eID) = Mesh(GL_TRIANGLES, mMeshData);
-
-    auto &towerMesh{registry->get<Mesh>(eID)};
-
-    initVertexBuffers(&towerMesh);
-    initIndexBuffers(&towerMesh);
-
-    glBindVertexArray(0);
-}
-
-/**
- * @brief Sphere prefab
- * @param n - number of recursions. Increase number for "rounder" sphere
- * @return
- */
 GLuint ResourceManager::makeOctBall(const QString &name, int n)
 {
     GLuint eID{registry->makeEntity<Transform>(name)};
@@ -627,10 +527,7 @@ void ResourceManager::makeBallMesh(GLuint eID, int n)
 
     glBindVertexArray(0);
 }
-/**
- * @brief Light object prefab -- not fully implemented yet
- * @return
- */
+
 GLuint ResourceManager::makeLightObject(const QString &name)
 {
     GLuint eID{registry->makeEntity<Light>(name)};
@@ -719,9 +616,6 @@ void ResourceManager::setAABBMesh(Mesh &mesh)
     initIndexBuffers(&mesh);
 }
 
-/**
- * @brief opengl init - initialize the given mesh's buffers and arrays
- */
 void ResourceManager::initVertexBuffers(Mesh *mesh)
 {
     //Vertex Array Object - VAO
@@ -746,10 +640,7 @@ void ResourceManager::initVertexBuffers(Mesh *mesh)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
 }
-/**
- * @brief opengl init for glDrawElements - initialize the given mesh's index buffer
- * @param mesh
- */
+
 void ResourceManager::initIndexBuffers(Mesh *mesh)
 {
     glGenBuffers(1, &mesh->EAB);
@@ -788,11 +679,6 @@ void ResourceManager::initParticleBuffers(ParticleEmitter &emitter)
     glBindVertexArray(0);
 }
 
-/**
- * @brief If you know the mesh you want at construction i.e. for prefabs and similar
- * @param name - name of the file you want to read
- * @param eID - entityID
- */
 void ResourceManager::addMeshComponent(std::string name, GLuint eID)
 {
     registry->add<Mesh>(eID);
@@ -829,11 +715,6 @@ void ResourceManager::setMesh(std::string name, GLuint eID)
     mMeshMap[name] = registry->get<Mesh>(eID);
 }
 
-/**
- * @brief ResourceManager::LoadMesh - Loads the mesh from file if it isn't already in the Meshes map.
- * @param fileName
- * @return
- */
 void ResourceManager::loadMesh(std::string fileName, int eID)
 {
     if (!readFile(fileName, eID)) { // Should run readFile and add the mesh to the Meshes map if it can be found
@@ -925,11 +806,6 @@ void ResourceManager::initParticleEmitter(ParticleEmitter &emitter)
     initParticleBuffers(emitter);
 }
 
-/**
- * @brief Load texture if it's not already in storage.
- * @param fileName
- * @param textureUnit
- */
 bool ResourceManager::loadTexture(std::string fileName)
 {
     if (mTextures.find(fileName) == mTextures.end()) {
@@ -943,11 +819,7 @@ bool ResourceManager::loadTexture(std::string fileName)
     }
     return false;
 }
-/**
- * @brief ResourceManager::loadCubemap specialized texture loader for the skybox
- * @param faces List of filenames for the cubemap
- * @return success
- */
+
 bool ResourceManager::loadCubemap(std::vector<std::string> faces)
 {
     if (mTextures.find("Skybox") == mTextures.end()) {
@@ -989,11 +861,7 @@ Mesh ResourceManager::getMesh(std::string meshName)
 {
     return mMeshMap[meshName];
 }
-/**
- * @brief Read .obj file.
- * @param fileName
- * @return
- */
+
 bool ResourceManager::readFile(std::string fileName, int eID)
 {
     //Open File

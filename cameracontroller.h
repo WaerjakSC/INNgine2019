@@ -9,11 +9,25 @@ class CameraController {
 public:
     CameraController(float aspectRatio);
 
+    /**
+     * Get an updated right vector.
+     */
     void updateRightVector();
+    /**
+     * Get an updated forward vector.
+     */
     void updateForwardVector();
+    /**
+     * Update the camera if it's out of date.
+     */
     virtual void update();
 
+    /**
+     * Set the movement speed of the editor camera.
+     * @param speed
+     */
     void setSpeed(float speed);
+
     void moveUp(float deltaHeight);
     virtual void moveRight(float delta);
     virtual void moveForward(float dt);
@@ -26,6 +40,10 @@ public:
     void setPitch(float newPitch);
     void setYaw(float newYaw);
 
+    /**
+     * Go to a specific point in the scene.
+     * @param target
+     */
     void goTo(vec3 target);
 
     vec3 up() const;
@@ -35,6 +53,10 @@ public:
     Camera &getCamera() { return mCamera; }
     const Camera &getCamera() const { return mCamera; }
 
+    /**
+     * Change the aspect ratio in the event of a resize event from renderwindow.
+     * @param aspectRatio
+     */
     void resize(float aspectRatio);
 
     float getPitch() const;
@@ -75,6 +97,7 @@ public:
     void pitch(float degrees) override;
     void yaw(float degrees) override;
     void update() override;
+
     bool isActive();
     /**
      * @brief setPosition overloaded function used by movementsystem to set position of the mesh representation of the game camera.

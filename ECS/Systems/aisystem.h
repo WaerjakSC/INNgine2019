@@ -38,7 +38,7 @@ public:
      * @param ai
      * @param dt
      */
-    void deathTimer(AIComponent &ai, DeltaTime dt = 0.016);
+    void deathTimer(DeltaTime dt = 0.016);
 
     /// A vector containing the entity id's of the dead npcs
     std::vector<GLuint> deadAI;

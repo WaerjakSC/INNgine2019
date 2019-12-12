@@ -62,7 +62,9 @@ public:
     void setBuildableDebug(bool value);
 
     cjk::Ref<CameraController> editorCamController() const;
-
+    /**
+     * Sets the Game Camera to inactive.
+     */
     void setGameCameraInactive();
     bool buildableDebugMode() const;
 
@@ -140,7 +142,14 @@ private:
 
     void inputMousePress(QMouseEvent *event, Input &input);
     void inputMouseRelease(QMouseEvent *event, Input &input);
+    /**
+     * Instantly move the camera to the selected object.
+     */
     void snapToObject();
+    /**
+     * Stops the mouse from exiting the screen during play.
+     * @param dt
+     */
     void confineMouseToScreen(DeltaTime dt);
     /**
      * @brief Move entity by mouse raycast when activated.
@@ -148,8 +157,18 @@ private:
      * @param entity
      */
     void dragEntity(GLuint entity);
+    /**
+     * Changes the plane mesh to a cube mesh if the entity is set to buildable and vice versa.
+     * @param entityID
+     */
     void updateBuildable(GLuint entityID);
+    /**
+     * Spawns a tower and flips the colors of all plane meshes.
+     */
     void spawnTower();
+    /**
+     * Actually places the tower on the entity under the mouse.
+     */
     void placeTower();
 };
 

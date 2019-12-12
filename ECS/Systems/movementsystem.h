@@ -62,7 +62,7 @@ public:
      * @param eID
      * @param position New position
      * @param signal decides whether to push the change in position on to the editor GUI
-     * In cases where the editor GUI instigated the change, this would want to be false to avoid unnecessary looping
+     * In cases where the editor GUI instigated the change, this would want to be false to avoid unnecessary looping.
      */
     void setLocalPosition(GLuint eID, vec3 position, bool signal = true);
     /**

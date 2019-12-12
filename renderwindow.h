@@ -43,7 +43,6 @@ public:
 
     void checkForGLerrors();
     void setCameraSpeed(float value);
-    void playSound();
 
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -92,7 +91,6 @@ private:
     MainWindow *mMainWindow{nullptr}; //points back to MainWindow to be able to put info in StatusBar
 
     class QOpenGLDebugLogger *mOpenGLDebugLogger{nullptr};
-    QOpenGLPaintDevice *mDevice{nullptr};
     void calculateFramerate();
 
     void startOpenGLDebugger();
