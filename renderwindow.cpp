@@ -118,6 +118,12 @@ void RenderWindow::init()
 
     mFactory->loadTexture("white.bmp");
     mFactory->loadTexture("gnome.bmp");
+    mFactory->loadTexture("Lives/5Lives.png");
+    mFactory->loadTexture("Lives/4Lives.png");
+    mFactory->loadTexture("Lives/3Lives.png");
+    mFactory->loadTexture("Lives/2Lives.png");
+    mFactory->loadTexture("Lives/1Lives.png");
+    mFactory->loadTexture("Lives/0Lives.png");
     std::vector<std::string> faces{
         "Skybox/right.jpg",
         "Skybox/left.jpg",
@@ -125,13 +131,6 @@ void RenderWindow::init()
         "Skybox/bottom.jpg",
         "Skybox/front.jpg",
         "Skybox/back.jpg"};
-    std::vector<std::string> lives{
-        "Lives/5lives.png",
-        "Lives/4lives.png",
-        "Lives/3lives.png",
-        "Lives/2lives.png",
-        "Lives/1lives.png",
-        "Lives/0lives.png"};
     mFactory->loadCubemap(faces);
     mFactory->loadMesh("OgreOBJ.obj"); // if a mesh is spawned in during play you'll probably want to load it here first to avoid fps hitches
 
