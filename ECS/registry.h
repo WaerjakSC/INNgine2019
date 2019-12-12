@@ -417,6 +417,9 @@ public:
      * @return
      */
     bool isDestroyed(GLuint entityID);
+
+    PlayerComponent &getPlayer();
+
 public slots:
     /**
      * Sets the selected entity, usually called by MainWindow or HierarchyView.
@@ -449,6 +452,8 @@ private:
     std::vector<GroupData *> mGroups{};
     /// Current entity selected in the GUI.
     GLuint mSelectedEntity{0};
+    PlayerComponent player;
+    ParticleEmitter particleEmitter;
     /// Snapshot containing relevant data for use when hitting Play/Stop in the editor.
     std::tuple<std::vector<GLuint>, std::vector<GroupData *>, std::map<std::string, IPool *>> mSnapshot;
 

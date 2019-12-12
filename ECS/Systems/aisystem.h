@@ -33,6 +33,10 @@ public:
 
     void draw();
 
+    void deathTimer(AIComponent &ai, DeltaTime dt = 0.016);
+
+    std::vector<GLuint> deadAI;
+
     void resetTimers();
 public slots:
     void setBSPlinePointX(double xIn);
@@ -97,7 +101,7 @@ private:
      */
     void spawnWave(DeltaTime dt);
     float elapsed_time;
-    float waveCD{7.f}, curWaveCD{1.f}, spawnCD{0.5f}, curSpawnCD{0.f}, spawnDuration{5.f}, curSpawnDuration{0.f};
+    float waveCD{7.f}, curWaveCD{1.f}, spawnCD{0.5f}, curSpawnCD{0.f}, spawnDuration{5.f}, curSpawnDuration{0.f}, curTimerCD{2.f}, curTimer{0.f};
 };
 
 #endif // AISYSTEM_H

@@ -417,6 +417,7 @@ struct AIComponent : public Component {
 struct TowerComponent : public Component {
     TowerComponent(int dmg = 40, float cd = 0.5f, float r = 13.f) : damage(dmg), range(r), cooldown(cd) {}
     int damage;
+    int towerCost;
     float range;
     float projectileSpeed = 25.f;
     float cooldown;
@@ -432,7 +433,7 @@ struct TowerComponent : public Component {
 struct PlayerComponent : public Component {
     PlayerComponent() {}
     int health = 5;
-    int gold = 500;
+    int gold = 200;
     int kills = 0;
 };
 
